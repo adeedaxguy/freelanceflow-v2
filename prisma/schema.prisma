@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite does not support native enums — values are stored as strings.
+// Valid values for role: "USER" | "ADMIN"
+// Valid values for status on Lead: "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST"
+// Valid values for status on Campaign: "DRAFT" | "RUNNING" | "COMPLETED"
+// Valid values for status on SentEmail: "SENT" | "DELIVERED" | "OPENED" | "BOUNCED" | "FAILED"
+
+model User {
+  id          String    @id @default(cuid())
+  name        String?
+  email       String    @unique
+  password    String?
+  role        String    @default("USER")
+  niche       String?
+  bio         String?
+  rate        Float?
+  portfolio   String?
+  avatarUrl   String?
+  googleId     String?   @unique
+  suspended        Boolean   @default(false)
+  plan             String    @default("free")
+  expertise        String?
+  referralSource   String?
+  weeklyLeads      Int       @default(0)
+  weeklyLeadReset  DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  leads            Lead[]
+  sentEmails       SentEmail[]
+  campaigns        Campaign[]
+  templates        Template[]
+  supportTickets   SupportTicket[]
+  followUps        FollowUp[]
+
+  @@index([email])
+  @@index([role])
+  @@index([plan])
+}
+
+model Lead {
+  id           String    @id @default(cuid())
+  userId       String
+  company      String
+  domain       String
+  email        String?
+  phone        String?
+  confidence   Int?
+  qualityScore Int?
+  niche        String?
+  title        String?
+  sourceUrl    String?
+  source       String?
+  notes        String?
+  status       String    @default("NEW")
+  savedAt      DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentEmails   SentEmail[]
+  followUps    FollowUp[]
+
+  @@index([userId])
+  @@index([niche])
+  @@index([status])
+}
+
+model SentEmail {
+  id         String    @id @default(cuid())
+  userId     String
+  leadId     String?
+  subject    String
+  body       String
+  sentAt     DateTime  @default(now())
+  status     String    @default("SENT")
+  resendId   String?
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([leadId])
+  @@index([sentAt])
+}
+
+model Campaign {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  niche       String?
+  status      String    @default("DRAFT")
+  emailCount  Int       @default(0)
+  templateId  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  userId      String?
+  name        String
+  niche       String?
+  subject     String
+  body        String
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  category    String   @default("General")
+  published   Boolean  @default(false)
+  coverImage  String?
+  readTime    Int      @default(5)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([published])
+  @@index([category])
+}
+
+model ContactSubmission {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  message     String
+  resolved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([resolved])
+}
+
+model PlatformSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String?
+  email     String
+  subject   String
+  messages  String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model FollowUp {
+  id          String   @id @default(cuid())
+  userId      String
+  leadId      String
+  step        Int      @default(1)
+  subject     String
+  body        String
+  scheduledAt DateTime
+  sentAt      DateTime?
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([leadId])
+  @@index([scheduledAt])
+  @@index([status])
+}

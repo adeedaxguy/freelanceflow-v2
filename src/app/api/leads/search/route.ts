@@ -1,0 +1,198 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import {
+  aggregateLeadsWithDiagnostics,
+  type LeadSource,
+  type AggregatedLead,
+} from "@/lib/leads-aggregator";
+import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
+import { z } from "zod";
+
+// Accept either `niche: "web-development"` (legacy) or `niches: ["web-development", "shopify"]`.
+const searchSchema = z.object({
+  niche:         z.string().min(1).optional(),
+  niches:        z.array(z.string().min(1)).max(15).optional(),
+  maxHours:      z.number().int().min(1).max(720).optional().default(48),
+  source:        z.string().optional(),
+  keyword:       z.string().optional(),
+  minConfidence: z.number().int().min(0).max(100).optional().default(25),
+  hasEmail:      z.boolean().optional().default(false),
+  freshOnly:     z.boolean().optional().default(false),
+}).refine(d => !!(d.niche || (d.niches && d.niches.length > 0)), {
+  message: "At least one niche is required",
+});
+
+const VALID_SOURCES: LeadSource[] = [
+  "remoteok", "remotive", "reddit", "weworkremotely",
+  "arbeitnow", "jobicy", "workingnomads", "hackernews",
+  "remoteco", "craigslist", "githubissues",
+];
+
+/**
+ * Per-user dedup fingerprint. Combines the FULL normalized company name with
+ * the domain — not a truncated substring of either. This was the root cause
+ * of the prior bug where saving one reddit.com lead would silently filter
+ * every future Reddit lead, because the old logic deduped on
+ * `domain.split(".")[0].slice(0, 15)` which collapses every Reddit lead to
+ * the same key.
+ */
+function fingerprint(company: string, domain: string): string {
+  const co  = company.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const dom = domain.toLowerCase().replace(/^www\./, "");
+  return `${co}|${dom}`;
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body: unknown = await req.json();
+    const parsed = searchSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid request", details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const { niche, niches, maxHours, source, keyword, minConfidence, hasEmail, freshOnly } = parsed.data;
+    const nicheList: string[] = niches && niches.length > 0
+      ? niches
+      : (niche ? [niche] : ["web-development"]);
+
+    // Usage stats — fall back to free defaults if columns aren't migrated yet.
+    let usage = {
+      plan: "free", limit: 20, used: 0, remaining: 20,
+      nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+      percentage: 0,
+    };
+    try {
+      const u = await getUsageStats(session.user.id);
+      if (u) usage = u;
+    } catch { /* non-fatal */ }
+
+    if (usage.remaining === 0) {
+      return NextResponse.json({
+        error:     "Weekly lead limit reached. Upgrade to Pro for 500 leads/week.",
+        plan:      usage.plan,
+        limit:     usage.limit,
+        nextReset: usage.nextReset,
+        upgrade:   true,
+      }, { status: 429 });
+    }
+
+    // Per-user dedup: build a fingerprint set from previously SAVED leads so we
+    // don't re-show the same company+title to the same user. Uses the FULL
+    // fingerprint (company + title + domain) — not a loose substring — so that
+    // saving one lead from reddit.com doesn't hide every future reddit lead.
+    const savedFingerprints = new Set<string>();
+    try {
+      const saved = await prisma.lead.findMany({
+        where: { userId: session.user.id },
+        select: { company: true, domain: true },
+      });
+      for (const s of saved) {
+        savedFingerprints.add(fingerprint(s.company, s.domain));
+      }
+    } catch { /* non-fatal */ }
+
+    const filterSource: LeadSource | undefined =
+      source && source !== "all" && (VALID_SOURCES as string[]).includes(source)
+        ? (source as LeadSource)
+        : undefined;
+
+    let { leads: rawLeads, diagnostics } = await aggregateLeadsWithDiagnostics(nicheList, {
+      maxHours,
+      filterSource,
+      minConfidence,
+      freshOnly,
+    });
+
+    // Auto-broaden fallback: if a fresh search returns nothing, silently widen
+    // the time window once to 7 days. We tell the UI it was broadened so it
+    // can warn the user that these aren't the freshest possible.
+    let effectiveMaxHours = maxHours;
+    let autoBroadened = false;
+    if (rawLeads.length === 0 && maxHours < 168) {
+      effectiveMaxHours = 168;
+      autoBroadened = true;
+      const retry = await aggregateLeadsWithDiagnostics(nicheList, {
+        maxHours: effectiveMaxHours,
+        filterSource,
+        minConfidence,
+        freshOnly,
+      });
+      rawLeads = retry.leads;
+      diagnostics = retry.diagnostics;
+    }
+
+    let leads: AggregatedLead[] = rawLeads.filter(l =>
+      !savedFingerprints.has(fingerprint(l.company, l.domain))
+    );
+    const totalAfterUserDedup = leads.length;
+
+    if (keyword?.trim()) {
+      const kw = keyword.toLowerCase();
+      leads = leads.filter(l =>
+        l.title.toLowerCase().includes(kw) ||
+        l.description.toLowerCase().includes(kw) ||
+        l.company.toLowerCase().includes(kw) ||
+        l.tags.some(t => t.toLowerCase().includes(kw))
+      );
+    }
+    if (hasEmail) leads = leads.filter(l => !!l.email);
+
+    // Respect the user's weekly cap — but always allow at least 5 results so
+    // a near-zero remaining doesn't make the page look empty when leads exist.
+    const cap = Math.max(usage.remaining, 5);
+    const toReturn = leads.slice(0, cap);
+
+    if (toReturn.length > 0) {
+      try { await checkAndIncrementLeads(session.user.id, toReturn.length); }
+      catch { /* non-fatal */ }
+    }
+
+    let updatedUsage = usage;
+    try {
+      const u = await getUsageStats(session.user.id);
+      if (u) updatedUsage = u;
+    } catch { /* non-fatal */ }
+
+    // Per-source breakdown for the UI.
+    const sources: Record<string, number> = Object.fromEntries(
+      VALID_SOURCES.map(s => [s, 0])
+    );
+    for (const l of toReturn) {
+      if (l.source in sources) sources[l.source] = (sources[l.source] ?? 0) + 1;
+    }
+
+    return NextResponse.json({
+      leads:     toReturn,
+      total:     toReturn.length,
+      sources,
+      usage:     updatedUsage,
+      fetchedAt: new Date().toISOString(),
+      maxHours: effectiveMaxHours,
+      requestedMaxHours: maxHours,
+      autoBroadened,
+      diagnostics: {
+        ...diagnostics,
+        totalAfterUserDedup,
+        totalAfterKeywordFilter: leads.length,
+        totalReturned: toReturn.length,
+        capped: leads.length > cap,
+        autoBroadened,
+        requestedMaxHours: maxHours,
+        effectiveMaxHours,
+      },
+    });
+  } catch (error) {
+    console.error("Lead search error:", error);
+    return NextResponse.json({
+      error: "Failed to fetch leads. Please try again.",
+      detail: error instanceof Error ? error.message : "unknown error",
+    }, { status: 500 });
+  }
+}

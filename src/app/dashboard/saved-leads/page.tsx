@@ -1,0 +1,311 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
+  Mail, Sparkles, ChevronDown, Search, ExternalLink, X,
+} from "lucide-react";
+import ConfirmModal from "@/components/ConfirmModal";
+import type { Lead } from "@/types";
+
+type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
+interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
+interface ApiResponse { leads: LeadExt[]; total: number; page: number; totalPages: number; }
+
+const CRM_PIPELINE: { value: CRMStatus; label: string; color: string; bg: string; desc: string }[] = [
+  { value: "NEW",       label: "New",        color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20",     desc: "Just discovered" },
+  { value: "CONTACTED", label: "Contacted",  color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20", desc: "Proposal sent" },
+  { value: "REPLIED",   label: "Replied",    color: "text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20", desc: "They responded" },
+  { value: "FOLLOW_UP", label: "Follow-Up",  color: "text-orange-400",  bg: "bg-orange-500/10 border-orange-500/20", desc: "Needs follow-up" },
+  { value: "WON",       label: "Won 🎉",     color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", desc: "Client landed!" },
+  { value: "LOST",      label: "Lost",       color: "text-red-400",     bg: "bg-red-500/10 border-red-500/20",       desc: "Didn't work out" },
+];
+
+function StatusDropdown({ current, onChange }: { current: string; onChange: (s: CRMStatus) => void }) {
+  const [open, setOpen] = useState(false);
+  const curr = CRM_PIPELINE.find(s => s.value === current) ?? CRM_PIPELINE[0]!;
+  return (
+    <div className="relative">
+      <button onClick={() => setOpen(o => !o)}
+        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold ${curr.bg} ${curr.color} transition-all`}>
+        {curr.label}
+        <ChevronDown className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute top-full mt-1 left-0 z-50 bg-surface border border-border rounded-xl shadow-card-hover min-w-[160px] overflow-hidden">
+          {CRM_PIPELINE.map(s => (
+            <button key={s.value} onClick={() => { onChange(s.value); setOpen(false); }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-medium transition-colors hover:bg-white/5 ${s.value === current ? "bg-white/5" : ""}`}>
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${s.bg.replace("/10", "/60").split(" ")[0]}`} />
+              <div className="text-left">
+                <div className={s.color}>{s.label}</div>
+                <div className="text-muted-foreground text-[10px]">{s.desc}</div>
+              </div>
+              {s.value === current && <Check className="w-3 h-3 ml-auto text-accent" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotesEditor({ leadId, initialNotes, onSave }: { leadId: string; initialNotes?: string | null; onSave: (notes: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [value,   setValue]   = useState(initialNotes ?? "");
+  const [saving,  setSaving]  = useState(false);
+
+  async function save() {
+    setSaving(true);
+    await fetch("/api/leads/save", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: leadId, notes: value }),
+    });
+    setSaving(false);
+    setEditing(false);
+    onSave(value);
+  }
+
+  if (!editing) {
+    return (
+      <button onClick={() => setEditing(true)}
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors group">
+        <StickyNote className="w-3.5 h-3.5" />
+        {value ? <span className="line-clamp-1 max-w-[200px]">{value}</span>
+                : <span className="group-hover:text-primary-light italic">Add note…</span>}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-2 w-full">
+      <textarea value={value} onChange={e => setValue(e.target.value)} placeholder="Add a note about this lead…" autoFocus
+        className="flex-1 text-xs bg-background border border-border rounded-lg p-2 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 resize-none min-h-[56px]" />
+      <div className="flex flex-col gap-1">
+        <button onClick={() => void save()} disabled={saving}
+          className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-light transition-colors disabled:opacity-50">
+          <Check className="w-3 h-3" />
+        </button>
+        <button onClick={() => { setValue(initialNotes ?? ""); setEditing(false); }}
+          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function SavedLeadsPage() {
+  const router   = useRouter();
+  const [leads,        setLeads]       = useState<LeadExt[]>([]);
+  const [loading,      setLoading]     = useState(true);
+  const [statusFilter, setStatusFilter]= useState("all");
+  const [search,       setSearch]      = useState("");
+  const [deleteId,     setDeleteId]    = useState<string | null>(null);
+  const [deleting,     setDeleting]    = useState(false);
+  const [total,        setTotal]       = useState(0);
+  const [viewMode,     setViewMode]    = useState<"list" | "pipeline">("list");
+
+  const fetchLeads = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ limit: "100" });
+    if (statusFilter !== "all") params.set("status", statusFilter);
+    if (search) params.set("search", search);
+    const res = await fetch(`/api/leads/save?${params.toString()}`);
+    if (res.ok) {
+      const data = (await res.json()) as ApiResponse;
+      setLeads(data.leads);
+      setTotal(data.total);
+    }
+    setLoading(false);
+  }, [statusFilter, search]);
+
+  useEffect(() => { void fetchLeads(); }, [fetchLeads]);
+
+  async function updateStatus(id: string, status: CRMStatus) {
+    await fetch("/api/leads/save", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    });
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, status } : l));
+  }
+
+  async function handleDelete() {
+    if (!deleteId) return;
+    setDeleting(true);
+    await fetch(`/api/leads/save?id=${deleteId}`, { method: "DELETE" });
+    setDeleteId(null);
+    setDeleting(false);
+    void fetchLeads();
+  }
+
+  function exportCSV() {
+    const esc = (v: string | number | null | undefined) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const headers = [
+      "Company", "Domain", "Email", "Niche", "Title", "Source",
+      "Match %", "Quality Score", "Pipeline Status", "Source URL",
+      "Notes", "Saved Date",
+    ];
+    const rows = leads.map(l => [
+      esc(l.company), esc(l.domain), esc(l.email),
+      esc(l.niche), esc(l.title), esc(l.source),
+      esc(l.confidence), esc(l.qualityScore),
+      esc(l.status), esc(l.sourceUrl),
+      esc(l.notes), esc(new Date(l.savedAt).toLocaleDateString()),
+    ].join(","));
+    // UTF-8 BOM makes Excel open the file correctly without garbled characters
+    const bom = "﻿";
+    const csv = bom + [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `freelanceflow-pipeline-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const pipelineGroups = CRM_PIPELINE.map(s => ({ ...s, items: leads.filter(l => l.status === s.value) }));
+
+  return (
+    <div className="p-6 lg:p-8 space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Bookmark className="w-6 h-6 text-primary-light" /> CRM Pipeline
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">{total} leads in your pipeline</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center bg-surface border border-border rounded-lg overflow-hidden">
+            {(["list","pipeline"] as const).map(mode => (
+              <button key={mode} onClick={() => setViewMode(mode)}
+                className={`px-3 py-1.5 text-xs font-medium capitalize transition-colors ${viewMode===mode ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}>
+                {mode}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => void fetchLeads()} className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button onClick={exportCSV} disabled={leads.length === 0}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+            <Download className="w-4 h-4" /> Export {leads.length > 0 ? `${leads.length} leads` : "CSV"}
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <div className="relative">
+          <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
+            className="pl-8 pr-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 w-40" />
+        </div>
+        <button onClick={() => setStatusFilter("all")}
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${statusFilter==="all" ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"}`}>
+          All ({total})
+        </button>
+        {CRM_PIPELINE.map(s => {
+          const cnt = leads.filter(l => l.status === s.value).length;
+          return (
+            <button key={s.value} onClick={() => setStatusFilter(s.value)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${statusFilter===s.value ? `${s.bg} ${s.color} border-current` : "border-border text-muted-foreground hover:text-foreground"}`}>
+              {s.label} {cnt > 0 && `(${cnt})`}
+            </button>
+          );
+        })}
+      </div>
+
+      {loading ? (
+        <div className="space-y-3">{[1,2,3].map(i=><div key={i} className="h-24 bg-surface border border-border rounded-2xl animate-pulse" />)}</div>
+      ) : leads.length === 0 ? (
+        <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-surface/50">
+          <Bookmark className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+          <h3 className="text-foreground font-semibold mb-2">No leads saved yet</h3>
+          <p className="text-muted-foreground text-sm mb-4">Find leads and click Save to start your pipeline.</p>
+          <a href="/dashboard/leads" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-light transition-all">
+            <Search className="w-4 h-4" /> Find Leads
+          </a>
+        </div>
+      ) : viewMode === "pipeline" ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          {pipelineGroups.map(stage => (
+            <div key={stage.value} className={`bg-surface border rounded-xl overflow-hidden border-l-2 ${stage.bg}`}>
+              <div className="px-3 py-2.5 border-b border-border">
+                <div className={`text-xs font-bold ${stage.color}`}>{stage.label}</div>
+                <div className="text-[10px] text-muted-foreground">{stage.items.length} lead{stage.items.length!==1?"s":""}</div>
+              </div>
+              <div className="p-2 space-y-2 min-h-[60px]">
+                {stage.items.map(lead => (
+                  <div key={lead.id} onClick={() => router.push(`/dashboard/proposal/${lead.id}`)}
+                    className="bg-background border border-border rounded-lg p-2 hover:border-primary/30 transition-all cursor-pointer">
+                    <div className="font-medium text-xs text-foreground line-clamp-1">{lead.company}</div>
+                    {lead.title && <div className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{lead.title}</div>}
+                    {lead.email && <div className="text-[10px] text-accent mt-1 flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{lead.email}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {leads.map(lead => (
+            <div key={lead.id} className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-5 transition-all">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 font-bold text-primary-light text-sm">
+                  {lead.company.slice(0,2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-foreground text-sm">{lead.company}</h3>
+                        <StatusDropdown current={lead.status} onChange={s => void updateStatus(lead.id, s)} />
+                      </div>
+                      {lead.title && <p className="text-xs text-muted-foreground mt-0.5">{lead.title}</p>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {lead.sourceUrl && (
+                        <a href={lead.sourceUrl} target="_blank" rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      <button onClick={() => router.push(`/dashboard/proposal/${lead.id}`)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20 text-xs font-medium transition-all">
+                        <Sparkles className="w-3.5 h-3.5" /> Proposal
+                      </button>
+                      <button onClick={() => setDeleteId(lead.id)}
+                        className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center flex-wrap gap-3 text-xs text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1"><Globe className="w-3 h-3" />{lead.domain}</span>
+                    {lead.email && <span className="flex items-center gap-1 text-accent"><Mail className="w-3 h-3" />{lead.email}</span>}
+                    {lead.niche && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">{lead.niche}</span>}
+                    {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
+                  </div>
+                  <div className="pt-3 border-t border-border/50">
+                    <NotesEditor leadId={lead.id} initialNotes={lead.notes}
+                      onSave={notes => setLeads(prev => prev.map(l => l.id===lead.id ? {...l,notes} : l))} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <ConfirmModal isOpen={!!deleteId} title="Remove Lead" message="This lead will be permanently removed from your pipeline."
+        confirmLabel="Remove" onConfirm={() => void handleDelete()} onCancel={() => setDeleteId(null)} loading={deleting} />
+    </div>
+  );
+}
