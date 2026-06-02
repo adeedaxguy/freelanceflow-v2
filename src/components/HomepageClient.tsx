@@ -275,8 +275,38 @@ export default function HomepageClient() {
   const heroY       = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
+  // Force dark mode on homepage — the animated gradients & glows are designed for dark
+  useEffect(() => {
+    const html = document.documentElement;
+    const hadLight = html.classList.contains("light");
+    html.classList.remove("light");
+    html.classList.add("dark");
+    return () => {
+      if (hadLight) {
+        html.classList.remove("dark");
+        html.classList.add("light");
+      }
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* ── Early Access Banner ─────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-50 bg-gradient-to-r from-primary/90 via-purple-600/90 to-accent/80 text-white text-center py-2.5 px-4 text-sm font-medium"
+      >
+        <span className="inline-flex items-center gap-2 flex-wrap justify-center">
+          <Zap className="w-3.5 h-3.5 text-gold flex-shrink-0" />
+          <span>🎉 <strong>Early Access — 100% Free right now.</strong> Pro & Agency plans launching soon.</span>
+          <Link href="/auth?mode=signup" className="underline underline-offset-2 hover:text-gold transition-colors font-semibold">
+            Grab your free account →
+          </Link>
+        </span>
+      </motion.div>
+
       <Navbar />
 
       {/* ════════════════════════════════════════════
@@ -709,8 +739,8 @@ export default function HomepageClient() {
         <div className="max-w-5xl mx-auto relative">
           <SectionHeading
             badge="Pricing"
-            title={<>Simple pricing.<br />No hidden fees.</>}
-            sub="Start free and upgrade only when you're ready. Every plan includes the full lead engine."
+            title={<>Free during Early Access.<br />Pro plans coming soon.</>}
+            sub="Everything is 100% free right now. Pro & Agency plans are launching soon — sign up free to lock in early access."
           />
 
           <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -726,7 +756,7 @@ export default function HomepageClient() {
 
           <Reveal delay={0.35} className="mt-8 text-center">
             <p className="text-muted-foreground text-sm">
-              All paid plans include a <strong className="text-foreground">14-day money-back guarantee</strong>. Cancel anytime, no questions asked.
+              All features are <strong className="text-foreground">free during Early Access</strong>. Paid plans launch soon — no surprise charges, ever.
             </p>
           </Reveal>
         </div>
@@ -791,18 +821,13 @@ export default function HomepageClient() {
                     <span className="relative z-10">Find My First Lead — Free</span>
                     <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/auth?mode=signup&plan=pro"
-                    className="flex items-center gap-2 px-8 py-4 rounded-2xl border border-gold/30 hover:border-gold/60 text-gold font-semibold text-base transition-all hover:-translate-y-0.5 hover:bg-gold/5">
-                    <Star className="w-4 h-4 fill-gold" />
-                    Start Pro — $29/mo
-                  </Link>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> No credit card</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> 20 leads free every week</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> Cancel anytime</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> 14-day money-back on paid</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> 100% free during Early Access</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> All features unlocked</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> No limits right now</span>
                 </div>
               </div>
             </div>

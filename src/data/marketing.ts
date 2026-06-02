@@ -6,14 +6,14 @@ export interface Testimonial {
 export interface PricingTier {
   name: string; price: string; period?: string; description: string;
   features: string[]; cta: string; href: string; highlight?: boolean; badge?: string;
-  limit?: string;
+  limit?: string; comingSoon?: boolean;
 }
 
 export const TESTIMONIALS: Testimonial[] = [
   { name: "Marcus Reid", role: "Full-Stack Developer", company: "Independent", avatar: "MR",
     content: "In my first month I found 23 qualified leads and landed 2 long-term contracts worth $18,000. The AI proposals are scarily good.", rating: 5, niche: "Web Development" },
   { name: "Sofia Andersen", role: "Brand Designer", company: "Sofia Design Studio", avatar: "SA",
-    content: "My response rate went from 3% to 19%. FreelanceFlow handles the research and drafts my proposals — I just personalize and send.", rating: 5, niche: "UI/UX Design" },
+    content: "My response rate went from 3% to 19%. iCloseLeads handles the research and drafts my proposals — I just personalize and send.", rating: 5, niche: "UI/UX Design" },
   { name: "James Okafor", role: "SEO Consultant", company: "Growth.io", avatar: "JO",
     content: "Real people posting HIRING right now — not a cold email list. This tool pays for itself 10x every single month.", rating: 5, niche: "SEO" },
 ];
@@ -51,10 +51,11 @@ export const PRICING_TIERS: PricingTier[] = [
       "Priority email support",
       "Custom proposal templates",
     ],
-    cta: "Start Pro — $29/mo",
-    href: "/auth?mode=signup&plan=pro",
+    cta: "Join Waitlist",
+    href: "#waitlist",
     highlight: true,
     badge: "Most Popular",
+    comingSoon: true,
   },
   {
     name: "Agency",
@@ -73,7 +74,8 @@ export const PRICING_TIERS: PricingTier[] = [
       "Custom integrations",
       "SLA support",
     ],
-    cta: "Contact Sales",
-    href: "/contact",
+    cta: "Join Waitlist",
+    href: "#waitlist",
+    comingSoon: true,
   },
 ];
