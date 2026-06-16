@@ -996,20 +996,21 @@ export default function LocalLeadsPage() {
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Business Type</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
-                  <input value={keyword} onChange={e => { setKeyword(e.target.value); setKwCategory(null); }}
-                    onFocus={() => setShowSugg("keyword")} onBlur={() => setTimeout(() => setShowSugg(null), 300)}
+                  <input value={keyword} onChange={e => { setKeyword(e.target.value); setKwCategory(null); setShowSugg("keyword"); }}
+                    onFocus={() => setShowSugg("keyword")} onClick={() => setShowSugg("keyword")}
+                    onBlur={() => setTimeout(() => setShowSugg(current => current === "keyword" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. plumber, dentist, bakery…"
                     className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
                 </div>
                 {showSugg === "keyword" && (
-                  <div onMouseDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
+                  <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
                     {keyword === "" && !kwCategory ? (
                       /* Show category browser when nothing typed */
                       <>
                         <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Browse by Category</p>
                         {Object.keys(KEYWORD_CATEGORIES).map(cat => (
-                          <button key={cat} onMouseDown={(e) => { e.preventDefault(); setKwCategory(cat); }}
+                          <button key={cat} onPointerDown={(e) => { e.preventDefault(); setKwCategory(cat); }}
                             className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center justify-between">
                             {cat}
                             <ChevronDown className="w-3 h-3 text-muted-foreground -rotate-90"/>
@@ -1019,13 +1020,13 @@ export default function LocalLeadsPage() {
                     ) : kwCategory && keyword === "" ? (
                       /* Show items in selected category */
                       <>
-                        <button onMouseDown={(e) => { e.preventDefault(); setKwCategory(null); }}
+                        <button onPointerDown={(e) => { e.preventDefault(); setKwCategory(null); }}
                           className="w-full text-left px-3 py-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 border-b border-border">
                           <ChevronDown className="w-3 h-3 rotate-90"/> Back
                         </button>
                         <p className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{kwCategory}</p>
                         {KEYWORD_CATEGORIES[kwCategory]!.map(s => (
-                          <button key={s} onMouseDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); setKwCategory(null); }}
+                          <button key={s} onPointerDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); setKwCategory(null); }}
                             className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 capitalize transition-colors">
                             {s}
                           </button>
@@ -1034,7 +1035,7 @@ export default function LocalLeadsPage() {
                     ) : (
                       /* Filtered search results */
                       KEYWORD_SUGGESTIONS.filter(s => s.toLowerCase().includes(keyword.toLowerCase())).slice(0, 30).map(s => (
-                        <button key={s} onMouseDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); }}
+                        <button key={s} onPointerDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); }}
                           className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 capitalize transition-colors">
                           {s}
                         </button>
@@ -1049,20 +1050,21 @@ export default function LocalLeadsPage() {
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">City / Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
-                  <input value={location} onChange={e => { setLocation(e.target.value); setLocRegion(null); }}
-                    onFocus={() => setShowSugg("location")} onBlur={() => setTimeout(() => setShowSugg(null), 300)}
+                  <input value={location} onChange={e => { setLocation(e.target.value); setLocRegion(null); setShowSugg("location"); }}
+                    onFocus={() => setShowSugg("location")} onClick={() => setShowSugg("location")}
+                    onBlur={() => setTimeout(() => setShowSugg(current => current === "location" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. Manchester, UK or Dubai, UAE"
                     className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
                 </div>
                 {showSugg === "location" && (
-                  <div onMouseDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
+                  <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
                     {location === "" && !locRegion ? (
                       /* Show region browser */
                       <>
                         <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Browse by Region</p>
                         {Object.keys(LOCATION_GROUPS).map(region => (
-                          <button key={region} onMouseDown={(e) => { e.preventDefault(); setLocRegion(region); }}
+                          <button key={region} onPointerDown={(e) => { e.preventDefault(); setLocRegion(region); }}
                             className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center justify-between">
                             {region}
                             <ChevronDown className="w-3 h-3 text-muted-foreground -rotate-90"/>
@@ -1072,13 +1074,13 @@ export default function LocalLeadsPage() {
                     ) : locRegion && location === "" ? (
                       /* Show cities in region */
                       <>
-                        <button onMouseDown={(e) => { e.preventDefault(); setLocRegion(null); }}
+                        <button onPointerDown={(e) => { e.preventDefault(); setLocRegion(null); }}
                           className="w-full text-left px-3 py-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 border-b border-border">
                           <ChevronDown className="w-3 h-3 rotate-90"/> Back
                         </button>
                         <p className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{locRegion}</p>
                         {LOCATION_GROUPS[locRegion]!.map(s => (
-                          <button key={s} onMouseDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); setLocRegion(null); }}
+                          <button key={s} onPointerDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); setLocRegion(null); }}
                             className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors">
                             {s}
                           </button>
@@ -1087,7 +1089,7 @@ export default function LocalLeadsPage() {
                     ) : (
                       /* Filtered search */
                       LOCATION_SUGGESTIONS.filter(s => s.toLowerCase().includes(location.toLowerCase())).slice(0, 30).map(s => (
-                        <button key={s} onMouseDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); }}
+                        <button key={s} onPointerDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); }}
                           className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors">
                           {s}
                         </button>
