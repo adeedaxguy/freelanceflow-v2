@@ -15,7 +15,7 @@ const QUICK_QUESTIONS = [
 
 export default function SupportPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "👋 Hi! I'm the FreelanceFlow support assistant. I can help you with leads, proposals, campaigns, billing, and anything else. What's on your mind?" },
+    { role: "assistant", content: "👋 Hi! I'm the iCloseLeads support assistant. I can help you with leads, proposals, campaigns, billing, and anything else. What's on your mind?" },
   ]);
   const [input,         setInput]         = useState("");
   const [email,         setEmail]         = useState("");

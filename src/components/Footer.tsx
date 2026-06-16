@@ -40,7 +40,7 @@ export default function Footer() {
               <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold text-foreground">FreelanceFlow</span>
+              <span className="font-bold text-foreground">iCloseLeads</span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               The AI-powered client acquisition platform built for freelancers who mean business.
@@ -50,7 +50,7 @@ export default function Footer() {
                 { icon: Twitter, href: "#", label: "Twitter" },
                 { icon: Github, href: "#", label: "GitHub" },
                 { icon: Linkedin, href: "#", label: "LinkedIn" },
-                { icon: Mail, href: "mailto:hello@freelanceflow.io", label: "Email" },
+                { icon: Mail, href: "mailto:hello@icloseleads.com", label: "Email" },
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
@@ -110,7 +110,7 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} FreelanceFlow, Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} iCloseLeads, Inc. All rights reserved.</p>
           <div className="flex items-center gap-1">
             <span>Made with</span>
             <span className="text-red-400">♥</span>

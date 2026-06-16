@@ -3,8 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — FreelanceFlow",
-  description: "FreelanceFlow Privacy Policy. Learn how we collect, use, and protect your personal data in compliance with GDPR.",
+  title: "Privacy Policy — iCloseLeads",
+  description: "iCloseLeads Privacy Policy. Learn how we collect, use, and protect your personal data in compliance with GDPR.",
 };
 
 export default function PrivacyPage() {
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
           <div className="space-y-10 text-muted-foreground leading-relaxed">
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">1. Introduction</h2>
-              <p>FreelanceFlow, Inc. (&quot;FreelanceFlow,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your personal information and your right to privacy. This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you use our service at freelanceflow.io.</p>
+              <p>iCloseLeads, Inc. (&quot;iCloseLeads,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your personal information and your right to privacy. This Privacy Policy describes how we collect, use, disclose, and safeguard your information when you use our service at icloseleads.com.</p>
             </section>
 
             <section>
@@ -74,7 +74,7 @@ export default function PrivacyPage() {
                 <li>Data portability</li>
                 <li>Withdraw consent at any time</li>
               </ul>
-              <p className="mt-2">To exercise these rights, email us at privacy@freelanceflow.io.</p>
+              <p className="mt-2">To exercise these rights, email us at privacy@icloseleads.com.</p>
             </section>
 
             <section>
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">9. Contact</h2>
-              <p>For privacy-related questions, contact our Data Protection Officer at privacy@freelanceflow.io or write to: FreelanceFlow, Inc., 123 Market Street, San Francisco, CA 94105.</p>
+              <p>For privacy-related questions, contact our Data Protection Officer at privacy@icloseleads.com.</p>
             </section>
           </div>
         </div>

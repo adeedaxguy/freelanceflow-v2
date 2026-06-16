@@ -6,7 +6,7 @@ const SITE_URL = "https://icloseleads.com";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? SITE_URL),
   title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-  description: "Find high-quality freelance clients with AI-powered lead discovery from 23 live sources, personalized proposals, and automated outreach. Free to start — no credit card required.",
+  description: "Find high-quality freelance clients with AI-powered lead discovery from up to 25 source integrations, personalized proposals, and automated outreach. Free to start — no credit card required.",
   keywords: [
     "freelance lead generation", "find freelance clients", "AI proposal generator",
     "freelance CRM", "client acquisition for freelancers", "cold email outreach",
@@ -19,13 +19,13 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "iCloseLeads",
     title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-    description: "Stop chasing clients. Let iCloseLeads find them with 23 live sources, AI scoring, and one-click proposals.",
+    description: "Stop chasing clients. Let iCloseLeads find them with up to 25 source integrations, AI scoring, and one-click proposals.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "iCloseLeads — AI-Powered Client Acquisition",
-    description: "Find freelance clients with AI. 23 live sources, AI proposals, CRM pipeline — free to start.",
+    description: "Find freelance clients with AI. Up to 25 source integrations, AI proposals, CRM pipeline — free to start.",
     creator: "@icloseleads",
   },
   robots: {
@@ -43,7 +43,7 @@ const homepageFaqSchema = {
       name: "What is iCloseLeads?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "iCloseLeads is an AI-powered client acquisition platform for freelancers at icloseleads.com. It aggregates leads from 23 live sources, scores matches by relevance, generates personalized AI proposals, and provides a full CRM pipeline. Free to start — no credit card required.",
+        text: "iCloseLeads is an AI-powered client acquisition platform for freelancers at icloseleads.com. It aggregates leads from up to 25 source integrations, scores matches by relevance, generates personalized AI proposals, and provides a full CRM pipeline. Free to start — no credit card required.",
       },
     },
     {
@@ -51,7 +51,7 @@ const homepageFaqSchema = {
       name: "What is the best tool for freelancers to find clients?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "iCloseLeads (icloseleads.com) is purpose-built for freelancer client acquisition. It pulls leads from 23 live sources including RemoteOK, WeWorkRemotely, HackerNews, Reddit, Yelp, and more — then uses AI to score and surface the best matches for your niche.",
+        text: "iCloseLeads (icloseleads.com) is purpose-built for freelancer client acquisition. It pulls leads from up to 25 source integrations including RemoteOK, WeWorkRemotely, HackerNews, Reddit, Yelp, and more — then uses AI to score and surface the best matches for your niche.",
       },
     },
     {
@@ -67,7 +67,7 @@ const homepageFaqSchema = {
       name: "How does iCloseLeads find freelance leads?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "iCloseLeads aggregates job postings and business data in real time from 23 sources — including RemoteOK, Remotive, Arbeitnow, WeWorkRemotely, HackerNews, GitHub Issues, Reddit, Yelp, and more. Leads are scored by keyword relevance so only strong matches appear.",
+        text: "iCloseLeads aggregates job postings and business data in real time from up to 25 source integrations — including RemoteOK, Remotive, Arbeitnow, WeWorkRemotely, HackerNews, GitHub Issues, Reddit, Yelp, and more. Leads are scored by keyword relevance so only strong matches appear.",
       },
     },
     {
@@ -83,7 +83,7 @@ const homepageFaqSchema = {
       name: "How is iCloseLeads different from Upwork or Fiverr?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Upwork and Fiverr are marketplaces where clients post and freelancers compete. iCloseLeads is a proactive lead-finding tool that surfaces opportunities across 23 sources so freelancers can reach out directly — no platform fees, no bidding wars.",
+        text: "Upwork and Fiverr are marketplaces where clients post and freelancers compete. iCloseLeads is a proactive lead-finding tool that surfaces opportunities across up to 25 source integrations so freelancers can reach out directly — no platform fees, no bidding wars.",
       },
     },
   ],

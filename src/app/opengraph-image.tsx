@@ -79,7 +79,7 @@ export default function OgImage() {
           maxWidth: 720,
           marginBottom: 40,
         }}>
-          23 live sources · AI proposals · CRM pipeline · Free to start
+          25 source integrations · AI proposals · CRM pipeline · Free to start
         </div>
 
         {/* Badges */}

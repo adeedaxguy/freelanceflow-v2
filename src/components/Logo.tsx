@@ -46,7 +46,7 @@ export default function Logo({ size = "md", showText = true, href = "/", classNa
       {mark}
       {showText && (
         <span className={cn("font-bold tracking-tight text-foreground group-hover:text-primary-light transition-colors", textSize[size])}>
-          Freelance<span className="text-primary-light">Flow</span>
+          iClose<span className="text-primary-light">Leads</span>
         </span>
       )}
     </span>

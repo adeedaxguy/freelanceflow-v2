@@ -18,7 +18,7 @@ export const STATIC_POSTS: BlogPost[] = [
     id: "2",
     title: "Cold Email Templates That Actually Get Responses",
     slug: "cold-email-templates-that-get-responses",
-    excerpt: "After analyzing 50,000+ cold emails sent through FreelanceFlow, we found the exact templates and subject lines with the highest response rates.",
+    excerpt: "After analyzing 50,000+ cold emails sent through iCloseLeads, we found the exact templates and subject lines with the highest response rates.",
     content: "",
     category: "Templates",
     published: true,

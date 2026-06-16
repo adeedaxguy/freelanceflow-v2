@@ -21,7 +21,7 @@ const MEGA_FEATURES = [
     color: "text-primary-light",
     href: "/features/lead-discovery",
     items: [
-      { label: "11-Source Aggregator",  desc: "RemoteOK, Reddit, Himalayas + more",   href: "/features/lead-discovery" },
+      { label: "11-Source Aggregator",  desc: "RemoteOK, Reddit, Remote.co + more",   href: "/features/lead-discovery" },
       { label: "AI Quality Scoring",    desc: "0–100 confidence score per lead",      href: "/features/lead-discovery#scoring" },
       { label: "Niche Targeting",       desc: "15+ freelance niches supported",       href: "/features/lead-discovery#niches" },
       { label: "Smart Deduplication",   desc: "Never see the same lead twice",        href: "/features/lead-discovery#dedup" },
@@ -213,7 +213,7 @@ export default function Navbar() {
                     <div className="px-5 py-3 border-t border-border/60 bg-gradient-to-r from-primary/5 to-accent/5 flex items-center justify-between">
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         {[
-                          { icon: Globe, label: "7 Live Sources" },
+                          { icon: Globe, label: "25 Source Integrations" },
                           { icon: Target, label: "15+ Niches" },
                           { icon: Star,   label: "Free to Start" },
                           { icon: Users,  label: "No Credit Card" },
@@ -355,7 +355,7 @@ export default function Navbar() {
               <div className="pt-4 pb-2 flex items-center justify-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><Star className="w-3 h-3 text-gold fill-gold" /> Free Plan</span>
                 <span>•</span>
-                <span>23 live sources</span>
+                <span>25 source integrations</span>
                 <span>•</span>
                 <span>No credit card</span>
               </div>

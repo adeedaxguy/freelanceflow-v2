@@ -139,7 +139,7 @@ function AuthForm() {
             {[
               "20 free leads every week — no credit card",
               "AI proposals powered by Groq (free tier)",
-              "7 lead sources: Reddit, Remote, Jobicy & more",
+              "25 source integrations across freelance and local leads",
               "Full CRM pipeline to track every deal",
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -163,7 +163,7 @@ function AuthForm() {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground relative z-10">© 2025 FreelanceFlow. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground relative z-10">© 2025 iCloseLeads. All rights reserved.</p>
       </div>
 
       {/* Right panel */}
@@ -307,7 +307,7 @@ function AuthForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find FreelanceFlow?</label>
+                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find iCloseLeads?</label>
                   <div className="grid grid-cols-3 gap-2">
                     {REFERRAL_OPTIONS.map(r => (
                       <button key={r} type="button" onClick={() => setReferral(r)}

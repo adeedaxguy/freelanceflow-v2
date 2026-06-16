@@ -139,9 +139,9 @@ export async function supportChat(
 ): Promise<{ reply: string; shouldCreateTicket: boolean }> {
   const apiKey = process.env.GROQ_API_KEY;
 
-  const systemPrompt = `You are a helpful support agent for FreelanceFlow — an AI-powered lead generation SaaS for freelancers.
+  const systemPrompt = `You are a helpful support agent for iCloseLeads — an AI-powered lead generation SaaS for freelancers.
 
-FreelanceFlow features:
+iCloseLeads features:
 - Find Leads: searches RemoteOK, Remotive, Reddit for real job postings in the last 48h
 - AI Proposals: generates personalised proposals using your profile
 - Campaigns: manage outreach sequences
@@ -160,7 +160,7 @@ Answer helpfully and concisely. If you cannot resolve the issue after 2 exchange
   if (!apiKey) {
     const last = messages[messages.length - 1];
     return {
-      reply: `Thanks for reaching out! Our AI assistant isn't configured yet. Please email support@freelanceflow.io and we'll get back to you within 24 hours.\n\nYour message: "${last?.content ?? ""}"`,
+      reply: `Thanks for reaching out! Our AI assistant isn't configured yet. Please email support@icloseleads.com and we'll get back to you within 24 hours.\n\nYour message: "${last?.content ?? ""}"`,
       shouldCreateTicket: true,
     };
   }
@@ -186,13 +186,13 @@ Answer helpfully and concisely. If you cannot resolve the issue after 2 exchange
     if (!res.ok) throw new Error("Groq error");
 
     const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-    const reply = data.choices?.[0]?.message?.content ?? "I'm having trouble right now. Please try again or email support@freelanceflow.io";
+    const reply = data.choices?.[0]?.message?.content ?? "I'm having trouble right now. Please try again or email support@icloseleads.com";
     const shouldCreateTicket = reply.includes("ESCALATE:");
 
     return { reply: reply.replace("ESCALATE:", "").trim(), shouldCreateTicket };
   } catch {
     return {
-      reply: "I'm having a technical issue. Please email support@freelanceflow.io and we'll help you right away.",
+      reply: "I'm having a technical issue. Please email support@icloseleads.com and we'll help you right away.",
       shouldCreateTicket: true,
     };
   }

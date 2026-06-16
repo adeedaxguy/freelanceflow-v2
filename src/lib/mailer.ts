@@ -77,7 +77,7 @@ function textToHtml(text: string): string {
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
     ${paragraphs}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
-    <p style="color:#888;font-size:12px;margin:0">Sent via FreelanceFlow</p>
+    <p style="color:#888;font-size:12px;margin:0">Sent via iCloseLeads</p>
   </div>
 </body></html>`;
 }
@@ -122,8 +122,8 @@ export async function sendMail(userId: string, opts: MailOptions): Promise<MailR
 
   try {
     const resend = new Resend(resendKey);
-    const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hello@freelanceflow.io";
-    const fromName = opts.fromName ?? "FreelanceFlow";
+    const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hello@icloseleads.com";
+    const fromName = opts.fromName ?? "iCloseLeads";
     const { data, error } = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
       to: [opts.to],

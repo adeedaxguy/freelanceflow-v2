@@ -33,7 +33,7 @@ The more specific, the better. Specificity = higher relevance = higher response 
 
 **Step 2: Find Verified Leads**
 
-Use a tool like FreelanceFlow (powered by Hunter.io) to find verified email addresses at companies matching your ICP. Focus on decision-makers: founders at small companies, VPs or Directors at mid-size companies.
+Use a tool like iCloseLeads to find verified email addresses at companies matching your ICP. Focus on decision-makers: founders at small companies, VPs or Directors at mid-size companies.
 
 Look for leads with confidence scores of 70%+ to maximize deliverability.
 
@@ -70,7 +70,7 @@ Generic proposals get ignored. Great proposals:
 
 The first client from direct outreach usually comes within 2–4 weeks of consistent effort. The second comes faster. By month 3, you'll have a pipeline.`,
 
-  "cold-email-templates-that-get-responses": `After analyzing 50,000+ cold emails sent through FreelanceFlow, we found some clear patterns. The emails that get 15–25% response rates share specific characteristics. Here are the templates.
+  "cold-email-templates-that-get-responses": `After analyzing 50,000+ cold emails sent through iCloseLeads, we found some clear patterns. The emails that get 15–25% response rates share specific characteristics. Here are the templates.
 
 ## What High-Response Emails Have in Common
 
@@ -247,7 +247,7 @@ This is your market. It's massive, underserved, and willing to pay for results t
 
 Manually finding local businesses that need SEO used to mean hours of Google searches, scraping review sites, and trying to track down contact info. Lead generation platforms like [iCloseLeads](https://icloseleads.com) automate this entirely.
 
-iCloseLeads pulls prospects from 23 sources — local business databases, job boards where businesses post for in-house SEO help, Reddit threads where business owners ask for marketing advice — and scores them by niche and opportunity. You get a ready-made list of businesses that are actively signaling they need help, without building spreadsheets by hand.
+iCloseLeads pulls prospects from up to 25 source integrations — local business databases, job boards where businesses post for in-house SEO help, Reddit threads where business owners ask for marketing advice — and scores them by niche and opportunity. You get a ready-made list of businesses that are actively signaling they need help, without building spreadsheets by hand.
 
 ## The Right Signals to Look For
 
@@ -296,10 +296,11 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const staticPost = STATIC_POSTS.find((p) => p.slug === params.slug);
   if (staticPost) {
     return {
-      title: staticPost.title,
-      description: staticPost.excerpt ?? undefined,
-      openGraph: { title: staticPost.title, description: staticPost.excerpt ?? undefined, type: "article", publishedTime: staticPost.createdAt.toISOString() },
-    };
+        title: staticPost.title,
+        description: staticPost.excerpt ?? undefined,
+        openGraph: { title: staticPost.title, description: staticPost.excerpt ?? undefined, type: "article", publishedTime: staticPost.createdAt.toISOString() },
+        twitter: { card: "summary_large_image", title: staticPost.title, description: staticPost.excerpt ?? undefined },
+      };
   }
   // Try DB
   try {
@@ -310,6 +311,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
         title: dbPost.title,
         description: dbPost.excerpt ?? undefined,
         openGraph: { title: dbPost.title, description: dbPost.excerpt ?? undefined, type: "article", publishedTime: dbPost.createdAt.toISOString() },
+        twitter: { card: "summary_large_image", title: dbPost.title, description: dbPost.excerpt ?? undefined },
       };
     }
   } catch {}
@@ -343,12 +345,25 @@ function renderContent(content: string): ReactNode {
       elements.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(3)}</h2>);
     } else if (line.startsWith("# ")) {
       elements.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(2)}</h2>);
-    } else if (line.startsWith("> ")) {
+    } else if (line.startsWith(">")) {
+      const quoteLines: string[] = [];
+      while (i < lines.length && (lines[i] ?? "").startsWith(">")) {
+        quoteLines.push((lines[i] ?? "").replace(/^>\s?/, ""));
+        i++;
+      }
       elements.push(
         <blockquote key={i} className="border-l-4 border-primary/40 pl-5 py-1 my-4 italic text-muted-foreground bg-white/5 rounded-r-lg">
-          <span dangerouslySetInnerHTML={{ __html: inlineFormat(line.slice(2)) }} />
+          {quoteLines.map((quoteLine, j) => (
+            quoteLine.trim() === "" ? <br key={j} /> : (
+              <React.Fragment key={j}>
+                <span dangerouslySetInnerHTML={{ __html: inlineFormat(quoteLine) }} />
+                {j < quoteLines.length - 1 && <br />}
+              </React.Fragment>
+            )
+          ))}
         </blockquote>
       );
+      continue;
     } else if (line.startsWith("- ")) {
       const items: string[] = [];
       while (i < lines.length && (lines[i] ?? "").startsWith("- ")) {

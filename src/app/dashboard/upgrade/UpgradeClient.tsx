@@ -62,7 +62,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       badge: null,
       features: [
         `${pricing.proLeads === "100" ? "20" : "20"} leads per week`,
-        "7 lead sources",
+        "25 source integrations",
         "Basic AI proposals",
         "CRM pipeline (3 stages)",
         "Email outreach",

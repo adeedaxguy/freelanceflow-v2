@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const { to, subject, body, leadId, company, domain } = parsed.data;
 
   // Resolve sender name from user profile
-  let fromName = "FreelanceFlow";
+  let fromName = "iCloseLeads";
   try {
     const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } });
     if (user?.name) fromName = user.name;

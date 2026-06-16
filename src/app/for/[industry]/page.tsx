@@ -48,7 +48,7 @@ const INDUSTRIES: Record<string, {
       "Manage your entire prospecting pipeline in the built-in CRM",
     ],
     features: [
-      { icon: "🔍", title: "Multi-Source Lead Discovery", desc: "23 live sources including local maps, job boards, Reddit, and GitHub Issues." },
+      { icon: "🔍", title: "Multi-Source Lead Discovery", desc: "Up to 25 source integrations including local maps, job boards, Reddit, and GitHub Issues." },
       { icon: "🤖", title: "AI Proposal Generation", desc: "One-click proposals personalised to each prospect's business and your agency's services." },
       { icon: "📋", title: "Team Pipeline", desc: "Track prospects across your team with a shared CRM pipeline." },
       { icon: "📬", title: "Email Campaigns", desc: "Send sequenced outreach campaigns directly from your own domain." },
@@ -59,7 +59,7 @@ const INDUSTRIES: Record<string, {
   "freelance-copywriters": {
     name: "Freelance Copywriters",
     headline: "Find Copywriting Clients Who Are Actively Hiring — Right Now",
-    sub: "iCloseLeads scans 23 live sources including Reddit, job boards, and HackerNews every hour to surface companies actively looking for copywriters. No more cold pitching into the void.",
+    sub: "iCloseLeads scans up to 25 source integrations including Reddit, job boards, and HackerNews every hour to surface companies actively looking for copywriters. No more cold pitching into the void.",
     pain: "Most copywriters get clients through referrals or platforms that take a 20% cut. iCloseLeads gives you direct access to companies posting for copywriters — no middleman.",
     useCases: [
       "Filter leads by 'copywriting', 'content writing', or 'SEO content' niche",
@@ -68,7 +68,7 @@ const INDUSTRIES: Record<string, {
       "Track every lead in your pipeline from first email to signed contract",
     ],
     features: [
-      { icon: "⚡", title: "Live Jobs Feed", desc: "Real-time feed of copywriting jobs from 23 sources updated every hour." },
+      { icon: "⚡", title: "Live Jobs Feed", desc: "Real-time feed of copywriting jobs from 11 freelance sources, plus local business lead discovery." },
       { icon: "✍️", title: "AI Proposals", desc: "Proposal writer trained on high-converting copywriter cold emails." },
       { icon: "📊", title: "Lead Scoring", desc: "Every lead is scored by AI so you focus on the highest-converting opportunities first." },
       { icon: "🔄", title: "Follow-Up Sequences", desc: "Automated 3-step follow-up sequences so no lead falls through the cracks." },
@@ -142,7 +142,7 @@ const INDUSTRIES: Record<string, {
     sub: "iCloseLeads scans live job boards, Reddit, and local business databases to surface ecommerce businesses that need Shopify development, theme work, or app integrations.",
     pain: "The best Shopify clients never post on Upwork. They mention their problem on Reddit, post a job on RemoteOK, or they're a local retailer whose website clearly hasn't been touched since 2019.",
     useCases: [
-      "Search 'Shopify', 'ecommerce', 'WooCommerce to Shopify migration' across 23 live sources",
+      "Search 'Shopify', 'ecommerce', 'WooCommerce to Shopify migration' across up to 25 source integrations",
       "Find local retailers with outdated or missing websites to pitch Shopify builds",
       "Write technical migration proposals with AI in 60 seconds",
       "Track every prospect from cold lead to retainer client",

@@ -34,14 +34,9 @@ const ALL_SOURCES: { id: string; label: string }[] = [
   { id: "jobicy",        label: "Jobicy" },
   { id: "workingnomads", label: "Working Nomads" },
   { id: "hackernews",    label: "HackerNews" },
-  { id: "ycjobs",        label: "YC Jobs" },
-  { id: "authenticjobs", label: "Authentic Jobs" },
+  { id: "remoteco",      label: "Remote.co" },
+  { id: "craigslist",    label: "Craigslist" },
   { id: "githubissues",  label: "GitHub Issues" },
-  { id: "freelancermap", label: "Jobspresso" },
-  { id: "smashingjobs",  label: "Smashing Jobs" },
-  { id: "dribbble",      label: "Dribbble" },
-  { id: "himalayas",     label: "Himalayas" },
-  { id: "nodesk",        label: "No Desk" },
 ];
 
 const PAGE_SIZE    = 25;
@@ -389,7 +384,7 @@ export default function LiveJobsPage() {
               Live Jobs Feed
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              16 sources scanned simultaneously · 2 min cooldown
+              11 sources scanned simultaneously · 2 min cooldown
               {newCount > 0 && <span className="ml-2 text-accent font-medium">· {newCount} new since last visit</span>}
             </p>
           </div>
@@ -538,7 +533,7 @@ export default function LiveJobsPage() {
                   <Radio className="w-8 h-8 text-accent"/>
                 </div>
                 <p className="text-foreground font-semibold">Scanning live job feeds…</p>
-                <p className="text-muted-foreground text-sm">Aggregating from 16 sources across {selectedNiches.length} niche{selectedNiches.length!==1?"s":""}</p>
+                <p className="text-muted-foreground text-sm">Aggregating from 11 sources across {selectedNiches.length} niche{selectedNiches.length!==1?"s":""}</p>
               </div>
             )}
 
@@ -691,7 +686,7 @@ export default function LiveJobsPage() {
                 <Radio className="w-12 h-12 text-muted-foreground mx-auto mb-3"/>
                 <h3 className="text-foreground font-semibold mb-2">Select niches and scan</h3>
                 <p className="text-muted-foreground text-sm mb-1">Pick your niches above, then hit Scan</p>
-                <p className="text-muted-foreground text-xs">16 sources · sorted by post time</p>
+                <p className="text-muted-foreground text-xs">11 sources · sorted by post time</p>
                 <div className="flex items-center justify-center gap-3 mt-5">
                   <button onClick={()=>{setMaxHours(72);void fetchLive(true);}} disabled={loading||selectedNiches.length===0}
                     className="px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all disabled:opacity-50 flex items-center gap-2">

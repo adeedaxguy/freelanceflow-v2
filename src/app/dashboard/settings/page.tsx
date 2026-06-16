@@ -38,7 +38,7 @@ export default function SettingsPage() {
         {[
           { key: "emailReplies" as const, label: "Email Reply Alerts", desc: "Get notified when a prospect replies to your email." },
           { key: "weeklyDigest" as const, label: "Weekly Digest", desc: "Summary of your outreach performance every Monday." },
-          { key: "productUpdates" as const, label: "Product Updates", desc: "News about new FreelanceFlow features and improvements." },
+          { key: "productUpdates" as const, label: "Product Updates", desc: "News about new iCloseLeads features and improvements." },
         ].map(({ key, label, desc }) => (
           <div key={key} className="flex items-center justify-between">
             <div>

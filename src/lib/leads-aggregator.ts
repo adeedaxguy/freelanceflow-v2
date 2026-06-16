@@ -1,5 +1,5 @@
 /**
- * FreelanceFlow Lead Aggregator v4
+ * iCloseLeads Lead Aggregator v4
  *
  * Sources:
  *  1.  RemoteOK            — https://remoteok.com/api
@@ -301,7 +301,7 @@ async function getRedditToken(): Promise<string | null> {
         method: "POST",
         headers: {
           "Authorization": `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`,
-          "User-Agent": "FreelanceFlow/4.0",
+          "User-Agent": "iCloseLeads/4.0",
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: "grant_type=client_credentials",
@@ -353,7 +353,7 @@ interface RemoteOKJob {
 async function fetchRemoteOK(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://remoteok.com/api", {
-      headers: { "User-Agent": "Mozilla/5.0 FreelanceFlow/4.0" },
+      headers: { "User-Agent": "Mozilla/5.0 iCloseLeads/4.0" },
       ...cacheOpts(freshOnly, 600),
     }),
     9000
@@ -410,7 +410,7 @@ async function fetchRemotive(niche: string, keywords: string[], maxHours: number
   const search   = keywords.slice(0, 2).join(" ");
   const url = `https://remotive.com/api/remote-jobs?${category ? `category=${category}` : `search=${encodeURIComponent(search)}`}&limit=100`;
   const res = await withTimeout(
-    fetch(url, { headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 600) }),
+    fetch(url, { headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 600) }),
     9000
   );
   if (!res.ok) throw new Error(`Remotive ${res.status}`);
@@ -460,7 +460,7 @@ async function fetchReddit(keywords: string[], maxHours: number, freshOnly: bool
   let inWindow = 0;
   const token   = await getRedditToken();
   const baseUrl = token ? "https://oauth.reddit.com" : "https://www.reddit.com";
-  const headers: Record<string, string> = { "User-Agent": "FreelanceFlow/4.0 (+https://freelanceflow.io)" };
+  const headers: Record<string, string> = { "User-Agent": "iCloseLeads/4.0 (+https://icloseleads.com)" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   await Promise.all(REDDIT_SUBS.map(async ({ sub, label }) => {
@@ -538,7 +538,7 @@ async function fetchWeWorkRemotely(niche: string, keywords: string[], maxHours: 
   const feedUrl = WWR_FEEDS[niche] ?? "https://weworkremotely.com/remote-jobs.rss";
   const res = await withTimeout(
     fetch(feedUrl, {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/rss+xml, text/xml" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/rss+xml, text/xml" },
       ...cacheOpts(freshOnly, 900),
     }),
     9000
@@ -600,7 +600,7 @@ interface ArbeitnowResponse { data?: ArbeitnowJob[]; }
 async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://www.arbeitnow.com/api/job-board-api", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/json" },
       ...cacheOpts(freshOnly, 900),
     }),
     9000
@@ -650,7 +650,7 @@ interface JobicyResponse { jobs?: JobicyJob[]; }
 async function fetchJobicy(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://jobicy.com/api/v2/remote-jobs?count=50&geo=worldwide", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/json" },
       ...cacheOpts(freshOnly, 900),
     }),
     8000
@@ -697,7 +697,7 @@ interface WNJob {
 async function fetchWorkingNomads(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://www.workingnomads.com/api/exposed_jobs/?limit=100", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/json" },
       ...cacheOpts(freshOnly, 900),
     }),
     8000
@@ -746,7 +746,7 @@ interface HNComment { id: number; type: string; text?: string; author?: string; 
 async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const search = await withTimeout(
     fetch("https://hn.algolia.com/api/v1/search?query=Ask%20HN%20hiring%20OR%20freelancer&tags=story&hitsPerPage=10", {
-      headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 1800),
+      headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 1800),
     }),
     8000
   );
@@ -761,7 +761,7 @@ async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: 
 
   const tres = await withTimeout(
     fetch(`https://hn.algolia.com/api/v1/items/${threadId}`, {
-      headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 900),
+      headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 900),
     }),
     8000
   );
@@ -816,7 +816,7 @@ async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: 
 async function fetchRemoteCo(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://remote.co/remote-jobs/feed/", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/rss+xml, text/xml, */*" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/rss+xml, text/xml, */*" },
       ...cacheOpts(freshOnly, 1800),
     }),
     10000
@@ -879,7 +879,7 @@ async function fetchCraigslistCity(city: string, cat: string, keywords: string[]
   try {
     const res = await withTimeout(
       fetch(`https://${city}.craigslist.org/search/${cat}?format=rss`, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; FreelanceFlow/4.0)" },
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/4.0)" },
         ...cacheOpts(freshOnly, 1800),
       }),
       7000
@@ -943,7 +943,7 @@ interface GHSearchResponse { items?: GHIssue[]; }
 
 async function fetchGitHubBounties(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const ghHeaders: Record<string, string> = {
-    "User-Agent": "FreelanceFlow/4.0",
+    "User-Agent": "iCloseLeads/4.0",
     "Accept":     "application/vnd.github.v3+json",
   };
   const token = process.env.GITHUB_TOKEN;

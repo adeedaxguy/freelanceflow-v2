@@ -494,9 +494,9 @@ export default function EmailSettingsPage() {
         <ul className="space-y-2 text-xs text-muted-foreground">
           {[
             "Your SMTP password is stored encrypted in the database — never exposed in the UI.",
-            "When you send a proposal or follow-up, FreelanceFlow uses your SMTP server to deliver it.",
+            "When you send a proposal or follow-up, iCloseLeads uses your SMTP server to deliver it.",
             "If SMTP is unavailable, emails fall back to the platform's Resend account.",
-            "Your recipients see your name and email address — not a generic FreelanceFlow address.",
+            "Your recipients see your name and email address — not a generic iCloseLeads address.",
           ].map((t, i) => (
             <li key={i} className="flex items-start gap-2">
               <CheckCircle className="w-3.5 h-3.5 text-accent flex-shrink-0 mt-0.5" />
