@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Search, Bookmark } from "lucide-react";
@@ -52,7 +54,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
       <div className="grid grid-cols-3 gap-4">
         {[
           { icon: Search, label: "Leads Saved", value: user.leads.length, color: "text-primary-light bg-primary/10" },
-          { icon: Mail, label: "Emails Sent", value: user.sentEmails.length, color: "text-accent bg-accent/10" },
+          { icon: Mail, label: "Outreach", value: user.sentEmails.length, color: "text-accent bg-accent/10" },
           { icon: Bookmark, label: "Campaigns", value: user.campaigns.length, color: "text-gold bg-gold/10" },
         ].map(({ icon: Icon, label, value, color }) => (
           <div key={label} className="bg-gradient-card border border-border rounded-2xl p-5 flex items-center gap-3">
@@ -75,7 +77,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
         {user.leads.length === 0 ? (
           <p className="px-6 py-4 text-muted-foreground text-sm">No leads yet.</p>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-[600px]">
             <thead><tr className="border-b border-border bg-background/30">
               {["Company", "Domain", "Email", "Status", "Saved"].map(h => <th key={h} className="text-left px-5 py-2.5 text-xs font-semibold text-muted-foreground uppercase">{h}</th>)}
             </tr></thead>
@@ -90,21 +92,21 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
 
-      {/* Recent Emails */}
+      {/* Recent Outreach */}
       <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
-          <h3 className="text-foreground font-semibold">Recent Sent Emails</h3>
+          <h3 className="text-foreground font-semibold">Recent Outreach</h3>
         </div>
         {user.sentEmails.length === 0 ? (
-          <p className="px-6 py-4 text-muted-foreground text-sm">No emails sent yet.</p>
+          <p className="px-6 py-4 text-muted-foreground text-sm">No outreach yet.</p>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-[600px]">
             <thead><tr className="border-b border-border bg-background/30">
-              {["Company", "Subject", "Sent", "Status"].map(h => <th key={h} className="text-left px-5 py-2.5 text-xs font-semibold text-muted-foreground uppercase">{h}</th>)}
+              {["Company", "Subject", "Logged", "Status"].map(h => <th key={h} className="text-left px-5 py-2.5 text-xs font-semibold text-muted-foreground uppercase">{h}</th>)}
             </tr></thead>
             <tbody>
               {user.sentEmails.map(e => (
@@ -116,7 +118,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, type FormEvent } from "react";
-import { Plus, Play, Pause, Trash2, Mail } from "lucide-react";
+import { Plus, Trash2, Mail } from "lucide-react";
 import { CampaignStatusBadge } from "@/components/Badge";
 import ConfirmModal from "@/components/ConfirmModal";
 import { formatDate } from "@/lib/utils";
@@ -31,12 +31,6 @@ export default function CampaignsPage() {
     setCreating(false); setForm({ name: "", niche: "" }); void fetchCampaigns();
   }
 
-  async function toggleStatus(campaign: Campaign) {
-    const newStatus = campaign.status === "RUNNING" ? "DRAFT" : campaign.status === "DRAFT" ? "RUNNING" : "COMPLETED";
-    await fetch("/api/campaigns", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: campaign.id, status: newStatus }) });
-    void fetchCampaigns();
-  }
-
   async function handleDelete() {
     if (!deleteId) return;
     await fetch(`/api/campaigns?id=${deleteId}`, { method: "DELETE" });
@@ -44,11 +38,13 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Email Campaigns</h1>
-          <p className="text-muted-foreground mt-1">Organize your outreach into campaigns.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Campaigns</h1>
+          <p className="text-muted-foreground mt-1">
+            Organize leads, proposal drafts, and follow-ups. Sending still happens manually in Gmail.
+          </p>
         </div>
         <button onClick={() => setCreating(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary">
           <Plus className="w-4 h-4" /> New Campaign
@@ -61,7 +57,7 @@ export default function CampaignsPage() {
         <div className="bg-gradient-card border border-border rounded-2xl p-12 text-center">
           <Mail className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-40" />
           <h3 className="text-foreground font-medium mb-1">No campaigns yet</h3>
-          <p className="text-muted-foreground text-sm">Create your first campaign to organize your outreach.</p>
+          <p className="text-muted-foreground text-sm">Create your first campaign to group leads and prepared outreach.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -75,15 +71,9 @@ export default function CampaignsPage() {
                   <p className="text-foreground font-semibold truncate">{c.name}</p>
                   <CampaignStatusBadge status={c.status} />
                 </div>
-                <p className="text-muted-foreground text-xs mt-0.5">{c.emailCount} emails · Created {formatDate(c.createdAt)} {c.niche ? `· ${c.niche}` : ""}</p>
+                <p className="text-muted-foreground text-xs mt-0.5">{c.emailCount} prepared item{c.emailCount === 1 ? "" : "s"} · Created {formatDate(c.createdAt)} {c.niche ? `· ${c.niche}` : ""}</p>
               </div>
               <div className="flex items-center gap-2">
-                {c.status !== "COMPLETED" && (
-                  <button onClick={() => void toggleStatus(c)}
-                    className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors" title={c.status === "RUNNING" ? "Pause" : "Start"}>
-                    {c.status === "RUNNING" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  </button>
-                )}
                 <button onClick={() => setDeleteId(c.id)} className="p-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors">
                   <Trash2 className="w-4 h-4" />
                 </button>

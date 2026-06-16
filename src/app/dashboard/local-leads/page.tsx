@@ -10,6 +10,8 @@ import {
   Key, Lock, Unlock, ArrowRight, Filter,
 } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import BonusLeadsModal from "@/components/BonusLeadsModal";
 import type { LocalLead } from "@/app/api/local-leads/search/route";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -245,10 +247,11 @@ function UrgencyBadge({ urgency }: { urgency: LocalLead["urgency"] }) {
 
 function SourceBadge({ source }: { source: LocalLead["source"] }) {
   const cfg = {
-    yelp: { label: "Yelp",      cls: "bg-red-500/10 text-red-400 border-red-500/20" },
-    here: { label: "HERE Maps", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-    osm:  { label: "OSM",       cls: "bg-green-500/10 text-green-400 border-green-500/20" },
-    demo: { label: "Preview",   cls: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+    yelp:       { label: "Yelp",       cls: "bg-red-500/10 text-red-400 border-red-500/20" },
+    here:       { label: "HERE Maps",  cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+    foursquare: { label: "Foursquare", cls: "bg-pink-500/10 text-pink-400 border-pink-500/20" },
+    osm:        { label: "OSM",        cls: "bg-green-500/10 text-green-400 border-green-500/20" },
+    demo:       { label: "Preview",    cls: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
   }[source] ?? { label: source, cls: "bg-muted text-muted-foreground border-border" };
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${cfg.cls}`}>
@@ -680,6 +683,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LocalLeadsPage() {
+  const { data: session, status: sessionStatus } = useSession();
   const [keyword,    setKeyword]    = useState("");
   const [location,   setLocation]   = useState("");
   const [filter,     setFilter]     = useState<"all"|"no_website"|"outdated_website"|"has_website">("no_website");
@@ -696,6 +700,7 @@ export default function LocalLeadsPage() {
   const [page,           setPage]           = useState(1);
   const [leadsViewed,    setLeadsViewed]    = useState(0);
   const [userPlan,       setUserPlan]       = useState<string>("free");
+  const [showBonus,      setShowBonus]      = useState(false);
   const [yelpKey,        setYelpKey]        = useState("");
   const [fsqKey,         setFsqKey]         = useState("");
   // Extra filters
@@ -703,19 +708,32 @@ export default function LocalLeadsPage() {
   const [minRating,      setMinRating]      = useState(0);
   const [showFilters,    setShowFilters]    = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const usageScope = session?.user?.email ?? "";
+  const localLeadsKey = usageScope ? `${LOCAL_LEADS_KEY}:${usageScope}` : LOCAL_LEADS_KEY;
+  const localLeadsResetKey = usageScope ? `${LOCAL_LEADS_RESET_KEY}:${usageScope}` : LOCAL_LEADS_RESET_KEY;
 
   // Load persisted state from localStorage — with 24hr auto-reset
   useEffect(() => {
-    const resetTs  = parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0", 10);
+    if (sessionStatus === "loading") return;
+    // Clear stale lead caches on schema changes
+    try {
+      if (sessionStorage.getItem("icl_cache_v") !== "5") {
+        sessionStorage.removeItem("ff_ss_live_results");
+        sessionStorage.removeItem("ff_ss_remote_results");
+        sessionStorage.removeItem("ff_ss_local_results");
+        sessionStorage.setItem("icl_cache_v", "5");
+      }
+    } catch {}
+    const resetTs  = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
     const now      = Date.now();
     const elapsed  = now - resetTs;
     if (elapsed >= 24 * 60 * 60 * 1000 || resetTs === 0) {
       // 24 hours passed — reset counter
-      localStorage.setItem(LOCAL_LEADS_KEY,       "0");
-      localStorage.setItem(LOCAL_LEADS_RESET_KEY, String(now));
+      localStorage.setItem(localLeadsKey,       "0");
+      localStorage.setItem(localLeadsResetKey, String(now));
       setLeadsViewed(0);
     } else {
-      const viewed = parseInt(localStorage.getItem(LOCAL_LEADS_KEY) ?? "0", 10);
+      const viewed = parseInt(localStorage.getItem(localLeadsKey) ?? "0", 10);
       setLeadsViewed(isNaN(viewed) ? 0 : viewed);
     }
     setYelpKey(localStorage.getItem(LOCAL_YELP_KEY_KEY) ?? "");
@@ -732,12 +750,12 @@ export default function LocalLeadsPage() {
     fetch("/api/usage").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.plan) setUserPlan(d.plan);
     }).catch(() => {});
-  }, []);
+  }, [sessionStatus, localLeadsKey, localLeadsResetKey]);
 
   // Reset time for display
   const resetAt = (() => {
     if (typeof window === "undefined") return null;
-    const resetTs = parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0", 10);
+    const resetTs = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
     return resetTs ? new Date(resetTs + 24 * 60 * 60 * 1000) : null;
   })();
 
@@ -759,10 +777,13 @@ export default function LocalLeadsPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = await res.json() as {
-        results?: LocalLead[]; source?: string; sources?: string[];
-        total?: number; geocoded?: boolean; cached?: boolean; error?: string;
-      };
+      let data: { results?: LocalLead[]; source?: string; sources?: string[]; total?: number; geocoded?: boolean; cached?: boolean; error?: string; };
+      try {
+        data = await res.json() as typeof data;
+      } catch {
+        setError("Server error. Please try again in a moment.");
+        return;
+      }
       if (!res.ok) { setError(data.error ?? "Search failed"); return; }
       if (!data.geocoded) {
         setError(`Could not find "${location}" — try a city name like "Chicago, IL" or "Sydney, Australia".`);
@@ -776,17 +797,17 @@ export default function LocalLeadsPage() {
       // Track leads viewed for daily limit
       const newCount = leadsViewed + newResults.length;
       setLeadsViewed(newCount);
-      localStorage.setItem(LOCAL_LEADS_KEY, String(newCount));
+      localStorage.setItem(localLeadsKey, String(newCount));
       // Set reset timestamp on first search of the day
-      if (!localStorage.getItem(LOCAL_LEADS_RESET_KEY) || parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0") === 0) {
-        localStorage.setItem(LOCAL_LEADS_RESET_KEY, String(Date.now()));
+      if (!localStorage.getItem(localLeadsResetKey) || parseInt(localStorage.getItem(localLeadsResetKey) ?? "0") === 0) {
+        localStorage.setItem(localLeadsResetKey, String(Date.now()));
       }
 
       // Scroll results into view
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, isOverLimit, leadsViewed, yelpKey, fsqKey]);
+  }, [keyword, location, filter, isOverLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -914,7 +935,16 @@ export default function LocalLeadsPage() {
       )}
 
       {/* Daily limit hit */}
-      {isOverLimit && <DailyLimitBanner resetAt={resetAt} />}
+      {isOverLimit && (
+        <div className="bg-surface border border-border rounded-2xl p-6 text-center">
+          <p className="text-foreground font-semibold mb-2">You've used your {FREE_PLAN_LIMIT} free local leads today</p>
+          <p className="text-muted-foreground text-sm mb-4">Unlock +300 more leads instantly — free.</p>
+          <button onClick={() => setShowBonus(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
+            🎁 Unlock +300 Free Leads
+          </button>
+        </div>
+      )}
 
       {!isOverLimit && (
         <>
@@ -1393,6 +1423,22 @@ export default function LocalLeadsPage() {
 
       </aside>
       </div>{/* end flex row */}
+
+      <BonusLeadsModal
+        isOpen={showBonus}
+        onClose={() => setShowBonus(false)}
+        onBonusClaimed={(newBonus) => {
+          setLeadsViewed(0); // reset counter after bonus — fresh start
+          setShowBonus(false);
+          // update localStorage to reflect bonus
+          if (typeof window !== "undefined") {
+            localStorage.setItem(localLeadsKey, "0");
+            localStorage.setItem(localLeadsResetKey, String(Date.now()));
+          }
+        }}
+        source="local-leads"
+        currentPlan={userPlan}
+      />
     </div>
   );
 }

@@ -62,7 +62,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       badge: null,
       features: [
         `${pricing.proLeads === "100" ? "20" : "20"} leads per week`,
-        "7 lead sources",
+        "16 lead sources",
         "Basic AI proposals",
         "CRM pipeline (3 stages)",
         "Email outreach",
@@ -114,7 +114,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
   ];
 
   return (
-    <div className="p-6 lg:p-8 max-w-5xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold text-foreground">Upgrade Your Plan</h1>
         <p className="text-muted-foreground mt-2">
@@ -236,7 +236,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Shield className="w-4 h-4 text-accent" />
-          Secure checkout via Stripe
+          Secure payment processing
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
@@ -245,6 +245,10 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
           14-day money-back guarantee
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Check className="w-4 h-4 text-accent" />
+          Works worldwide
         </div>
       </div>
 

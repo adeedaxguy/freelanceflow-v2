@@ -8,49 +8,121 @@ interface LogoProps {
   className?: string;
 }
 
-export default function Logo({ size = "md", showText = true, href = "/", className }: LogoProps) {
-  const dims = { sm: "w-7 h-7", md: "w-9 h-9", lg: "w-12 h-12" };
-  const textSize = { sm: "text-base", md: "text-lg", lg: "text-2xl" };
+/**
+ * iCloseLeads — Premium brand mark
+ *
+ * The icon: a hexagonal shield with a bold ">" arrow cut-out,
+ * symbolising closing deals and forward momentum.
+ * Gradient: deep violet → electric cyan (matches the app's primary palette).
+ *
+ * Wordmark: "i" + "Close" + "Leads" with the "i" and "Leads"
+ * in the gradient colour so the eye reads "iClose · Leads" as two ideas.
+ */
+export default function Logo({
+  size      = "md",
+  showText  = true,
+  href      = "/",
+  className,
+}: LogoProps) {
+  const iconSize  = { sm: "w-7 h-7",   md: "w-9 h-9",   lg: "w-12 h-12"  }[size];
+  const textSize  = { sm: "text-base", md: "text-lg",   lg: "text-2xl"   }[size];
 
+  // ── Icon mark ────────────────────────────────────────────────────────────────
   const mark = (
-    <div className={cn("relative flex-shrink-0", dims[size])}>
-      {/* Glow ring */}
-      <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md scale-110" />
-      {/* Main mark */}
-      <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center shadow-glow-primary overflow-hidden">
-        {/* Inner grid pattern */}
-        <svg viewBox="0 0 36 36" fill="none" className="w-full h-full absolute inset-0 opacity-10">
-          <path d="M0 12h36M0 24h36M12 0v36M24 0v36" stroke="white" strokeWidth="0.5" />
-        </svg>
-        {/* FF monogram */}
-        <svg viewBox="0 0 36 36" fill="none" className="w-[70%] h-[70%] relative z-10">
-          {/* F left stroke */}
-          <rect x="4" y="7" width="2.5" height="22" rx="1.25" fill="white" />
-          {/* F top bar */}
-          <rect x="4" y="7" width="11" height="2.5" rx="1.25" fill="white" />
-          {/* F mid bar */}
-          <rect x="4" y="15" width="8" height="2.5" rx="1.25" fill="white" />
-          {/* F2 right stroke */}
-          <rect x="19.5" y="7" width="2.5" height="22" rx="1.25" fill="white" fillOpacity="0.85" />
-          {/* F2 top bar */}
-          <rect x="19.5" y="7" width="11" height="2.5" rx="1.25" fill="white" fillOpacity="0.85" />
-          {/* F2 mid bar */}
-          <rect x="19.5" y="15" width="8" height="2.5" rx="1.25" fill="white" fillOpacity="0.85" />
+    <div className={cn("relative flex-shrink-0", iconSize)}>
+      {/* Ambient glow */}
+      <div className="absolute inset-0 rounded-xl bg-violet-600/40 blur-md scale-110 pointer-events-none" />
+
+      {/* Shield container */}
+      <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg shadow-violet-900/40">
+        <svg
+          viewBox="0 0 40 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full"
+          aria-hidden="true"
+        >
+          <defs>
+            {/* Main brand gradient */}
+            <linearGradient id="icl-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#6D28D9" />
+              <stop offset="55%"  stopColor="#7C3AED" />
+              <stop offset="100%" stopColor="#06B6D4" />
+            </linearGradient>
+            {/* Top-left shine */}
+            <linearGradient id="icl-shine" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0"    />
+            </linearGradient>
+          </defs>
+
+          {/* Background fill */}
+          <rect width="40" height="40" fill="url(#icl-bg)" />
+
+          {/* Subtle shine overlay */}
+          <rect width="40" height="40" fill="url(#icl-shine)" />
+
+          {/* Subtle grid texture */}
+          <path
+            d="M0 13.3h40M0 26.7h40M13.3 0v40M26.7 0v40"
+            stroke="white" strokeOpacity="0.06" strokeWidth="0.6"
+          />
+
+          {/*
+            ">" chevron / closing-bracket mark — bold, geometric, memorable.
+            Reads as: "close the deal", forward movement, a cursor/pointer.
+          */}
+          <path
+            d="M13 10 L26 20 L13 30"
+            stroke="white"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+
+          {/* Small dot to the left of the chevron — the "i" dot metaphor */}
+          <circle cx="9" cy="20" r="2.5" fill="white" fillOpacity="0.85" />
         </svg>
       </div>
     </div>
   );
 
-  const content = (
-    <span className={cn("flex items-center gap-2.5 group", className)}>
-      {mark}
-      {showText && (
-        <span className={cn("font-bold tracking-tight text-foreground group-hover:text-primary-light transition-colors", textSize[size])}>
-          Freelance<span className="text-primary-light">Flow</span>
-        </span>
+  // ── Wordmark ─────────────────────────────────────────────────────────────────
+  const wordmark = (
+    <span
+      className={cn(
+        "font-extrabold tracking-tight leading-none select-none",
+        textSize,
       )}
+    >
+      {/* "i" — accent colour */}
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
+        i
+      </span>
+      {/* "Close" — foreground */}
+      <span className="text-foreground">Close</span>
+      {/* "Leads" — accent colour */}
+      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
+        Leads
+      </span>
     </span>
   );
 
-  return href ? <Link href={href}>{content}</Link> : content;
+  // ── Composed ─────────────────────────────────────────────────────────────────
+  const inner = (
+    <span className={cn("flex items-center gap-2.5 group", className)}>
+      {mark}
+      {showText && wordmark}
+    </span>
+  );
+
+  return href ? (
+    <Link
+      href={href}
+      className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 rounded-xl"
+    >
+      {inner}
+    </Link>
+  ) : inner;
 }

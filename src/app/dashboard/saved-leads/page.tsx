@@ -163,7 +163,7 @@ export default function SavedLeadsPage() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = `freelanceflow-pipeline-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `icloseleads-saved-leads-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -176,9 +176,9 @@ export default function SavedLeadsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Bookmark className="w-6 h-6 text-primary-light" /> CRM Pipeline
+            <Bookmark className="w-6 h-6 text-primary-light" /> Saved Leads
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">{total} leads in your pipeline</p>
+          <p className="text-muted-foreground mt-1 text-sm">{total} saved leads across list and pipeline views</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-surface border border-border rounded-lg overflow-hidden">

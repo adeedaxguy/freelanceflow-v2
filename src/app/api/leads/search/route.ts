@@ -17,7 +17,7 @@ const searchSchema = z.object({
   maxHours:      z.number().int().min(1).max(720).optional().default(48),
   source:        z.string().optional(),
   keyword:       z.string().optional(),
-  minConfidence: z.number().int().min(0).max(100).optional().default(25),
+  minConfidence: z.number().int().min(0).max(100).optional().default(45),
   hasEmail:      z.boolean().optional().default(false),
   freshOnly:     z.boolean().optional().default(false),
 }).refine(d => !!(d.niche || (d.niches && d.niches.length > 0)), {
@@ -27,20 +27,24 @@ const searchSchema = z.object({
 const VALID_SOURCES: LeadSource[] = [
   "remoteok", "remotive", "reddit", "weworkremotely",
   "arbeitnow", "jobicy", "workingnomads", "hackernews",
-  "remoteco", "craigslist", "githubissues",
+  "ycjobs", "authenticjobs", "githubissues",
+  "freelancermap", "smashingjobs", "dribbble",
+  "himalayas", "nodesk",
 ];
+
+const UNLIMITED_EMAILS = new Set([
+  "adeedaxguy@gmail.com",
+  "adnan@technodigg.com",
+  "adnanaimanager@gmail.com",
+]);
 
 /**
  * Per-user dedup fingerprint. Combines the FULL normalized company name with
- * the domain — not a truncated substring of either. This was the root cause
- * of the prior bug where saving one reddit.com lead would silently filter
- * every future Reddit lead, because the old logic deduped on
- * `domain.split(".")[0].slice(0, 15)` which collapses every Reddit lead to
- * the same key.
+ * the domain — not a truncated substring of either.
  */
 function fingerprint(company: string, domain: string): string {
-  const co  = company.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const dom = domain.toLowerCase().replace(/^www\./, "");
+  const co  = (company ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const dom = (domain ?? "").toLowerCase().replace(/^www\./, "");
   return `${co}|${dom}`;
 }
 
@@ -62,24 +66,33 @@ export async function POST(req: NextRequest) {
       ? niches
       : (niche ? [niche] : ["web-development"]);
 
-    // Usage stats — fall back to free defaults if columns aren't migrated yet.
+    const userEmail = (session.user.email ?? "").toLowerCase();
+    const isUnlimitedUser = UNLIMITED_EMAILS.has(userEmail);
+
+    // Usage stats — agency/pro bypass first; fall back to free defaults if DB unavailable.
     let usage = {
-      plan: "free", limit: 20, used: 0, remaining: 20,
+      plan: isUnlimitedUser ? "agency" : "free",
+      limit: isUnlimitedUser ? 99999 : 100,
+      used: 0,
+      remaining: isUnlimitedUser ? 99999 : 100,
       nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
       percentage: 0,
     };
-    try {
-      const u = await getUsageStats(session.user.id);
-      if (u) usage = u;
-    } catch { /* non-fatal */ }
+    if (!isUnlimitedUser) {
+      try {
+        const u = await getUsageStats(session.user.id);
+        if (u) usage = u;
+      } catch { /* non-fatal */ }
+    }
 
     if (usage.remaining === 0) {
       return NextResponse.json({
-        error:     "Weekly lead limit reached. Upgrade to Pro for 500 leads/week.",
+        error:     "Daily limit reached. You get 100 free leads every 24 hours. Pro plan coming soon for unlimited access.",
         plan:      usage.plan,
         limit:     usage.limit,
         nextReset: usage.nextReset,
         upgrade:   true,
+        comingSoon: true,
       }, { status: 429 });
     }
 
@@ -111,12 +124,24 @@ export async function POST(req: NextRequest) {
     });
 
     // Auto-broaden fallback: if a fresh search returns nothing, silently widen
-    // the time window once to 7 days. We tell the UI it was broadened so it
-    // can warn the user that these aren't the freshest possible.
+    // the time window. We tell the UI it was broadened so it can warn the user
+    // that these aren't the freshest possible.
     let effectiveMaxHours = maxHours;
     let autoBroadened = false;
     if (rawLeads.length === 0 && maxHours < 168) {
       effectiveMaxHours = 168;
+      autoBroadened = true;
+      const retry = await aggregateLeadsWithDiagnostics(nicheList, {
+        maxHours: effectiveMaxHours,
+        filterSource,
+        minConfidence,
+        freshOnly,
+      });
+      rawLeads = retry.leads;
+      diagnostics = retry.diagnostics;
+    }
+    if (rawLeads.length === 0 && effectiveMaxHours < 720) {
+      effectiveMaxHours = 720;
       autoBroadened = true;
       const retry = await aggregateLeadsWithDiagnostics(nicheList, {
         maxHours: effectiveMaxHours,
@@ -136,10 +161,10 @@ export async function POST(req: NextRequest) {
     if (keyword?.trim()) {
       const kw = keyword.toLowerCase();
       leads = leads.filter(l =>
-        l.title.toLowerCase().includes(kw) ||
-        l.description.toLowerCase().includes(kw) ||
-        l.company.toLowerCase().includes(kw) ||
-        l.tags.some(t => t.toLowerCase().includes(kw))
+        (l.title ?? "").toLowerCase().includes(kw) ||
+        (l.description ?? "").toLowerCase().includes(kw) ||
+        (l.company ?? "").toLowerCase().includes(kw) ||
+        (l.tags ?? []).some(t => (t ?? "").toLowerCase().includes(kw))
       );
     }
     if (hasEmail) leads = leads.filter(l => !!l.email);

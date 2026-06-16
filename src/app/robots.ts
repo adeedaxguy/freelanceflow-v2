@@ -1,20 +1,15 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: [
-          "/api/",
-          "/dashboard/",
-          "/admin/",
-          "/auth/",
-        ],
+        disallow: ["/api/", "/dashboard/", "/admin/", "/auth/"],
       },
     ],
-    sitemap: "https://icloseleads.com/sitemap.xml",
-    host: "https://icloseleads.com",
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }

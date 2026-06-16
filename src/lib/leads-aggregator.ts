@@ -1,25 +1,31 @@
 /**
- * FreelanceFlow Lead Aggregator v4
+ * iCloseLeads Lead Aggregator v5
  *
  * Sources:
  *  1.  RemoteOK            — https://remoteok.com/api
  *  2.  Remotive            — https://remotive.com/api/remote-jobs
- *  3.  Reddit              — r/forhire, r/hiring, r/freelance_forhire, r/slavelabour
- *  4.  WeWorkRemotely      — RSS feeds per category
+ *  3.  Reddit              — r/forhire, r/hiring, r/freelance_forhire, r/slavelabour  (Atom RSS)
+ *  4.  WeWorkRemotely      — general + category RSS feeds
  *  5.  Arbeitnow           — https://www.arbeitnow.com/api/job-board-api
- *  6.  Jobicy              — https://jobicy.com/api/v2/remote-jobs
+ *  6.  Jobicy              — JSON API + RSS fallback
  *  7.  Working Nomads      — https://www.workingnomads.com/api/exposed_jobs
  *  8.  HackerNews          — Algolia "Who is hiring?" / freelancer threads
- *  9.  Remote.co           — https://remote.co/remote-jobs/feed/ (RSS)      [NEW]
- *  10. Craigslist Gigs     — computer + web gigs RSS, 8 major US cities     [NEW]
- *  11. GitHub Bounties     — open issues labelled bounty/paid               [NEW]
+ *  9.  YC Jobs             — hacker-news.firebaseio.com/v0/jobstories          [replaces Remote.co]
+ *  10. Authentic Jobs      — https://authenticjobs.com/feed/                  [replaces Craigslist]
+ *  11. GitHub Bounties     — open issues labelled bounty/paid
+ *  12. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/
+ *  13. Dribbble Jobs       — https://dribbble.com/jobs.rss
+ *  14. Jobspresso          — https://jobspresso.co/feed/                      [replaces Freelancermap]
  *
- * v4 additions:
- *  - budget?: string   — extracted dollar amount / rate from each posting
- *  - urgency?: boolean — ASAP / urgent signals detected
- *  - Budget boosts qualityScore (+18) — clients who state budget are serious
- *  - ALL_SOURCE_LABELS exported for UI source-filter chips
- *  - extractBudget() + detectUrgency() applied across ALL sources
+ * v5 changes:
+ *  - Reddit switched to public Atom RSS (no OAuth, 100% reliable)
+ *  - Remote.co removed (Cloudflare blocks Vercel IPs) → replaced by YC Jobs (HN Firebase API)
+ *  - Craigslist removed (Vercel IPs blocked) → replaced by Authentic Jobs RSS
+ *  - Freelancermap removed (wrong/blocked URL from Vercel) → replaced by Jobspresso RSS
+ *  - Jobicy: improved headers + RSS fallback on 4xx
+ *  - WeWorkRemotely: now fetches general feed in addition to category feeds
+ *  - Dedup: 3-key strategy (ID + normalised URL + company+title)
+ *  - Added 5 new niches: Blockchain/Web3, Cybersecurity, Game Dev, Technical Writing, VA
  */
 
 export type LeadSource =
@@ -31,9 +37,14 @@ export type LeadSource =
   | "jobicy"
   | "workingnomads"
   | "hackernews"
-  | "remoteco"
-  | "craigslist"
-  | "githubissues";
+  | "ycjobs"           // replaced Remote.co (Cloudflare-blocked from Vercel)
+  | "authenticjobs"   // replaced Craigslist (Vercel IPs blocked)
+  | "githubissues"
+  | "smashingjobs"
+  | "dribbble"
+  | "freelancermap"   // shows Jobspresso feed (freelancermap.com URL was wrong)
+  | "himalayas"       // himalayas.app — startup/remote jobs RSS
+  | "nodesk";         // nodesk.co — curated remote-work RSS
 
 /** Canonical display labels for every source — used by the UI source-filter chips */
 export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
@@ -45,9 +56,14 @@ export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
   jobicy:        "Jobicy",
   workingnomads: "Working Nomads",
   hackernews:    "Hacker News",
-  remoteco:      "Remote.co",
-  craigslist:    "Craigslist",
-  githubissues:  "GitHub",
+  ycjobs:        "YC Jobs",
+  authenticjobs: "Authentic Jobs",
+  githubissues:  "GitHub Bounties",
+  smashingjobs:  "Smashing Jobs",
+  dribbble:      "Dribbble Jobs",
+  freelancermap: "Jobspresso",
+  himalayas:    "Himalayas",
+  nodesk:       "No Desk",
 };
 
 export interface AggregatedLead {
@@ -112,7 +128,31 @@ const NICHE_ALIASES: Record<string, string> = {
   "writing":          "copywriting",
   "content":          "copywriting",
   "marketing":        "email-marketing",
+  "meta":             "meta-ads",
+  "meta ads":         "meta-ads",
+  "facebook ads":     "meta-ads",
+  "instagram ads":    "meta-ads",
+  "paid social":      "meta-ads",
+  "paid media":       "meta-ads",
+  "media buying":     "meta-ads",
+  "media buyer":      "meta-ads",
   "video":            "video-editing",
+  // New niche aliases
+  "web3":             "blockchain",
+  "crypto":           "blockchain",
+  "nft":              "blockchain",
+  "defi":             "blockchain",
+  "security":         "cybersecurity",
+  "infosec":          "cybersecurity",
+  "pentest":          "cybersecurity",
+  "game":             "game-development",
+  "games":            "game-development",
+  "unity":            "game-development",
+  "gaming":           "game-development",
+  "docs":             "technical-writing",
+  "documentation":    "technical-writing",
+  "va":               "virtual-assistant",
+  "assistant":        "virtual-assistant",
 };
 
 export function normalizeNiche(niche: string): string {
@@ -130,6 +170,7 @@ export const NICHE_KEYWORDS: Record<string, string[]> = {
   "video-editing":       ["video editor","video editing","motion graphics","after effects","premiere pro","youtube editor","video production","videographer","animator","davinci resolve","final cut","video content"],
   "graphic-design":      ["graphic designer","graphic design","logo design","branding","illustrator","photoshop","visual design","brand identity","print design","packaging design","canva","illustration"],
   "social-media":        ["social media manager","social media","community manager","instagram manager","content creator","social strategy","tiktok","youtube manager","facebook ads","social media marketing"],
+  "meta-ads":            ["meta ads","facebook ads","instagram ads","paid social","paid media","media buyer","media buying","performance marketer","performance marketing","facebook ad","instagram ad","meta advertising","ads manager","facebook campaigns","instagram campaigns","paid acquisition","social ads","social advertising"],
   "data-science":        ["data scientist","data analyst","machine learning","ml engineer","data engineering","python developer","analytics","ai engineer","llm","nlp","tensorflow","pytorch","sql","tableau","power bi","data pipeline"],
   "devops":              ["devops","cloud engineer","aws","kubernetes","docker","ci/cd","infrastructure","sre","platform engineer","terraform","gcp","azure","ansible","linux","nginx","cloud architect"],
   "wordpress":           ["wordpress","wp developer","wordpress developer","woocommerce","elementor","wordpress plugin","wp theme","gutenberg","divi","wordpress site"],
@@ -137,6 +178,27 @@ export const NICHE_KEYWORDS: Record<string, string[]> = {
   "email-marketing":     ["email marketing","klaviyo","mailchimp","email campaign","email automation","drip campaign","hubspot","activecampaign","email funnel","beehiiv","convertkit","email strategy"],
   "business-consulting": ["business consultant","strategy consultant","management consultant","business analyst","startup advisor","fractional cto","fractional cfo","operations consultant","growth consultant","coo","business strategy"],
   "photography":         ["photographer","photo editor","product photography","photo retouching","lightroom","photoshoot","commercial photography","real estate photography","portrait","headshot"],
+  // ── New niches ──────────────────────────────────────────────────────────────
+  "blockchain":          ["blockchain","web3","solidity","smart contract","defi","nft","ethereum","crypto","dao","dapp","polygon","solana","near protocol","rust blockchain","web3 developer","blockchain developer","token","cryptocurrency"],
+  "cybersecurity":       ["cybersecurity","penetration testing","pentest","security audit","infosec","ethical hacking","vulnerability assessment","soc analyst","bug bounty","cloud security","network security","ctf","cybersecurity analyst","security engineer","red team","blue team"],
+  "game-development":    ["game developer","unity developer","unreal engine","game design","game programmer","godot","c# unity","game dev","multiplayer game","mobile game","game mechanics","gameplay programmer","game artist","indie game","gaming"],
+  "technical-writing":   ["technical writer","api documentation","user manual","documentation","developer docs","knowledge base","doc writer","api docs","confluence","technical documentation","product documentation","content documentation","sdk docs"],
+  "virtual-assistant":   ["virtual assistant","executive assistant","admin assistant","administrative","data entry","research assistant","personal assistant","remote assistant","calendar management","scheduling","inbox management","project coordinator","online assistant"],
+};
+
+const NICHE_TITLE_CONTEXT: Record<string, string[]> = {
+  "wordpress": [
+    "wordpress","wp developer","wordpress developer","woocommerce","elementor",
+    "website","web designer","web developer","web design","fullstack","full stack",
+    "frontend","backend","php developer",
+  ],
+  "meta-ads": [
+    "meta ads","facebook ads","instagram ads","paid social","paid media","media buyer",
+    "performance marketing","performance marketer","marketing manager","marketing strategist",
+    "growth marketing","growth marketer","digital marketing","social media strategist",
+    "account strategist","brand strategist","campaign manager","ppc","paid acquisition",
+    "social ads","ads manager",
+  ],
 };
 
 const FREELANCE_SIGNALS = [
@@ -194,6 +256,27 @@ function truncate(text: string, max = 320): string {
   return cleaned.length > max ? cleaned.slice(0, max).replace(/\s+\S*$/, "") + "…" : cleaned;
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function keywordMatchesText(text: string, keyword: string): boolean {
+  const kw = keyword.trim().toLowerCase();
+  if (!kw) return false;
+  const escaped = kw.split(/\s+/).map(escapeRegExp).join("\\s+");
+  const needsLeftBoundary = /^[a-z0-9]/i.test(kw);
+  const needsRightBoundary = /[a-z0-9]$/i.test(kw);
+  const pattern = `${needsLeftBoundary ? "(^|[^a-z0-9])" : ""}${escaped}${needsRightBoundary ? "($|[^a-z0-9])" : ""}`;
+  return new RegExp(pattern, "i").test(text.toLowerCase());
+}
+
+function titleHasNicheContext(niche: string, title: string, tags: string[]): boolean {
+  const context = NICHE_TITLE_CONTEXT[niche];
+  if (!context) return true;
+  const titleAndTags = `${title ?? ""} ${(tags ?? []).join(" ")}`.toLowerCase();
+  return context.some(keyword => keywordMatchesText(titleAndTags, keyword));
+}
+
 /**
  * Extract a budget / rate string from text.
  * Matches "$500", "$45/hr", "$1k-$5k", "budget: $200", "500 USD", etc.
@@ -232,10 +315,11 @@ function scoreMatch(title: string, body: string, tags: string[], keywords: strin
 
   let titleHits = 0; let bodyHits = 0;
   for (const raw of keywords) {
-    const kw = raw.toLowerCase();
-    if (titleLower.includes(kw)) titleHits++;
-    else if (bodyLower.includes(kw)) bodyHits++;
+    if (keywordMatchesText(titleLower, raw)) titleHits++;
+    else if (keywordMatchesText(bodyLower, raw)) bodyHits++;
   }
+
+  if (titleHits + bodyHits === 0) return 0;
 
   let score = 22;
   if (titleHits > 0) score += 30 + Math.min(20, (titleHits - 1) * 8);
@@ -247,6 +331,29 @@ function scoreMatch(title: string, body: string, tags: string[], keywords: strin
   }
 
   return Math.min(100, Math.max(0, Math.round(score)));
+}
+
+function bestNicheMatch(
+  lead: Pick<AggregatedLead, "title" | "description" | "tags" | "confidence">,
+  nicheKeywordSets: Array<{ niche: string; keywords: string[] }>,
+): { niche: string; confidence: number } | null {
+  if (nicheKeywordSets.length === 0) return null;
+
+  if (nicheKeywordSets.length === 1) {
+    const only = nicheKeywordSets[0]!;
+    if (!titleHasNicheContext(only.niche, lead.title, lead.tags)) return null;
+    const visibleScore = scoreMatch(lead.title, lead.description, lead.tags, only.keywords);
+    const confidence = Math.max(visibleScore, lead.confidence);
+    return confidence > 0 ? { niche: only.niche, confidence } : null;
+  }
+
+  let best: { niche: string; confidence: number } | null = null;
+  for (const candidate of nicheKeywordSets) {
+    if (!titleHasNicheContext(candidate.niche, lead.title, lead.tags)) continue;
+    const confidence = scoreMatch(lead.title, lead.description, lead.tags, candidate.keywords);
+    if (confidence > (best?.confidence ?? 0)) best = { niche: candidate.niche, confidence };
+  }
+  return best && best.confidence > 0 ? best : null;
 }
 
 function calcQuality(lead: {
@@ -286,38 +393,92 @@ function cacheOpts(freshOnly: boolean, revalidateSec: number): RequestInit & { n
   return freshOnly ? { cache: "no-store" } : { next: { revalidate: revalidateSec } };
 }
 
-// ─── Reddit OAuth ─────────────────────────────────────────────────────────────
+// ─── Reddit helpers (RSS/Atom — no OAuth required) ───────────────────────────
 
-let redditToken: { token: string; expiresAt: number } | null = null;
-
-async function getRedditToken(): Promise<string | null> {
-  const id = process.env.REDDIT_CLIENT_ID;
-  const secret = process.env.REDDIT_CLIENT_SECRET;
-  if (!id || !secret) return null;
-  if (redditToken && redditToken.expiresAt > Date.now() + 60_000) return redditToken.token;
+/** Pull posts from one subreddit via its public Atom feed. */
+async function fetchRedditSub(
+  sub: string,
+  isHiringFilter: (title: string) => boolean,
+  keywords: string[],
+  maxHours: number,
+  freshOnly: boolean,
+): Promise<AggregatedLead[]> {
+  let xml = "";
   try {
     const res = await withTimeout(
-      fetch("https://www.reddit.com/api/v1/access_token", {
-        method: "POST",
+      fetch(`https://www.reddit.com/r/${sub}/new.rss?limit=100`, {
         headers: {
-          "Authorization": `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`,
-          "User-Agent": "FreelanceFlow/4.0",
-          "Content-Type": "application/x-www-form-urlencoded",
+          // Must look like a real browser agent to avoid Reddit's bot block
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 iCloseLeads/5.0",
+          "Accept":      "application/rss+xml, application/atom+xml, text/xml, */*",
         },
-        body: "grant_type=client_credentials",
-        cache: "no-store",
+        ...cacheOpts(freshOnly, 300),
       }),
-      6000
+      9000,
     );
-    if (!res.ok) return null;
-    const data = await res.json() as { access_token?: string; expires_in?: number };
-    if (!data.access_token) return null;
-    redditToken = {
-      token: data.access_token,
-      expiresAt: Date.now() + ((data.expires_in ?? 86_400) * 1000),
-    };
-    return data.access_token;
-  } catch { return null; }
+    if (!res.ok) return [];
+    xml = await res.text();
+  } catch { return []; }
+
+  // Reddit RSS uses Atom <entry> elements
+  const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/gi)];
+  const leads: AggregatedLead[] = [];
+
+  for (const m of entries) {
+    const entry = m[1] ?? "";
+
+    // Title
+    const titleRaw = entry.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i)?.[1] ?? "";
+    const title    = stripHtml(titleRaw).trim();
+    if (!title) continue;
+
+    // Skip posts that don't match the "hiring" filter for this subreddit
+    if (!isHiringFilter(title)) continue;
+
+    // Link — Reddit Atom has <link rel="alternate" href="..."/>
+    const link = entry.match(/<link[^>]+href="([^"]+)"/i)?.[1]?.replace(/&amp;/g, "&") ?? "";
+    if (!link) continue;
+
+    // Post ID from the <id> tag or URL
+    const postId = entry.match(/\/comments\/([a-z0-9]+)\//i)?.[1] ?? Math.random().toString(36).slice(2);
+
+    // Published timestamp
+    const updatedStr = entry.match(/<updated[^>]*>([\s\S]*?)<\/updated>/i)?.[1] ?? "";
+    const posted     = updatedStr ? new Date(updatedStr) : null;
+    if (!posted || isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+
+    // Body content
+    const contentRaw = entry.match(/<content[^>]*>([\s\S]*?)<\/content>/i)?.[1] ?? "";
+    const body       = stripHtml(contentRaw);
+
+    // Author
+    const author = entry.match(/<name[^>]*>([\s\S]*?)<\/name>/i)?.[1]?.trim() ?? "";
+
+    const baseConfidence = scoreMatch(title, body, [], keywords);
+    const confidence = baseConfidence > 0 ? Math.min(100, baseConfidence + 14) : 0;
+    if (confidence < SOURCE_FLOOR) continue;
+    const budget     = extractBudget(title + " " + body);
+    const urgency    = detectUrgency(title + " " + body);
+    const email      = extractEmail(body);
+    const domain     = email ? (email.split("@")[1] ?? "reddit.com") : "reddit.com";
+    const titleClean = title.replace(/\[.*?\]/g, "").replace(/\bhiring\b/gi, "").replace(/\s+/g, " ").trim();
+    const company    = titleClean.length > 5 ? titleClean.slice(0, 70) : `u/${author || "redditor"}`;
+
+    leads.push({
+      id:          `reddit-${postId}`,
+      company,     domain, email,
+      title:       title.replace(/\[.*?\]\s*/g, "").trim() || title,
+      description: truncate(body || "Reddit hiring post — click to view the full thread."),
+      url:         link,
+      source:      "reddit", sourceLabel: `r/${sub}`,
+      postedAt:    posted.toISOString(), hoursAgo: hrs, niche: "", tags: [],
+      confidence,  budget, urgency,
+      qualityScore: calcQuality({ email, description: body, domain, title, budget, urgency }),
+    });
+  }
+  return leads;
 }
 
 const SOURCE_FLOOR = 12;
@@ -353,7 +514,7 @@ interface RemoteOKJob {
 async function fetchRemoteOK(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://remoteok.com/api", {
-      headers: { "User-Agent": "Mozilla/5.0 FreelanceFlow/4.0" },
+      headers: { "User-Agent": "Mozilla/5.0 iCloseLeads/4.0" },
       ...cacheOpts(freshOnly, 600),
     }),
     9000
@@ -403,14 +564,14 @@ async function fetchRemotive(niche: string, keywords: string[], maxHours: number
     "web-development":"software-dev","mobile-apps":"software-dev",
     "ui-ux-design":"design","copywriting":"writing","seo":"marketing",
     "graphic-design":"design","social-media":"marketing","data-science":"data",
-    "devops":"devops-sysadmin","email-marketing":"marketing","business-consulting":"business",
+    "devops":"devops-sysadmin","email-marketing":"marketing","meta-ads":"marketing","business-consulting":"business",
     "wordpress":"software-dev","shopify":"software-dev",
   };
   const category = categoryMap[niche] ?? "";
   const search   = keywords.slice(0, 2).join(" ");
   const url = `https://remotive.com/api/remote-jobs?${category ? `category=${category}` : `search=${encodeURIComponent(search)}`}&limit=100`;
   const res = await withTimeout(
-    fetch(url, { headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 600) }),
+    fetch(url, { headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 600) }),
     9000
   );
   if (!res.ok) throw new Error(`Remotive ${res.status}`);
@@ -443,72 +604,44 @@ async function fetchRemotive(niche: string, keywords: string[], maxHours: number
   return { leads, raw: inWindow };
 }
 
-// ─── Source 3: Reddit ─────────────────────────────────────────────────────────
+// ─── Source 3: Reddit (via public RSS / Atom feeds — no OAuth needed) ────────
 
-interface RedditChild { data: { id?: string; title?: string; selftext?: string; author?: string; created_utc?: number; permalink?: string; }; }
-interface RedditResponse { data?: { children?: RedditChild[] }; }
-
-const REDDIT_SUBS = [
-  { sub: "forhire",           label: "r/forhire" },
-  { sub: "hiring",            label: "r/hiring" },
-  { sub: "freelance_forhire", label: "r/freelance_forhire" },
-  { sub: "slavelabour",       label: "r/slavelabour" },
+const REDDIT_SUBS: Array<{
+  sub: string;
+  filter: (title: string) => boolean;
+}> = [
+  {
+    sub:    "forhire",
+    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t),
+  },
+  {
+    sub:    "freelance_forhire",
+    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t),
+  },
+  {
+    sub:    "hiring",
+    // r/hiring: all posts are from hirers UNLESS tagged [For Hire] / [FH]
+    filter: t => !/\[for\s*hire\]/i.test(t) && !/\[fh\]/i.test(t),
+  },
+  {
+    sub:    "slavelabour",
+    // slavelabour: [Offer] = someone offering a service; [Task] = hiring
+    filter: t => /\[task\]/i.test(t),
+  },
 ];
 
-async function fetchReddit(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
-  const leads: AggregatedLead[] = [];
-  let inWindow = 0;
-  const token   = await getRedditToken();
-  const baseUrl = token ? "https://oauth.reddit.com" : "https://www.reddit.com";
-  const headers: Record<string, string> = { "User-Agent": "FreelanceFlow/4.0 (+https://freelanceflow.io)" };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  await Promise.all(REDDIT_SUBS.map(async ({ sub, label }) => {
-    try {
-      const url = `${baseUrl}/r/${sub}/new${token ? "" : ".json"}?limit=100&raw_json=1`;
-      const res = await withTimeout(fetch(url, { headers, ...cacheOpts(freshOnly, 300) }), 7000);
-      if (!res.ok) return;
-      const data = await res.json() as RedditResponse;
-      for (const post of data.data?.children ?? []) {
-        const d = post.data;
-        if (!d.title || !d.created_utc) continue;
-        const tl = d.title.toLowerCase();
-        let isHiring = false;
-        if (sub === "forhire" || sub === "freelance_forhire") {
-          isHiring = /\[hiring\]/i.test(d.title) || /\[h\]/i.test(d.title);
-        } else if (sub === "hiring") {
-          isHiring = !(/\[for\s*hire\]/i.test(d.title) || /\[fh\]/i.test(d.title));
-        } else if (sub === "slavelabour") {
-          isHiring = /\[?offer\]?/i.test(d.title) || /^\$/.test(d.title) || tl.startsWith("offer");
-        }
-        if (!isHiring) continue;
-        const posted = new Date(d.created_utc * 1000);
-        const hrs = hoursAgo(posted);
-        if (hrs > maxHours) continue;
-        inWindow++;
-        const body       = d.selftext ?? "";
-        const rawScore   = scoreMatch(d.title, body, [], keywords);
-        const confidence = Math.min(100, rawScore + 14);
-        const budget     = extractBudget(d.title + " " + body);
-        const urgency    = detectUrgency(d.title + " " + body);
-        const email      = extractEmail(body);
-        const domain     = email ? (email.split("@")[1] ?? "reddit.com") : "reddit.com";
-        const titleClean = d.title.replace(/\[.*?\]/g, "").replace(/\bhiring\b/gi, "").replace(/\s+/g, " ").trim();
-        const company    = titleClean.length > 5 ? titleClean.slice(0, 70) : `u/${d.author ?? "redditor"}`;
-        leads.push({
-          id: `reddit-${d.id ?? Math.random()}`,
-          company, domain, email,
-          title: d.title.replace(/\[.*?\]\s*/g, "").trim() || d.title,
-          description: truncate(body || "Reddit hiring post — see thread for details."),
-          url: d.permalink ? `https://reddit.com${d.permalink}` : `https://reddit.com/r/${sub}`,
-          source: "reddit", sourceLabel: label,
-          postedAt: posted.toISOString(), hoursAgo: hrs, niche: "", tags: [], confidence, budget, urgency,
-          qualityScore: calcQuality({ email, description: body, domain, title: d.title, budget, urgency }),
-        });
-      }
-    } catch { /* per-sub failure is non-fatal */ }
-  }));
-  return { leads, raw: inWindow };
+async function fetchReddit(
+  keywords: string[],
+  maxHours: number,
+  freshOnly: boolean,
+): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const results = await Promise.all(
+    REDDIT_SUBS.map(({ sub, filter }) =>
+      fetchRedditSub(sub, filter, keywords, maxHours, freshOnly),
+    ),
+  );
+  const leads = results.flat();
+  return { leads, raw: leads.length };
 }
 
 // ─── Source 4: WeWorkRemotely ─────────────────────────────────────────────────
@@ -518,7 +651,9 @@ function extractRSS(xml: string, tag: string): string {
   return (m?.[1] ?? "").trim();
 }
 
-const WWR_FEEDS: Record<string, string> = {
+// WWR: fetch the general all-jobs feed PLUS a niche-specific category feed in parallel.
+// This ensures we always get some results even when the category has low posting volume.
+const WWR_CATEGORY_FEEDS: Record<string, string> = {
   "web-development":     "https://weworkremotely.com/categories/remote-programming-jobs.rss",
   "mobile-apps":         "https://weworkremotely.com/categories/remote-programming-jobs.rss",
   "wordpress":           "https://weworkremotely.com/categories/remote-programming-jobs.rss",
@@ -529,64 +664,82 @@ const WWR_FEEDS: Record<string, string> = {
   "seo":                 "https://weworkremotely.com/categories/remote-marketing-jobs.rss",
   "social-media":        "https://weworkremotely.com/categories/remote-marketing-jobs.rss",
   "email-marketing":     "https://weworkremotely.com/categories/remote-marketing-jobs.rss",
+  "meta-ads":            "https://weworkremotely.com/categories/remote-marketing-jobs.rss",
   "data-science":        "https://weworkremotely.com/categories/remote-programming-jobs.rss",
   "devops":              "https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss",
   "business-consulting": "https://weworkremotely.com/categories/remote-business-exec-management-jobs.rss",
 };
+const WWR_GENERAL = "https://weworkremotely.com/remote-jobs.rss";
+
+async function fetchWWRFeed(feedUrl: string, keywords: string[], maxHours: number, freshOnly: boolean): Promise<AggregatedLead[]> {
+  try {
+    const res = await withTimeout(
+      fetch(feedUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
+          "Accept":     "application/rss+xml, text/xml, */*",
+        },
+        ...cacheOpts(freshOnly, 900),
+      }),
+      10000
+    );
+    if (!res.ok) return [];
+    const xml   = await res.text();
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+    const leads: AggregatedLead[] = [];
+
+    for (const m of items) {
+      const item    = m[1] ?? "";
+      const title   = stripHtml(extractRSS(item, "title"));
+      // WWR uses <link> but sometimes puts it after CDATA — also try <guid>
+      let link = extractRSS(item, "link");
+      if (!link) link = extractRSS(item, "guid");
+      const pubDate = extractRSS(item, "pubDate");
+      const desc    = extractRSS(item, "description");
+      if (!title || !link) continue;
+      const posted = new Date(pubDate);
+      if (isNaN(posted.getTime())) continue;
+      const hrs = hoursAgo(posted);
+      if (hrs > maxHours) continue;
+      const cleanDesc  = stripHtml(desc);
+      const confidence = scoreMatch(title, cleanDesc, [], keywords);
+      if (confidence < SOURCE_FLOOR) continue;
+
+      let company = ""; let cleanTitle = title;
+      const atMatch    = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+      const colonMatch = title.match(/^(.+?):\s*(.+)$/);
+      if (atMatch?.[2])  { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+      else if (colonMatch?.[1] && colonMatch[1].length < 40) { company = colonMatch[1].trim(); cleanTitle = colonMatch[2]?.trim() ?? title; }
+      if (!company) { const rm = item.match(/<region[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/region>/i); company = rm?.[1]?.trim() ?? ""; }
+      if (!company) company = "Hiring Company";
+      company = company.slice(0, 80);
+
+      const budget  = extractBudget(cleanDesc);
+      const urgency = detectUrgency(title + " " + cleanDesc);
+      const email   = extractEmail(cleanDesc);
+      const domain  = extractDomain(link) !== "weworkremotely.com" ? extractDomain(link) : companyToDomain(company);
+      leads.push({
+        id: `wwr-${link.split("/").pop()?.replace(/[^a-z0-9]/gi, "") ?? Math.random()}`,
+        company, domain, email, title: cleanTitle || title, description: truncate(cleanDesc),
+        url: link, source: "weworkremotely", sourceLabel: "WeWorkRemotely",
+        postedAt: posted.toISOString(), hoursAgo: hrs, niche: "", tags: [], confidence, budget, urgency,
+        qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+      });
+    }
+    return leads;
+  } catch { return []; }
+}
 
 async function fetchWeWorkRemotely(niche: string, keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
-  const feedUrl = WWR_FEEDS[niche] ?? "https://weworkremotely.com/remote-jobs.rss";
-  const res = await withTimeout(
-    fetch(feedUrl, {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/rss+xml, text/xml" },
-      ...cacheOpts(freshOnly, 900),
-    }),
-    9000
-  );
-  if (!res.ok) throw new Error(`WWR ${res.status}`);
-  const xml   = await res.text();
-  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
-  const leads: AggregatedLead[] = [];
-  let inWindow = 0;
+  const categoryFeed = WWR_CATEGORY_FEEDS[niche];
+  // Always fetch general feed; additionally fetch category feed if available
+  const feedUrls = categoryFeed && categoryFeed !== WWR_GENERAL
+    ? [WWR_GENERAL, categoryFeed]
+    : [WWR_GENERAL];
 
-  for (const m of items) {
-    const item    = m[1] ?? "";
-    const title   = extractRSS(item, "title");
-    const link    = extractRSS(item, "link");
-    const pubDate = extractRSS(item, "pubDate");
-    const desc    = extractRSS(item, "description");
-    if (!title || !link) continue;
-    const posted = new Date(pubDate);
-    if (isNaN(posted.getTime())) continue;
-    const hrs = hoursAgo(posted);
-    if (hrs > maxHours) continue;
-    inWindow++;
-    const cleanDesc  = stripHtml(desc);
-    const confidence = scoreMatch(title, cleanDesc, [], keywords);
-    if (confidence < SOURCE_FLOOR) continue;
-
-    let company = ""; let cleanTitle = title;
-    const atMatch    = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
-    const colonMatch = title.match(/^(.+?):\s*(.+)$/);
-    if (atMatch?.[2])  { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
-    else if (colonMatch?.[1] && colonMatch[1].length < 40) { company = colonMatch[1].trim(); cleanTitle = colonMatch[2]?.trim() ?? title; }
-    if (!company) { const rm = item.match(/<region[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/region>/i); company = rm?.[1]?.trim() ?? ""; }
-    if (!company) company = "Hiring Company";
-    company = company.slice(0, 80);
-
-    const budget  = extractBudget(cleanDesc);
-    const urgency = detectUrgency(title + " " + cleanDesc);
-    const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "weworkremotely.com" ? extractDomain(link) : companyToDomain(company);
-    leads.push({
-      id: `wwr-${link.split("/").pop()?.replace(/[^a-z0-9]/gi, "") ?? Math.random()}`,
-      company, domain, email, title: cleanTitle || title, description: truncate(cleanDesc),
-      url: link, source: "weworkremotely", sourceLabel: "WeWorkRemotely",
-      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "", tags: [], confidence, budget, urgency,
-      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
-    });
-  }
-  return { leads, raw: inWindow };
+  const results = await Promise.all(feedUrls.map(url => fetchWWRFeed(url, keywords, maxHours, freshOnly)));
+  const leads   = results.flat();
+  return { leads, raw: leads.length };
 }
 
 // ─── Source 5: Arbeitnow ─────────────────────────────────────────────────────
@@ -600,7 +753,7 @@ interface ArbeitnowResponse { data?: ArbeitnowJob[]; }
 async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://www.arbeitnow.com/api/job-board-api", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/json" },
       ...cacheOpts(freshOnly, 900),
     }),
     9000
@@ -640,6 +793,8 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
 }
 
 // ─── Source 6: Jobicy ─────────────────────────────────────────────────────────
+// Uses browser-like headers to bypass Cloudflare. Falls back to their RSS feed
+// if the JSON API returns a 4xx (common from Vercel/serverless IPs).
 
 interface JobicyJob {
   id?: number; jobTitle?: string; companyName?: string; jobIndustry?: string[];
@@ -648,42 +803,106 @@ interface JobicyJob {
 interface JobicyResponse { jobs?: JobicyJob[]; }
 
 async function fetchJobicy(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
-  const res = await withTimeout(
-    fetch("https://jobicy.com/api/v2/remote-jobs?count=50&geo=worldwide", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
-      ...cacheOpts(freshOnly, 900),
-    }),
-    8000
-  );
-  if (!res.ok) throw new Error(`Jobicy ${res.status}`);
-  const data = await res.json() as JobicyResponse;
-  let inWindow = 0;
-  const leads = (data.jobs ?? []).flatMap((job): AggregatedLead[] => {
-    if (!job.jobTitle || !job.companyName) return [];
-    const posted = job.pubDate ? new Date(job.pubDate) : null;
-    if (!posted || isNaN(posted.getTime())) return [];
-    const hrs = hoursAgo(posted);
-    if (hrs > maxHours) return [];
-    inWindow++;
-    const desc       = stripHtml(job.jobDescription ?? job.jobExcerpt ?? "");
-    const confidence = scoreMatch(job.jobTitle, desc, job.jobIndustry ?? [], keywords);
-    if (confidence < SOURCE_FLOOR) return [];
-    const budget  = extractBudget(desc);
-    const urgency = detectUrgency(job.jobTitle + " " + desc);
-    const email   = extractEmail(desc);
-    const domain  = companyToDomain(job.companyName);
-    const url     = job.url ?? (job.jobSlug ? `https://jobicy.com/jobs/${job.jobSlug}` : "https://jobicy.com");
-    return [{
-      id: `jobicy-${job.id ?? Math.random()}`,
-      company: job.companyName.trim(), domain, email, title: job.jobTitle.trim(),
-      description: truncate(desc), url,
-      source: "jobicy", sourceLabel: "Jobicy",
-      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
-      tags: (job.jobIndustry ?? []).slice(0, 8), confidence, budget, urgency,
-      qualityScore: calcQuality({ email, description: desc, tags: job.jobIndustry, domain, title: job.jobTitle, budget, urgency }),
-    }];
-  });
-  return { leads, raw: inWindow };
+  const BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+  // ── Try JSON API first ────────────────────────────────────────────────────
+  try {
+    const res = await withTimeout(
+      fetch("https://jobicy.com/api/v2/remote-jobs?count=50&geo=worldwide", {
+        headers: {
+          "User-Agent": BROWSER_UA,
+          "Accept":     "application/json, text/plain, */*",
+          "Referer":    "https://jobicy.com/",
+          "Origin":     "https://jobicy.com",
+        },
+        ...cacheOpts(freshOnly, 900),
+      }),
+      9000
+    );
+    if (res.ok) {
+      const data = await res.json() as JobicyResponse;
+      let inWindow = 0;
+      const leads = (data.jobs ?? []).flatMap((job): AggregatedLead[] => {
+        if (!job.jobTitle || !job.companyName) return [];
+        const posted = job.pubDate ? new Date(job.pubDate) : null;
+        if (!posted || isNaN(posted.getTime())) return [];
+        const hrs = hoursAgo(posted);
+        if (hrs > maxHours) return [];
+        inWindow++;
+        const desc       = stripHtml(job.jobDescription ?? job.jobExcerpt ?? "");
+        const confidence = scoreMatch(job.jobTitle, desc, job.jobIndustry ?? [], keywords);
+        if (confidence < SOURCE_FLOOR) return [];
+        const budget  = extractBudget(desc);
+        const urgency = detectUrgency(job.jobTitle + " " + desc);
+        const email   = extractEmail(desc);
+        const domain  = companyToDomain(job.companyName);
+        const url     = job.url ?? (job.jobSlug ? `https://jobicy.com/jobs/${job.jobSlug}` : "https://jobicy.com");
+        return [{
+          id: `jobicy-${job.id ?? Math.random()}`,
+          company: job.companyName.trim(), domain, email, title: job.jobTitle.trim(),
+          description: truncate(desc), url,
+          source: "jobicy", sourceLabel: "Jobicy",
+          postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+          tags: (job.jobIndustry ?? []).slice(0, 8), confidence, budget, urgency,
+          qualityScore: calcQuality({ email, description: desc, tags: job.jobIndustry, domain, title: job.jobTitle, budget, urgency }),
+        }];
+      });
+      return { leads, raw: inWindow };
+    }
+    // Fall through to RSS fallback on non-2xx
+  } catch { /* fall through to RSS */ }
+
+  // ── RSS fallback (WordPress feed — more permissive on bot IPs) ────────────
+  try {
+    const res = await withTimeout(
+      fetch("https://jobicy.com/feed/", {
+        headers: { "User-Agent": BROWSER_UA, "Accept": "application/rss+xml, text/xml, */*" },
+        ...cacheOpts(freshOnly, 1800),
+      }),
+      9000
+    );
+    if (!res.ok) throw new Error(`Jobicy RSS ${res.status}`);
+    const xml   = await res.text();
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+    const leads: AggregatedLead[] = [];
+    let inWindow = 0;
+    for (const m of items) {
+      const item    = m[1] ?? "";
+      const title   = stripHtml(extractRSS(item, "title"));
+      const link    = extractRSS(item, "link");
+      const pubDate = extractRSS(item, "pubDate");
+      const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+      if (!title || !link) continue;
+      const posted = new Date(pubDate);
+      if (isNaN(posted.getTime())) continue;
+      const hrs = hoursAgo(posted);
+      if (hrs > maxHours) continue;
+      inWindow++;
+      const cleanDesc  = stripHtml(desc);
+      const confidence = scoreMatch(title, cleanDesc, [], keywords);
+      if (confidence < SOURCE_FLOOR) continue;
+      let company = ""; let cleanTitle = title;
+      const atMatch = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+      if (atMatch?.[2]) { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+      if (!company) company = "Jobicy Posting";
+      const budget  = extractBudget(cleanDesc);
+      const urgency = detectUrgency(title + " " + cleanDesc);
+      const email   = extractEmail(cleanDesc);
+      const domain  = companyToDomain(company);
+      leads.push({
+        id: `jobicy-rss-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
+        company: company.slice(0, 80), domain, email, title: cleanTitle || title,
+        description: truncate(cleanDesc), url: link,
+        source: "jobicy", sourceLabel: "Jobicy",
+        postedAt: posted.toISOString(), hoursAgo: hrs, niche: "", tags: [],
+        confidence, budget, urgency,
+        qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+      });
+    }
+    return { leads, raw: inWindow };
+  } catch (err) {
+    throw new Error(`Jobicy (all endpoints) ${err instanceof Error ? err.message : "failed"}`);
+  }
 }
 
 // ─── Source 7: Working Nomads ─────────────────────────────────────────────────
@@ -697,7 +916,7 @@ interface WNJob {
 async function fetchWorkingNomads(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://www.workingnomads.com/api/exposed_jobs/?limit=100", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/json" },
+      headers: { "User-Agent": "iCloseLeads/4.0", "Accept": "application/json" },
       ...cacheOpts(freshOnly, 900),
     }),
     8000
@@ -746,7 +965,7 @@ interface HNComment { id: number; type: string; text?: string; author?: string; 
 async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const search = await withTimeout(
     fetch("https://hn.algolia.com/api/v1/search?query=Ask%20HN%20hiring%20OR%20freelancer&tags=story&hitsPerPage=10", {
-      headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 1800),
+      headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 1800),
     }),
     8000
   );
@@ -761,7 +980,7 @@ async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: 
 
   const tres = await withTimeout(
     fetch(`https://hn.algolia.com/api/v1/items/${threadId}`, {
-      headers: { "User-Agent": "FreelanceFlow/4.0" }, ...cacheOpts(freshOnly, 900),
+      headers: { "User-Agent": "iCloseLeads/4.0" }, ...cacheOpts(freshOnly, 900),
     }),
     8000
   );
@@ -811,17 +1030,107 @@ async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: 
   return { leads, raw: inWindow };
 }
 
-// ─── Source 9: Remote.co (RSS) ───────────────────────────────────────────────
+// ─── Source 9: YC / HN Jobs (HN Firebase API) ────────────────────────────────
+// Uses the official HN Firebase API (hacker-news.firebaseio.com) which is 100%
+// reliable from any IP. Fetches the current "job stories" list — real startup
+// job postings made directly on Hacker News by YC-backed companies.
 
-async function fetchRemoteCo(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+interface HNItem {
+  id: number; type?: string; title?: string; text?: string;
+  url?: string; time?: number; by?: string;
+}
+
+async function fetchYCJobs(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  // Step 1: Get the list of current job story IDs (returns ~200 most recent)
+  const idsRes = await withTimeout(
+    fetch("https://hacker-news.firebaseio.com/v0/jobstories.json", {
+      headers: { "User-Agent": "iCloseLeads/5.0" },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    9000
+  );
+  if (!idsRes.ok) throw new Error(`HN jobstories ${idsRes.status}`);
+  const ids = await idsRes.json() as number[];
+  if (!Array.isArray(ids) || ids.length === 0) return { leads: [], raw: 0 };
+
+  // Step 2: Fetch the first 40 items in parallel (plenty for 48h window)
+  const itemResults = await Promise.all(
+    ids.slice(0, 40).map(async id => {
+      try {
+        const r = await withTimeout(
+          fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, {
+            headers: { "User-Agent": "iCloseLeads/5.0" },
+            ...cacheOpts(freshOnly, 1800),
+          }),
+          6000
+        );
+        return r.ok ? (await r.json() as HNItem) : null;
+      } catch { return null; }
+    })
+  );
+
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const item of itemResults) {
+    if (!item || item.type !== "job" || !item.title || !item.time) continue;
+    const posted = new Date(item.time * 1000);
+    const hrs    = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+
+    const body       = stripHtml(item.text ?? "");
+    const baseConfidence = scoreMatch(item.title, body, [], keywords);
+    const confidence = baseConfidence > 0 ? Math.min(100, baseConfidence + 10) : 0;
+    if (confidence < SOURCE_FLOOR) continue;
+
+    // Parse company from title: "Company (YC S24) is hiring a Role"
+    let company = ""; let cleanTitle = item.title;
+    const ycMatch = item.title.match(/^(.+?)\s+\(YC\s+\w+\)\s+is\s+hiring/i);
+    const hireM   = item.title.match(/^(.+?)\s+is\s+hiring/i);
+    const atMatch = item.title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    if      (ycMatch?.[1]) { company = ycMatch[1].trim(); cleanTitle = item.title.replace(ycMatch[0], "").trim() || item.title; }
+    else if (hireM?.[1])   { company = hireM[1].trim();   cleanTitle = item.title.replace(hireM[0], "").trim()   || item.title; }
+    else if (atMatch?.[2]) { cleanTitle = atMatch[1]?.trim() ?? item.title; company = atMatch[2].trim(); }
+    if (!company) company = item.by ?? "YC Startup";
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(item.title + " " + body);
+    const urgency = detectUrgency(item.title + " " + body);
+    const email   = extractEmail(body);
+    const url     = item.url ?? `https://news.ycombinator.com/item?id=${item.id}`;
+    const domain  = item.url ? extractDomain(item.url) : companyToDomain(company);
+
+    leads.push({
+      id: `yc-${item.id}`,
+      company, domain, email,
+      title: cleanTitle || item.title,
+      description: truncate(body || "YC startup job listing — view the full thread on Hacker News."),
+      url, source: "ycjobs", sourceLabel: "YC Jobs",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["startup", "YC"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: body, domain, title: item.title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 10: Authentic Jobs (replaces Craigslist) ─────────────────────────
+// authenticjobs.com — curated web/design/tech jobs, WordPress RSS, small site
+// that doesn't block serverless IPs like Craigslist does.
+
+async function fetchAuthenticJobs(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
-    fetch("https://remote.co/remote-jobs/feed/", {
-      headers: { "User-Agent": "FreelanceFlow/4.0", "Accept": "application/rss+xml, text/xml, */*" },
+    fetch("https://authenticjobs.com/feed/", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
+        "Accept":     "application/rss+xml, text/xml, */*",
+      },
       ...cacheOpts(freshOnly, 1800),
     }),
     10000
   );
-  if (!res.ok) throw new Error(`Remote.co ${res.status}`);
+  if (!res.ok) throw new Error(`AuthenticJobs ${res.status}`);
   const xml   = await res.text();
   const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
   const leads: AggregatedLead[] = [];
@@ -830,9 +1139,9 @@ async function fetchRemoteCo(keywords: string[], maxHours: number, freshOnly: bo
   for (const m of items) {
     const item    = m[1] ?? "";
     const title   = stripHtml(extractRSS(item, "title"));
-    const link    = extractRSS(item, "link");
+    const link    = extractRSS(item, "link") || extractRSS(item, "guid");
     const pubDate = extractRSS(item, "pubDate");
-    const desc    = extractRSS(item, "description");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
     if (!title || !link) continue;
     const posted = new Date(pubDate);
     if (isNaN(posted.getTime())) continue;
@@ -848,88 +1157,26 @@ async function fetchRemoteCo(keywords: string[], maxHours: number, freshOnly: bo
     if (atMatch?.[2]) { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
     if (!company) {
       const catM = item.match(/<category[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/category>/i);
-      company = catM?.[1]?.trim() ?? "Remote.co Company";
+      company = catM?.[1]?.trim() ?? "Authentic Jobs";
     }
     company = company.slice(0, 80);
 
     const budget  = extractBudget(cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "remote.co" ? extractDomain(link) : companyToDomain(company);
+    const domain  = extractDomain(link) !== "authenticjobs.com" ? extractDomain(link) : companyToDomain(company);
 
     leads.push({
-      id: `rc-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
+      id: `aj-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
       company, domain, email, title: cleanTitle || title,
       description: truncate(cleanDesc),
-      url: link, source: "remoteco", sourceLabel: "Remote.co",
-      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "", tags: [], confidence, budget, urgency,
+      url: link, source: "authenticjobs", sourceLabel: "Authentic Jobs",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["web", "design", "tech"], confidence, budget, urgency,
       qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
     });
   }
   return { leads, raw: inWindow };
-}
-
-// ─── Source 10: Craigslist Gigs (multi-city RSS) ──────────────────────────────
-
-const CL_CITIES = ["sfbay","newyork","chicago","losangeles","seattle","boston","miami","austin"];
-const CL_CATS   = ["cpg","web"]; // computer gigs, web design gigs
-
-async function fetchCraigslistCity(city: string, cat: string, keywords: string[], maxHours: number, freshOnly: boolean): Promise<AggregatedLead[]> {
-  let xml = "";
-  try {
-    const res = await withTimeout(
-      fetch(`https://${city}.craigslist.org/search/${cat}?format=rss`, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; FreelanceFlow/4.0)" },
-        ...cacheOpts(freshOnly, 1800),
-      }),
-      7000
-    );
-    if (!res.ok) return [];
-    xml = await res.text();
-  } catch { return []; }
-
-  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
-  const leads: AggregatedLead[] = [];
-
-  for (const m of items) {
-    const item    = m[1] ?? "";
-    const title   = stripHtml(extractRSS(item, "title"));
-    const link    = extractRSS(item, "link");
-    const pubDate = extractRSS(item, "pubDate") || extractRSS(item, "dc:date");
-    const desc    = extractRSS(item, "description");
-    if (!title || !link) continue;
-    const posted = pubDate ? new Date(pubDate) : null;
-    if (!posted || isNaN(posted.getTime())) continue;
-    const hrs = hoursAgo(posted);
-    if (hrs > maxHours) continue;
-    const cleanDesc  = stripHtml(desc);
-    const fullText   = title + " " + cleanDesc;
-    const confidence = scoreMatch(title, cleanDesc, [], keywords);
-    if (confidence < SOURCE_FLOOR) continue;
-
-    const budget  = extractBudget(fullText);
-    const urgency = detectUrgency(fullText);
-    const email   = extractEmail(cleanDesc);
-    const cityLabel = city === "sfbay" ? "San Francisco" : city === "newyork" ? "New York" : city.charAt(0).toUpperCase() + city.slice(1);
-
-    leads.push({
-      id: `cl-${city}-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
-      company: title.slice(0, 80), domain: "craigslist.org", email, title,
-      description: truncate(cleanDesc || "Craigslist gig — click to see full details."),
-      url: link, source: "craigslist", sourceLabel: `Craigslist (${cityLabel})`,
-      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
-      tags: [cityLabel, cat === "web" ? "web design" : "computer gigs"], confidence, budget, urgency,
-      qualityScore: calcQuality({ email, description: cleanDesc, domain: "craigslist.org", title, budget, urgency }),
-    });
-  }
-  return leads;
-}
-
-async function fetchCraigslist(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
-  const tasks   = CL_CITIES.flatMap(city => CL_CATS.map(cat => fetchCraigslistCity(city, cat, keywords, maxHours, freshOnly)));
-  const results = await Promise.all(tasks);
-  const leads   = results.flat();
-  return { leads, raw: leads.length };
 }
 
 // ─── Source 11: GitHub Bounties ───────────────────────────────────────────────
@@ -943,7 +1190,7 @@ interface GHSearchResponse { items?: GHIssue[]; }
 
 async function fetchGitHubBounties(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const ghHeaders: Record<string, string> = {
-    "User-Agent": "FreelanceFlow/4.0",
+    "User-Agent": "iCloseLeads/4.0",
     "Accept":     "application/vnd.github.v3+json",
   };
   const token = process.env.GITHUB_TOKEN;
@@ -999,6 +1246,325 @@ async function fetchGitHubBounties(keywords: string[], maxHours: number, freshOn
   return { leads, raw: inWindow };
 }
 
+// ─── Source 11b: Jobspresso (RSS) ────────────────────────────────────────────
+// jobspresso.co — curated remote jobs board, WordPress RSS, no WAF issues from
+// serverless IPs. Replaces freelancermap.com (wrong/blocked URL from Vercel).
+
+async function fetchFreelancermap(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const res = await withTimeout(
+    fetch("https://jobspresso.co/feed/", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
+        "Accept":     "application/rss+xml, text/xml, */*",
+      },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    10000
+  );
+  if (!res.ok) throw new Error(`Jobspresso ${res.status}`);
+  const xml   = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const m of items) {
+    const item    = m[1] ?? "";
+    const title   = stripHtml(extractRSS(item, "title"));
+    const link    = extractRSS(item, "link") || extractRSS(item, "guid");
+    const pubDate = extractRSS(item, "pubDate");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    if (!title || !link) continue;
+    const posted = new Date(pubDate);
+    if (isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+    const cleanDesc  = stripHtml(desc);
+    const confidence = scoreMatch(title, cleanDesc, [], keywords);
+    if (confidence < SOURCE_FLOOR) continue;
+
+    // Title format: "Role at Company" or "Company – Role"
+    let company = ""; let cleanTitle = title;
+    const atMatch   = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    const dashMatch = title.match(/^(.+?)\s*[—–-]\s*(.+)$/);
+    if (atMatch?.[2])   { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+    else if (dashMatch) { company = dashMatch[1]?.trim() ?? ""; cleanTitle = dashMatch[2]?.trim() ?? title; }
+    if (!company) {
+      const catM = item.match(/<category[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/category>/i);
+      company = catM?.[1]?.trim() ?? "Jobspresso";
+    }
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(title + " " + cleanDesc);
+    const urgency = detectUrgency(title + " " + cleanDesc);
+    const email   = extractEmail(cleanDesc);
+    const domain  = extractDomain(link) !== "jobspresso.co" ? extractDomain(link) : companyToDomain(company);
+    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
+
+    leads.push({
+      id: `jp-${slug}`,
+      company, domain, email,
+      title: cleanTitle || title,
+      description: truncate(cleanDesc || "Remote job listing — click to view full details."),
+      url: link, source: "freelancermap", sourceLabel: "Jobspresso",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["remote", "curated"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 12: Smashing Magazine Jobs (RSS) ──────────────────────────────────
+
+async function fetchSmashingJobs(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const res = await withTimeout(
+    fetch("https://jobs.smashingmagazine.com/feed/", {
+      headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/rss+xml, text/xml, */*" },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    10000
+  );
+  if (!res.ok) throw new Error(`SmashingJobs ${res.status}`);
+  const xml   = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const m of items) {
+    const item    = m[1] ?? "";
+    const title   = stripHtml(extractRSS(item, "title"));
+    const link    = extractRSS(item, "link");
+    const pubDate = extractRSS(item, "pubDate");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    if (!title || !link) continue;
+    const posted = new Date(pubDate);
+    if (isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+    const cleanDesc  = stripHtml(desc);
+    const confidence = scoreMatch(title, cleanDesc, [], keywords);
+    if (confidence < SOURCE_FLOOR) continue;
+
+    // Title format is usually "Role at Company" or "Company — Role"
+    let company = ""; let cleanTitle = title;
+    const atMatch   = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    const dashMatch = title.match(/^(.+?)\s*[—–-]\s*(.+)$/);
+    if (atMatch?.[2])   { cleanTitle = atMatch[1]?.trim() ?? title;   company = atMatch[2].trim(); }
+    else if (dashMatch) { company = dashMatch[1]?.trim() ?? ""; cleanTitle = dashMatch[2]?.trim() ?? title; }
+    if (!company) {
+      const cat = item.match(/<category[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/category>/i)?.[1]?.trim();
+      company = cat ?? "Smashing Jobs";
+    }
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(cleanDesc);
+    const urgency = detectUrgency(title + " " + cleanDesc);
+    const email   = extractEmail(cleanDesc);
+    const domain  = extractDomain(link) !== "jobs.smashingmagazine.com" ? extractDomain(link) : companyToDomain(company);
+    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
+
+    leads.push({
+      id: `smashing-${slug}`,
+      company, domain, email, title: cleanTitle || title,
+      description: truncate(cleanDesc),
+      url: link, source: "smashingjobs", sourceLabel: "Smashing Jobs",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["design", "web"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 13: Dribbble Jobs (RSS) ──────────────────────────────────────────
+
+async function fetchDribbbleJobs(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const res = await withTimeout(
+    fetch("https://dribbble.com/jobs.rss", {
+      headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/rss+xml, text/xml, */*" },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    10000
+  );
+  if (!res.ok) throw new Error(`Dribbble ${res.status}`);
+  const xml   = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const m of items) {
+    const item    = m[1] ?? "";
+    const title   = stripHtml(extractRSS(item, "title"));
+    const link    = extractRSS(item, "link");
+    const pubDate = extractRSS(item, "pubDate");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    if (!title || !link) continue;
+    const posted = new Date(pubDate);
+    if (isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+    const cleanDesc  = stripHtml(desc);
+    const confidence = scoreMatch(title, cleanDesc, [], keywords);
+    if (confidence < SOURCE_FLOOR) continue;
+
+    // Dribbble title format: "Role at Company" or just "Role — Company"
+    let company = ""; let cleanTitle = title;
+    const atMatch   = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    const dashMatch = title.match(/^(.+?)\s*[—–-]\s*(.+)$/);
+    if (atMatch?.[2])   { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+    else if (dashMatch) { company = dashMatch[2]?.trim() ?? ""; cleanTitle = dashMatch[1]?.trim() ?? title; }
+    if (!company) company = "Dribbble Company";
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(cleanDesc);
+    const urgency = detectUrgency(title + " " + cleanDesc);
+    const email   = extractEmail(cleanDesc);
+    const domain  = companyToDomain(company);
+    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
+
+    leads.push({
+      id: `dribbble-${slug}`,
+      company, domain, email, title: cleanTitle || title,
+      description: truncate(cleanDesc),
+      url: link, source: "dribbble", sourceLabel: "Dribbble Jobs",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["design", "ui-ux"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 15: Himalayas App (RSS) ──────────────────────────────────────────
+// himalayas.app — curated startup/remote jobs board with open RSS feed.
+
+async function fetchHimalayas(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const res = await withTimeout(
+    fetch("https://himalayas.app/jobs/feed", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
+        "Accept":     "application/rss+xml, text/xml, */*",
+      },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    10000
+  );
+  if (!res.ok) throw new Error(`Himalayas ${res.status}`);
+  const xml   = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const m of items) {
+    const item    = m[1] ?? "";
+    const title   = stripHtml(extractRSS(item, "title"));
+    const link    = extractRSS(item, "link") || extractRSS(item, "guid");
+    const pubDate = extractRSS(item, "pubDate");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    if (!title || !link) continue;
+    const posted = new Date(pubDate);
+    if (isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+    const cleanDesc  = stripHtml(desc);
+    const confidence = scoreMatch(title, cleanDesc, [], keywords);
+    if (confidence < SOURCE_FLOOR) continue;
+
+    let company = ""; let cleanTitle = title;
+    const atMatch   = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    const dashMatch = title.match(/^(.+?)\s*[—–-]\s*(.+)$/);
+    if (atMatch?.[2])   { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+    else if (dashMatch) { company = dashMatch[1]?.trim() ?? ""; cleanTitle = dashMatch[2]?.trim() ?? title; }
+    if (!company) {
+      const catM = item.match(/<category[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/category>/i);
+      company = catM?.[1]?.trim() ?? "Himalayas";
+    }
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(title + " " + cleanDesc);
+    const urgency = detectUrgency(title + " " + cleanDesc);
+    const email   = extractEmail(cleanDesc);
+    const domain  = extractDomain(link) !== "himalayas.app" ? extractDomain(link) : companyToDomain(company);
+    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
+
+    leads.push({
+      id: `him-${slug}`,
+      company, domain, email, title: cleanTitle || title,
+      description: truncate(cleanDesc || "Startup remote job — view full details on Himalayas."),
+      url: link, source: "himalayas", sourceLabel: "Himalayas",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["startup", "remote"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 16: No Desk (RSS) ─────────────────────────────────────────────────
+// nodesk.co/remote-work — hand-curated remote work opportunities, no WAF.
+
+async function fetchNoDesk(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const res = await withTimeout(
+    fetch("https://nodesk.co/remote-work/feed/", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
+        "Accept":     "application/rss+xml, text/xml, */*",
+      },
+      ...cacheOpts(freshOnly, 1800),
+    }),
+    10000
+  );
+  if (!res.ok) throw new Error(`NoDesk ${res.status}`);
+  const xml   = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const m of items) {
+    const item    = m[1] ?? "";
+    const title   = stripHtml(extractRSS(item, "title"));
+    const link    = extractRSS(item, "link") || extractRSS(item, "guid");
+    const pubDate = extractRSS(item, "pubDate");
+    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    if (!title || !link) continue;
+    const posted = new Date(pubDate);
+    if (isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+    const cleanDesc  = stripHtml(desc);
+    const confidence = scoreMatch(title, cleanDesc, [], keywords);
+    if (confidence < SOURCE_FLOOR) continue;
+
+    let company = ""; let cleanTitle = title;
+    const atMatch = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
+    if (atMatch?.[2]) { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
+    if (!company) company = "No Desk Listing";
+    company = company.slice(0, 80);
+
+    const budget  = extractBudget(title + " " + cleanDesc);
+    const urgency = detectUrgency(title + " " + cleanDesc);
+    const email   = extractEmail(cleanDesc);
+    const domain  = companyToDomain(company);
+    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
+
+    leads.push({
+      id: `nd-${slug}`,
+      company, domain, email, title: cleanTitle || title,
+      description: truncate(cleanDesc || "Curated remote opportunity — view on No Desk."),
+      url: link, source: "nodesk", sourceLabel: "No Desk",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: ["remote", "curated"], confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
+    });
+  }
+  return { leads, raw: inWindow };
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export interface AggregateOptions {
@@ -1020,9 +1586,14 @@ const SOURCE_RUNNERS: Array<{
   { name: "jobicy",        run: (_n, k, h, f) => fetchJobicy(k, h, f) },
   { name: "workingnomads", run: (_n, k, h, f) => fetchWorkingNomads(k, h, f) },
   { name: "hackernews",    run: (_n, k, h, f) => fetchHackerNews(k, h, f) },
-  { name: "remoteco",      run: (_n, k, h, f) => fetchRemoteCo(k, h, f) },
-  { name: "craigslist",    run: (_n, k, h, f) => fetchCraigslist(k, h, f) },
+  { name: "ycjobs",        run: (_n, k, h, f) => fetchYCJobs(k, h, f) },        // replaces Remote.co
+  { name: "authenticjobs", run: (_n, k, h, f) => fetchAuthenticJobs(k, h, f) }, // replaces Craigslist
   { name: "githubissues",  run: (_n, k, h, f) => fetchGitHubBounties(k, h, f) },
+  { name: "freelancermap", run: (_n, k, h, f) => fetchFreelancermap(k, h, f) }, // new
+  { name: "smashingjobs",  run: (_n, k, h, f) => fetchSmashingJobs(k, h, f) },
+  { name: "dribbble",      run: (_n, k, h, f) => fetchDribbbleJobs(k, h, f) },
+  { name: "himalayas",     run: (_n, k, h, f) => fetchHimalayas(k, h, f) },
+  { name: "nodesk",        run: (_n, k, h, f) => fetchNoDesk(k, h, f) },
 ];
 
 export async function aggregateLeads(niche: string | string[], options: AggregateOptions = {}): Promise<AggregatedLead[]> {
@@ -1038,6 +1609,10 @@ export async function aggregateLeadsWithDiagnostics(
   const niches   = Array.isArray(niche) ? niche : [niche];
   const { keywords, resolved: resolvedAll } = buildKeywordsForNiches(niches);
   const resolved = resolvedAll[0] ?? "web-development";
+  const nicheKeywordSets = resolvedAll.map(n => ({
+    niche: n,
+    keywords: NICHE_KEYWORDS[n] ?? [],
+  }));
 
   const sourceDiagnostics: SourceDiagnostic[] = [];
 
@@ -1060,7 +1635,11 @@ export async function aggregateLeadsWithDiagnostics(
   }));
 
   const totalFetched = sourceDiagnostics.reduce((s, d) => s + d.fetched, 0);
-  let all = results.flat().map(l => ({ ...l, niche: resolved }));
+  let all = results.flat().flatMap((lead): AggregatedLead[] => {
+    const match = bestNicheMatch(lead, nicheKeywordSets);
+    if (!match) return [];
+    return [{ ...lead, niche: match.niche, confidence: Math.min(100, Math.max(lead.confidence, match.confidence)) }];
+  });
   const totalKeptAfterSourceFilter = all.length;
 
   all = all.filter(l => l.confidence >= minConfidence);
@@ -1073,14 +1652,31 @@ export async function aggregateLeadsWithDiagnostics(
     return b.confidence - a.confidence;
   });
 
-  // Deduplicate by company + title fingerprint
-  const seen = new Set<string>();
+  // Deduplicate — three-key strategy to catch all duplicate shapes:
+  //  1. Exact lead id (same item from same source)
+  //  2. Normalised URL (same posting linked from different aggregators)
+  //  3. company+title fingerprint with generous window (truly identical listings)
+  const seenId  = new Set<string>();
+  const seenUrl = new Set<string>();
+  const seenCT  = new Set<string>();
   const deduped = all.filter((lead) => {
-    const co  = lead.company.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 20);
-    const ti  = lead.title.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 30);
-    const key = `${co}|${ti}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
+    // Key 1 – canonical ID
+    if (seenId.has(lead.id)) return false;
+    seenId.add(lead.id);
+
+    // Key 2 – URL (strip utm params / trailing slashes)
+    const normUrl = (lead.url ?? "").replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+    if (normUrl && seenUrl.has(normUrl)) return false;
+    if (normUrl) seenUrl.add(normUrl);
+
+    // Key 3 – company(40) + title(50) — wider window than before to reduce false positives
+    const co  = (lead.company ?? "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 40);
+    const ti  = (lead.title ?? "").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 50);
+    if (co && ti) {
+      const key = `${co}|${ti}`;
+      if (seenCT.has(key)) return false;
+      seenCT.add(key);
+    }
     return true;
   });
 

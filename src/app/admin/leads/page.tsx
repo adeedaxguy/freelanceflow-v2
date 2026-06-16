@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/prisma";
 import { LeadStatusBadge } from "@/components/Badge";
 import { formatDate } from "@/lib/utils";
@@ -35,7 +37,7 @@ export default async function AdminLeadsPage() {
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-border bg-background/50">
                 {["User", "Company", "Domain", "Email", "Confidence", "Niche", "Status", "Saved"].map(h => (

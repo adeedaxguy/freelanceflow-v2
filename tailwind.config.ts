@@ -72,12 +72,16 @@ const config: Config = {
         "card-hover": "0 20px 60px rgba(0,0,0,0.5)",
       },
       animation: {
-        "gradient-shift": "gradient-shift 3s ease infinite",
-        "float": "float 6s ease-in-out infinite",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "fade-in-up": "fade-in-up 0.5s ease-out",
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "gradient-shift":  "gradient-shift 3s ease infinite",
+        "float":           "float 6s ease-in-out infinite",
+        "pulse-glow":      "pulse-glow 2s ease-in-out infinite",
+        "fade-in-up":      "fade-in-up 0.5s ease-out",
+        "slide-in-right":  "slide-in-right 0.3s ease-out",
+        "slide-in-left":   "slide-in-left 0.3s ease-out",
+        "scale-in":        "scale-in 0.2s ease-out",
+        "accordion-down":  "accordion-down 0.2s ease-out",
+        "accordion-up":    "accordion-up 0.2s ease-out",
+        "skeleton":        "skeleton-shimmer 1.5s ease-in-out infinite",
       },
       keyframes: {
         "gradient-shift": {
@@ -103,6 +107,22 @@ const config: Config = {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
+        },
+        "slide-in-right": {
+          from: { opacity: "0", transform: "translateX(20px)" },
+          to:   { opacity: "1", transform: "translateX(0)" },
+        },
+        "slide-in-left": {
+          from: { opacity: "0", transform: "translateX(-20px)" },
+          to:   { opacity: "1", transform: "translateX(0)" },
+        },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.92)" },
+          to:   { opacity: "1", transform: "scale(1)" },
+        },
+        "skeleton-shimmer": {
+          "0%":   { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
       borderRadius: {

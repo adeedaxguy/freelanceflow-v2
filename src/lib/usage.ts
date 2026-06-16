@@ -1,9 +1,17 @@
 import { prisma } from "@/lib/prisma";
 
+// Unlimited accounts — bypasses all lead limits
+const UNLIMITED_EMAILS = [
+  "adeedaxguy@gmail.com",
+  "admin@icloseleads.com",
+  "adnan@technodigg.com",
+  "adnanaimanager@gmail.com",
+];
+
 export const PLAN_LIMITS = {
-  free:   { leadsPerWeek: 20,     proposalsPerMonth: 10,  campaigns: 1 },
-  pro:    { leadsPerWeek: 999999, proposalsPerMonth: 999, campaigns: 10 },
-  agency: { leadsPerWeek: 999999, proposalsPerMonth: 999, campaigns: 999 },
+  free:   { leadsPerDay: 100,    proposalsPerMonth: 10,  campaigns: 3 },
+  pro:    { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 10 },
+  agency: { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 999 },
 } as const;
 
 export type Plan = keyof typeof PLAN_LIMITS;
@@ -11,24 +19,28 @@ export type Plan = keyof typeof PLAN_LIMITS;
 export async function checkAndIncrementLeads(
   userId: string,
   count: number
-): Promise<{ allowed: boolean; remaining: number; plan: string }> {
+): Promise<{ allowed: boolean; remaining: number; plan: string; resetAt?: string }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true },
   });
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
 
-  const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const baseLimit = PLAN_LIMITS[plan].leadsPerWeek;
-  const limit = baseLimit >= 999999 ? baseLimit : baseLimit + (user.bonusLeads ?? 0);
+  // Unlimited bypass
+  if (UNLIMITED_EMAILS.includes(user.email ?? "")) {
+    return { allowed: true, remaining: 99999, plan: user.plan ?? "agency" };
+  }
 
-  // Reset weekly counter if 7+ days have passed
+  const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
+  const limit = PLAN_LIMITS[plan].leadsPerDay;
+
+  // Reset counter if 24+ hours have passed
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
-  const daysSinceReset = (now.getTime() - resetDate.getTime()) / 86_400_000;
+  const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
 
   let currentCount = user.weeklyLeads;
-  if (daysSinceReset >= 7) {
+  if (hoursSinceReset >= 24) {
     currentCount = 0;
     await prisma.user.update({
       where: { id: userId },
@@ -36,12 +48,9 @@ export async function checkAndIncrementLeads(
     });
   }
 
-  if (limit >= 999999) {
-    return { allowed: true, remaining: 99999, plan };
-  }
-
+  const resetAt = new Date(resetDate.getTime() + 24 * 3_600_000).toISOString();
   const remaining = Math.max(0, limit - currentCount);
-  if (remaining === 0) return { allowed: false, remaining: 0, plan };
+  if (remaining === 0) return { allowed: false, remaining: 0, plan, resetAt };
 
   const toAdd = Math.min(count, remaining);
   await prisma.user.update({
@@ -49,33 +58,45 @@ export async function checkAndIncrementLeads(
     data: { weeklyLeads: { increment: toAdd } },
   });
 
-  return { allowed: true, remaining: remaining - toAdd, plan };
+  return { allowed: true, remaining: remaining - toAdd, plan, resetAt };
 }
 
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true },
   });
   if (!user) return null;
 
+  // Unlimited bypass
+  if (UNLIMITED_EMAILS.includes(user.email ?? "")) {
+    return {
+      plan: user.plan ?? "agency",
+      limit: 99999,
+      used: 0,
+      remaining: 99999,
+      nextReset: new Date(Date.now() + 24 * 3_600_000).toISOString(),
+      percentage: 0,
+      unlimited: true,
+    };
+  }
+
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const baseLimit = PLAN_LIMITS[plan].leadsPerWeek;
-  const limit = baseLimit >= 999999 ? baseLimit : baseLimit + (user.bonusLeads ?? 0);
+  const limit = PLAN_LIMITS[plan].leadsPerDay;
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
-  const daysSinceReset = (now.getTime() - resetDate.getTime()) / 86_400_000;
-  const weeklyLeads = daysSinceReset >= 7 ? 0 : user.weeklyLeads;
-  const nextReset = new Date(resetDate.getTime() + 7 * 86_400_000);
+  const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
+  const dailyLeads = hoursSinceReset >= 24 ? 0 : user.weeklyLeads;
+  const nextReset = new Date(resetDate.getTime() + 24 * 3_600_000);
 
   const isUnlimited = limit >= 999999;
   return {
     plan,
     limit: isUnlimited ? 99999 : limit,
-    used: weeklyLeads,
-    remaining: isUnlimited ? 99999 : Math.max(0, limit - weeklyLeads),
+    used: dailyLeads,
+    remaining: isUnlimited ? 99999 : Math.max(0, limit - dailyLeads),
     nextReset: nextReset.toISOString(),
-    percentage: isUnlimited ? 0 : Math.round((weeklyLeads / limit) * 100),
+    percentage: isUnlimited ? 0 : Math.round((dailyLeads / limit) * 100),
     unlimited: isUnlimited,
   };
 }

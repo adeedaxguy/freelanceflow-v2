@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // ─── Mega Menu Data ───────────────────────────────────────────────────────────
 const MEGA_FEATURES = [
@@ -19,47 +20,43 @@ const MEGA_FEATURES = [
     category: "Lead Discovery",
     icon: Search,
     color: "text-primary-light",
-    href: "/features/lead-discovery",
     items: [
-      { label: "11-Source Aggregator",  desc: "RemoteOK, Reddit, Himalayas + more",   href: "/features/lead-discovery" },
-      { label: "AI Quality Scoring",    desc: "0–100 confidence score per lead",      href: "/features/lead-discovery#scoring" },
-      { label: "Niche Targeting",       desc: "15+ freelance niches supported",       href: "/features/lead-discovery#niches" },
-      { label: "Smart Deduplication",   desc: "Never see the same lead twice",        href: "/features/lead-discovery#dedup" },
+      { label: "11-Source Aggregator",   desc: "RemoteOK, Remotive, Reddit + more",     href: "/features/lead-discovery" },
+      { label: "Quality Scoring",       desc: "0–100 AI confidence per lead",          href: "/features/lead-discovery#scoring" },
+      { label: "Niche Targeting",       desc: "15+ freelance niches supported",        href: "/features/lead-discovery#niches" },
+      { label: "Smart Deduplication",   desc: "Never see the same lead twice",         href: "/features/lead-discovery#dedup" },
     ],
   },
   {
     category: "CRM Pipeline",
     icon: Layers,
     color: "text-accent",
-    href: "/features/crm-pipeline",
     items: [
-      { label: "6-Stage Pipeline",      desc: "New → Contacted → Won → Lost",        href: "/features/crm-pipeline" },
-      { label: "Lead Notes",            desc: "Private notes per opportunity",        href: "/features/crm-pipeline#notes" },
-      { label: "Status Tracking",       desc: "Move leads with one click",            href: "/features/crm-pipeline#status" },
-      { label: "CSV Export",            desc: "Export your pipeline anytime",         href: "/features/crm-pipeline#export" },
+      { label: "6-Stage Pipeline",      desc: "New → Contacted → Won → Lost",         href: "/features/crm-pipeline" },
+      { label: "Lead Notes",            desc: "Private notes per opportunity",         href: "/features/crm-pipeline#notes" },
+      { label: "Status Tracking",       desc: "Move leads with one click",             href: "/features/crm-pipeline#status" },
+      { label: "CSV Export",            desc: "Export your pipeline anytime",          href: "/features/crm-pipeline#export" },
     ],
   },
   {
     category: "AI Proposal Engine",
     icon: Sparkles,
     color: "text-gold",
-    href: "/features/ai-proposals",
     items: [
-      { label: "Groq-Powered AI",       desc: "llama-3.3-70b for human-like copy",   href: "/features/ai-proposals" },
-      { label: "Niche Personalisation", desc: "Tailored to every job posting",       href: "/features/ai-proposals#personalisation" },
-      { label: "Custom Templates",      desc: "Save & reuse winning formats",        href: "/features/ai-proposals#templates" },
-      { label: "Follow-Up Writer",      desc: "AI-crafted follow-up sequences",      href: "/features/ai-proposals#followup" },
+      { label: "Groq-Powered AI",       desc: "llama-3.3-70b for human-like copy",    href: "/features/ai-proposals" },
+      { label: "Niche Personalisation", desc: "Tailored to every job posting",        href: "/features/ai-proposals#personalisation" },
+      { label: "Custom Templates",      desc: "Save & reuse winning formats",         href: "/features/ai-proposals#templates" },
+      { label: "Follow-Up Writer",      desc: "AI-crafted follow-up sequences",       href: "/features/ai-proposals#followup" },
     ],
   },
   {
     category: "Outreach & Email",
     icon: Mail,
     color: "text-blue-400",
-    href: "/features/email-outreach",
     items: [
-      { label: "One-Click Send",        desc: "Send via Gmail, logged instantly",    href: "/features/email-outreach" },
-      { label: "Campaign Builder",      desc: "Multi-step outreach sequences",       href: "/features/email-outreach#campaigns" },
-      { label: "Open & Click Tracking", desc: "See who opened, who clicked",         href: "/features/email-outreach#tracking" },
+      { label: "Gmail Compose",         desc: "Prepare emails in Gmail safely",       href: "/features/email-outreach" },
+      { label: "Campaign Builder",      desc: "Multi-step outreach sequences",        href: "/features/email-outreach#campaigns" },
+      { label: "Outreach History",      desc: "Log prepared and sent emails",         href: "/features/email-outreach#tracking" },
       { label: "No Duplicates",         desc: "Prevent repeat outreach automatically", href: "/features/email-outreach#dedup" },
     ],
   },
@@ -67,24 +64,22 @@ const MEGA_FEATURES = [
     category: "Analytics",
     icon: BarChart2,
     color: "text-green-400",
-    href: "/features/analytics",
     items: [
-      { label: "Dashboard Overview",    desc: "Leads, proposals, replies at a glance", href: "/features/analytics" },
-      { label: "Source Breakdown",      desc: "Which sources convert best",           href: "/features/analytics#sources" },
-      { label: "Pipeline Reports",      desc: "Win rate and conversion tracking",     href: "/features/analytics#pipeline" },
-      { label: "Revenue Tracking",      desc: "Monthly revenue won, automatically",  href: "/features/analytics#revenue" },
+      { label: "Dashboard Overview",   desc: "Leads, proposals, replies at a glance", href: "/features/analytics" },
+      { label: "Source Breakdown",     desc: "Which sources convert best",            href: "/features/analytics#sources" },
+      { label: "Pipeline Reports",     desc: "Win rate and conversion tracking",      href: "/features/analytics#pipeline" },
+      { label: "Weekly Usage Stats",   desc: "Track your quota and resets",          href: "/features/analytics#revenue" },
     ],
   },
   {
-    category: "Free Tools",
+    category: "Platform",
     icon: Shield,
     color: "text-purple-400",
-    href: "/features/free-tools",
     items: [
-      { label: "Rate Calculator",       desc: "Know exactly what to charge",         href: "/features/free-tools#rate" },
-      { label: "Subject Line Generator",desc: "AI subject lines that get opened",    href: "/features/free-tools#subject" },
-      { label: "Red Flag Detector",     desc: "Spot bad clients before you sign",    href: "/features/free-tools#redflags" },
-      { label: "Blog & Resources",      desc: "Freelance guides and strategies",     href: "/blog" },
+      { label: "Free Tools",           desc: "Rate calculator, subject line gen",    href: "/features/free-tools" },
+      { label: "Blog & Resources",     desc: "Freelance guides and strategies",      href: "/blog" },
+      { label: "Support Chat",         desc: "AI help + human escalation 24/7",     href: "/features/free-tools#support" },
+      { label: "Mobile Optimised",     desc: "Works beautifully on any device",     href: "/features/free-tools#mobile" },
     ],
   },
 ];
@@ -99,26 +94,11 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const [bannerH, setBannerH] = useState(44);
-
   useEffect(() => {
-    // Measure the fixed banner height so navbar sits directly below it
-    const measure = () => {
-      const banner = document.getElementById("top-banner");
-      if (banner) setBannerH(banner.getBoundingClientRect().height);
-    };
-    // Small delay to let the banner render fully on first load
-    setTimeout(measure, 50);
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > bannerH);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, [bannerH]);
+  }, []);
 
   // Close menus on outside click
   useEffect(() => {
@@ -130,6 +110,9 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Close mobile menu on navigation
+  useEffect(() => { setIsOpen(false); }, [pathname]);
+
   const otherLinks = [
     { label: "Pricing", href: "/pricing" },
     { label: "Blog",    href: "/blog" },
@@ -137,13 +120,10 @@ export default function Navbar() {
   ];
 
   return (
-    <nav
-      style={{ top: scrolled ? 0 : bannerH }}
-      className={cn(
-        "fixed left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-surface/95 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
-      )}
-    >
+    <nav className={cn(
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+      scrolled ? "bg-surface/80 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
+    )}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -192,11 +172,10 @@ export default function Navbar() {
                         const CatIcon = cat.icon;
                         return (
                           <div key={cat.category} className="space-y-1">
-                            <Link href={cat.href} onClick={() => setMegaOpen(false)}
-                              className={cn("flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider mb-2 rounded-lg hover:bg-white/5 transition-colors", cat.color)}>
+                            <div className={cn("flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider mb-2", cat.color)}>
                               <CatIcon className="w-3.5 h-3.5" />
                               {cat.category}
-                            </Link>
+                            </div>
                             {cat.items.map((item) => (
                               <Link key={item.label} href={item.href} onClick={() => setMegaOpen(false)}
                                 className="block px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
@@ -213,7 +192,7 @@ export default function Navbar() {
                     <div className="px-5 py-3 border-t border-border/60 bg-gradient-to-r from-primary/5 to-accent/5 flex items-center justify-between">
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         {[
-                          { icon: Globe, label: "7 Live Sources" },
+                          { icon: Globe, label: "16 Live Sources" },
                           { icon: Target, label: "15+ Niches" },
                           { icon: Star,   label: "Free to Start" },
                           { icon: Users,  label: "No Credit Card" },
@@ -245,14 +224,17 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right: CTA + User */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right: Theme + CTA + User */}
+          <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle size="sm" />
             {session ? (
               <div ref={userRef} className="relative">
                 <button onClick={() => setUserMenuOpen(v => !v)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface border border-border hover:border-primary/40 transition-all">
-                  <div className="w-7 h-7 rounded-full bg-gradient-hero flex items-center justify-center text-white text-xs font-bold">
-                    {session.user?.name?.[0]?.toUpperCase() ?? "U"}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface border border-border hover:border-primary/40 transition-all ml-1">
+                  <div className="w-7 h-7 rounded-full bg-gradient-hero flex items-center justify-center text-white text-xs font-bold overflow-hidden">
+                    {session.user?.image
+                      ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
+                      : (session.user?.name?.[0]?.toUpperCase() ?? "U")}
                   </div>
                   <span className="text-sm text-foreground max-w-24 truncate">{session.user?.name ?? "Account"}</span>
                   <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", userMenuOpen && "rotate-180")} />
@@ -295,69 +277,57 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile toggle */}
-          <button onClick={() => setIsOpen(v => !v)} className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
-            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Mobile: theme + hamburger */}
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggle size="sm" />
+            <button onClick={() => setIsOpen(v => !v)} className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu — full-screen overlay below navbar */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18 }}
-            className="md:hidden fixed inset-x-0 bg-[#0d0a1a]/98 backdrop-blur-xl border-t border-border shadow-2xl z-40 overflow-y-auto"
-            style={{ top: bannerH + 64, maxHeight: `calc(100dvh - ${bannerH + 64}px)` }}
-          >
-            <div className="px-5 py-5 space-y-1">
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-surface/95 backdrop-blur-xl border-t border-border overflow-hidden">
+            <div className="px-4 py-4 space-y-1">
               <Link href="/features" onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 active:bg-white/10 transition-colors">
-                <Zap className="w-5 h-5 text-primary-light flex-shrink-0" /> Features
+                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
+                <Zap className="w-4 h-4 text-primary-light" /> Features
               </Link>
               {otherLinks.map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 active:bg-white/10 transition-colors">
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
                   {l.label}
                 </Link>
               ))}
-
-              <div className="pt-3 mt-3 border-t border-border/60 space-y-3">
+              <div className="pt-2 border-t border-border space-y-2">
                 {session ? (
                   <>
                     <Link href="/dashboard" onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 transition-colors">
-                      <LayoutDashboard className="w-5 h-5 text-muted-foreground" /> Dashboard
+                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
+                      Dashboard
                     </Link>
                     <button onClick={() => { setIsOpen(false); void signOut(); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors">
-                      <LogOut className="w-5 h-5" /> Sign Out
+                      className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                      Sign Out
                     </button>
                   </>
                 ) : (
                   <>
                     <Link href="/auth" onClick={() => setIsOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors">
-                      Sign In
-                    </Link>
+                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
                     <Link href="/auth?mode=signup" onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-primary hover:bg-primary-light text-white text-base font-bold transition-colors shadow-glow-primary/50">
-                      <Zap className="w-4 h-4" /> Get Started Free
+                      className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
+                      Get Started Free
                     </Link>
                   </>
                 )}
-              </div>
-
-              {/* Quick stats inside mobile menu */}
-              <div className="pt-4 pb-2 flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1"><Star className="w-3 h-3 text-gold fill-gold" /> Free Plan</span>
-                <span>•</span>
-                <span>23 live sources</span>
-                <span>•</span>
-                <span>No credit card</span>
               </div>
             </div>
           </motion.div>

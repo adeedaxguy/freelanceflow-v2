@@ -1,19 +1,24 @@
-import React, { type ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { type ReactNode } from "react";
+import { headers } from "next/headers";
 import AdminSidebar from "@/components/AdminSidebar";
 
+export const metadata = { title: "iCloseLeads Admin" };
+
+// Auth is enforced by middleware (src/middleware.ts).
+// This layout provides admin chrome (sidebar + mobile header), but skips it for /admin/login.
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  const session = await getServerSession(authOptions);
-  if (!session) redirect("/auth");
-  if (session.user?.role !== "ADMIN") redirect("/dashboard");
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+
+  // Admin login page renders standalone — no sidebar chrome
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="hidden md:flex flex-shrink-0">
-        <AdminSidebar />
-      </div>
+      {/* AdminSidebar handles desktop aside + mobile drawer + mobile top bar */}
+      <AdminSidebar />
       <main className="flex-1 min-w-0 overflow-auto">
         {children}
       </main>

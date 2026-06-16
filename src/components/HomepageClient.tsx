@@ -11,7 +11,6 @@ import {
   ChevronDown, Star, Shield, Globe, Users, TrendingUp,
   Target, Layers, Bot, Send, Mail, Play, ExternalLink,
   CheckCircle2, X, AlertCircle, Clock, DollarSign,
-  MapPin, Building2,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -205,9 +204,9 @@ const FEATURES = [
     icon: <Search className="w-5 h-5 text-primary-light" />,
     tag: "Discovery",
     tagColor: "#9F67FF",
-    title: "7 Live Sources, One Search",
-    desc: "We simultaneously scrape Reddit, Remote OK, Remotive, WeWorkRemotely, Arbeitnow, Jobicy, and Working Nomads. Every result is fresh, real, and scored.",
-    stat: "7 sources",
+    title: "16 Live Sources, One Search",
+    desc: "We simultaneously scan remote job boards, Reddit, Hacker News, GitHub bounty issues, and curated freelance feeds. Every result is fresh, real, and scored.",
+    stat: "16 sources",
   },
   {
     icon: <Bot className="w-5 h-5 text-accent" />,
@@ -251,105 +250,100 @@ const FEATURES = [
   },
 ];
 
-const SOURCES = ["Remote OK", "Remotive", "Reddit", "WeWorkRemotely", "Arbeitnow", "Jobicy", "Working Nomads"];
+const SOURCES = ["Remote OK", "Remotive", "Reddit", "WeWorkRemotely", "Arbeitnow", "Jobicy", "Working Nomads", "Hacker News", "YC Jobs", "Authentic Jobs", "GitHub Bounties", "Smashing Jobs", "Dribbble Jobs", "Jobspresso", "Himalayas", "No Desk"];
 
 const STATS = [
   { to: 2847, suffix: "+", label: "Active Freelancers", sub: "signed up this month", color: "text-primary-light" },
-  { to: 10000, suffix: "+", label: "Leads Found Monthly", sub: "across all sources", color: "text-accent" },
+  { to: 40000, suffix: "+", label: "Leads Found Monthly", sub: "across 16 sources", color: "text-accent" },
   { to: 94, suffix: "%", label: "Open Rate on AI Proposals", sub: "vs 21% industry avg", color: "text-gold" },
   { to: 18, suffix: "k", prefix: "$", label: "Avg First-Month Revenue", sub: "for Pro users", color: "text-blue-400" },
 ];
 
 const FAQS = [
-  {
-    q: "Is it really free?",
-    a: "Yes — during Early Access everything is completely free with no credit card required. You get unlimited leads, AI proposals, the full CRM pipeline, Local Business Leads, Live Jobs feed, and all outreach tools. Pro and Agency plans are coming soon and will offer even higher limits and extra features, but right now there's no catch.",
-  },
-  {
-    q: "Where do the leads come from?",
-    a: "iCloseLeads pulls from 23 real sources in parallel — including RemoteOK, Remotive, Arbeitnow, Jobicy, WeWorkRemotely, WorkingNomads, Himalayas, HackerNews Hiring, GitHub Issues, The Muse, Reddit (6 subreddits with /r/forhire, /r/hiring and more), ProBlogger, and WP Hired. For Local Business Leads we use OpenStreetMap, Yelp, HERE Maps, TomTom, and Geoapify. Every lead is a real person or business actively looking for help.",
-  },
-  {
-    q: "How does the AI proposal writing work?",
-    a: "It uses Groq's Llama 3.3 70B — one of the fastest large language models available. It reads the lead's job posting, your chosen niche, and your preferred tone, then writes a unique personalised cold email in seconds. You can edit before sending. Most users report a 3–5× improvement in reply rate compared to generic templates.",
-  },
-  {
-    q: "What is Local Business Leads?",
-    a: "It's a search engine for finding local businesses that have no website or an outdated one — potential web design or digital marketing clients. You enter a business type (e.g. 'plumber') and a city, and iCloseLeads pulls real-time data from multiple sources including OpenStreetMap, Yelp, and HERE Maps, then flags which businesses are missing a web presence so you can pitch them first.",
-  },
-  {
-    q: "Will two freelancers get the same leads?",
-    a: "No. iCloseLeads runs per-user deduplication — you're never shown a lead you've already saved or applied to. The system also filters out leads that users with overlapping niches have already contacted, so you're not competing against other iCloseLeads users for the same client.",
-  },
-  {
-    q: "When are Pro and Agency plans launching?",
-    a: "Soon — we're finishing the payment integration and finalising pricing. Pro will focus on higher lead volume and advanced outreach automation. Agency will add team seats, white-label proposals, and multi-client workspaces. Sign up free now and you'll get early-bird pricing when they launch.",
-  },
-  {
-    q: "Can I send emails directly from iCloseLeads?",
-    a: "Yes. You can connect your Gmail account under Dashboard → Email Connection and send proposals directly from your own Gmail address without leaving iCloseLeads. Your emails come from your real domain, not a third-party sender, which means better deliverability and trust.",
-  },
-  {
-    q: "Is my data safe?",
-    a: "Yes. All data is stored on encrypted Neon PostgreSQL hosted on AWS. We never sell your data or share it with third parties. Passwords are hashed with bcrypt. You can delete your account and all associated data at any time from your profile settings.",
-  },
+  { q: "Is it really free to start?", a: "Yes — the Free plan gives you fresh leads from all 16 sources, AI-powered proposals, the full CRM pipeline, and all 3 free tools. No credit card, no trial expiry." },
+  { q: "Where exactly do the leads come from?", a: "We pull from 7 real job boards and communities in real time: Reddit (/r/forhire, /r/hiring), Remote OK, Remotive, WeWorkRemotely, Arbeitnow, Jobicy, and Working Nomads. Every lead is a real person or company actively hiring." },
+  { q: "How good is the AI proposal writing?", a: "It uses Groq's Llama 3.3 70B — one of the fastest large language models available. It reads the lead's job posting, your niche, and your preferred tone to write a unique, personal cold email. Most users report a 3–5× improvement in response rate vs their old templates." },
+  { q: "Will other users see the same leads as me?", a: "No. iCloseLeads runs per-user deduplication — you'll never be shown a lead you've already saved or emailed, and our system filters out leads that heavily overlapping users have already contacted." },
+  { q: "Can I cancel at any time?", a: "Yes — cancel anytime from your profile with zero friction. You keep access until the end of your billing period. No cancellation fees." },
+  { q: "How do I connect Stripe for payments?", a: "If you're running the self-hosted version, go to Admin → Settings → Payment Gateway, paste your Stripe keys and price IDs, and you're live. The guide in GO_LIVE_GUIDE.md walks you through every step." },
 ];
+
+
+// ── Early Access Banner (dismissible) ────────────────────────────────────────
+function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) {
+  if (!visible) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.4 }}
+      className="relative z-40 mt-16 overflow-hidden"
+    >
+      <div className="bg-[#0d0d1f] border-b border-primary/20 text-center py-2 px-10 text-sm">
+        <span className="inline-flex items-center gap-2 flex-wrap justify-center">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/15 text-accent text-xs font-bold border border-accent/25">
+            ✦ FREE
+          </span>
+          <span className="text-white/80">
+            <strong className="text-white">Early Access</strong> — all features unlocked, no credit card.
+          </span>
+          <span className="text-white/40 hidden sm:inline">·</span>
+          <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
+          <Link
+            href="/auth?mode=signup"
+            className="ml-1 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/20 hover:bg-primary/30 text-primary-light text-xs font-semibold border border-primary/25 transition-all"
+          >
+            Get free access <ArrowRight className="w-3 h-3" />
+          </Link>
+        </span>
+        <button
+          onClick={onDismiss}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors p-1"
+          aria-label="Dismiss"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
 
 // ── Main Component ────────────────────────────────────────────────────
 export default function HomepageClient() {
   const heroRef = useRef<HTMLElement>(null);
+  const [showEarlyAccess, setShowEarlyAccess] = useState(true);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY       = useTransform(scrollYProgress, [0, 1], [0, -80]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
-  // Force dark mode on homepage — the animated gradients & glows are designed for dark
+  // Force dark mode on homepage regardless of user preference.
+  // On unmount (navigation away), restore the saved class.
   useEffect(() => {
-    const html = document.documentElement;
-    const hadLight = html.classList.contains("light");
+    const html     = document.documentElement;
+    const savedCls = html.className; // e.g. "light" or ""
     html.classList.remove("light");
-    html.classList.add("dark");
+    html.style.colorScheme = "dark";
     return () => {
-      if (hadLight) {
-        html.classList.remove("dark");
-        html.classList.add("light");
-      }
+      html.className = savedCls;
+      html.style.colorScheme = "";
     };
   }, []);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* ── Early Access Banner ─────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        id="top-banner"
-        className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-primary/90 via-purple-600/90 to-accent/80 text-white text-center py-2 px-4 text-xs sm:text-sm font-medium"
-      >
-        {/* Desktop banner */}
-        <span className="hidden sm:inline-flex items-center gap-2 justify-center">
-          <Zap className="w-3.5 h-3.5 text-gold flex-shrink-0" />
-          <span>🎉 <strong>Early Access — 100% Free right now.</strong> Pro & Agency plans launching soon.</span>
-          <Link href="/auth?mode=signup" className="underline underline-offset-2 hover:text-gold transition-colors font-semibold whitespace-nowrap">
-            Grab your free account →
-          </Link>
-        </span>
-        {/* Mobile banner — single condensed line */}
-        <span className="sm:hidden inline-flex items-center gap-1.5 justify-center">
-          <Zap className="w-3 h-3 text-gold flex-shrink-0" />
-          <span><strong>100% Free</strong> — Pro launching soon.</span>
-          <Link href="/auth?mode=signup" className="underline font-semibold whitespace-nowrap">
-            Start free →
-          </Link>
-        </span>
-      </motion.div>
-
+    <div className="min-h-screen bg-[#090915] overflow-x-hidden">
       <Navbar />
+
+      {/* ── Early Access Banner ── */}
+      <EarlyAccessBanner visible={showEarlyAccess} onDismiss={() => setShowEarlyAccess(false)} />
 
       {/* ════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-[108px] sm:pt-[112px]">
+      <section
+        ref={heroRef}
+        className={`relative min-h-screen flex items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-20"}`}
+      >
 
         {/* Layered mesh gradient background */}
         <div className="absolute inset-0 mesh-gradient" />
@@ -391,8 +385,8 @@ export default function HomepageClient() {
 
           {/* Social proof chip */}
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-2 mb-8">
-            <div className="flex -space-x-2 flex-shrink-0">
+            className="inline-flex items-center gap-2.5 mb-8">
+            <div className="flex -space-x-2">
               {["#7C3AED","#00E5A0","#FFD166","#F472B6","#60A5FA"].map((c, i) => (
                 <div key={i} className="w-7 h-7 rounded-full border-2 border-background flex items-center justify-center text-[10px] font-bold text-white"
                   style={{ background: c }}>
@@ -400,12 +394,12 @@ export default function HomepageClient() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-sm">
-              <div className="flex gap-0.5 flex-shrink-0">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-sm">
+              <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
               </div>
-              <span className="text-foreground font-semibold whitespace-nowrap">2,847 freelancers</span>
-              <span className="text-muted-foreground whitespace-nowrap">found clients this week</span>
+              <span className="text-foreground font-semibold">2,847 freelancers</span>
+              <span className="text-muted-foreground">found clients this week</span>
             </div>
           </motion.div>
 
@@ -433,7 +427,7 @@ export default function HomepageClient() {
           {/* Sub */}
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            iCloseLeads searches <strong className="text-foreground">23 live sources</strong> simultaneously, scores every lead with AI, and writes personalized proposals in 3 seconds — so you spend time closing, not searching.
+            iCloseLeads searches <strong className="text-foreground">16 live sources</strong> simultaneously, scores every lead with AI, and writes personalised proposals in 3 seconds — so you spend time closing, not searching.
           </motion.p>
 
           {/* CTAs */}
@@ -457,7 +451,7 @@ export default function HomepageClient() {
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
               { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Live in 60 seconds" },
-              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "23 real lead sources" },
+              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "16 real lead sources" },
               { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "94% open rate on proposals" },
             ].map(({ icon, t }) => (
               <div key={t} className="flex items-center gap-1.5">{icon}<span>{t}</span></div>
@@ -467,7 +461,7 @@ export default function HomepageClient() {
           {/* Source pills */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-2 mt-8">
-            <span className="text-xs text-muted-foreground mr-1">Pulling live leads from:</span>
+            <span className="text-xs text-muted-foreground mr-1">Pulling live leads from 16 sources:</span>
             {SOURCES.map((s, i) => (
               <motion.span key={s} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1 + i * 0.06 }}
@@ -570,17 +564,17 @@ export default function HomepageClient() {
                 <Reveal delay={0.1}>
                   <StepCard n="1" icon={<Search className="w-5 h-5" />}
                     title="Search your niche"
-                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches 23 live sources and returns scored, deduplicated leads in seconds." />
+                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches 7 live sources and returns scored, deduplicated leads in seconds." />
                 </Reveal>
                 <Reveal delay={0.2}>
                   <StepCard n="2" icon={<Sparkles className="w-5 h-5" />}
                     title="Generate an AI proposal"
-                    desc="Click any lead. Our AI reads the posting and writes a personalized cold email in your voice in under 3 seconds. Edit freely, then send." />
+                    desc="Click any lead. Our AI reads the posting and writes a personalized cold email in your voice in under 3 seconds. Edit freely, then prepare it in Gmail." />
                 </Reveal>
                 <Reveal delay={0.3}>
                   <StepCard n="3" icon={<Send className="w-5 h-5" />}
-                    title="Send & track"
-                    desc="Email directly from iCloseLeads. See who opens, who clicks, and who replies — all tracked automatically in your pipeline." />
+                    title="Prepare and track"
+                    desc="Open Gmail compose with the message prefilled, review it, and send manually. iCloseLeads logs the prepared outreach in your history." />
                 </Reveal>
                 <Reveal delay={0.4}>
                   <StepCard n="4" icon={<DollarSign className="w-5 h-5" />}
@@ -729,432 +723,6 @@ export default function HomepageClient() {
       </section>
 
       {/* ════════════════════════════════════════════
-          POWER FEATURES — Deep-dive spotlights
-      ════════════════════════════════════════════ */}
-      <section className="py-28 px-4 relative overflow-hidden" id="power-features">
-
-        {/* Gradient mesh background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] rounded-full opacity-[0.07] blur-[120px]"
-            style={{ background: "radial-gradient(circle, #9f67ff 0%, transparent 70%)" }} />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.06] blur-[100px]"
-            style={{ background: "radial-gradient(circle, #00c6ff 0%, transparent 70%)" }} />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] rounded-full opacity-[0.04] blur-[80px]"
-            style={{ background: "radial-gradient(ellipse, #f7b731 0%, transparent 70%)" }} />
-        </div>
-
-        <div className="max-w-6xl mx-auto relative">
-
-          <SectionHeading
-            badge="Power Features"
-            badgeColor="primary"
-            title={<>Everything that sets<br />iCloseLeads apart</>}
-            sub="Three unique capabilities you won't find bundled together anywhere else."
-          />
-
-          {/* ── Feature 1: Local Business Leads ── */}
-          <div className="mt-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* Floating particles */}
-            <div className="absolute -left-8 top-40 pointer-events-none hidden lg:block">
-              {[
-                { size: 10, color: "#9f67ff", delay: 0, x: 0, y: 0 },
-                { size: 7,  color: "#00c6ff", delay: 1.2, x: 60, y: 80 },
-                { size: 5,  color: "#f7b731", delay: 0.6, x: -20, y: 160 },
-              ].map((p, i) => (
-                <motion.div key={i}
-                  className="absolute rounded-full opacity-40"
-                  style={{ width: p.size, height: p.size, background: p.color, left: p.x, top: p.y }}
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3.5 + i * 0.5, delay: p.delay, repeat: Infinity, ease: "easeInOut" }} />
-              ))}
-            </div>
-
-            {/* Text */}
-            <Reveal delay={0} className="order-1">
-              <Badge color="accent">Local Business Leads</Badge>
-              <h3 className="mt-4 text-3xl sm:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
-                Find local businesses that need a website —{" "}
-                <span className="gradient-text">before anyone else does</span>
-              </h3>
-              <p className="mt-4 text-muted-foreground text-lg leading-relaxed">
-                Real-time data from OpenStreetMap, Yelp, and HERE Maps. Search any city, filter by website
-                status, and find businesses actively looking for web help.
-              </p>
-
-              {/* Stats row */}
-              <div className="mt-8 flex flex-wrap gap-4">
-                {[
-                  { label: "cities covered", value: "50,000", suffix: "+" },
-                  { label: "live data sources", value: 5, suffix: "" },
-                  { label: "real-time results", value: "100", suffix: "%" },
-                ].map((s) => (
-                  <div key={s.label} className="flex flex-col bg-gradient-card border border-border rounded-xl px-5 py-3 min-w-[110px]">
-                    <span className="text-2xl font-extrabold gradient-text leading-none">
-                      {typeof s.value === "number"
-                        ? <Counter to={s.value} suffix={s.suffix} />
-                        : <>{s.value}{s.suffix}</>}
-                    </span>
-                    <span className="text-xs text-muted-foreground mt-1">{s.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8">
-                <Link href="/auth?mode=signup"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-colors shadow-glow">
-                  Start Finding Local Leads <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </Reveal>
-
-            {/* Visual: mock business search card */}
-            <Reveal delay={0.15} className="order-2">
-              <TiltCard className="relative">
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative">
-                  {/* Search bar */}
-                  <div className="bg-gradient-card border border-border rounded-2xl p-4 shadow-xl">
-                    <div className="flex items-center gap-3 mb-4 bg-surface/80 border border-border/60 rounded-xl px-4 py-2.5">
-                      <Search className="w-4 h-4 text-muted-foreground/60 flex-shrink-0" />
-                      <span className="text-sm text-foreground/70">Plumbers in Manchester, UK</span>
-                      <span className="ml-auto text-xs bg-primary/20 text-primary-light px-2 py-0.5 rounded-full font-semibold">
-                        No Website
-                      </span>
-                    </div>
-
-                    {/* Result cards */}
-                    {[
-                      { name: "MK Plumbing & Heating", area: "Manchester, M1 2AB", phone: "+44 161 4•• ••••", priority: "High", priorityColor: "#ff4d4d" },
-                      { name: "City Drain Specialists",  area: "Salford, M6 5LQ",    phone: "+44 161 7•• ••••", priority: "Med",  priorityColor: "#f7b731" },
-                      { name: "North West Boiler Co",   area: "Stockport, SK1 1AP", phone: "+44 161 2•• ••••", priority: "High", priorityColor: "#ff4d4d" },
-                    ].map((biz, bi) => (
-                      <motion.div key={biz.name}
-                        initial={{ opacity: 0, x: 16 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: bi * 0.12 + 0.2 }}
-                        whileHover={{ rotateY: 3, scale: 1.01 }}
-                        style={{ perspective: 1000 }}
-                        className="mb-3 last:mb-0 flex items-center justify-between bg-surface/60 border border-border/60 rounded-xl px-4 py-3 cursor-default group hover:border-accent/40 transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center flex-shrink-0">
-                            <Building2 className="w-4 h-4 text-accent" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-foreground leading-none mb-0.5">{biz.name}</p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />{biz.area}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                            style={{ background: `${biz.priorityColor}18`, color: biz.priorityColor, border: `1px solid ${biz.priorityColor}30` }}>
-                            {biz.priority} Priority
-                          </span>
-                          <span className="text-[10px] text-muted-foreground/70">No Website Detected</span>
-                        </div>
-                      </motion.div>
-                    ))}
-
-                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
-                      <span>Showing 3 of <strong className="text-foreground">147 results</strong></span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                        Live data
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              </TiltCard>
-            </Reveal>
-          </div>
-
-          {/* ── Feature 2: Live Jobs Feed ── */}
-          <div className="mt-28 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* Floating particles (right side) */}
-            <div className="absolute -right-8 pointer-events-none hidden lg:block">
-              {[
-                { size: 9,  color: "#00c6ff", delay: 0.3, x: 0,   y: 0   },
-                { size: 6,  color: "#9f67ff", delay: 1.0, x: -50, y: 60  },
-                { size: 12, color: "#f7b731", delay: 0.8, x: 30,  y: 140 },
-              ].map((p, i) => (
-                <motion.div key={i}
-                  className="absolute rounded-full opacity-35"
-                  style={{ width: p.size, height: p.size, background: p.color, left: p.x, top: p.y }}
-                  animate={{ y: [0, -12, 0] }}
-                  transition={{ duration: 4 + i * 0.6, delay: p.delay, repeat: Infinity, ease: "easeInOut" }} />
-              ))}
-            </div>
-
-            {/* Visual: mock live jobs feed — left on desktop */}
-            <Reveal delay={0.15} className="order-2 lg:order-1">
-              <TiltCard className="relative">
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative">
-                  <div className="bg-gradient-card border border-border rounded-2xl p-4 shadow-xl">
-                    {/* Feed header */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-primary-light" />
-                        <span className="text-sm font-bold text-foreground">Live Jobs Feed</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-green-400 font-semibold">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                        Updated 4 min ago
-                      </div>
-                    </div>
-
-                    {/* Job cards */}
-                    {[
-                      {
-                        title: "React Developer for SaaS MVP",
-                        source: "Reddit",
-                        sourceColor: "#ff4500",
-                        budget: "$3,200",
-                        score: 94,
-                        scoreColor: "#9f67ff",
-                        age: "12 min ago",
-                      },
-                      {
-                        title: "Next.js landing page redesign",
-                        source: "RemoteOK",
-                        sourceColor: "#00c6ff",
-                        budget: "$900",
-                        score: 87,
-                        scoreColor: "#00c6ff",
-                        age: "38 min ago",
-                      },
-                      {
-                        title: "Node.js API — open contract",
-                        source: "HN",
-                        sourceColor: "#f7b731",
-                        budget: "$5,000",
-                        score: 91,
-                        scoreColor: "#9f67ff",
-                        age: "1 hr ago",
-                      },
-                    ].map((job, ji) => (
-                      <motion.div key={job.title}
-                        initial={{ opacity: 0, x: -16 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: ji * 0.12 + 0.2 }}
-                        whileHover={{ rotateY: -3, scale: 1.01 }}
-                        style={{ perspective: 1000 }}
-                        className="mb-3 last:mb-0 bg-surface/60 border border-border/60 rounded-xl px-4 py-3 cursor-default hover:border-primary/40 transition-colors group">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-start gap-2.5">
-                            {/* LIVE pulse */}
-                            <span className="mt-1 flex-shrink-0 w-2 h-2 rounded-full animate-pulse" style={{ background: job.sourceColor }} />
-                            <div>
-                              <p className="text-sm font-semibold text-foreground leading-snug mb-1">{job.title}</p>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                  style={{ background: `${job.sourceColor}18`, color: job.sourceColor, border: `1px solid ${job.sourceColor}30` }}>
-                                  {job.source}
-                                </span>
-                                <span className="text-[10px] text-muted-foreground">{job.age}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1 flex-shrink-0">
-                            <span className="text-xs font-bold text-foreground">{job.budget}</span>
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                              style={{ background: `${job.scoreColor}18`, color: job.scoreColor }}>
-                              {job.score}% match
-                            </span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-
-                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
-                      <span><strong className="text-foreground">23 sources</strong> monitored</span>
-                      <span className="text-primary-light font-semibold cursor-pointer hover:underline">View all 340 →</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </TiltCard>
-            </Reveal>
-
-            {/* Text — right on desktop */}
-            <Reveal delay={0} className="order-1 lg:order-2">
-              <Badge color="primary">Live Jobs Feed</Badge>
-              <h3 className="mt-4 text-3xl sm:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
-                23 live sources. One feed.{" "}
-                <span className="gradient-text">Updated every hour.</span>
-              </h3>
-              <p className="mt-4 text-muted-foreground text-lg leading-relaxed">
-                Stop checking Upwork manually. iCloseLeads scans RemoteOK, Reddit, HackerNews,
-                WeWorkRemotely, GitHub Issues and 18 more sources — scores every match for you.
-              </p>
-
-              {/* Stats row */}
-              <div className="mt-8 flex flex-wrap gap-4">
-                {[
-                  { label: "sources monitored", value: 23,   suffix: "" },
-                  { label: "updated hourly",     value: "1",  suffix: "hr" },
-                  { label: "AI-scored leads",    value: "100", suffix: "%" },
-                ].map((s) => (
-                  <div key={s.label} className="flex flex-col bg-gradient-card border border-border rounded-xl px-5 py-3 min-w-[110px]">
-                    <span className="text-2xl font-extrabold gradient-text leading-none">
-                      {typeof s.value === "number"
-                        ? <Counter to={s.value} suffix={s.suffix} />
-                        : <>{s.value}{s.suffix}</>}
-                    </span>
-                    <span className="text-xs text-muted-foreground mt-1">{s.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8">
-                <Link href="/auth?mode=signup"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-semibold text-sm hover:opacity-90 transition-opacity shadow-glow">
-                  See live jobs <Zap className="w-4 h-4" />
-                </Link>
-              </div>
-            </Reveal>
-          </div>
-
-          {/* ── Feature 3: Google Email Connection ── */}
-          <div className="mt-28 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
-            {/* Floating particles */}
-            <div className="absolute left-0 pointer-events-none hidden lg:block">
-              {[
-                { size: 8,  color: "#34a853", delay: 0.2, x: 20,  y: 0   },
-                { size: 11, color: "#4285f4", delay: 0.9, x: -10, y: 90  },
-                { size: 6,  color: "#ea4335", delay: 0.5, x: 50,  y: 170 },
-              ].map((p, i) => (
-                <motion.div key={i}
-                  className="absolute rounded-full opacity-40"
-                  style={{ width: p.size, height: p.size, background: p.color, left: p.x, top: p.y }}
-                  animate={{ y: [0, -9, 0] }}
-                  transition={{ duration: 3.8 + i * 0.4, delay: p.delay, repeat: Infinity, ease: "easeInOut" }} />
-              ))}
-            </div>
-
-            {/* Text — left */}
-            <Reveal delay={0} className="order-1">
-              <Badge color="gold">Google Email Connection</Badge>
-              <h3 className="mt-4 text-3xl sm:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
-                Send proposals directly from Gmail —{" "}
-                <span className="gradient-text">without leaving iCloseLeads</span>
-              </h3>
-              <p className="mt-4 text-muted-foreground text-lg leading-relaxed">
-                Connect your Google account once. Write AI proposals, personalise them, and send directly
-                from your own Gmail address. No third-party email tools needed.
-              </p>
-
-              {/* Stats row */}
-              <div className="mt-8 flex flex-wrap gap-4">
-                {[
-                  { label: "your own domain",      icon: <Globe className="w-3.5 h-3.5" />, color: "#4285f4" },
-                  { label: "AI-written proposals", icon: <Bot   className="w-3.5 h-3.5" />, color: "#9f67ff" },
-                  { label: "1-click send",         icon: <Send  className="w-3.5 h-3.5" />, color: "#34a853" },
-                ].map((s) => (
-                  <div key={s.label} className="flex items-center gap-2 bg-gradient-card border border-border rounded-xl px-4 py-3">
-                    <span style={{ color: s.color }}>{s.icon}</span>
-                    <span className="text-sm font-semibold text-foreground">{s.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8">
-                <Link href="/auth?mode=signup"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-gradient-card text-foreground font-semibold text-sm hover:border-primary/50 hover:bg-surface transition-colors">
-                  <Mail className="w-4 h-4 text-primary-light" />
-                  Connect Gmail
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
-              </div>
-            </Reveal>
-
-            {/* Visual: mock Gmail compose window */}
-            <Reveal delay={0.15} className="order-2">
-              <TiltCard className="relative">
-                <motion.div
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative">
-                  <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden shadow-xl">
-                    {/* Gmail-style title bar */}
-                    <div className="flex items-center justify-between px-4 py-2.5 bg-surface/80 border-b border-border/60">
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1.5">
-                          <span className="w-3 h-3 rounded-full bg-red-400/70" />
-                          <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
-                          <span className="w-3 h-3 rounded-full bg-green-400/70" />
-                        </div>
-                        <span className="text-xs font-semibold text-muted-foreground ml-2">New Message — Gmail</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex items-center gap-1 bg-[#4285f4]/10 border border-[#4285f4]/20 rounded-full px-2.5 py-0.5">
-                          <span className="text-[10px] font-bold text-[#4285f4]">G</span>
-                          <span className="text-[10px] text-muted-foreground">Connected</span>
-                        </div>
-                        <Bot className="w-3.5 h-3.5 text-primary-light" />
-                        <span className="text-[10px] text-primary-light font-semibold">AI</span>
-                      </div>
-                    </div>
-
-                    {/* To / Subject */}
-                    <div className="px-4 pt-3 space-y-2 border-b border-border/40 pb-3">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground w-12">To:</span>
-                        <span className="text-foreground">john@mkplumbing.co.uk</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground w-12">From:</span>
-                        <span className="text-foreground/70">you@yourdomain.com</span>
-                        <span className="ml-auto text-[10px] bg-[#4285f4]/10 text-[#4285f4] px-2 py-0.5 rounded-full font-semibold border border-[#4285f4]/20">
-                          via Gmail
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="text-muted-foreground w-12">Subject:</span>
-                        <span className="text-foreground">Website proposal for MK Plumbing & Heating</span>
-                      </div>
-                    </div>
-
-                    {/* Email body */}
-                    <div className="px-4 py-3 text-xs text-muted-foreground leading-relaxed space-y-2">
-                      <p>Hi John,</p>
-                      <p>I noticed MK Plumbing & Heating doesn&apos;t have a website yet — I help tradespeople in
-                        Manchester get found on Google with a professional site from £499.</p>
-                      <p className="text-primary-light/80">✦ <em>AI-written from your lead data — personalised in seconds.</em></p>
-                    </div>
-
-                    {/* Action bar */}
-                    <div className="flex items-center justify-between px-4 py-3 border-t border-border/40 bg-surface/40">
-                      <div className="flex items-center gap-2">
-                        <motion.button
-                          whileHover={{ scale: 1.04 }}
-                          whileTap={{ scale: 0.97 }}
-                          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#4285f4] text-white text-[11px] font-bold shadow-sm">
-                          <Send className="w-3 h-3" /> Send via Gmail
-                        </motion.button>
-                        <button className="text-[11px] text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-surface transition-colors">
-                          Edit
-                        </button>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground/60">Powered by iCloseLeads</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </TiltCard>
-            </Reveal>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════
           TESTIMONIALS
       ════════════════════════════════════════════ */}
       <section className="py-24 px-4" id="testimonials">
@@ -1261,53 +829,37 @@ export default function HomepageClient() {
                   style={{ backgroundImage: "linear-gradient(rgba(159,103,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(159,103,255,1) 1px, transparent 1px)", backgroundSize: "50px 50px" }} />
               </div>
 
-              <div className="relative z-10 py-16 px-6 sm:px-12 text-center">
-                {/* Icon */}
+              <div className="relative z-10 py-20 px-8 text-center">
                 <motion.div
                   animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.05, 1] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
+                  className="w-16 h-16 mx-auto mb-7 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
                   <Zap className="w-8 h-8 text-white" />
                 </motion.div>
 
-                {/* Social proof row */}
-                <div className="inline-flex items-center gap-2 mb-5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-muted-foreground">
-                  <div className="flex -space-x-1.5">
-                    {["#7C3AED","#00E5A0","#FFD166","#F472B6","#60A5FA"].map((c, i) => (
-                      <div key={i} className="w-5 h-5 rounded-full border border-background flex items-center justify-center text-[8px] font-bold text-white" style={{ background: c }}>
-                        {["M","S","C","A","R"][i]}
-                      </div>
-                    ))}
-                  </div>
-                  <span><strong className="text-foreground">2,847 freelancers</strong> found clients this week</span>
-                </div>
-
-                <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-4 tracking-tight leading-tight">
+                <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5 tracking-tight">
                   Stop waiting for clients<br />to come to you.
                 </h2>
-                <p className="text-muted-foreground text-lg sm:text-xl mb-8 max-w-lg mx-auto leading-relaxed">
-                  Join 2,847 freelancers already finding clients with AI.<br className="hidden sm:block"/>
-                  100% free during early access — start in 60 seconds.
+                <p className="text-muted-foreground text-xl mb-10 max-w-lg mx-auto leading-relaxed">
+                  Join 2,847 freelancers already finding clients with AI. 100% free during early access — start in 60 seconds.
                 </p>
 
-                {/* CTA buttons */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Link href="/auth?mode=signup"
-                    className="group relative flex items-center gap-3 w-full sm:w-auto px-8 py-4 rounded-2xl bg-primary text-white text-base font-bold transition-all shadow-glow-primary hover:shadow-xl hover:bg-primary-light hover:-translate-y-1 overflow-hidden">
+                    className="group relative flex items-center gap-3 px-10 py-4 rounded-2xl bg-primary text-white text-lg font-bold transition-all shadow-glow-primary hover:shadow-xl hover:bg-primary-light hover:-translate-y-1 overflow-hidden">
                     <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Zap className="w-5 h-5 relative z-10" />
                     <span className="relative z-10">Find My First Lead — Free</span>
-                    <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/auth?mode=signup"
-                    className="flex items-center gap-2.5 w-full sm:w-auto px-8 py-4 rounded-2xl border border-gold/40 bg-gold/5 text-gold text-base font-bold transition-all hover:bg-gold/10 hover:border-gold/60 hover:-translate-y-1">
+                  <Link href="/auth?mode=signup&plan=pro"
+                    className="flex items-center gap-2 px-8 py-4 rounded-2xl border border-gold/30 hover:border-gold/60 text-gold font-semibold text-base transition-all hover:-translate-y-0.5 hover:bg-gold/5">
                     <Star className="w-4 h-4 fill-gold" />
                     Start Pro — $29/mo
                   </Link>
                 </div>
 
-                {/* Trust badges */}
-                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
+                <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> No credit card</span>
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> 100% free during Early Access</span>
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> All features unlocked</span>
@@ -1320,39 +872,6 @@ export default function HomepageClient() {
       </section>
 
       <Footer />
-
-      {/* SoftwareApplication + Product schema for Google rich results */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "iCloseLeads",
-        "url": "https://icloseleads.com",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Web",
-        "description": "AI-powered lead generation and client acquisition platform for freelancers. Find local business leads, live remote jobs, and write AI proposals — free.",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD",
-          "description": "Free during Early Access",
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "247",
-          "bestRating": "5",
-        },
-        "featureList": [
-          "23 live lead sources",
-          "AI proposal writer",
-          "Local business lead discovery",
-          "CRM pipeline",
-          "Gmail integration",
-          "Live jobs feed",
-        ],
-        "screenshot": "https://icloseleads.com/og-image.png",
-        "author": { "@type": "Organization", "name": "iCloseLeads", "url": "https://icloseleads.com" },
-      }) }} />
     </div>
   );
 }

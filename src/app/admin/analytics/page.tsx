@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -89,9 +91,9 @@ export default async function AdminAnalyticsPage() {
   const qualityLow = totalLeads - qualityHigh - qualityMed;
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Platform Analytics</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Platform Analytics</h1>
         <p className="text-muted-foreground mt-1">Platform-wide usage, lead quality, and growth metrics.</p>
       </div>
 
@@ -99,13 +101,13 @@ export default async function AdminAnalyticsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard title="Total Users"      value={totalUsers}                  icon={<Users  className="w-5 h-5" />} trend={newUsers7d}  trendLabel="last 7d" />
         <StatsCard title="Saved Leads"      value={totalLeads.toLocaleString()} icon={<Search className="w-5 h-5" />} trend={newLeads7d}  trendLabel="last 7d" />
-        <StatsCard title="Emails Sent"      value={totalEmails.toLocaleString()}icon={<Mail   className="w-5 h-5" />} variant="accent" trend={newEmails7d} trendLabel="last 7d" />
+        <StatsCard title="Outreach"         value={totalEmails.toLocaleString()}icon={<Mail   className="w-5 h-5" />} variant="accent" trend={newEmails7d} trendLabel="last 7d" />
         <StatsCard title="Live Campaigns"   value={activeCampaigns}             icon={<Zap    className="w-5 h-5" />} variant="gold" />
       </div>
 
       {/* Growth Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <EmailChart data={emailChartData}  title="Emails Sent — Last 30 Days" />
+        <EmailChart data={emailChartData}  title="Outreach — Last 30 Days" />
         <EmailChart data={signupChartData} title="New Signups — Last 30 Days" />
       </div>
 

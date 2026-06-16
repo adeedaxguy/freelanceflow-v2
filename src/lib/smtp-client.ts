@@ -86,7 +86,7 @@ export async function smtpSend(
       if (finished) return;
       finished = true;
       clearTimeout(timer);
-      try { rawSock.destroy(); } catch {}
+      try { rawSock?.destroy(); } catch {}
       if (err) reject(err); else resolve();
     }
 
@@ -96,11 +96,11 @@ export async function smtpSend(
     let state = 0;
     let buffer = "";
     // rawSock is always the original TCP socket; activeSock may be upgraded to TLS
-    let rawSock: net.Socket;
-    let activeSock: net.Socket | tls.TLSSocket;
+    let rawSock: net.Socket | null = null;
+    let activeSock: net.Socket | tls.TLSSocket | null = null;
 
     const write = (line: string) => {
-      activeSock.write(line + "\r\n");
+      activeSock?.write(line + "\r\n");
     };
 
     const handleLine = (line: string) => {
@@ -110,7 +110,7 @@ export async function smtpSend(
 
       switch (state) {
         case 0: // waiting for 220 greeting
-          if (code === 220) { state = 1; write("EHLO freelanceflow.io"); }
+          if (code === 220) { state = 1; write("EHLO icloseleads.com"); }
           else done(new Error(`Bad greeting: ${line}`));
           break;
 
@@ -125,7 +125,7 @@ export async function smtpSend(
           if (code === 220) {
             // Upgrade TCP → TLS in-place
             const tlsSock = tls.connect({
-              socket: rawSock,
+              socket: rawSock as net.Socket,
               host: cfg.host,
               rejectUnauthorized: false,
             });
@@ -134,7 +134,7 @@ export async function smtpSend(
               activeSock = tlsSock;
               activeSock.on("data", onData);
               state = 3;
-              write("EHLO freelanceflow.io");
+              write("EHLO icloseleads.com");
             });
           } else done(new Error(`STARTTLS failed: ${line}`));
           break;
@@ -172,7 +172,7 @@ export async function smtpSend(
         case 9: // DATA go-ahead (354)
           if (code === 354) {
             state = 10;
-            activeSock.write(mime + "\r\n.\r\n");
+            activeSock?.write(mime + "\r\n.\r\n");
           } else done(new Error(`DATA failed: ${line}`));
           break;
 
@@ -190,10 +190,6 @@ export async function smtpSend(
       for (const line of lines) handleLine(line);
     };
 
-    const handleClose = () => {
-      if (!finished && state < 11) done(new Error("Connection closed unexpectedly"));
-    };
-
     // Open connection
     if (cfg.secure) {
       // Implicit TLS (port 465)
@@ -203,7 +199,6 @@ export async function smtpSend(
         rejectUnauthorized: false,
       });
       tlsSock.once("error", (e) => done(e));
-      tlsSock.once("close", handleClose);
       tlsSock.once("secureConnect", () => {
         rawSock = tlsSock as unknown as net.Socket;
         activeSock = tlsSock;
@@ -214,8 +209,11 @@ export async function smtpSend(
       rawSock = net.createConnection({ host: cfg.host, port: cfg.port });
       activeSock = rawSock;
       rawSock.once("error", (e) => done(e));
-      rawSock.once("close", handleClose);
       rawSock.on("data", onData);
     }
+
+    rawSock?.once("close", () => {
+      if (!finished && state < 11) done(new Error("Connection closed unexpectedly"));
+    });
   });
 }

@@ -15,6 +15,7 @@ interface FollowUp {
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING:   "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+  READY_TO_SEND: "bg-gold/10 text-gold border-gold/20",
   SENT:      "bg-green-500/10  text-green-400  border-green-500/20",
   CANCELLED: "bg-red-500/10    text-red-400    border-red-500/20",
 };
@@ -46,6 +47,7 @@ export default function FollowUpsPage() {
   const [filterStatus,setFilterStatus]= useState("all");
   const [form, setForm] = useState({ leadId: "", step: 1, subject: "", body: "", sendAfterDays: 3 });
   const [saveMsg, setSaveMsg] = useState("");
+  const [actionMsg, setActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -82,6 +84,42 @@ export default function FollowUpsPage() {
     void fetchAll();
   };
 
+  const handlePrepareInGmail = async (fu: FollowUp) => {
+    if (!fu.lead?.email) {
+      setActionMsg({ type: "error", text: "This follow-up has no recipient email." });
+      return;
+    }
+
+    const composeWindow = window.open("about:blank", "_blank");
+    setActionMsg(null);
+    try {
+      const res = await fetch("/api/email/prepare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: fu.lead.email,
+          subject: fu.subject,
+          body: fu.body,
+          leadId: fu.leadId,
+          company: fu.lead.company,
+          domain: fu.lead.domain,
+        }),
+      });
+      const data = await res.json() as { composeUrl?: string; error?: string };
+      if (!res.ok || !data.composeUrl) throw new Error(data.error ?? "Could not prepare Gmail compose");
+      if (composeWindow) {
+        composeWindow.location.href = data.composeUrl;
+      } else {
+        window.open(data.composeUrl, "_blank");
+      }
+      await handlePatch(fu.id, { status: "READY_TO_SEND" } as Partial<FollowUp>);
+      setActionMsg({ type: "success", text: "Follow-up prepared in Gmail. Review it and click Send inside Gmail." });
+    } catch (e) {
+      if (composeWindow) composeWindow.close();
+      setActionMsg({ type: "error", text: e instanceof Error ? e.message : "Could not prepare Gmail compose." });
+    }
+  };
+
   const handleDelete = async (id: string) => {
     await fetch(`/api/followup?id=${id}`, { method: "DELETE" });
     void fetchAll();
@@ -102,7 +140,7 @@ export default function FollowUpsPage() {
   }, {});
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 max-w-5xl">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl">
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -110,7 +148,7 @@ export default function FollowUpsPage() {
             <CalendarDays className="w-6 h-6 text-primary-light" /> Follow-Up Sequences
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Schedule multi-step follow-ups for leads who haven't replied yet.
+            Plan follow-up drafts and prepare them in Gmail when it is time to reach out.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -126,13 +164,23 @@ export default function FollowUpsPage() {
 
       {/* Filter tabs */}
       <div className="flex items-center gap-2 flex-wrap">
-        {[["all","All"], ["PENDING","Pending"], ["SENT","Sent"], ["CANCELLED","Cancelled"]].map(([val, label]) => (
+        {[["all","All"], ["PENDING","Pending"], ["READY_TO_SEND","Prepared"], ["SENT","Sent"], ["CANCELLED","Cancelled"]].map(([val, label]) => (
           <button key={val} onClick={() => setFilterStatus(val!)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border ${filterStatus === val ? "bg-primary border-primary text-white" : "border-border text-muted-foreground hover:text-foreground"}`}>
             {label}
           </button>
         ))}
       </div>
+
+      {actionMsg && (
+        <div className={`px-4 py-3 rounded-xl border text-sm ${
+          actionMsg.type === "success"
+            ? "bg-accent/10 border-accent/20 text-accent"
+            : "bg-destructive/10 border-destructive/20 text-destructive"
+        }`}>
+          {actionMsg.text}
+        </div>
+      )}
 
       {/* Create modal */}
       {creating && (
@@ -170,7 +218,7 @@ export default function FollowUpsPage() {
                 className="w-full px-3 py-2.5 bg-background border border-border rounded-xl text-foreground text-sm focus:outline-none focus:border-primary/50" />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Send After (days)</label>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Prepare After (days)</label>
               <input type="number" min={1} max={90} value={form.sendAfterDays} onChange={e => setForm(f => ({ ...f, sendAfterDays: Number(e.target.value) }))}
                 className="w-full px-3 py-2.5 bg-background border border-border rounded-xl text-foreground text-sm focus:outline-none focus:border-primary/50" />
             </div>
@@ -191,7 +239,7 @@ export default function FollowUpsPage() {
           <div className="flex gap-3">
             <button onClick={() => void handleCreate()}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-sm transition-all shadow-glow-primary">
-              <CheckCircle className="w-4 h-4" /> Schedule Follow-Up
+              <CheckCircle className="w-4 h-4" /> Save Follow-Up
             </button>
             <button onClick={() => { setCreating(false); setSaveMsg(""); }}
               className="px-5 py-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-all">
@@ -207,9 +255,9 @@ export default function FollowUpsPage() {
       ) : Object.keys(byLead).length === 0 ? (
         <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-surface/50">
           <CalendarDays className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-40" />
-          <h3 className="text-foreground font-semibold mb-2">No follow-ups scheduled</h3>
+          <h3 className="text-foreground font-semibold mb-2">No follow-ups planned</h3>
           <p className="text-muted-foreground text-sm mb-5 max-w-sm mx-auto">
-            Create follow-up sequences for leads who haven't replied to keep deals moving forward.
+            Create follow-up drafts for leads who have not replied, then prepare each one in Gmail when it is due.
           </p>
           <button onClick={() => setCreating(true)}
             className="px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-light transition-all shadow-glow-primary">
@@ -255,20 +303,24 @@ export default function FollowUpsPage() {
 
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${STATUS_STYLES[fu.status] ?? ""}`}>
-                          {fu.status}
+                          {fu.status === "READY_TO_SEND" ? "PREPARED" : fu.status}
                         </span>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
-                          {fu.status === "SENT" && fu.sentAt ? `Sent ${formatDate(fu.sentAt)}` : daysUntil(fu.scheduledAt)}
+                          {fu.status === "SENT" && fu.sentAt
+                            ? `Sent ${formatDate(fu.sentAt)}`
+                            : fu.status === "READY_TO_SEND"
+                            ? "Prepared"
+                            : daysUntil(fu.scheduledAt)}
                         </div>
-                        {fu.status === "PENDING" && (
+                        {(fu.status === "PENDING" || fu.status === "READY_TO_SEND") && (
                           <div className="flex items-center gap-1 mt-1">
                             <button onClick={() => setEditingId(editingId === fu.id ? null : fu.id)}
                               className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors">
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => void handlePatch(fu.id, { status: "SENT" } as Partial<FollowUp>)}
-                              title="Mark as sent"
+                            <button onClick={() => void handlePrepareInGmail(fu)}
+                              title="Prepare in Gmail"
                               className="p-1 rounded text-muted-foreground hover:text-accent transition-colors">
                               <Send className="w-3.5 h-3.5" />
                             </button>

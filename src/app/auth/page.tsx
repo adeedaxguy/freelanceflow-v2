@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Check, Loader2, Chrome, Zap } from "lucide-react";
 import Link from "next/link";
@@ -33,9 +33,18 @@ function GoogleIcon() {
   );
 }
 
+function GitHubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+    </svg>
+  );
+}
+
 function AuthForm() {
   const router = useRouter();
   const params = useSearchParams();
+  const { status } = useSession();
   const [mode,      setMode]      = useState<"signin" | "signup">(params.get("mode") === "signup" ? "signup" : "signin");
   const [step,      setStep]      = useState(1);
   const [name,      setName]      = useState("");
@@ -56,6 +65,10 @@ function AuthForm() {
     if (m === "signup") setMode("signup");
   }, [params]);
 
+  useEffect(() => {
+    if (status === "authenticated") router.replace("/dashboard");
+  }, [status, router]);
+
   const strength = strengthLabel(password);
 
   const handleGoogleSignIn = async () => {
@@ -66,6 +79,15 @@ function AuthForm() {
     } catch {
       setError("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setError("");
+    try {
+      await signIn("github", { callbackUrl: "/dashboard" });
+    } catch {
+      setError("GitHub sign-in failed. Please try again.");
     }
   };
 
@@ -139,7 +161,7 @@ function AuthForm() {
             {[
               "20 free leads every week — no credit card",
               "AI proposals powered by Groq (free tier)",
-              "7 lead sources: Reddit, Remote, Jobicy & more",
+              "16 lead sources: Reddit, RemoteOK, Jobicy & more",
               "Full CRM pipeline to track every deal",
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -163,7 +185,7 @@ function AuthForm() {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground relative z-10">© 2025 FreelanceFlow. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground relative z-10">© 2025 iCloseLeads. All rights reserved.</p>
       </div>
 
       {/* Right panel */}
@@ -192,29 +214,39 @@ function AuthForm() {
                   {mode === "signin" ? "Welcome back" : "Create your account"}
                 </h1>
 
-                {/* Google OAuth Button */}
-                {hasGoogle && (
-                  <div className="mb-5">
+                {/* OAuth Buttons */}
+                <div className="mb-5 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* Google */}
                     <button
                       type="button"
                       onClick={() => void handleGoogleSignIn()}
                       disabled={googleLoading}
-                      className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all disabled:opacity-60 hover:border-primary/30"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all disabled:opacity-60 hover:border-primary/30"
                     >
                       {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
-                      {mode === "signin" ? "Sign in with Google" : "Sign up with Google"}
+                      Google
                     </button>
+                    {/* GitHub */}
+                    <button
+                      type="button"
+                      onClick={() => void handleGitHubSignIn()}
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all hover:border-primary/30"
+                    >
+                      <GitHubIcon />
+                      GitHub
+                    </button>
+                  </div>
 
-                    <div className="relative my-5">
-                      <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-border" />
-                      </div>
-                      <div className="relative flex justify-center text-xs">
-                        <span className="bg-background px-3 text-muted-foreground">or continue with email</span>
-                      </div>
+                  <div className="relative my-1">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs">
+                      <span className="bg-background px-3 text-muted-foreground">or continue with email</span>
                     </div>
                   </div>
-                )}
+                </div>
 
                 <form onSubmit={e => void handleCredentials(e)} className="space-y-4">
                   {mode === "signup" && (
@@ -307,7 +339,7 @@ function AuthForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find FreelanceFlow?</label>
+                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find iCloseLeads?</label>
                   <div className="grid grid-cols-3 gap-2">
                     {REFERRAL_OPTIONS.map(r => (
                       <button key={r} type="button" onClick={() => setReferral(r)}

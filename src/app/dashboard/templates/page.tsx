@@ -21,6 +21,8 @@ export default function TemplatesPage() {
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<Template | null>(null);
   const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [createError, setCreateError] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [newTemplate, setNewTemplate] = useState({ name: "", niche: "", subject: "", body: "" });
 
@@ -44,12 +46,27 @@ export default function TemplatesPage() {
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
-    const res = await fetch("/api/templates", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newTemplate),
-    });
-    if (res.ok) { setCreating(false); setNewTemplate({ name: "", niche: "", subject: "", body: "" }); void fetchTemplates(); }
+    setSaving(true);
+    setCreateError("");
+    try {
+      const res = await fetch("/api/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTemplate),
+      });
+      const data = await res.json().catch(() => ({})) as { error?: string };
+      if (!res.ok) {
+        setCreateError(data.error ?? "Could not save this template. Please check the fields and try again.");
+        return;
+      }
+      setCreating(false);
+      setNewTemplate({ name: "", niche: "", subject: "", body: "" });
+      void fetchTemplates();
+    } catch {
+      setCreateError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDelete() {
@@ -60,13 +77,13 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Proposal Templates</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Proposal Templates</h1>
           <p className="text-muted-foreground mt-1">Reusable templates to speed up your outreach.</p>
         </div>
-        <button onClick={() => setCreating(true)}
+        <button onClick={() => { setCreateError(""); setCreating(true); }}
           className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary">
           <Plus className="w-4 h-4" /> New Template
         </button>
@@ -152,9 +169,16 @@ export default function TemplatesPage() {
                 <textarea required rows={6} value={newTemplate.body} onChange={e => setNewTemplate({...newTemplate, body: e.target.value})}
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none focus:border-primary/50 resize-none" />
               </div>
+              {createError && (
+                <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                  {createError}
+                </p>
+              )}
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setCreating(false)} className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium"><Sparkles className="w-3.5 h-3.5 inline mr-1" />Save Template</button>
+                <button type="button" onClick={() => { setCreating(false); setCreateError(""); }} className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground">Cancel</button>
+                <button type="submit" disabled={saving} className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium disabled:opacity-50">
+                  <Sparkles className="w-3.5 h-3.5 inline mr-1" />{saving ? "Saving..." : "Save Template"}
+                </button>
               </div>
             </form>
           </div>

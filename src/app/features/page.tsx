@@ -5,12 +5,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://icloseleads.com"),
-  title: "iCloseLeads Features — AI-Powered Client Acquisition for Freelancers",
-  description: "Explore all iCloseLeads features: 11-source lead discovery, AI proposal generator, 6-stage CRM pipeline, cold email outreach, analytics, and free tools for freelancers.",
-  keywords: ["freelance lead generation tool", "AI proposal generator freelancers", "freelance CRM software", "cold email outreach freelancers", "best tools for freelancers 2025"],
+  title: "iCloseLeads Features — AI-Powered Client Outreach for Freelancers",
+  description: "Explore iCloseLeads's features: lead discovery, AI proposal generation, safe Gmail outreach, analytics, and more.",
   openGraph: { title: "iCloseLeads Features", description: "Everything you need to find and close freelance clients." },
-  alternates: { canonical: "https://icloseleads.com/features" },
 };
 
 const features = [
@@ -43,9 +40,9 @@ const features = [
   },
   {
     icon: Mail,
-    title: "Automated Outreach via Resend",
-    description: "Send beautifully formatted emails directly from FreelanceFlow using Resend's enterprise-grade email infrastructure. Track every open, click, and response.",
-    highlights: ["Enterprise deliverability", "HTML + plain text", "Reply tracking", "Spam score checking"],
+    title: "Safe Gmail Outreach",
+    description: "Prepare personalized emails in Gmail compose, keep users in control, and track every prepared outreach item.",
+    highlights: ["Gmail compose mode", "Monthly safety limits", "Outreach history", "Manual send control"],
     color: "from-blue-500/20 to-blue-500/5",
     iconColor: "text-blue-400",
     iconBg: "bg-blue-500/15",
@@ -71,14 +68,14 @@ const features = [
 ];
 
 const comparisonData = [
-  { feature: "Verified email discovery", freelanceflow: true, upwork: false, fiverr: false, manual: false },
-  { feature: "AI proposal generation", freelanceflow: true, upwork: false, fiverr: false, manual: false },
-  { feature: "Direct email outreach", freelanceflow: true, upwork: false, fiverr: false, manual: true },
-  { feature: "Analytics & tracking", freelanceflow: true, upwork: true, fiverr: false, manual: false },
-  { feature: "No platform fees", freelanceflow: true, upwork: false, fiverr: false, manual: true },
-  { feature: "No bidding war", freelanceflow: true, upwork: false, fiverr: false, manual: true },
-  { feature: "Unlimited outreach", freelanceflow: true, upwork: false, fiverr: false, manual: true },
-  { feature: "Control over pricing", freelanceflow: true, upwork: false, fiverr: false, manual: true },
+  { feature: "Verified email discovery", icloseleads: true, upwork: false, fiverr: false, manual: false },
+  { feature: "AI proposal generation", icloseleads: true, upwork: false, fiverr: false, manual: false },
+  { feature: "Gmail-ready outreach drafts", icloseleads: true, upwork: false, fiverr: false, manual: true },
+  { feature: "Analytics & tracking", icloseleads: true, upwork: true, fiverr: false, manual: false },
+  { feature: "No platform fees", icloseleads: true, upwork: false, fiverr: false, manual: true },
+  { feature: "No bidding war", icloseleads: true, upwork: false, fiverr: false, manual: true },
+  { feature: "Unlimited outreach", icloseleads: true, upwork: false, fiverr: false, manual: true },
+  { feature: "Control over pricing", icloseleads: true, upwork: false, fiverr: false, manual: true },
 ];
 
 export default function FeaturesPage() {
@@ -136,7 +133,7 @@ export default function FeaturesPage() {
         <section className="py-24 bg-surface">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-4">FreelanceFlow vs. The Alternatives</h2>
+              <h2 className="text-4xl font-bold text-foreground mb-4">iCloseLeads vs. The Alternatives</h2>
               <p className="text-muted-foreground">Why smart freelancers choose direct outreach over platform dependency.</p>
             </div>
 
@@ -145,7 +142,7 @@ export default function FeaturesPage() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Feature</th>
-                    <th className="text-center px-6 py-4 text-sm font-bold text-primary-light">FreelanceFlow</th>
+                    <th className="text-center px-6 py-4 text-sm font-bold text-primary-light">iCloseLeads</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Upwork</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Fiverr</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Manual Email</th>
@@ -155,7 +152,7 @@ export default function FeaturesPage() {
                   {comparisonData.map((row, i) => (
                     <tr key={row.feature} className={`border-b border-border/50 last:border-0 ${i % 2 === 0 ? "" : "bg-background/30"}`}>
                       <td className="px-6 py-4 text-sm text-foreground">{row.feature}</td>
-                      {[row.freelanceflow, row.upwork, row.fiverr, row.manual].map((val, j) => (
+                      {[row.icloseleads, row.upwork, row.fiverr, row.manual].map((val, j) => (
                         <td key={j} className="text-center px-6 py-4">
                           {val ? (
                             <div className="inline-flex w-6 h-6 rounded-full bg-accent/10 items-center justify-center">

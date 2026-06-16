@@ -15,7 +15,7 @@ const QUICK_QUESTIONS = [
 
 export default function SupportPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "👋 Hi! I'm the FreelanceFlow support assistant. I can help you with leads, proposals, campaigns, billing, and anything else. What's on your mind?" },
+    { role: "assistant", content: "👋 Hi! I'm the iCloseLeads support assistant. I can help you with leads, proposals, campaigns, billing, and anything else. What's on your mind?" },
   ]);
   const [input,         setInput]         = useState("");
   const [email,         setEmail]         = useState("");
@@ -56,7 +56,7 @@ export default function SupportPage() {
   const showChips = messages.length <= 1;
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
@@ -64,7 +64,7 @@ export default function SupportPage() {
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Support Chat</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">Support Chat</h1>
             <p className="text-muted-foreground text-sm">AI-powered help, 24/7. Complex issues escalate to our team.</p>
           </div>
         </div>

@@ -9,11 +9,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { AggregatedLead } from "@/lib/leads-aggregator";
+import BonusLeadsModal from "@/components/BonusLeadsModal";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
   "devops","copywriting","seo","graphic-design","social-media",
-  "shopify","wordpress","email-marketing",
+  "shopify","wordpress","email-marketing","meta-ads",
 ];
 const NICHE_LABELS: Record<string, string> = {
   "web-development": "Web Dev", "mobile-apps": "Mobile Apps",
@@ -22,6 +23,7 @@ const NICHE_LABELS: Record<string, string> = {
   "seo": "SEO", "graphic-design": "Graphic Design",
   "social-media": "Social Media", "shopify": "Shopify",
   "wordpress": "WordPress", "email-marketing": "Email Marketing",
+  "meta-ads": "Meta Ads",
 };
 
 // All possible sources with display labels
@@ -58,6 +60,14 @@ interface BestMatchPrefs {
   preferShortTerm: boolean;
   preferredNiches: string[];
 }
+interface UsageStats {
+  plan: string;
+  limit: number;
+  used: number;
+  remaining: number;
+  nextReset: string;
+  percentage: number;
+}
 const DEFAULT_PREFS: BestMatchPrefs = {
   minConfidence: 40,
   preferRemote: true,
@@ -70,10 +80,10 @@ function calcBestMatch(lead: AggregatedLead, prefs: BestMatchPrefs): number {
   let score = (lead.confidence / 100) * 40;
   score += ((lead.qualityScore ?? lead.confidence) / 100) * 20;
   if (lead.email) score += 15;
-  if (prefs.preferredNiches.length > 0 && prefs.preferredNiches.includes(lead.niche)) score += 15;
+  if ((prefs.preferredNiches ?? []).length > 0 && (prefs.preferredNiches ?? []).includes(lead.niche)) score += 15;
   if (lead.confidence < prefs.minConfidence) score *= 0.5;
   if (prefs.requireEmail && !lead.email) score *= 0.4;
-  const t = lead.title.toLowerCase();
+  const t = (lead.title ?? "").toLowerCase();
   if (prefs.preferShortTerm && (t.includes("quick")||t.includes("small")||t.includes("gig"))) score += 5;
   if (prefs.preferRemote && (t.includes("remote")||false)) score += 5;
   return Math.min(100, Math.round(score));
@@ -119,7 +129,7 @@ function BestMatchModal({ prefs, onSave, onClose }: {
   prefs: BestMatchPrefs; onSave: (p:BestMatchPrefs)=>void; onClose: ()=>void;
 }) {
   const [local, setLocal] = useState<BestMatchPrefs>({...prefs});
-  const niches = ["web-development","mobile-apps","ui-ux-design","data-science","devops","copywriting","seo","shopify","wordpress"];
+  const niches = ["web-development","mobile-apps","ui-ux-design","data-science","devops","copywriting","seo","shopify","wordpress","meta-ads"];
   function toggleNiche(n: string) {
     setLocal(p=>({...p,preferredNiches:p.preferredNiches.includes(n)?p.preferredNiches.filter(x=>x!==n):[...p.preferredNiches,n]}));
   }
@@ -191,6 +201,7 @@ export default function LiveJobsPage() {
   const [loading,         setLoading]         = useState(false);
   const [error,           setError]           = useState("");
   const [limitHit,        setLimitHit]        = useState<{nextReset:string|null}|null>(null);
+  const [showBonus,       setShowBonus]       = useState(false);
   const [page,            setPage]            = useState(1);
   const [savedIds,        setSavedIds]        = useState<Set<string>>(new Set());
   const [savingId,        setSavingId]        = useState<string|null>(null);
@@ -209,6 +220,7 @@ export default function LiveJobsPage() {
   const [maxHours,        setMaxHours]        = useState(72);
   const [activeSources,   setActiveSources]   = useState<string[]>([]);
   const [totalFound,      setTotalFound]      = useState(0);
+  const [usage,           setUsage]           = useState<UsageStats | null>(null);
   // Source filter — "all" or one specific source id
   const [sourceFilter,    setSourceFilter]    = useState<string>("all");
 
@@ -217,6 +229,13 @@ export default function LiveJobsPage() {
 
   useEffect(() => {
     try {
+      // Clear stale lead caches on schema changes
+      if (sessionStorage.getItem("icl_cache_v") !== "4") {
+        sessionStorage.removeItem("ff_ss_live_results");
+        sessionStorage.removeItem("ff_ss_remote_results");
+        sessionStorage.removeItem("ff_ss_local_results");
+        sessionStorage.setItem("icl_cache_v", "4");
+      }
       const p = localStorage.getItem(PREFS_KEY);
       if (p) setPrefs(JSON.parse(p) as BestMatchPrefs);
       const s = localStorage.getItem(SEEN_KEY);
@@ -231,6 +250,15 @@ export default function LiveJobsPage() {
       const elapsed = Date.now() - last;
       if (elapsed < COOLDOWN_MS) setCountdown(Math.ceil((COOLDOWN_MS - elapsed)/1000));
     } catch {}
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/usage", { cache: "no-store" })
+      .then(r => (r.ok ? r.json() : null))
+      .then((data: UsageStats | null) => {
+        if (data?.plan) setUsage(data);
+      })
+      .catch(() => {});
   }, []);
 
   function startTimer(secs: number) {
@@ -253,13 +281,14 @@ export default function LiveJobsPage() {
       const res = await fetch("/api/leads/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niches: nichesToFetch, maxHours, minConfidence: 25 }),
+        body: JSON.stringify({ niches: nichesToFetch, maxHours, minConfidence: 45 }),
       });
 
       if (!res.ok) {
         const d = await res.json().catch(()=>({})) as {error?:string; nextReset?:string};
         if (res.status === 429) {
           setLimitHit({ nextReset: d.nextReset ?? null });
+          setShowBonus(true);
         } else {
           setError(d.error ?? "Failed to fetch leads. Please try again.");
         }
@@ -308,9 +337,6 @@ export default function LiveJobsPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown, selectedNiches, maxHours]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { void fetchLive(true); }, []);
-
   function savePrefs(p: BestMatchPrefs) {
     setPrefs(p);
     try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
@@ -348,6 +374,9 @@ export default function LiveJobsPage() {
   const newCount = scored.filter(l=>!seenIds.has(l.id)).length;
   const bestMatchCount = scored.filter(l=>l.bmScore>=80).length;
   const emailCount = leads.filter(l=>!!l.email).length;
+  const usagePlanKey = (usage?.plan ?? "").toLowerCase();
+  const hasPaidAccess = usagePlanKey === "pro" || usagePlanKey === "agency";
+  const accessLabel = usagePlanKey === "agency" ? "Agency" : usagePlanKey === "pro" ? "Pro" : "Early Access";
 
   const handleSave = async (lead: AggregatedLead & { bmScore: number }) => {
     if (savedIds.has(lead.id)) return;
@@ -424,7 +453,7 @@ export default function LiveJobsPage() {
         </div>
 
         {/* Two-column layout on large screens */}
-        <div className="flex gap-6 items-start">
+        <div className="flex flex-col xl:flex-row gap-6 items-start">
 
           {/* ── Left: main content ── */}
           <div className="flex-1 min-w-0 space-y-4">
@@ -442,6 +471,7 @@ export default function LiveJobsPage() {
                     <option value={48}>Last 48h</option>
                     <option value={72}>Last 72h</option>
                     <option value={168}>Last 7 days</option>
+                    <option value={720}>Last 30 days</option>
                   </select>
                   <button onClick={()=>setSelectedNiches(LIVE_NICHES)}
                     className="text-xs text-primary-light hover:text-primary font-medium transition-colors">All</button>
@@ -463,7 +493,7 @@ export default function LiveJobsPage() {
               <button onClick={()=>void fetchLive(true)} disabled={loading||selectedNiches.length===0}
                 className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                 <Zap className="w-4 h-4"/>
-                {loading ? "Scanning…" : `Scan ${selectedNiches.length} Niche${selectedNiches.length!==1?"s":""} · ${maxHours === 168 ? "7d" : `${maxHours}h`}`}
+                {loading ? "Scanning…" : `Scan ${selectedNiches.length} Niche${selectedNiches.length!==1?"s":""} · ${maxHours === 720 ? "30d" : maxHours === 168 ? "7d" : `${maxHours}h`}`}
               </button>
             </div>
 
@@ -607,9 +637,9 @@ export default function LiveJobsPage() {
                             {lead.domain && <span className="text-muted-foreground font-normal text-xs">· {lead.domain}</span>}
                           </p>
                           <p className="text-muted-foreground text-sm leading-relaxed mb-2 sm:mb-3 line-clamp-2">{stripHtml(lead.description)}</p>
-                          {lead.tags.length > 0 && (
+                          {(lead.tags ?? []).length > 0 && (
                             <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
-                              {lead.tags.slice(0,5).map(t=>(
+                              {(lead.tags ?? []).slice(0,5).map(t=>(
                                 <span key={t} className="px-1.5 sm:px-2 py-0.5 rounded-md bg-surface border border-border text-xs text-muted-foreground">{t}</span>
                               ))}
                             </div>
@@ -711,8 +741,8 @@ export default function LiveJobsPage() {
             )}
           </div>
 
-          {/* ── Right: Stats sidebar (hidden on mobile/tablet, visible lg+) ── */}
-          <div className="hidden lg:flex flex-col gap-4 w-64 xl:w-72 flex-shrink-0">
+          {/* ── Right: Stats sidebar (hidden until wide layouts have room) ── */}
+          <div className="hidden xl:flex flex-col gap-4 w-72 flex-shrink-0">
 
             {/* Live stats */}
             <div className="bg-surface border border-border rounded-2xl p-4 space-y-3 sticky top-6">
@@ -772,7 +802,7 @@ export default function LiveJobsPage() {
                 "Set Best Match preferences to auto-score leads for your niche.",
                 "Filter by 'Has Email' to find leads you can cold-pitch right now.",
                 "Favourite your top picks — they float to the top on your next visit.",
-                "Use 'AI Apply' to generate a proposal and send it in one click.",
+                "Use AI Proposal to generate a tailored draft in seconds.",
               ].map(tip => (
                 <p key={tip} className="text-xs text-muted-foreground leading-relaxed flex gap-2">
                   <span className="text-accent flex-shrink-0 mt-0.5">→</span>{tip}
@@ -780,20 +810,38 @@ export default function LiveJobsPage() {
               ))}
             </div>
 
-            {/* Upgrade nudge */}
+            {/* Plan access */}
             <div className="bg-gradient-card border border-primary/20 rounded-2xl p-4 text-center space-y-2">
-              <p className="text-foreground font-semibold text-sm">Unlock Pro</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                500 leads/week, priority sources, and Groq AI for every application.
+              <p className="text-foreground font-semibold text-sm">
+                {hasPaidAccess ? `${accessLabel} access active` : "Early access active"}
               </p>
-              <Link href="/dashboard/upgrade"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
-                Upgrade <ArrowRight className="w-3 h-3"/>
-              </Link>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {hasPaidAccess
+                  ? "High-volume live job scanning is enabled for this account."
+                  : "Higher daily lead limits, priority sources, and AI proposal drafts."}
+              </p>
+              {hasPaidAccess ? (
+                <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
+                  {accessLabel} plan
+                </span>
+              ) : (
+                <Link href="/dashboard/upgrade"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
+                  Upgrade <ArrowRight className="w-3 h-3"/>
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <BonusLeadsModal
+        isOpen={showBonus}
+        onClose={() => setShowBonus(false)}
+        onBonusClaimed={() => setShowBonus(false)}
+        source="live-jobs"
+        currentPlan="free"
+      />
     </>
   );
 }

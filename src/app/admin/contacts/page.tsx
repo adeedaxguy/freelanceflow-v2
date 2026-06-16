@@ -31,10 +31,10 @@ export default function AdminContactsPage() {
   const open = contacts.filter(c => !c.resolved).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Contact Submissions</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Contact Submissions</h1>
           <p className="text-muted-foreground mt-1">{open} unresolved messages</p>
         </div>
       </div>

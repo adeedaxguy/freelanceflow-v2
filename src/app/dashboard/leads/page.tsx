@@ -5,10 +5,9 @@ import {
   Search, Clock, Globe, Mail, Phone, ExternalLink, Bookmark, Sparkles,
   RefreshCw, Filter, X, TrendingUp, AlertCircle, CheckCircle,
   ChevronDown, Star, Zap, BarChart3, ChevronLeft, ChevronRight,
-  Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer,
+  Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer, BarChart2, ArrowRight,
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
-import BonusLeadsModal from "@/components/BonusLeadsModal";
 import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
@@ -20,6 +19,7 @@ const HOUR_OPTIONS = [
   { label: "48h", value: 48 },
   { label: "72h", value: 72 },
   { label: "7d",  value: 168 },
+  { label: "30d", value: 720 },
 ];
 
 type SortOption = "freshest" | "best-match" | "best-quality" | "has-budget";
@@ -33,7 +33,6 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const SEARCH_COOLDOWN_SECS = 30;
 const FORCE_COOLDOWN_SECS  = 180;
 const PAGE_SIZE = 20;
-const SS_REMOTE_KEY = "ff_ss_remote_results";
 
 interface UsageStats { plan: string; limit: number; used: number; remaining: number; nextReset: string; percentage: number; }
 interface SourceDiag { source: string; ok: boolean; fetched: number; kept: number; errorMessage?: string; }
@@ -53,7 +52,15 @@ interface SearchDiagnostics {
   requestedMaxHours?: number;
   effectiveMaxHours?: number;
 }
-interface ContactInfo { company: string; email?: string; phone?: string; domain: string; title: string; url: string; }
+interface ContactInfo {
+  company: string;
+  email?: string;
+  phone?: string;
+  domain: string;
+  title: string;
+  url: string;
+  lead: AggregatedLead;
+}
 
 // ── Cooldown formatter ────────────────────────────────────────────────────────
 function fmtCooldown(secs: number): string {
@@ -63,7 +70,7 @@ function fmtCooldown(secs: number): string {
 }
 
 // ── CSV export ────────────────────────────────────────────────────────────────
-function exportLeadsCSV(leads: AggregatedLead[], filename = "freelanceflow-leads.csv") {
+function exportLeadsCSV(leads: AggregatedLead[], filename = "icloseleads-leads.csv") {
   const headers = [
     "Title", "Company", "Domain", "Source", "Niche", "Match %", "Quality",
     "Budget", "Urgent", "Has Email", "Email", "Posted At", "Hours Ago",
@@ -87,8 +94,8 @@ function exportLeadsCSV(leads: AggregatedLead[], filename = "freelanceflow-leads
     escape(l.email ?? ""),
     escape(l.postedAt),
     escape(l.hoursAgo),
-    escape((l.tags ?? []).join(", ")),
-    escape((l.description ?? "").slice(0, 300)),
+    escape(l.tags.join(", ")),
+    escape(l.description.slice(0, 300)),
     escape(l.url),
   ].join(","));
 
@@ -117,7 +124,7 @@ function exportContactsCSV(contacts: ContactInfo[]) {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");
   a.href     = url;
-  a.download = "freelanceflow-contacts.csv";
+  a.download = "icloseleads-contacts.csv";
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -135,6 +142,13 @@ const SOURCE_COLORS: Record<string, string> = {
   remoteco:      "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
   craigslist:    "bg-purple-500/15 text-purple-400 border-purple-500/20",
   githubissues:  "bg-neutral-500/15 text-neutral-300 border-neutral-500/20",
+  ycjobs:        "bg-orange-500/15 text-orange-300 border-orange-500/20",
+  authenticjobs: "bg-pink-500/15 text-pink-400 border-pink-500/20",
+  smashingjobs:  "bg-red-500/15 text-red-400 border-red-500/20",
+  dribbble:      "bg-rose-500/15 text-rose-400 border-rose-500/20",
+  freelancermap: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  himalayas:     "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
+  nodesk:        "bg-lime-500/15 text-lime-400 border-lime-500/20",
 };
 
 function SourcePill({ source }: { source: string }) {
@@ -228,14 +242,13 @@ export default function LeadsPage() {
   const [leads,           setLeads]          = useState<AggregatedLead[]>([]);
   const [loading,         setLoading]        = useState(false);
   const [error,           setError]          = useState("");
+  const [limitHit,        setLimitHit]       = useState<{ nextReset: string | null } | null>(null);
   const [usage,           setUsage]          = useState<UsageStats | null>(null);
   const [fetchedAt,       setFetchedAt]      = useState("");
   const [savingId,        setSavingId]       = useState<string | null>(null);
   const [savedIds,        setSavedIds]       = useState<Set<string>>(new Set());
   const [showFilters,     setShowFilters]    = useState(false);
   const [searched,        setSearched]       = useState(false);
-  const [showBonus,       setShowBonus]      = useState(false);
-  const [bonusLeads,      setBonusLeads]     = useState(0);
   const [page,            setPage]           = useState(1);
   const [activeTab,       setActiveTab]      = useState<"leads" | "contacts">("leads");
   const [diagnostics,     setDiagnostics]    = useState<SearchDiagnostics | null>(null);
@@ -250,25 +263,6 @@ export default function LeadsPage() {
 
   const resultsTopRef = useRef<HTMLDivElement>(null);
 
-  // Restore cached results on mount
-  useEffect(() => {
-    try {
-      // Clear stale lead caches on schema changes
-      if (sessionStorage.getItem("icl_cache_v") !== "4") {
-        sessionStorage.removeItem("ff_ss_live_results");
-        sessionStorage.removeItem("ff_ss_remote_results");
-        sessionStorage.removeItem("ff_ss_local_results");
-        sessionStorage.setItem("icl_cache_v", "4");
-        return;
-      }
-      const cached = sessionStorage.getItem(SS_REMOTE_KEY);
-      if (cached) {
-        const { leads: cl, fetchedAt: ft } = JSON.parse(cached) as { leads: AggregatedLead[]; fetchedAt: string };
-        setLeads(cl); setFetchedAt(ft); setSearched(true);
-      }
-    } catch {}
-  }, []);
-
   // Cooldown tickers
   useEffect(() => {
     if (searchCooldown <= 0) return;
@@ -280,6 +274,15 @@ export default function LeadsPage() {
     const t = setInterval(() => setForceCooldown(s => Math.max(0, s - 1)), 1000);
     return () => clearInterval(t);
   }, [forceCooldown]);
+
+  useEffect(() => {
+    fetch("/api/usage", { cache: "no-store" })
+      .then(r => (r.ok ? r.json() : null))
+      .then((data: UsageStats | null) => {
+        if (data?.plan) setUsage(data);
+      })
+      .catch(() => {});
+  }, []);
 
   // Filtered + sorted leads
   const filteredLeads = useMemo(() => {
@@ -327,7 +330,7 @@ export default function LeadsPage() {
   const contacts: ContactInfo[] = useMemo(() =>
     filteredLeads
       .filter(l => l.email)
-      .map(l => ({ company: l.company, email: l.email, phone: undefined, domain: l.domain, title: l.title, url: l.url })),
+      .map(l => ({ company: l.company, email: l.email, phone: undefined, domain: l.domain, title: l.title, url: l.url, lead: l })),
     [filteredLeads]
   );
 
@@ -344,14 +347,14 @@ export default function LeadsPage() {
     if (!opts.freshOnly && searchCooldown > 0) return;
     if (opts.freshOnly  && forceCooldown  > 0) return;
 
-    setError(""); setLoading(true); setPage(1); setSearched(true);
+    setError(""); setLimitHit(null); setLoading(true); setPage(1); setSearched(true);
     setNicheFilter(null); setExpandedIds(new Set());
 
     try {
       const res = await fetch("/api/leads/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niches, maxHours, minConfidence: 25, freshOnly: !!opts.freshOnly }),
+        body: JSON.stringify({ niches, maxHours, minConfidence: 45, freshOnly: !!opts.freshOnly }),
       });
 
       type SearchResponse = {
@@ -366,7 +369,7 @@ export default function LeadsPage() {
       const data = await res.json() as SearchResponse;
 
       if (res.status === 429) {
-        setShowBonus(true);
+        setLimitHit({ nextReset: data.nextReset ?? null });
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
@@ -376,7 +379,6 @@ export default function LeadsPage() {
       setFetchedAt(data.fetchedAt ?? "");
       setDiagnostics(data.diagnostics ?? null);
       setSelectedSources([]);
-      try { sessionStorage.setItem(SS_REMOTE_KEY, JSON.stringify({ leads: data.leads ?? [], fetchedAt: data.fetchedAt ?? "" })); } catch {}
 
       if (!opts.freshOnly) setSearchCooldown(SEARCH_COOLDOWN_SECS);
       else                 setForceCooldown(FORCE_COOLDOWN_SECS);
@@ -412,9 +414,15 @@ export default function LeadsPage() {
 
   const activeFilters = (forMe ? 1 : 0) + (minMatch > 0 ? 1 : 0) + (hasEmail ? 1 : 0) + (hasBudget ? 1 : 0) + (keyword ? 1 : 0);
   const allSourceKeys = Object.keys(ALL_SOURCE_LABELS) as LeadSource[];
+  const usagePlanKey = (usage?.plan ?? "").toLowerCase();
+  const hasPaidAccess = usagePlanKey === "pro" || usagePlanKey === "agency";
+  const accessLabel = usagePlanKey === "agency" ? "Agency" : usagePlanKey === "pro" ? "Pro" : "Early Access";
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 max-w-7xl">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <div className="flex flex-col xl:flex-row gap-6 items-start">
+      {/* ── Main column ───────────────────────────────────────── */}
+      <div className="flex-1 min-w-0 space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -423,7 +431,7 @@ export default function LeadsPage() {
             Find Leads
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Real-time opportunities from 11 sources — matched to your niche
+            Real-time opportunities from 16 sources — matched to your niche
           </p>
         </div>
         {fetchedAt && (
@@ -439,7 +447,7 @@ export default function LeadsPage() {
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground capitalize">{usage.plan} Plan</span>
-            <span className="text-xs text-muted-foreground">{usage.used} / {usage.limit} leads this week</span>
+            <span className="text-xs text-muted-foreground">{usage.used} / {usage.limit} leads today</span>
           </div>
           <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
             <div className={`h-full rounded-full transition-all ${usage.percentage > 80 ? "bg-destructive" : "bg-gradient-hero"}`}
@@ -449,7 +457,7 @@ export default function LeadsPage() {
             <span className="text-xs text-muted-foreground">{usage.remaining} remaining</span>
             {usage.plan === "free" && (
               <Link href="/dashboard/upgrade" className="text-xs text-primary-light hover:underline font-medium">
-                Upgrade for 500/week →
+                Upgrade for higher daily limits →
               </Link>
             )}
           </div>
@@ -458,51 +466,27 @@ export default function LeadsPage() {
 
       {/* Niches */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-            1. Niches <span className="text-foreground/60 normal-case font-normal">(pick one or more)</span>
-          </h2>
-          {niches.length > 0 && (
-            <button onClick={() => setNiches([])}
-              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-              <X className="w-3 h-3" /> Clear all
-            </button>
-          )}
-        </div>
-        {niches.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {niches.map(id => {
-              const n = NICHES.find(x => x.id === id);
-              if (!n) return null;
-              return (
-                <span key={id}
-                  className="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 rounded-full bg-primary/15 border border-primary/40 text-xs font-medium text-primary-light">
-                  <span aria-hidden="true">{n.icon}</span>
-                  {n.label}
-                  <button onClick={() => setNiches(prev => prev.filter(x => x !== id))}
-                    className="ml-0.5 w-4 h-4 inline-flex items-center justify-center rounded-full hover:bg-primary/30 transition-colors">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        )}
-        <NicheSelector selectedMany={niches} onChangeMany={setNiches} max={10} />
+        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+          1. Niches <span className="text-foreground/60 normal-case font-normal">(pick one or more)</span>
+        </h2>
+        <NicheSelector selected={niches} onChange={setNiches} maxSelect={10} />
       </section>
 
-      {/* Time range + Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Time Range:</span>
-        {HOUR_OPTIONS.map(opt => (
-          <button key={opt.value} onClick={() => setMaxHours(opt.value)}
-            className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${maxHours === opt.value ? "bg-primary border-primary text-white shadow-glow-primary/20" : "bg-surface border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
-            {opt.label}
-          </button>
-        ))}
+      {/* Time range + Filters — horizontally scrollable on mobile */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex-shrink-0 hidden sm:block">Range:</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide flex-1 min-w-0 pb-0.5">
+          {HOUR_OPTIONS.map(opt => (
+            <button key={opt.value} onClick={() => setMaxHours(opt.value)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${maxHours === opt.value ? "bg-primary border-primary text-white shadow-glow-primary/20" : "bg-surface border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
         <button onClick={() => setShowFilters(f => !f)}
-          className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all relative ${showFilters ? "bg-primary/10 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>
-          <Filter className="w-3.5 h-3.5" /> Filters
+          className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all relative ${showFilters ? "bg-primary/10 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>
+          <Filter className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Filters</span>
           {activeFilters > 0 && (
             <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
               {activeFilters}
@@ -598,18 +582,34 @@ export default function LeadsPage() {
         )}
       </div>
 
+      {/* Daily limit hit banner */}
+      {limitHit && (
+        <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/8 to-primary/5 p-5">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gold/15 flex items-center justify-center flex-shrink-0">
+              <AlertCircle className="w-5 h-5 text-gold" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-foreground mb-1">You&apos;ve used your 100 free leads today</p>
+              <p className="text-muted-foreground text-sm mb-3">
+                Free plan resets every 24 hours.
+                {limitHit.nextReset && (
+                  <> Resets at <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong> today.</>
+                )}
+              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
+                <span>🚀</span> Pro plan coming soon — unlimited leads every day
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Error */}
       {error && (
         <div className="flex items-start gap-3 text-destructive bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-medium">{error}</p>
-            {error.includes("limit") && (
-              <Link href="/dashboard/upgrade" className="text-xs text-primary-light underline mt-1 block">
-                Upgrade to Pro — 500 leads/week →
-              </Link>
-            )}
-          </div>
+          <p className="text-sm font-medium">{error}</p>
         </div>
       )}
 
@@ -627,12 +627,12 @@ export default function LeadsPage() {
       {/* Results */}
       {leads.length > 0 && (
         <>
-          {/* Source filter chips */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-muted-foreground font-medium">Sources:</span>
+          {/* Source filter chips — horizontally scrollable on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+            <span className="text-xs text-muted-foreground font-medium flex-shrink-0">Sources:</span>
             <button
               onClick={() => { setSelectedSources([]); setPage(1); }}
-              className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${selectedSources.length === 0 ? "bg-primary border-primary text-white" : "border-border text-muted-foreground hover:border-primary/40"}`}>
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${selectedSources.length === 0 ? "bg-primary border-primary text-white" : "border-border text-muted-foreground hover:border-primary/40"}`}>
               All ({leads.length})
             </button>
             {allSourceKeys.filter(s => (sourceCounts[s] ?? 0) > 0).map(s => (
@@ -641,7 +641,7 @@ export default function LeadsPage() {
                   setSelectedSources(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
                   setPage(1);
                 }}
-                className={`px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
                   selectedSources.includes(s)
                     ? SOURCE_COLORS[s] ?? "bg-primary/15 text-primary-light border-primary/30"
                     : "border-border text-muted-foreground hover:border-primary/30"
@@ -652,8 +652,8 @@ export default function LeadsPage() {
           </div>
 
           {/* Summary + tabs + sort */}
-          <div ref={resultsTopRef} className="flex items-center justify-between gap-4 flex-wrap scroll-mt-4">
-            <div className="flex items-center gap-3 flex-wrap">
+          <div ref={resultsTopRef} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 scroll-mt-4">
+            <div className="flex items-center gap-2 flex-wrap">
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 <BarChart3 className="w-4 h-4 text-primary-light" />
                 {filteredLeads.length} leads found
@@ -763,11 +763,11 @@ export default function LeadsPage() {
                   const isSaved    = savedIds.has(lead.id);
                   const isSaving   = savingId === lead.id;
                   const isExpanded = expandedIds.has(lead.id);
-                  const descLong   = (lead.description ?? "").length > 180;
+                  const descLong   = lead.description.length > 180;
                   return (
                     <div key={lead.id}
-                      className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-5 transition-all duration-200 hover:shadow-card-hover">
-                      <div className="flex items-start justify-between gap-4">
+                      className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-card-hover">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           {/* Badges row */}
                           <div className="flex flex-wrap items-center gap-2 mb-2.5">
@@ -823,9 +823,9 @@ export default function LeadsPage() {
                             )}
                           </div>
 
-                          {(lead.tags ?? []).length > 0 && (
+                          {lead.tags.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mb-3">
-                              {(lead.tags ?? []).slice(0, 7).map(tag => (
+                              {lead.tags.slice(0, 7).map(tag => (
                                 <span key={tag} className="px-2 py-0.5 rounded-md bg-surface border border-border text-xs text-muted-foreground">
                                   {tag}
                                 </span>
@@ -842,10 +842,11 @@ export default function LeadsPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col gap-2 flex-shrink-0 w-[110px]">
+                        {/* Desktop: vertical stack. Mobile: horizontal row below content */}
+                        <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 w-[110px]">
                           <a href={lead.url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
-                            <ExternalLink className="w-3.5 h-3.5" /> View Post
+                            <ExternalLink className="w-3.5 h-3.5" /> View
                           </a>
                           <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
                             className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -859,11 +860,35 @@ export default function LeadsPage() {
                             }
                           </button>
                           <Link
-                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company ?? "")}&domain=${encodeURIComponent(lead.domain ?? "")}&title=${encodeURIComponent(lead.title ?? "")}&description=${encodeURIComponent((lead.description ?? "").slice(0, 400))}&url=${encodeURIComponent(lead.url ?? "")}&niche=${encodeURIComponent(lead.niche ?? "")}&email=${encodeURIComponent(lead.email ?? "")}`}
+                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all shadow-glow-primary/20">
-                            <Sparkles className="w-3.5 h-3.5" /> AI Apply
+                            <Sparkles className="w-3.5 h-3.5" /> AI Proposal
                           </Link>
                         </div>
+                      </div>
+
+                      {/* Mobile action row — full width below content */}
+                      <div className="sm:hidden flex gap-2 mt-2 pt-3 border-t border-border/50">
+                        <a href={lead.url} target="_blank" rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border text-muted-foreground text-xs font-medium transition-all active:bg-white/5">
+                          <ExternalLink className="w-3.5 h-3.5" /> View
+                        </a>
+                        <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
+                          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                            isSaved
+                              ? "bg-accent/10 text-accent border border-accent/30"
+                              : "bg-primary/10 text-primary-light border border-primary/30 active:bg-primary/20"
+                          }`}>
+                          {isSaved
+                            ? <><CheckCircle className="w-3.5 h-3.5" /> Saved</>
+                            : <><Bookmark className="w-3.5 h-3.5" /> {isSaving ? "…" : "Save"}</>
+                          }
+                        </button>
+                        <Link
+                          href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-gradient-hero text-white text-xs font-semibold transition-all">
+                          <Sparkles className="w-3.5 h-3.5" /> AI Proposal
+                        </Link>
                       </div>
                     </div>
                   );
@@ -901,41 +926,87 @@ export default function LeadsPage() {
                   <p className="text-muted-foreground text-sm">Try enabling "Has Email" filter or searching a broader time range.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {contacts.map((c, i) => (
-                    <div key={i} className="bg-gradient-card border border-border hover:border-accent/30 rounded-xl p-4 transition-all">
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <div>
-                          <h4 className="text-foreground font-semibold text-sm leading-snug">{c.company}</h4>
-                          <p className="text-muted-foreground text-xs mt-0.5 line-clamp-1">{c.title}</p>
-                        </div>
-                        <a href={c.url} target="_blank" rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground flex-shrink-0 transition-colors">
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-                      <div className="space-y-1.5">
-                        {c.email && (
-                          <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/5 border border-accent/10">
-                            <Mail className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                            <span className="text-xs font-mono text-accent truncate flex-1">{c.email}</span>
-                            <CopyButton text={c.email} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {contacts.map((c) => {
+                    const lead = c.lead;
+                    const isSaved  = savedIds.has(lead.id);
+                    const isSaving = savingId === lead.id;
+
+                    return (
+                      <div key={lead.id} className="bg-gradient-card border border-border hover:border-accent/30 rounded-xl p-4 transition-all">
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <SourcePill source={lead.source} />
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {hoursLabel(lead.hoursAgo)}
+                              </span>
+                              <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border font-medium ${lead.confidence >= 70 ? "bg-primary/10 text-primary-light border-primary/20" : "bg-muted text-muted-foreground border-border"}`}>
+                                <Star className="w-3 h-3" /> {lead.confidence}% match
+                              </span>
+                              <QualityDot score={lead.qualityScore} />
+                            </div>
+                            <h4 className="text-foreground font-semibold text-sm leading-snug line-clamp-2">{c.title}</h4>
+                            <p className="text-primary-light/80 text-xs mt-1 font-medium line-clamp-1">{c.company}</p>
                           </div>
-                        )}
-                        {c.phone && (
-                          <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/10">
-                            <Phone className="w-3.5 h-3.5 text-primary-light flex-shrink-0" />
-                            <span className="text-xs font-mono text-primary-light flex-1">{c.phone}</span>
-                            <CopyButton text={c.phone} />
+                          <a href={c.url} target="_blank" rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground flex-shrink-0 transition-colors"
+                            title="View original posting">
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+
+                        <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 mb-3">
+                          {lead.description}
+                        </p>
+
+                        <div className="space-y-1.5">
+                          {c.email && (
+                            <div className="flex items-center gap-2 p-2 rounded-lg bg-accent/5 border border-accent/10">
+                              <Mail className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+                              <span className="text-xs font-mono text-accent truncate flex-1">{c.email}</span>
+                              <CopyButton text={c.email} />
+                            </div>
+                          )}
+                          {c.phone && (
+                            <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/5 border border-primary/10">
+                              <Phone className="w-3.5 h-3.5 text-primary-light flex-shrink-0" />
+                              <span className="text-xs font-mono text-primary-light flex-1">{c.phone}</span>
+                              <CopyButton text={c.phone} />
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+                            <Globe className="w-3 h-3" />
+                            <span className="truncate">{c.domain}</span>
                           </div>
-                        )}
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
-                          <Globe className="w-3 h-3" />
-                          {c.domain}
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-border/50">
+                          <a href={lead.url} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
+                            <ExternalLink className="w-3.5 h-3.5" /> View
+                          </a>
+                          <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
+                            className={`flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
+                              isSaved
+                                ? "bg-accent/10 text-accent border border-accent/30 cursor-default"
+                                : "bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20"
+                            }`}>
+                            {isSaved
+                              ? <><CheckCircle className="w-3.5 h-3.5" /> Saved</>
+                              : <><Bookmark className="w-3.5 h-3.5" /> {isSaving ? "…" : "Save"}</>
+                            }
+                          </button>
+                          <Link
+                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                            className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all shadow-glow-primary/20">
+                            <Sparkles className="w-3.5 h-3.5" /> AI Proposal
+                          </Link>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -949,9 +1020,9 @@ export default function LeadsPage() {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Search className="w-8 h-8 text-primary-light" />
           </div>
-          <h3 className="text-foreground font-semibold text-lg mb-2">No leads found right now</h3>
+          <h3 className="text-foreground font-semibold text-lg mb-2">No high-confidence matches in this window</h3>
           <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-4">
-            Try widening the time range to <strong>7d</strong>, or reducing the min match score in filters.
+            Try widening the time range to <strong>30d</strong>. We keep weak matches out so the list does not fill with unrelated jobs.
           </p>
           {diagnostics && (
             <div className="max-w-md mx-auto bg-background/50 border border-border rounded-xl p-4 mb-5 text-left">
@@ -986,6 +1057,10 @@ export default function LeadsPage() {
               className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium hover:border-primary/40 transition-all">
               Search Last 7 Days
             </button>
+            <button onClick={() => { setMaxHours(720); setMinMatch(0); setHasEmail(false); setHasBudget(false); setKeyword(""); setForMe(false); void handleSearch({ freshOnly: true }); }}
+              className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium hover:border-primary/40 transition-all">
+              Search Last 30 Days
+            </button>
           </div>
         </div>
       )}
@@ -1010,17 +1085,120 @@ export default function LeadsPage() {
               </span>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-3">Scanning 11 sources in parallel</p>
+          <p className="text-xs text-muted-foreground mt-3">Scanning 16 sources in parallel</p>
         </div>
       )}
+      </div>{/* end main column */}
 
-      <BonusLeadsModal
-        isOpen={showBonus}
-        onClose={() => setShowBonus(false)}
-        onBonusClaimed={(newBonus) => { setBonusLeads(newBonus); setShowBonus(false); }}
-        source="remote-leads"
-        currentPlan={usage?.plan ?? "free"}
-      />
+      {/* ── Right sidebar ─────────────────────────────────────── */}
+      <aside className="xl:w-72 w-full flex-shrink-0 space-y-4 xl:sticky xl:top-6">
+
+        {/* Search Stats */}
+        <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart2 className="w-4 h-4 text-primary-light" />
+            <h3 className="text-sm font-bold text-foreground">Search Stats</h3>
+          </div>
+          {searched && leads.length > 0 ? (
+            <div className="space-y-2.5">
+              {[
+                { label: "Total leads", value: leads.length, color: "text-foreground" },
+                { label: "With email", value: leads.filter(l => l.email).length, color: "text-accent" },
+                { label: "With budget", value: leads.filter(l => l.budget).length, color: "text-gold" },
+                { label: "Urgent", value: leads.filter(l => l.urgency).length, color: "text-red-400" },
+                { label: "High quality (80+)", value: leads.filter(l => (l.confidence ?? 0) >= 80).length, color: "text-primary-light" },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className={`font-bold ${color}`}>{value}</span>
+                </div>
+              ))}
+              {usage && (
+                <div className="pt-2 mt-2 border-t border-border/60">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                    <span>Daily usage</span>
+                    <span>{usage.used} / {usage.limit}</span>
+                  </div>
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${usage.percentage > 80 ? "bg-red-400" : usage.percentage > 50 ? "bg-yellow-400" : "bg-accent"}`}
+                      style={{ width: `${Math.min(100, usage.percentage)}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-xs">Run a search to see stats</p>
+          )}
+        </div>
+
+        {/* Source Breakdown */}
+        {searched && leads.length > 0 && (() => {
+          const srcCounts: Record<string, number> = {};
+          leads.forEach(l => { srcCounts[l.source] = (srcCounts[l.source] ?? 0) + 1; });
+          const sorted = Object.entries(srcCounts).sort((a, b) => b[1] - a[1]);
+          return (
+            <div className="bg-surface border border-border rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Globe className="w-4 h-4 text-accent" />
+                <h3 className="text-sm font-bold text-foreground">Source Breakdown</h3>
+              </div>
+              <div className="space-y-2">
+                {sorted.map(([src, count]) => (
+                  <div key={src}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-muted-foreground capitalize">{ALL_SOURCE_LABELS[src as LeadSource] ?? src}</span>
+                      <span className="text-foreground font-semibold">{count}</span>
+                    </div>
+                    <div className="h-1 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary/50 rounded-full" style={{ width: `${Math.round((count / leads.length) * 100)}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Pro Tips */}
+        <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-gold" />
+            <h3 className="text-sm font-bold text-foreground">Pro Tips</h3>
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              "Select multiple niches to cast a wider net in one search.",
+              "Use 12h range for the hottest leads — less competition.",
+              "Filter by 'Has Email' to find leads you can pitch right now.",
+              "Save the best leads before Force Refreshing — they may disappear.",
+              "AI Proposal generates a personalised draft in under 3 seconds.",
+            ].map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <ArrowRight className="w-3 h-3 text-primary-light flex-shrink-0 mt-0.5" />
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Plan access */}
+        <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 text-center">
+          <Sparkles className="w-5 h-5 text-primary-light mx-auto mb-2" />
+          <h3 className="text-sm font-bold text-foreground mb-1">
+            {hasPaidAccess ? `${accessLabel} access active` : "Early access active"}
+          </h3>
+          <p className="text-xs text-muted-foreground mb-3">
+            {hasPaidAccess
+              ? "High-volume lead search is enabled for this account."
+              : "All core lead tools are unlocked during launch."}
+          </p>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
+            ✦ {hasPaidAccess ? `${accessLabel} plan` : "Free early access"}
+          </div>
+        </div>
+
+      </aside>
+      </div>{/* end flex row */}
     </div>
   );
 }

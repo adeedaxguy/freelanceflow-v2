@@ -50,6 +50,7 @@ export function EmailStatusBadge({ status }: { status: string }) {
     SENT: { label: "Sent", variant: "blue" },
     DELIVERED: { label: "Delivered", variant: "accent" },
     OPENED: { label: "Opened", variant: "primary" },
+    READY_TO_SEND: { label: "Prepared", variant: "gold" },
     BOUNCED: { label: "Bounced", variant: "red" },
     FAILED: { label: "Failed", variant: "red" },
   };
@@ -61,7 +62,7 @@ export function EmailStatusBadge({ status }: { status: string }) {
 export function CampaignStatusBadge({ status }: { status: string }) {
   const statusConfig: Record<string, { label: string; variant: BadgeVariant }> = {
     DRAFT: { label: "Draft", variant: "outline" },
-    RUNNING: { label: "Running", variant: "accent" },
+    RUNNING: { label: "Active", variant: "accent" },
     COMPLETED: { label: "Completed", variant: "primary" },
   };
 

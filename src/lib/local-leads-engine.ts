@@ -48,7 +48,7 @@ export interface LocalBizLead {
   reviewCount?:    number;
   category:        string;
   categoryLabel:   string;
-  source:          "yelp" | "here" | "osm" | "demo";
+  source:          "yelp" | "here" | "foursquare" | "osm" | "demo";
   osmId?:          string;
   isOpen?:         boolean;
   imageUrl?:       string;
@@ -628,6 +628,7 @@ async function fetchFromFoursquare(keyword: string, bbox: BBox, apiKey: string):
       headers: {
         Authorization: apiKey,
         Accept: "application/json",
+        "X-Places-Api-Version": "1970-01-01",
       },
       signal: AbortSignal.timeout(10000),
     });
@@ -655,7 +656,7 @@ async function fetchFromFoursquare(keyword: string, bbox: BBox, apiKey: string):
         category:     cat,
         mapsUrl:      `https://www.google.com/maps/search/${mapsQ}`,
         isOpen:       b.hours?.open_now,
-        source:       "osm" as const,   // grouped under OSM tier (free, no special badge)
+        source:       "foursquare" as const,
       } satisfies Partial<LocalBizLead>;
     });
   } catch { return []; }
@@ -1386,6 +1387,47 @@ async function checkWebsite(url: string): Promise<WebInfo> {
   } catch { return { status: "unreachable" }; }
 }
 
+const GENERIC_NAME_TOKENS = new Set([
+  "the", "and", "for", "with", "from", "near", "local", "best", "top",
+  "service", "services", "company", "business", "group", "team", "pros",
+  "pro", "llc", "inc", "ltd", "co", "corp", "corporation", "residential",
+  "commercial", "professional", "solutions", "center", "centre",
+]);
+
+function tokeniseBusinessName(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .split(/[^a-z0-9]+/)
+    .map(t => t.trim())
+    .filter(t => t.length >= 4 && !GENERIC_NAME_TOKENS.has(t));
+}
+
+function domainStem(url: string): string {
+  try {
+    const withProtocol = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+    const host = new URL(withProtocol).hostname.toLowerCase().replace(/^www\./, "");
+    return host.split(".").slice(0, -1).join("").replace(/[^a-z0-9]/g, "");
+  } catch {
+    return url.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]!.split(".").slice(0, -1).join("").replace(/[^a-z0-9]/g, "");
+  }
+}
+
+function websiteMatchesBusinessName(name: string | undefined, website: string | undefined): boolean {
+  if (!name || !website) return false;
+  const stem = domainStem(website);
+  if (stem.length < 4) return false;
+  const tokens = tokeniseBusinessName(name);
+  if (tokens.length === 0) return false;
+  return tokens.some(token => stem.includes(token) || token.includes(stem));
+}
+
+function shouldTrustWebsiteForLead(raw: Partial<LocalBizLead>): boolean {
+  if (!raw.website) return false;
+  if (raw.source && raw.source !== "osm") return true;
+  return websiteMatchesBusinessName(raw.name, raw.website);
+}
+
 // ── Email pattern generator ────────────────────────────────────────────────────
 function guessEmails(domain: string | undefined): string[] {
   if (!domain) return [];
@@ -1560,6 +1602,7 @@ export interface SearchOpts {
   yelpKey?: string; hereKey?: string; foursquareKey?: string;
   tomtomKey?: string; geoapifyKey?: string; radarKey?: string;
   bingKey?: string; companiesHouseKey?: string; abnGuid?: string;
+  cacheScope?: string;
   db: import("@prisma/client").PrismaClient;
 }
 
@@ -1573,11 +1616,13 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
     keyword, location, filter, groqKey,
     yelpKey, hereKey, foursquareKey,
     tomtomKey, geoapifyKey, radarKey, bingKey, companiesHouseKey, abnGuid,
+    cacheScope,
     db,
   } = opts;
   const limit    = Math.min(opts.limit ?? 60, 80);
-  // v3 — bumped to bust caches built before multi-source (TomTom/FSQ/Geoapify) was added
-  const cacheKey = `v3-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
+  // v5 — tighter website trust checks for outdated/down results.
+  const sourceScope = cacheScope ?? "default";
+  const cacheKey = `v5-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
 
   // 1. Cache check — instant return
   const cached = await cacheGet(cacheKey, db);
@@ -1660,25 +1705,26 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
       batch.map(async (raw) => {
         let webInfo: WebInfo | null = null;
         let wsStatus: LocalBizLead["websiteStatus"] = "unknown";
+        const trustedWebsite = shouldTrustWebsiteForLead(raw) ? raw.website : undefined;
 
         if (raw.websiteStatus && raw.websiteStatus !== "unknown") {
           // Demo data or pre-enriched source has explicit status
           wsStatus = raw.websiteStatus;
-        } else if (raw.website) {
-          webInfo  = await checkWebsite(raw.website).catch(() => null);
+        } else if (trustedWebsite) {
+          webInfo  = await checkWebsite(trustedWebsite).catch(() => null);
           wsStatus = webInfo?.status ?? "unreachable";
         } else {
           // Only mark "none" if from a rich source that reliably stores website data.
           // OSM/Photon/Nominatim rarely store website URLs, so absence of a URL
           // does NOT mean the business has no website — it just means OSM doesn't
           // know about it. Mark as "unknown" to avoid false "No Website" badges.
-          const richSource = raw.source === "yelp" || raw.source === "here";
+          const richSource = raw.source === "yelp" || raw.source === "here" || raw.source === "foursquare";
           wsStatus = richSource ? "none" : "unknown";
         }
 
         const cat    = (raw.category ?? keyword).toLowerCase();
         const revEst = estimateRevenue(cat, wsStatus);
-        const guEmails = guessEmails(raw.website);
+        const guEmails = guessEmails(trustedWebsite);
 
         const opType: LocalBizLead["opportunityType"] =
           wsStatus === "none"       ? "no_website" :
@@ -1703,7 +1749,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           phone:           resolvedPhone,
           email:           raw.email,
           guessedEmails:   raw.email ? [] : guEmails,
-          website:         raw.website,
+          website:         trustedWebsite,
           websiteStatus:   wsStatus,
           websiteAge:      webInfo?.age,
           websiteTech:     webInfo?.tech,
@@ -1753,7 +1799,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
 }
 
 function applyFilter(leads: LocalBizLead[], filter: string): LocalBizLead[] {
-  if (filter === "no_website")       return leads.filter(l => l.websiteStatus === "none");
+  if (filter === "no_website")       return leads.filter(l => l.websiteStatus === "none" || l.websiteStatus === "unknown");
   if (filter === "outdated_website") return leads.filter(l => l.websiteStatus === "outdated" || l.websiteStatus === "unreachable");
   if (filter === "has_website")      return leads.filter(l => l.websiteStatus === "alive");
   return leads;

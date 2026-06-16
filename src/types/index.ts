@@ -1,7 +1,7 @@
 export type Role = "USER" | "ADMIN";
 export type LeadStatus = "NEW" | "PROPOSAL_SENT" | "REPLIED" | "CLOSED";
 export type CampaignStatus = "DRAFT" | "RUNNING" | "COMPLETED";
-export type EmailStatus = "SENT" | "DELIVERED" | "OPENED" | "BOUNCED" | "FAILED";
+export type EmailStatus = "SENT" | "DELIVERED" | "OPENED" | "READY_TO_SEND" | "BOUNCED" | "FAILED";
 
 export interface UserProfile {
   id: string;
@@ -153,19 +153,26 @@ export type NicheOption = {
 };
 
 export const NICHES: NicheOption[] = [
-  { id: "web-development", label: "Web Development", icon: "🌐", description: "Frontend & Backend dev" },
-  { id: "mobile-apps", label: "Mobile Apps", icon: "📱", description: "iOS & Android" },
-  { id: "ui-ux-design", label: "UI/UX Design", icon: "🎨", description: "Product & interface design" },
-  { id: "copywriting", label: "Copywriting", icon: "✍️", description: "Web copy & content" },
-  { id: "seo", label: "SEO & Content", icon: "🔍", description: "Rankings & traffic" },
-  { id: "video-editing", label: "Video Editing", icon: "🎬", description: "YouTube & social" },
-  { id: "graphic-design", label: "Graphic Design", icon: "🖼️", description: "Branding & visuals" },
-  { id: "social-media", label: "Social Media", icon: "📣", description: "Strategy & management" },
-  { id: "data-science", label: "Data Science", icon: "📊", description: "Analytics & ML" },
-  { id: "devops", label: "DevOps & Cloud", icon: "☁️", description: "AWS, GCP, Azure" },
-  { id: "wordpress", label: "WordPress", icon: "📝", description: "Sites & plugins" },
-  { id: "shopify", label: "Shopify / E-commerce", icon: "🛒", description: "Stores & conversion" },
-  { id: "email-marketing", label: "Email Marketing", icon: "📧", description: "Campaigns & funnels" },
-  { id: "consulting", label: "Business Consulting", icon: "💼", description: "Strategy & growth" },
-  { id: "photography", label: "Photography", icon: "📷", description: "Commercial & editorial" },
+  { id: "web-development",   label: "Web Development",     icon: "🌐", description: "Frontend & Backend dev" },
+  { id: "mobile-apps",       label: "Mobile Apps",         icon: "📱", description: "iOS & Android" },
+  { id: "ui-ux-design",      label: "UI/UX Design",        icon: "🎨", description: "Product & interface design" },
+  { id: "copywriting",       label: "Copywriting",         icon: "✍️", description: "Web copy & content" },
+  { id: "seo",               label: "SEO & Content",       icon: "🔍", description: "Rankings & traffic" },
+  { id: "video-editing",     label: "Video Editing",       icon: "🎬", description: "YouTube & social" },
+  { id: "graphic-design",    label: "Graphic Design",      icon: "🖼️", description: "Branding & visuals" },
+  { id: "social-media",      label: "Social Media",        icon: "📣", description: "Strategy & management" },
+  { id: "meta-ads",          label: "Meta Ads",            icon: "🎯", description: "Facebook & Instagram ads" },
+  { id: "data-science",      label: "Data Science",        icon: "📊", description: "Analytics & ML" },
+  { id: "devops",            label: "DevOps & Cloud",      icon: "☁️", description: "AWS, GCP, Azure" },
+  { id: "wordpress",         label: "WordPress",           icon: "📝", description: "Sites & plugins" },
+  { id: "shopify",           label: "Shopify / E-commerce",icon: "🛒", description: "Stores & conversion" },
+  { id: "email-marketing",   label: "Email Marketing",     icon: "📧", description: "Campaigns & funnels" },
+  { id: "consulting",        label: "Business Consulting", icon: "💼", description: "Strategy & growth" },
+  { id: "photography",       label: "Photography",         icon: "📷", description: "Commercial & editorial" },
+  // ── New niches ──────────────────────────────────────────────────────────────
+  { id: "blockchain",        label: "Blockchain / Web3",   icon: "🔗", description: "DeFi, NFTs & smart contracts" },
+  { id: "cybersecurity",     label: "Cybersecurity",       icon: "🔒", description: "Pentesting & security audits" },
+  { id: "game-development",  label: "Game Development",    icon: "🎮", description: "Unity, Unreal & more" },
+  { id: "technical-writing", label: "Technical Writing",   icon: "📄", description: "API docs & user guides" },
+  { id: "virtual-assistant", label: "Virtual Assistant",   icon: "🤖", description: "Admin, scheduling & research" },
 ];

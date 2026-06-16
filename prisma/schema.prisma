@@ -3,13 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// SQLite does not support native enums — values are stored as strings.
+// PostgreSQL — string enum values stored as plain strings (no native enum).
 // Valid values for role: "USER" | "ADMIN"
-// Valid values for status on Lead: "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST"
+// Valid values for status on Lead: "NEW" | "CONTACTED" | "REPLIED" | "NEGOTIATION" | "FOLLOW_UP" | "WON" | "LOST"
 // Valid values for status on Campaign: "DRAFT" | "RUNNING" | "COMPLETED"
 // Valid values for status on SentEmail: "SENT" | "DELIVERED" | "OPENED" | "BOUNCED" | "FAILED"
 
@@ -31,6 +32,9 @@ model User {
   referralSource   String?
   weeklyLeads      Int       @default(0)
   weeklyLeadReset  DateTime  @default(now())
+  portfolioLinks   String?   // JSON array of { label, url }
+  gmailRefreshToken String?  // OAuth2 refresh token for Gmail send
+  gmailEmail       String?   // Gmail address connected via OAuth2
   bonusLeads       Int       @default(0)
   whatsapp         String?
   marketingConsent Boolean   @default(false)
@@ -46,6 +50,7 @@ model User {
   templates        Template[]
   supportTickets   SupportTicket[]
   followUps        FollowUp[]
+  leadApplications LeadApplication[]
 
   @@index([email])
   @@index([role])
@@ -53,22 +58,25 @@ model User {
 }
 
 model Lead {
-  id           String    @id @default(cuid())
-  userId       String
-  company      String
-  domain       String
-  email        String?
-  phone        String?
-  confidence   Int?
-  qualityScore Int?
-  niche        String?
-  title        String?
-  sourceUrl    String?
-  source       String?
-  notes        String?
-  status       String    @default("NEW")
-  savedAt      DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  userId         String
+  company        String
+  domain         String
+  email          String?
+  phone          String?
+  confidence     Int?
+  qualityScore   Int?
+  bestMatchScore Int?
+  niche          String?
+  title          String?
+  description    String?
+  sourceUrl      String?
+  source         String?
+  notes          String?
+  isManual       Boolean   @default(false)
+  status         String    @default("NEW")
+  savedAt        DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   sentEmails   SentEmail[]
@@ -131,17 +139,27 @@ model Template {
 }
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  excerpt     String?
-  content     String
-  category    String   @default("General")
-  published   Boolean  @default(false)
-  coverImage  String?
-  readTime    Int      @default(5)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  excerpt      String?
+  content      String
+  category     String   @default("General")
+  published    Boolean  @default(false)
+  coverImage   String?
+  readTime     Int      @default(5)
+  author       String?
+  metaTitle    String?
+  metaDesc     String?
+  focusKeyword String?
+  ogImage      String?
+  canonical    String?
+  noIndex      Boolean  @default(false)
+  twitterCard  String?
+  schema       String?
+  tags         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([slug])
   @@index([published])
@@ -169,16 +187,19 @@ model PlatformSetting {
 }
 
 model SupportTicket {
-  id        String   @id @default(cuid())
-  userId    String?
-  email     String
-  subject   String
-  messages  String
-  status    String   @default("open")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String?
+  email      String
+  subject    String
+  messages   String
+  status     String   @default("open")
+  priority   String   @default("normal")
+  category   String?
+  assignedTo String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
@@ -231,4 +252,20 @@ model FollowUp {
   @@index([leadId])
   @@index([scheduledAt])
   @@index([status])
+}
+
+// Tracks which users have marked a lead URL as "applied".
+// leadUrl is the canonical job URL (not the saved Lead row ID) so it works
+// for leads shown in the live feed even before they are saved to the DB.
+model LeadApplication {
+  id        String   @id @default(cuid())
+  userId    String
+  leadUrl   String
+  appliedAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, leadUrl])
+  @@index([leadUrl])
+  @@index([userId])
 }

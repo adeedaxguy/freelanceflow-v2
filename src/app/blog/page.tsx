@@ -6,7 +6,7 @@ import { STATIC_POSTS } from "@/data/blog-posts";
 import { prisma } from "@/lib/prisma";
 import type { BlogPost } from "@/types";
 
-export const dynamic = "force-dynamic"; // always fetch latest posts
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Freelance Tips & Client Acquisition Strategies | iCloseLeads Blog",
@@ -20,10 +20,18 @@ export const metadata: Metadata = {
   },
 };
 
-const categories = ["all", "Strategy", "Templates", "Growth", "Tools", "Client Acquisition", "Lead Generation", "Outreach", "Freelance Business", "Local Business", "Proposals"];
+type BlogPageProps = {
+  searchParams?: {
+    category?: string | string[];
+  };
+};
 
-export default async function BlogPage() {
-  // Fetch DB posts (published only)
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const selectedCategory = Array.isArray(searchParams?.category)
+    ? searchParams?.category[0]
+    : searchParams?.category;
+  const activeCategory = selectedCategory?.trim().toLowerCase() || "all";
+
   let dbPosts: BlogPost[] = [];
   try {
     const raw = await prisma.blogPost.findMany({
@@ -35,22 +43,26 @@ export default async function BlogPage() {
         coverImage: true, readTime: true, createdAt: true, updatedAt: true,
       },
     });
-    dbPosts = raw.map(p => ({
-      ...p,
-      excerpt: p.excerpt ?? "",
-      coverImage: p.coverImage ?? null,
+    dbPosts = raw.map(post => ({
+      ...post,
+      excerpt: post.excerpt ?? "",
+      coverImage: post.coverImage ?? null,
     }));
   } catch {
-    // DB suspended or unavailable — fall back to static only
+    dbPosts = [];
   }
 
-  // Merge: DB posts first (newest), then static posts (dedup by slug)
-  const dbSlugs = new Set(dbPosts.map(p => p.slug));
-  const staticOnly = STATIC_POSTS.filter(p => !dbSlugs.has(p.slug));
-  const allPosts: BlogPost[] = [
-    ...dbPosts,
-    ...staticOnly,
-  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const dbSlugs = new Set(dbPosts.map(post => post.slug));
+  const staticOnly = STATIC_POSTS.filter(post => post.published && !dbSlugs.has(post.slug));
+  const publishedPosts = [...dbPosts, ...staticOnly]
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const categories = [
+    "All",
+    ...Array.from(new Set(publishedPosts.map(post => post.category).filter(Boolean))),
+  ];
+  const posts = activeCategory === "all"
+    ? publishedPosts
+    : publishedPosts.filter(post => post.category.toLowerCase() === activeCategory);
 
   return (
     <>
@@ -66,7 +78,7 @@ export default async function BlogPage() {
                 Actionable strategies, templates, and insights to grow your freelance business.
               </p>
               <p className="text-sm text-muted-foreground mt-3">
-                {allPosts.length} articles · New posts daily
+                {publishedPosts.length} articles · New posts daily
               </p>
             </div>
 
@@ -75,8 +87,12 @@ export default async function BlogPage() {
               {categories.map((cat) => (
                 <a
                   key={cat}
-                  href={cat === "all" ? "/blog" : `/blog?category=${cat}`}
-                  className="px-4 py-1.5 rounded-full text-sm font-medium border border-border text-muted-foreground hover:border-primary/40 hover:text-primary-light transition-colors capitalize"
+                  href={cat.toLowerCase() === "all" ? "/blog" : `/blog?category=${encodeURIComponent(cat)}`}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors capitalize ${
+                    activeCategory === cat.toLowerCase()
+                      ? "bg-primary/15 border-primary/40 text-primary-light"
+                      : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary-light"
+                  }`}
                 >
                   {cat}
                 </a>
@@ -84,14 +100,14 @@ export default async function BlogPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allPosts.map((post) => (
+              {posts.map((post) => (
                 <BlogCard key={post.id ?? post.slug} post={post} />
               ))}
             </div>
 
-            {allPosts.length === 0 && (
+            {posts.length === 0 && (
               <div className="text-center py-20 text-muted-foreground">
-                No posts yet. Check back soon.
+                No posts found in this category.
               </div>
             )}
           </div>

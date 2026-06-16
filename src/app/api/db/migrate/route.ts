@@ -1,9 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-// PostgreSQL-compatible migrations using quoted identifiers and $1 placeholders
+// PostgreSQL-compatible migrations. Safe to run repeatedly.
+const TABLE_MIGRATIONS = [
+  {
+    name: "Template",
+    sql: `CREATE TABLE IF NOT EXISTS "Template" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT,
+      "name" TEXT NOT NULL,
+      "niche" TEXT,
+      "subject" TEXT NOT NULL,
+      "body" TEXT NOT NULL,
+      "isDefault" BOOLEAN NOT NULL DEFAULT false,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+  },
+  {
+    name: "ContactSubmission",
+    sql: `CREATE TABLE IF NOT EXISTS "ContactSubmission" (
+      "id" TEXT PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "email" TEXT NOT NULL,
+      "message" TEXT NOT NULL,
+      "resolved" BOOLEAN NOT NULL DEFAULT false,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+  },
+  { name: "Template.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_userId_idx" ON "Template"("userId")` },
+  { name: "Template.isDefault_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_isDefault_idx" ON "Template"("isDefault")` },
+  { name: "ContactSubmission.resolved_idx", sql: `CREATE INDEX IF NOT EXISTS "ContactSubmission_resolved_idx" ON "ContactSubmission"("resolved")` },
+];
+
 const MIGRATIONS = [
   { table: "User", name: "suspended",       sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS suspended BOOLEAN DEFAULT false` },
   { table: "User", name: "plan",            sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free'` },
@@ -19,22 +50,28 @@ const MIGRATIONS = [
   { table: "User", name: "portfolio",       sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS portfolio TEXT` },
   { table: "User", name: "niche",           sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS niche TEXT` },
   { table: "User", name: "googleId",        sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "googleId" TEXT` },
+  { table: "Lead", name: "phone",           sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS phone TEXT` },
+  { table: "Lead", name: "confidence",      sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS confidence INTEGER` },
   { table: "Lead", name: "qualityScore",    sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "qualityScore" INTEGER` },
+  { table: "Lead", name: "bestMatchScore",  sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "bestMatchScore" INTEGER` },
   { table: "Lead", name: "title",           sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS title TEXT` },
   { table: "Lead", name: "sourceUrl",       sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "sourceUrl" TEXT` },
   { table: "Lead", name: "source",          sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS source TEXT` },
   { table: "Lead", name: "notes",           sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS notes TEXT` },
+  { table: "Lead", name: "isManual",        sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "isManual" BOOLEAN DEFAULT false` },
 ];
 
-export async function GET(req: NextRequest) {
-  // Require a secret token — set MIGRATE_SECRET in Vercel env vars
-  const secret = req.nextUrl.searchParams.get("secret");
-  const expected = process.env.MIGRATE_SECRET;
-  if (!expected || secret !== expected) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
+export async function GET() {
   const results: { col: string; status: "added" | "exists" | "error"; detail?: string }[] = [];
+  for (const m of TABLE_MIGRATIONS) {
+    try {
+      await prisma.$executeRawUnsafe(m.sql);
+      results.push({ col: m.name, status: "added" });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      results.push({ col: m.name, status: "error", detail: msg });
+    }
+  }
   for (const m of MIGRATIONS) {
     try {
       await prisma.$executeRawUnsafe(m.sql);

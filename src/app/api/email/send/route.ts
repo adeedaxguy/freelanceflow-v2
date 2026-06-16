@@ -1,8 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { sendMail } from "@/lib/mailer";
 import { prisma } from "@/lib/prisma";
+import { getResolvedOutreachUsage } from "@/lib/outreach-limits";
 import { z } from "zod";
 
 const sendSchema = z.object({
@@ -29,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { to, subject, body, leadId, company, domain } = parsed.data;
 
   // Resolve sender name from user profile
-  let fromName = "FreelanceFlow";
+  let fromName = "iCloseLeads";
   try {
     const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } });
     if (user?.name) fromName = user.name;
@@ -38,7 +41,10 @@ export async function POST(req: NextRequest) {
   const result = await sendMail(session.user.id, { to, subject, text: body, fromName });
 
   if (!result.success) {
-    return NextResponse.json({ error: result.error ?? "Failed to send email" }, { status: 500 });
+    return NextResponse.json(
+      { error: result.error ?? "Failed to send email" },
+      { status: result.code === "OUTREACH_LIMIT" ? 429 : 500 },
+    );
   }
 
   // Log sent email
@@ -70,5 +76,10 @@ export async function POST(req: NextRequest) {
     }).catch(() => null);
   }
 
-  return NextResponse.json({ success: true, provider: result.provider, id: result.id });
+  const usage = await getResolvedOutreachUsage({
+    userId: session.user.id,
+    sessionPlan: session.user.plan,
+    sessionEmail: session.user.email,
+  });
+  return NextResponse.json({ success: true, provider: result.provider, id: result.id, usage });
 }

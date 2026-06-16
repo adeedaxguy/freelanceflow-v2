@@ -258,7 +258,7 @@ export default function PipelinePage() {
   const totalValue = leads.filter(l => l.status === "WON").length;
 
   return (
-    <div className="p-6 lg:p-8 h-full flex flex-col gap-6">
+    <div className="p-4 sm:p-6 lg:p-8 h-full flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>

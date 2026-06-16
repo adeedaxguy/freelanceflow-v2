@@ -7,7 +7,7 @@ interface Message { role: "user" | "assistant"; content: string; }
 
 const QUICK_QUESTIONS = [
   "How do I find more leads?",
-  "How does AI Apply work?",
+  "How does AI Proposal work?",
   "How to upgrade my plan?",
   "Why am I not getting leads?",
 ];
@@ -15,7 +15,7 @@ const QUICK_QUESTIONS = [
 export default function FloatingChat() {
   const [open,       setOpen]      = useState(false);
   const [messages,   setMessages]  = useState<Message[]>([
-    { role: "assistant", content: "Hi! I'm the iCloseLeads AI assistant. How can I help you find clients and grow your freelance business today? 🚀" },
+    { role: "assistant", content: "Hi! I'm iCloseLeads's AI assistant. How can I help you find clients and grow your freelance business today? 🚀" },
   ]);
   const [input,      setInput]     = useState("");
   const [loading,    setLoading]   = useState(false);
@@ -68,9 +68,9 @@ export default function FloatingChat() {
       {open && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)} />}
 
       {/* Chat panel */}
-      <div className={`fixed bottom-28 sm:bottom-24 right-4 sm:right-6 z-50 transition-all duration-300 ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4 pointer-events-none"}`}>
+      <div className={`fixed bottom-[84px] right-4 sm:right-6 z-50 transition-all duration-300 ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4 pointer-events-none"}`}>
         <div className="w-[calc(100vw-32px)] sm:w-[380px] bg-surface border border-border rounded-2xl shadow-card-hover overflow-hidden flex flex-col"
-          style={{ maxHeight: "min(500px, calc(100svh - 140px))" }}>
+          style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}>
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary/20 to-accent/10 border-b border-border flex-shrink-0">
@@ -151,7 +151,7 @@ export default function FloatingChat() {
 
       {/* FAB button */}
       <button onClick={() => setOpen(o => !o)}
-        className="fixed bottom-6 sm:bottom-6 right-4 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-hero shadow-glow-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-hero shadow-glow-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
         aria-label="Open support chat">
         {open
           ? <X className="w-6 h-6 text-white" />

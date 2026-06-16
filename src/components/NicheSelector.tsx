@@ -1,78 +1,211 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { NICHES, type NicheOption } from "@/types";
-import { Check } from "lucide-react";
-
 /**
- * NicheSelector supports BOTH single-select (legacy `selected` + `onChange`)
- * and multi-select (`selectedMany` + `onChangeMany`). The leads page uses the
- * multi variant; older pages keep working with the single variant.
+ * NicheSelector — compact multi-select with search + pill tags.
+ * Replaces the old full-grid card layout. Much smaller footprint.
  */
+
+import { useState, useRef, useEffect, useCallback } from "react";
+import { NICHES, type NicheOption } from "@/types";
+import { Search, X, ChevronDown, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 interface NicheSelectorProps {
-  selected?: string;
-  onChange?: (nicheId: string) => void;
-  selectedMany?: string[];
-  onChangeMany?: (next: string[]) => void;
+  selected: string[];
+  onChange: (ids: string[]) => void;
   className?: string;
-  max?: number;
+  maxSelect?: number;
 }
 
-export default function NicheSelector(props: NicheSelectorProps) {
-  const isMulti = Array.isArray(props.selectedMany) && typeof props.onChangeMany === "function";
+export default function NicheSelector({
+  selected,
+  onChange,
+  className,
+  maxSelect = 5,
+}: NicheSelectorProps) {
+  const [open,   setOpen]   = useState(false);
+  const [query,  setQuery]  = useState("");
+  const containerRef        = useRef<HTMLDivElement>(null);
+  const inputRef            = useRef<HTMLInputElement>(null);
 
-  const handleToggle = (nicheId: string) => {
-    if (isMulti) {
-      const cur = props.selectedMany ?? [];
-      const next = cur.includes(nicheId)
-        ? cur.filter(id => id !== nicheId)
-        : (props.max && cur.length >= props.max ? cur : [...cur, nicheId]);
-      props.onChangeMany?.(next);
-    } else {
-      props.onChange?.(nicheId);
+  // Close on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery("");
+      }
     }
-  };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Focus input when dropdown opens
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  const filtered: NicheOption[] = query.trim()
+    ? NICHES.filter(n =>
+        n.label.toLowerCase().includes(query.toLowerCase()) ||
+        n.description.toLowerCase().includes(query.toLowerCase())
+      )
+    : NICHES;
+
+  const toggle = useCallback((id: string) => {
+    if (selected.includes(id)) {
+      onChange(selected.filter(s => s !== id));
+    } else if (selected.length < maxSelect) {
+      onChange([...selected, id]);
+    }
+  }, [selected, onChange, maxSelect]);
+
+  const remove = useCallback((id: string) => {
+    onChange(selected.filter(s => s !== id));
+  }, [selected, onChange]);
+
+  const selectedNiches = NICHES.filter(n => selected.includes(n.id));
 
   return (
-    <div
-      className={cn("grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3", props.className)}
-      role={isMulti ? "group" : "radiogroup"}
-      aria-label="Select your niche"
-    >
-      {NICHES.map((niche: NicheOption) => {
-        const isSelected = isMulti
-          ? (props.selectedMany ?? []).includes(niche.id)
-          : props.selected === niche.id;
+    <div ref={containerRef} className={cn("relative w-full", className)}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className={cn(
+          "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-all text-left",
+          open
+            ? "border-primary/50 bg-surface ring-2 ring-primary/10"
+            : "border-border bg-surface hover:border-primary/30"
+        )}
+      >
+        {/* Pills or placeholder */}
+        <div className="flex-1 flex flex-wrap gap-1.5 min-h-[24px] items-center">
+          {selectedNiches.length === 0 ? (
+            <span className="text-muted-foreground text-sm">Select niches (up to {maxSelect})…</span>
+          ) : (
+            selectedNiches.map(n => (
+              <span
+                key={n.id}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-primary/15 border border-primary/30 text-primary-light text-xs font-medium"
+              >
+                <span>{n.icon}</span>
+                {n.label}
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); remove(n.id); }}
+                  className="ml-0.5 rounded-full hover:bg-primary/20 p-0.5 transition-colors"
+                  aria-label={`Remove ${n.label}`}
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            ))
+          )}
+        </div>
 
-        return (
+        {selected.length > 0 && (
           <button
-            key={niche.id}
             type="button"
-            role={isMulti ? "checkbox" : "radio"}
-            aria-checked={isSelected}
-            onClick={() => handleToggle(niche.id)}
-            className={cn(
-              "relative flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all duration-200 group",
-              isSelected
-                ? "bg-primary/15 border-primary/50 text-foreground shadow-glow-primary/30"
-                : "bg-surface border-border text-muted-foreground hover:border-primary/30 hover:bg-primary/5 hover:text-foreground"
-            )}
+            onClick={e => { e.stopPropagation(); onChange([]); }}
+            className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors flex-shrink-0"
+            aria-label="Clear all"
           >
-            {isSelected && (
-              <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                <Check className="w-3 h-3 text-white" />
-              </div>
-            )}
-            <span className="text-2xl" aria-hidden="true">{niche.icon}</span>
-            <div>
-              <div className={cn("text-xs font-semibold leading-tight", isSelected ? "text-primary-light" : "text-foreground")}>
-                {niche.label}
-              </div>
-              <div className="text-xs text-muted-foreground mt-0.5 leading-tight">{niche.description}</div>
-            </div>
+            <X className="w-3.5 h-3.5" />
           </button>
-        );
-      })}
+        )}
+
+        <ChevronDown className={cn("w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {/* Count badge */}
+      {selected.length > 0 && (
+        <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center z-10">
+          {selected.length}
+        </span>
+      )}
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-50 w-full mt-2 bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
+          {/* Search */}
+          <div className="p-3 border-b border-border">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted-foreground" />
+              <input
+                ref={inputRef}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search niches…"
+                className="w-full pl-8 pr-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            {selected.length >= maxSelect && (
+              <p className="text-xs text-amber-400 mt-2 text-center">Max {maxSelect} niches selected</p>
+            )}
+          </div>
+
+          {/* List */}
+          <div className="max-h-64 overflow-y-auto py-1.5">
+            {filtered.length === 0 ? (
+              <p className="text-center text-sm text-muted-foreground py-6">No niches match "{query}"</p>
+            ) : (
+              filtered.map(n => {
+                const isSelected = selected.includes(n.id);
+                const disabled   = !isSelected && selected.length >= maxSelect;
+                return (
+                  <button
+                    key={n.id}
+                    type="button"
+                    disabled={disabled}
+                    onClick={() => toggle(n.id)}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all",
+                      isSelected
+                        ? "bg-primary/10 text-foreground"
+                        : disabled
+                          ? "opacity-40 cursor-not-allowed text-muted-foreground"
+                          : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                    )}
+                  >
+                    <span className="text-base w-6 text-center flex-shrink-0">{n.icon}</span>
+                    <div className="flex-1 text-left">
+                      <p className={cn("font-medium text-sm", isSelected ? "text-primary-light" : "text-foreground")}>{n.label}</p>
+                      <p className="text-xs text-muted-foreground">{n.description}</p>
+                    </div>
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-primary-light flex-shrink-0" />
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          {selected.length > 0 && (
+            <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-background/50">
+              <span className="text-xs text-muted-foreground">{selected.length} / {maxSelect} selected</span>
+              <button
+                type="button"
+                onClick={() => { setOpen(false); setQuery(""); }}
+                className="text-xs font-semibold text-primary-light hover:text-foreground transition-colors"
+              >
+                Done ✓
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

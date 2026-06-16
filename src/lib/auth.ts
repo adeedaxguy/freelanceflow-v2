@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
@@ -12,11 +13,13 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: "USER" | "ADMIN";
+      plan: string;
     };
   }
   interface User {
     id: string;
     role: "USER" | "ADMIN";
+    plan?: string;
   }
 }
 
@@ -24,24 +27,41 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: "USER" | "ADMIN";
+    plan: string;
   }
 }
 
+// ─── Auth options ──────────────────────────────────────────────────────────────
 export const authOptions: NextAuthOptions = {
   providers: [
-    // Google OAuth — credentials come from env; skipped if not set
+    // Google OAuth — skipped if env vars not set
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ? [
           GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            // IMPORTANT: only request basic non-sensitive scopes.
+            // gmail.send is handled separately in email-settings via gmail-oauth.ts
+            // Keeping scopes here to just openid+email+profile means Google
+            // does NOT require app verification for sign-in — works for all users.
             authorization: {
               params: {
-                prompt: "consent",
-                access_type: "offline",
+                scope: "openid email profile",
+                prompt: "select_account",
+                access_type: "online",
                 response_type: "code",
               },
             },
+          }),
+        ]
+      : []),
+
+    // GitHub OAuth — skipped if env vars not set
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? [
+          GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
           }),
         ]
       : []),
@@ -55,98 +75,116 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email.trim().toLowerCase() },
+            select: { id: true, name: true, email: true, password: true, role: true, plan: true, suspended: true },
+          });
 
-        if (!user) return null;
-        if (user.suspended) return null;
-        // Google-only accounts have no password
-        if (!user.password) return null;
+          if (!user) return null;
 
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
+          // Treat suspended as suspended
+          if (user.suspended) return null;
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role as "USER" | "ADMIN",
-        };
+          // Google-only accounts have no password
+          if (!user.password) return null;
+
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          if (!isValid) return null;
+
+          return {
+            id:    user.id,
+            name:  user.name,
+            email: user.email,
+            role:  (user.role as "USER" | "ADMIN") ?? "USER",
+            plan:  user.plan ?? "free",
+          };
+        } catch (err) {
+          console.error("[auth] authorize error:", err);
+          return null;
+        }
       },
     }),
   ],
+
   callbacks: {
     async signIn({ user, account }) {
-      // Handle Google OAuth sign-in / account creation
-      if (account?.provider === "google" && user.email) {
+      // Handle OAuth sign-in / account creation for Google and GitHub
+      const isOAuth = account?.provider === "google" || account?.provider === "github";
+      if (isOAuth && user.email) {
         try {
           const existing = await prisma.user.findUnique({
             where: { email: user.email },
-            select: { id: true, role: true, suspended: true },
+            select: { id: true, role: true, plan: true, suspended: true },
           });
 
           if (existing) {
             if (existing.suspended) return false;
-            // Link Google ID if not already linked (raw query to avoid type issue)
-            await prisma.$executeRawUnsafe(
-              `UPDATE "User" SET "googleId" = ? WHERE email = ? AND "googleId" IS NULL`,
-              account.providerAccountId,
-              user.email
-            ).catch(() => { /* column may not exist yet — safe to ignore */ });
             user.id = existing.id;
-            (user as { role?: string }).role = existing.role;
+            (user as { role?: string; plan?: string }).role = existing.role ?? "USER";
+            (user as { role?: string; plan?: string }).plan = existing.plan ?? "free";
           } else {
-            // Create new account for Google user
+            // Create new OAuth account
             const newUser = await prisma.user.create({
               data: {
                 email: user.email,
-                name: user.name ?? user.email.split("@")[0],
-                plan: "free",
-                role: "USER",
+                name:  user.name ?? user.email.split("@")[0],
+                plan:  "free",
+                role:  "USER",
               },
-              select: { id: true, role: true },
+              select: { id: true, role: true, plan: true },
             });
-            // Store googleId via raw query (graceful if column absent)
-            await prisma.$executeRawUnsafe(
-              `UPDATE "User" SET "googleId" = ? WHERE id = ?`,
-              account.providerAccountId,
-              newUser.id
-            ).catch(() => { /* ignore */ });
             user.id = newUser.id;
-            (user as { role?: string }).role = newUser.role;
+            (user as { role?: string; plan?: string }).role = newUser.role;
+            (user as { role?: string; plan?: string }).plan = newUser.plan ?? "free";
           }
         } catch (err) {
-          console.error("Google signIn error:", err);
+          console.error(`[auth] ${account?.provider} signIn error:`, err);
           return false;
         }
       }
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
-        token.id = user.id;
+        token.id   = user.id;
         token.role = (user as { role?: "USER" | "ADMIN" }).role ?? "USER";
+        token.plan = (user as { plan?: string }).plan ?? "free";
+      }
+      // Re-fetch plan on session refresh
+      if (trigger === "update" && token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id },
+            select: { plan: true, role: true },
+          });
+          if (dbUser) {
+            if (dbUser.plan) token.plan = dbUser.plan;
+            if (dbUser.role) token.role = dbUser.role as "USER" | "ADMIN";
+          }
+        } catch { /* non-fatal */ }
       }
       return token;
     },
 
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+        session.user.id   = token.id;
+        session.user.role = token.role ?? "USER";
+        session.user.plan = token.plan ?? "free";
       }
       return session;
     },
   },
+
   pages: {
     signIn: "/auth",
-    error: "/auth",
+    error:  "/auth",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge:   30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

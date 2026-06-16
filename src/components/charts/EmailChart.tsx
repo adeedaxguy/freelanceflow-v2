@@ -19,12 +19,12 @@ function CustomTooltip({ active, payload, label }: {
   return (
     <div className="bg-surface border border-border rounded-xl p-3 shadow-card-hover">
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className="text-foreground font-semibold text-sm">{payload[0]?.value} emails</p>
+      <p className="text-foreground font-semibold text-sm">{payload[0]?.value} outreach items</p>
     </div>
   );
 }
 
-export default function EmailChart({ data, title = "Emails Sent" }: EmailChartProps) {
+export default function EmailChart({ data, title = "Outreach" }: EmailChartProps) {
   return (
     <div className="bg-gradient-card border border-border rounded-2xl p-6">
       <h3 className="text-foreground font-semibold mb-6">{title}</h3>
