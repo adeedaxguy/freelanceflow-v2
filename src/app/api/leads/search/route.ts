@@ -87,12 +87,12 @@ export async function POST(req: NextRequest) {
 
     if (usage.remaining === 0) {
       return NextResponse.json({
-        error:     "Daily limit reached. You get 100 free leads every 24 hours. Pro plan coming soon for unlimited access.",
+        error:     `Daily limit reached. You have used your ${usage.limit} free leads for this 24-hour window. Share iCloseLeads to unlock more leads instantly.`,
         plan:      usage.plan,
         limit:     usage.limit,
         nextReset: usage.nextReset,
         upgrade:   true,
-        comingSoon: true,
+        bonusAvailable: true,
       }, { status: 429 });
     }
 
@@ -169,9 +169,9 @@ export async function POST(req: NextRequest) {
     }
     if (hasEmail) leads = leads.filter(l => !!l.email);
 
-    // Respect the user's weekly cap — but always allow at least 5 results so
-    // a near-zero remaining doesn't make the page look empty when leads exist.
-    const cap = Math.max(usage.remaining, 5);
+    // Respect the user's daily cap exactly. Bonus claims increase this value
+    // through getUsageStats, so the UI and API always share one threshold.
+    const cap = usage.remaining;
     const toReturn = leads.slice(0, cap);
 
     if (toReturn.length > 0) {

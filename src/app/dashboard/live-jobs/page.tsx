@@ -252,14 +252,17 @@ export default function LiveJobsPage() {
     } catch {}
   }, []);
 
-  useEffect(() => {
-    fetch("/api/usage", { cache: "no-store" })
-      .then(r => (r.ok ? r.json() : null))
-      .then((data: UsageStats | null) => {
-        if (data?.plan) setUsage(data);
-      })
-      .catch(() => {});
+  const refreshUsage = useCallback(async () => {
+    try {
+      const res = await fetch("/api/usage", { cache: "no-store" });
+      const data = res.ok ? await res.json() as UsageStats : null;
+      if (data?.plan) setUsage(data);
+    } catch {}
   }, []);
+
+  useEffect(() => {
+    void refreshUsage();
+  }, [refreshUsage]);
 
   function startTimer(secs: number) {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -299,12 +302,14 @@ export default function LiveJobsPage() {
         leads?: AggregatedLead[];
         total?: number;
         activeSources?: string[];
+        usage?: UsageStats;
         error?: string;
       };
 
       const fetched = data.leads ?? [];
       setTotalFound(data.total ?? fetched.length);
       setActiveSources(data.activeSources ?? []);
+      if (data.usage) setUsage(data.usage);
 
       const prev = prevSeenRef.current;
       fetched.sort((a, b) => {
@@ -579,16 +584,21 @@ export default function LiveJobsPage() {
                     <AlertCircle className="w-5 h-5 text-gold" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-foreground mb-1">You&apos;ve used your 100 free leads today</p>
+                    <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 100} free leads today</p>
                     <p className="text-muted-foreground text-sm mb-3">
                       Free plan resets every 24 hours.
                       {limitHit.nextReset && (
                         <> Resets at <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
                       )}
                     </p>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
-                      <span>🚀</span> Pro plan coming soon — unlimited leads every day
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowBonus(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Unlock +300 free leads
+                    </button>
                   </div>
                 </div>
               </div>
@@ -838,9 +848,13 @@ export default function LiveJobsPage() {
       <BonusLeadsModal
         isOpen={showBonus}
         onClose={() => setShowBonus(false)}
-        onBonusClaimed={() => setShowBonus(false)}
+        onBonusClaimed={async () => {
+          setShowBonus(false);
+          setLimitHit(null);
+          await refreshUsage();
+        }}
         source="live-jobs"
-        currentPlan="free"
+        currentPlan={usage?.plan ?? "free"}
       />
     </>
   );

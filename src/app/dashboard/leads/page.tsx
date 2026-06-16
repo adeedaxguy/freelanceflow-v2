@@ -8,6 +8,7 @@ import {
   Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer, BarChart2, ArrowRight,
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
+import BonusLeadsModal from "@/components/BonusLeadsModal";
 import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
@@ -244,6 +245,7 @@ export default function LeadsPage() {
   const [error,           setError]          = useState("");
   const [limitHit,        setLimitHit]       = useState<{ nextReset: string | null } | null>(null);
   const [usage,           setUsage]          = useState<UsageStats | null>(null);
+  const [showBonus,       setShowBonus]      = useState(false);
   const [fetchedAt,       setFetchedAt]      = useState("");
   const [savingId,        setSavingId]       = useState<string | null>(null);
   const [savedIds,        setSavedIds]       = useState<Set<string>>(new Set());
@@ -275,14 +277,17 @@ export default function LeadsPage() {
     return () => clearInterval(t);
   }, [forceCooldown]);
 
-  useEffect(() => {
-    fetch("/api/usage", { cache: "no-store" })
-      .then(r => (r.ok ? r.json() : null))
-      .then((data: UsageStats | null) => {
-        if (data?.plan) setUsage(data);
-      })
-      .catch(() => {});
+  const refreshUsage = useCallback(async () => {
+    try {
+      const res = await fetch("/api/usage", { cache: "no-store" });
+      const data = res.ok ? await res.json() as UsageStats : null;
+      if (data?.plan) setUsage(data);
+    } catch {}
   }, []);
+
+  useEffect(() => {
+    void refreshUsage();
+  }, [refreshUsage]);
 
   // Filtered + sorted leads
   const filteredLeads = useMemo(() => {
@@ -370,6 +375,7 @@ export default function LeadsPage() {
 
       if (res.status === 429) {
         setLimitHit({ nextReset: data.nextReset ?? null });
+        setShowBonus(true);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
@@ -590,16 +596,21 @@ export default function LeadsPage() {
               <AlertCircle className="w-5 h-5 text-gold" />
             </div>
             <div className="flex-1">
-              <p className="font-bold text-foreground mb-1">You&apos;ve used your 100 free leads today</p>
+              <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 100} free leads today</p>
               <p className="text-muted-foreground text-sm mb-3">
                 Free plan resets every 24 hours.
                 {limitHit.nextReset && (
                   <> Resets at <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong> today.</>
                 )}
               </p>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
-                <span>🚀</span> Pro plan coming soon — unlimited leads every day
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowBonus(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
+              >
+                <Sparkles className="w-4 h-4" />
+                Unlock +300 free leads
+              </button>
             </div>
           </div>
         </div>
@@ -1199,6 +1210,18 @@ export default function LeadsPage() {
 
       </aside>
       </div>{/* end flex row */}
+
+      <BonusLeadsModal
+        isOpen={showBonus}
+        onClose={() => setShowBonus(false)}
+        onBonusClaimed={async () => {
+          setShowBonus(false);
+          setLimitHit(null);
+          await refreshUsage();
+        }}
+        source="remote-leads"
+        currentPlan={usage?.plan ?? "free"}
+      />
     </div>
   );
 }

@@ -8,10 +8,10 @@ const genCode = () => randomBytes(4).toString("hex").toUpperCase();
 
 const BONUS_BY_SOURCE: Record<string, number> = {
   "local-leads": 300,
-  "live-jobs": 100,
-  "remote-leads": 100,
+  "live-jobs": 300,
+  "remote-leads": 300,
 };
-const DEFAULT_BONUS = 100;
+const DEFAULT_BONUS = 300;
 const FREE_LOCAL_BASE_LIMIT = 100;
 
 const schema = z.object({
@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
     success: true,
     bonusAdded: bonusForClaim,
     bonusLeads: newBonusLeads,
-    newLimit: 20 + newBonusLeads, // remote/live free plan base + bonus
+    newLimit: FREE_LOCAL_BASE_LIMIT + newBonusLeads,
     localDailyLimit: normalizedSource === "local-leads" ? FREE_LOCAL_BASE_LIMIT + newBonusLeads : undefined,
     referralCode,
     referralUrl: `https://icloseleads.com/auth?mode=signup&ref=${referralCode}`,
@@ -152,6 +152,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const source = req.nextUrl.searchParams.get("source") ?? "general";
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -165,7 +166,7 @@ export async function GET(req: NextRequest) {
     claimed,
     referralCode:  user?.referralCode,
     whatsapp:      user?.whatsapp,
-    canClaimShare:     !claimed.some(entry => entry === "share" || entry.startsWith("share:")),
+    canClaimShare:     !claimed.some(entry => entry === "share" || entry === `share:${source}`),
     canClaimSubscribe: !claimed.includes("subscribe"),
   });
 }

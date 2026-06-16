@@ -269,16 +269,16 @@ function DailyLimitBanner({ resetAt }: { resetAt: Date | null }) {
         <Clock className="w-7 h-7 text-gold"/>
       </div>
       <div>
-        <h3 className="text-foreground font-bold text-lg">You&apos;ve used your 100 free local leads today</h3>
+        <h3 className="text-foreground font-bold text-lg">You&apos;ve used today&apos;s free local leads</h3>
         <p className="text-muted-foreground text-sm mt-1 max-w-md mx-auto leading-relaxed">
           Free plan resets every 24 hours.
           {resetAt && (
-            <> Your next 100 leads unlock at <strong className="text-foreground">{resetAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
+            <> Your next leads unlock at <strong className="text-foreground">{resetAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
           )}
         </p>
       </div>
       <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
-        <span>🚀</span> Pro plan coming soon — unlimited local searches every day
+        <Sparkles className="w-4 h-4" /> Use the unlock option to add +300 free leads
       </div>
     </div>
   );
@@ -818,7 +818,14 @@ export default function LocalLeadsPage() {
               />
             </div>
           </div>
-          <span className="flex-shrink-0 text-xs text-primary-light font-medium">🚀 Pro coming soon</span>
+          <button
+            type="button"
+            onClick={() => setShowBonus(true)}
+            className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-light transition-all hover:bg-primary/15"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Unlock +300
+          </button>
         </div>
       )}
 

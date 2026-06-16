@@ -16,13 +16,19 @@ export const PLAN_LIMITS = {
 
 export type Plan = keyof typeof PLAN_LIMITS;
 
+function getDailyLeadLimit(plan: Plan, bonusLeads = 0): number {
+  const baseLimit = PLAN_LIMITS[plan].leadsPerDay;
+  if (baseLimit >= 999999) return baseLimit;
+  return baseLimit + Math.max(0, bonusLeads);
+}
+
 export async function checkAndIncrementLeads(
   userId: string,
   count: number
 ): Promise<{ allowed: boolean; remaining: number; plan: string; resetAt?: string }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
   });
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
 
@@ -32,7 +38,7 @@ export async function checkAndIncrementLeads(
   }
 
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const limit = PLAN_LIMITS[plan].leadsPerDay;
+  const limit = getDailyLeadLimit(plan, user.bonusLeads ?? 0);
 
   // Reset counter if 24+ hours have passed
   const now = new Date();
@@ -64,7 +70,7 @@ export async function checkAndIncrementLeads(
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
   });
   if (!user) return null;
 
@@ -82,7 +88,7 @@ export async function getUsageStats(userId: string) {
   }
 
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const limit = PLAN_LIMITS[plan].leadsPerDay;
+  const limit = getDailyLeadLimit(plan, user.bonusLeads ?? 0);
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;

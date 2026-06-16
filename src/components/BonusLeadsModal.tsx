@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
+  Copy,
   ExternalLink,
   Gift,
   Link as LinkIcon,
@@ -37,7 +38,12 @@ const SOURCE_COPY: Record<string, { title: string; body: string; bonus: number }
   "live-jobs": {
     title: "Extra Live Job Leads",
     body: "Free early access is active. Claim a fresh lead allowance and keep searching for client opportunities.",
-    bonus: 100,
+    bonus: 300,
+  },
+  "remote-leads": {
+    title: "Extra Remote Job Leads",
+    body: "Free early access is active. Add more remote lead allowance and keep finding niche-matched opportunities.",
+    bonus: 300,
   },
   "local-leads": {
     title: "Extra Local Business Leads",
@@ -95,6 +101,7 @@ export default function BonusLeadsModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [copiedPost, setCopiedPost] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -105,6 +112,7 @@ export default function BonusLeadsModal({
     setSubmitting(false);
     setError("");
     setSuccess("");
+    setCopiedPost(false);
   }, [isOpen, source]);
 
   const shareUrl = useMemo(() => {
@@ -114,14 +122,40 @@ export default function BonusLeadsModal({
     url.searchParams.set("utm_campaign", "free_bonus");
     return url.toString();
   }, [source]);
+  const sharePostText = useMemo(() => {
+    const useCase = source === "local-leads"
+      ? "find local businesses that need better websites, stronger follow-up, or a faster way to get found online"
+      : source === "remote-leads"
+        ? "find remote freelance leads matched to my niche instead of digging through random job boards"
+        : "track fresh client opportunities from live job feeds before they get crowded";
+
+    return [
+      "I am using iCloseLeads during its free early access launch.",
+      `It helps freelancers and agencies ${useCase}, then turn those leads into AI-assisted proposals.`,
+      "Worth checking out while it is free:",
+      shareUrl,
+    ].join("\n\n");
+  }, [shareUrl, source]);
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(sharePostText)}`;
   const linkedInValid = isLinkedInProfile(linkedInUrl);
   const facebookValid = isFacebookProfile(facebookUrl);
   const canClaim = openedLinkedIn && openedFacebook && linkedInValid && facebookValid && !submitting;
 
+  const copyShareText = async () => {
+    try {
+      if (!navigator.clipboard) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(sharePostText);
+      setCopiedPost(true);
+      window.setTimeout(() => setCopiedPost(false), 2500);
+    } catch {
+      setCopiedPost(false);
+    }
+  };
+
   const openShare = (platform: "linkedin" | "facebook") => {
     const targetUrl = platform === "linkedin" ? linkedInShareUrl : facebookShareUrl;
+    void copyShareText();
     window.open(targetUrl, "_blank", "noopener,noreferrer");
     if (platform === "linkedin") setOpenedLinkedIn(true);
     if (platform === "facebook") setOpenedFacebook(true);
@@ -220,9 +254,27 @@ export default function BonusLeadsModal({
               <div>
                 <p className="text-sm font-semibold text-foreground">Instant validation</p>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Open both share screens, then add your LinkedIn and Facebook profile/post links. We verify the platform links and allow one bonus claim per account.
+                  Open both share screens, then add your LinkedIn and Facebook profile/post links. We verify the platform links and allow one bonus claim per lead tool.
                 </p>
               </div>
+            </div>
+
+            <div className="rounded-xl border border-border bg-background/70 p-3">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ready-to-post intro</p>
+                <button
+                  type="button"
+                  onClick={() => void copyShareText()}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-xs font-semibold text-primary-light transition-all hover:border-primary/40"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  {copiedPost ? "Copied" : "Copy text"}
+                </button>
+              </div>
+              <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">{sharePostText}</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/80">
+                We copy this before opening the share window. Paste it if the platform does not prefill the post text.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">

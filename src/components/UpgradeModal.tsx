@@ -11,7 +11,7 @@ interface UpgradeModalProps {
 }
 
 const REASON_MESSAGES: Record<string, { title: string; body: string; emoji: string }> = {
-  leads:     { emoji: "🔍", title: "Daily Lead Limit Reached",  body: "You've used all 100 free leads today. Upgrade to Pro for higher daily limits — never miss an opportunity." },
+  leads:     { emoji: "🔍", title: "Daily Lead Limit Reached",  body: "You've used today's free lead allowance. Share iCloseLeads from the lead tool to unlock bonus leads instantly." },
   proposals: { emoji: "✉️", title: "Proposal Limit Reached",    body: "You've hit your monthly proposal limit. Upgrade to Pro for unlimited AI proposals every month." },
   campaigns: { emoji: "📣", title: "Campaign Limit Reached",    body: "Free plan allows 1 campaign. Upgrade to Pro to run up to 10 simultaneous campaigns." },
   generic:   { emoji: "⚡", title: "Upgrade to iCloseLeads Pro", body: "Unlock the full power of iCloseLeads with Pro. More leads, unlimited proposals, and priority support." },
