@@ -19,7 +19,7 @@ const INDUSTRIES: Record<string, {
   "web-designers": {
     name: "Web Designers",
     headline: "Find Local Businesses That Need a Website — Before Anyone Else Does",
-    sub: "iCloseLeads scans OpenStreetMap, Yelp, and HERE Maps in real time to surface local businesses with no website or an outdated one. You get the lead; you make the pitch.",
+    sub: "iCloseLeads scans live business profiles in real time to surface local businesses with no website or an outdated one. You get the lead; you make the pitch.",
     pain: "Most web designers spend more time searching for clients than doing actual design work. Cold DMing on Instagram, scrolling through job boards, or waiting for referrals is unpredictable and slow.",
     useCases: [
       "Search 'plumber' in Manchester and get 40+ businesses with no website in 30 seconds",

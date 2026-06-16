@@ -76,7 +76,12 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-bold text-foreground mb-3">11. Contact</h2>
+              <h2 className="text-xl font-bold text-foreground mb-3">11. Data and Attribution</h2>
+              <p>Lead discovery may use public records, open datasets, and licensed third-party data providers. Some location and business profile data may include contributions from OpenStreetMap contributors and is available under the Open Database License. Additional provider attribution may apply where required by the underlying data license or API terms.</p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-foreground mb-3">12. Contact</h2>
               <p>Questions about these Terms? Contact us at legal@icloseleads.com.</p>
             </section>
           </div>

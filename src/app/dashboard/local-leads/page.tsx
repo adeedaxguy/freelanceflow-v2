@@ -7,7 +7,7 @@ import {
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
   Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  Key, Lock, Unlock, ArrowRight, Filter,
+  ArrowRight, Filter,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -210,7 +210,7 @@ function WebsiteBadge({ status, tech, age }: { status: LocalLead["websiteStatus"
     </span>
   );
   if (status === "unknown") return (
-    <span title="Website status not confirmed — OSM data rarely includes website URLs. Verify via Google Maps." className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground border border-border font-medium cursor-help">
+    <span title="Website status has not been confirmed yet. Verify the business profile before pitching." className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground border border-border font-medium cursor-help">
       <AlertCircle className="w-3 h-3"/> Website unverified
     </span>
   );
@@ -253,21 +253,6 @@ function UrgencyBadge({ urgency }: { urgency: LocalLead["urgency"] }) {
   return null;
 }
 
-function SourceBadge({ source }: { source: LocalLead["source"] }) {
-  const cfg = {
-    yelp:       { label: "Yelp",       cls: "bg-red-500/10 text-red-400 border-red-500/20" },
-    here:       { label: "HERE Maps",  cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
-    foursquare: { label: "Foursquare", cls: "bg-pink-500/10 text-pink-400 border-pink-500/20" },
-    osm:        { label: "OSM",        cls: "bg-green-500/10 text-green-400 border-green-500/20" },
-    demo:       { label: "Preview",    cls: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
-  }[source] ?? { label: source, cls: "bg-muted text-muted-foreground border-border" };
-  return (
-    <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${cfg.cls}`}>
-      {cfg.label}
-    </span>
-  );
-}
-
 function OpportunityBadge({ type }: { type: LocalLead["opportunityType"] }) {
   if (type === "no_website")       return <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium">New Website</span>;
   if (type === "outdated_website") return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">Redesign</span>;
@@ -294,103 +279,6 @@ function DailyLimitBanner({ resetAt }: { resetAt: Date | null }) {
       <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
         <span>🚀</span> Pro plan coming soon — unlimited local searches every day
       </div>
-    </div>
-  );
-}
-
-// ─── Yelp API connector panel ─────────────────────────────────────────────────
-function YelpConnector({ onConnected }: { onConnected: (key: string) => void }) {
-  const [open,    setOpen]    = useState(false);
-  const [apiKey,  setApiKey]  = useState("");
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
-  const [err,     setErr]     = useState("");
-
-  const handleSave = async () => {
-    if (!apiKey.trim() || apiKey.trim().length < 20) {
-      setErr("Please enter a valid Yelp API key (40+ characters)");
-      return;
-    }
-    setSaving(true); setErr("");
-    try {
-      // Save to localStorage for this session + persist in user settings via API
-      localStorage.setItem(LOCAL_YELP_KEY_KEY, apiKey.trim());
-      const res = await fetch("/api/user/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: "yelp_api_key", value: apiKey.trim() }),
-      });
-      if (res.ok) {
-        setSaved(true);
-        onConnected(apiKey.trim());
-        setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
-      } else {
-        // API might not exist — still save to localStorage and pass it
-        onConnected(apiKey.trim());
-        setSaved(true);
-        setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
-      }
-    } catch {
-      // Offline fallback — still use in-memory
-      localStorage.setItem(LOCAL_YELP_KEY_KEY, apiKey.trim());
-      onConnected(apiKey.trim());
-      setSaved(true);
-      setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
-    } finally { setSaving(false); }
-  };
-
-  return (
-    <div className="bg-surface border border-border rounded-xl overflow-hidden">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-primary/5 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
-            <Key className="w-4 h-4 text-red-400"/>
-          </div>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-foreground">Connect Yelp API for more results</p>
-            <p className="text-xs text-muted-foreground">Free tier: 500 searches/day · Add your API key below</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">
-            Optional
-          </span>
-          {open ? <ChevronUp className="w-4 h-4 text-muted-foreground"/> : <ChevronDown className="w-4 h-4 text-muted-foreground"/>}
-        </div>
-      </button>
-
-      {open && (
-        <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Get a free Yelp API key at{" "}
-            <a href="https://www.yelp.com/developers/v3/manage_app" target="_blank" rel="noopener noreferrer"
-              className="text-primary-light hover:underline">
-              yelp.com/developers
-            </a>{" "}
-            — it&apos;s free with 500 searches/day. Once connected, you&apos;ll get ratings, reviews, photos, and phone numbers for every business.
-          </p>
-          <div className="flex gap-2">
-            <input
-              value={apiKey}
-              onChange={e => { setApiKey(e.target.value); setErr(""); }}
-              placeholder="Paste your Yelp API key here…"
-              type="password"
-              className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 transition-all font-mono"
-            />
-            <button
-              onClick={() => void handleSave()}
-              disabled={saving || !apiKey.trim()}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${saved ? "bg-accent/10 text-accent border border-accent/30" : "bg-primary hover:bg-primary-light text-white"} disabled:opacity-50`}
-            >
-              {saved ? <><CheckCircle className="w-3.5 h-3.5"/> Saved!</> : saving ? "Saving…" : <><Unlock className="w-3.5 h-3.5"/> Connect</>}
-            </button>
-          </div>
-          {err && <p className="text-xs text-destructive">{err}</p>}
-        </div>
-      )}
     </div>
   );
 }
@@ -518,7 +406,6 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
                 {lead.categoryLabel ?? lead.category}
               </span>
             )}
-            <SourceBadge source={lead.source}/>
             {lead.revenueEst && (
               <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-medium">
                 <DollarSign className="w-3 h-3"/> {lead.revenueEst}/mo potential
@@ -550,7 +437,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
             ) : (
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-muted-foreground/60 flex items-center gap-1 italic">
-                  <Phone className="w-3 h-3"/> No phone in OSM data —
+                  <Phone className="w-3 h-3"/> No phone on record —
                 </span>
                 <a
                   href={`https://www.google.com/search?q=${encodeURIComponent(lead.name + " " + lead.city + " phone number")}`}
@@ -592,17 +479,6 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
                   : <><Globe className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/50 shrink-0"/><span className="text-muted-foreground/60">Website status unverified — check Google Maps</span></>
                 }
               </p>
-            )}
-
-            {lead.yelpUrl && (
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Star className="w-3.5 h-3.5 flex-shrink-0 text-red-400"/>
-                <a href={lead.yelpUrl} target="_blank" rel="noopener noreferrer"
-                  className="hover:text-red-400 hover:underline text-xs">
-                  View on Yelp
-                </a>
-                <ExternalLink className="w-3 h-3 opacity-50"/>
-              </div>
             )}
           </div>
 
@@ -845,7 +721,7 @@ export default function LocalLeadsPage() {
           title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${websiteStatusLabel(lead.websiteStatus)})`,
           description: lead.pitchOpener,
           sourceUrl:   lead.mapsUrl ?? null,
-          source:      `local_business_${lead.source}`,
+          source:      "local_business",
           isManual:    true,
           notes: [
             `Address: ${lead.address}`,
@@ -854,7 +730,7 @@ export default function LocalLeadsPage() {
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
             lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
             lead.guessedEmails?.length ? `Guessed Emails: ${lead.guessedEmails.join(", ")}` : null,
-            `Data Source: ${lead.source.toUpperCase()}`,
+            "Lead Coverage: Live local search",
             `Priority Score: ${lead.score}/100 (${lead.urgency} urgency)`,
             "",
             "Pitch Points:",
@@ -874,7 +750,7 @@ export default function LocalLeadsPage() {
   // Apply all client-side filters: website status + phone + rating
   const filteredResults = results.filter(r => {
     // Website status filter (the main Show: selector)
-    // "No Website" shows confirmed none + unverified (OSM unknown) — both worth pitching
+    // "No Website" shows confirmed none + unverified businesses — both worth pitching.
     if (filter === "no_website"       && r.websiteStatus !== "none" && r.websiteStatus !== "unknown") return false;
     if (filter === "outdated_website" && r.websiteStatus !== "outdated" && r.websiteStatus !== "unreachable") return false;
     if (filter === "has_website"      && (!r.website || r.websiteStatus === "none" || r.websiteStatus === "unknown")) return false;
@@ -891,26 +767,6 @@ export default function LocalLeadsPage() {
   const withPhone     = filteredResults.filter(r => !!r.phone).length;
   const filtersActive = hasPhone || minRating > 0 || filter !== "all";
   const hasDemo       = meta?.sources?.includes("demo");
-  const hasYelp      = meta?.sources?.includes("yelp");
-  const hasFsq       = meta?.sources?.includes("foursquare");
-
-  const sourceLabelMap: Record<string, string> = {
-    yelp:            "Yelp",
-    here:            "HERE Maps",
-    foursquare:      "Foursquare",
-    tomtom:          "TomTom",
-    geoapify:        "Geoapify",
-    radar:           "Radar",
-    bing:            "Bing Local",
-    "companies-house": "Companies House",
-    sirene:          "SIRENE (FR)",
-    abn:             "ABN (AU)",
-    opencorporates:  "OpenCorporates",
-    osm:             "OpenStreetMap",
-    photon:          "Photon/OSM",
-    nominatim:       "Nominatim/OSM",
-    demo:            "Preview Data",
-  };
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
@@ -925,11 +781,11 @@ export default function LocalLeadsPage() {
             <MapPin className="w-5 h-5 text-white"/>
           </div>
           Local Business Leads
-          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-semibold">FREE · LIVE DATA</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-semibold">LIVE INTELLIGENCE</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1.5 max-w-2xl leading-relaxed">
-          Find local businesses with no website or outdated sites — real-time data from OpenStreetMap
-          with optional Yelp integration for ratings, reviews, and phone numbers.
+          Find local businesses with weak or missing web presence using live business profiles,
+          contact signals, website checks, and AI-ready pitch context.
         </p>
       </div>
 
@@ -969,7 +825,7 @@ export default function LocalLeadsPage() {
           {/* How it works */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { icon: BarChart2,  color: "text-primary-light", bg: "bg-primary/10",    title: "Multi-Source Data",   desc: "Pulls from OpenStreetMap — global coverage, thousands of real businesses. Connect Yelp for even more." },
+              { icon: BarChart2,  color: "text-primary-light", bg: "bg-primary/10",    title: "Coverage Engine",     desc: "Combines live business profiles, location signals, and contact enrichment into one clean lead list." },
               { icon: Wifi,       color: "text-accent",        bg: "bg-accent/10",     title: "Live Website Check",  desc: "Every site is validated in real-time for status, tech stack, and age — know exactly what to pitch." },
               { icon: TrendingUp, color: "text-yellow-400",    bg: "bg-yellow-500/10", title: "Revenue Estimates",   desc: "See the monthly revenue potential for each opportunity — prioritise leads worth the most to you." },
             ].map(({ icon: Icon, color, bg, title, desc }) => (
@@ -984,9 +840,6 @@ export default function LocalLeadsPage() {
               </div>
             ))}
           </div>
-
-          {/* API Connectors */}
-          <YelpConnector onConnected={(k) => { setYelpKey(k); }} />
 
           {/* Search form */}
           <div className="bg-surface border border-border rounded-2xl p-5 space-y-4">
@@ -1114,7 +967,7 @@ export default function LocalLeadsPage() {
                   <Icon className={`w-3.5 h-3.5 ${filter === v ? "text-primary-light" : c}`}/>{l}
                 </button>
               ))}
-              <span title="Website data comes from OpenStreetMap which rarely stores website URLs. 'No/Unknown Website' includes both confirmed no-website (Yelp/HERE) and unverified (OSM). Always confirm via Google Maps before pitching." className="flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors">
+              <span title="No/Unknown Website includes confirmed no-website records and businesses where no website is available from profile data. Always verify on Google Maps before pitching." className="flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors">
                 <Info className="w-3.5 h-3.5"/>
               </span>
             </div>
@@ -1171,13 +1024,12 @@ export default function LocalLeadsPage() {
 
           {/* Results section */}
           <div ref={resultsRef}>
-            {/* OSM-only info banner (no system API paths exposed) */}
-            {!hasDemo && !loading && results.length > 0 && !hasYelp && (
+            {!hasDemo && !loading && results.length > 0 && (
               <div className="flex items-start gap-3 bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 mb-4">
                 <Info className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  <span className="text-foreground font-semibold">OpenStreetMap data</span>
-                  {" "}— {filteredResults.length} businesses found. Connect your Yelp API key above for deeper coverage with ratings, reviews, and phone numbers.
+                  <span className="text-foreground font-semibold">Live coverage</span>
+                  {" "}— {filteredResults.length} businesses found. Ratings, reviews, phone numbers, and website signals appear when available.
                 </p>
               </div>
             )}
@@ -1196,11 +1048,6 @@ export default function LocalLeadsPage() {
                 {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated/down</span>}
                 {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
                 <div className="ml-auto flex items-center gap-2 flex-wrap">
-                  {(meta?.sources ?? []).filter(s => s !== "demo").map(s => (
-                    <span key={s} className="text-xs bg-surface text-muted-foreground px-2 py-0.5 rounded-full border border-border">
-                      {sourceLabelMap[s] ?? s}
-                    </span>
-                  ))}
                   {meta?.cached && (
                     <span className="flex items-center gap-1 text-xs bg-surface text-muted-foreground px-2 py-0.5 rounded-full border border-border">
                       <Clock className="w-3 h-3"/> Cached (24hr)
@@ -1245,7 +1092,7 @@ export default function LocalLeadsPage() {
                   <p className="text-muted-foreground text-xs mt-1">
                     {filter === "no_website" || filter === "outdated_website"
                       ? "Try a different area or keyword — website data varies by location."
-                      : "Connect Yelp or Foursquare for richer data including ratings and phone numbers."}
+                      : "Broaden your filters to include leads without ratings or phone numbers."}
                   </p>
                 </div>
                 <button onClick={() => { setHasPhone(false); setMinRating(0); setFilter("all"); setPage(1); }}
@@ -1316,7 +1163,7 @@ export default function LocalLeadsPage() {
                 <div>
                   <h3 className="text-foreground font-bold text-lg">No businesses found for this search</h3>
                   <p className="text-muted-foreground max-w-md mx-auto text-sm mt-1.5 leading-relaxed">
-                    Try a different city, broaden your search term, or connect Yelp for much deeper coverage.
+                    Try a different city, broaden your search term, or remove extra filters for wider coverage.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
@@ -1373,26 +1220,26 @@ export default function LocalLeadsPage() {
           )}
         </div>
 
-        {/* Data Sources */}
+        {/* Coverage Quality */}
         <div className="bg-surface border border-border rounded-2xl p-4">
           <div className="flex items-center gap-2 mb-3">
             <Globe className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-foreground">Data Sources</h3>
+            <h3 className="text-sm font-bold text-foreground">Coverage Quality</h3>
           </div>
           <div className="space-y-2">
             {[
-              { name: "OpenStreetMap", status: "active",  note: "Addresses & POIs" },
-              { name: "Yelp",          status: yelpKey ? "active" : "connect", note: yelpKey ? "Ratings & phones ✓" : "Connect for ratings" },
-              { name: "Foursquare",    status: fsqKey  ? "active" : "connect", note: fsqKey  ? "Places data ✓"     : "Connect for places" },
-              { name: "TomTom",        status: "active",  note: "Business search" },
-              { name: "Geoapify",      status: "active",  note: "Geocoding & POIs" },
+              { name: "Business profiles", status: "active", note: "Names & categories" },
+              { name: "Location matching", status: "active", note: "City-level targeting" },
+              { name: "Website signals",   status: "active", note: "Live status checks" },
+              { name: "Contact enrichment", status: (yelpKey || fsqKey) ? "active" : "partial", note: (yelpKey || fsqKey) ? "Enhanced" : "When available" },
+              { name: "Pitch context",     status: "active", note: "AI-ready notes" },
             ].map(({ name, status, note }) => (
               <div key={name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-1.5">
-                  <div className={`w-1.5 h-1.5 rounded-full ${status === "active" ? "bg-accent" : "bg-muted-foreground/40"}`} />
+                  <div className={`w-1.5 h-1.5 rounded-full ${status === "active" ? "bg-accent" : "bg-yellow-400"}`} />
                   <span className="text-foreground">{name}</span>
                 </div>
-                <span className={`${status === "connect" ? "text-primary-light" : "text-muted-foreground"}`}>{note}</span>
+                <span className="text-muted-foreground">{note}</span>
               </div>
             ))}
           </div>
@@ -1407,7 +1254,7 @@ export default function LocalLeadsPage() {
           <ul className="space-y-2.5">
             {[
               "Filter 'No Website' to find the best web design opportunities.",
-              "Connect Yelp to get phone numbers and ratings on results.",
+              "Prioritise leads with phone numbers, reviews, or recent website issues.",
               "Use Google Maps link to verify website status before pitching.",
               "Try different keyword synonyms — 'electrician' vs 'electrical contractor'.",
               "Search smaller towns for less competition and easier wins.",
@@ -1425,7 +1272,7 @@ export default function LocalLeadsPage() {
           <div className="bg-gradient-to-br from-accent/10 to-primary/5 border border-accent/20 rounded-2xl p-4 text-center">
             <div className="text-lg mb-1">✦</div>
             <h3 className="text-sm font-bold text-foreground mb-1 capitalize">{userPlan} Plan Active</h3>
-            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, all sources active, no daily limits.</p>
+            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, enhanced enrichment, no daily limits.</p>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
               ✓ Unlimited local leads
             </div>
@@ -1434,7 +1281,7 @@ export default function LocalLeadsPage() {
           <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 text-center">
             <div className="text-lg mb-1">🚀</div>
             <h3 className="text-sm font-bold text-foreground mb-1">Pro Plan Coming Soon</h3>
-            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, Yelp built-in, phone enrichment, priority support.</p>
+            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, enhanced contact coverage, priority support.</p>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
               ✦ You&apos;re on free early access
             </div>

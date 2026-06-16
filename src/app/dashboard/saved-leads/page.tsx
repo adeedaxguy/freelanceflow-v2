@@ -13,9 +13,22 @@ type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
 interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
 interface ApiResponse { leads: LeadExt[]; total: number; page: number; totalPages: number; }
 
+function isLocalBusinessLead(lead: LeadExt) {
+  return lead.source?.startsWith("local_business") ?? false;
+}
+
+function displayLeadSource(lead: LeadExt) {
+  if (isLocalBusinessLead(lead)) return "Local Business";
+  return lead.source ?? "";
+}
+
+function sanitizeLeadNotes(notes?: string | null) {
+  return (notes ?? "").replace(/^Data Source:\s*.+$/gim, "Lead Coverage: Live local search");
+}
+
 function displayLeadTitle(lead: LeadExt) {
   if (!lead.title) return null;
-  if (!lead.source?.startsWith("local_business")) return lead.title;
+  if (!isLocalBusinessLead(lead)) return lead.title;
 
   const websiteLine = lead.notes?.match(/^Website:\s*(.+)$/im)?.[1]?.toLowerCase() ?? "";
   const label =
@@ -69,7 +82,7 @@ function StatusDropdown({ current, onChange }: { current: string; onChange: (s: 
 
 function NotesEditor({ leadId, initialNotes, onSave }: { leadId: string; initialNotes?: string | null; onSave: (notes: string) => void }) {
   const [editing, setEditing] = useState(false);
-  const [value,   setValue]   = useState(initialNotes ?? "");
+  const [value,   setValue]   = useState(sanitizeLeadNotes(initialNotes));
   const [saving,  setSaving]  = useState(false);
 
   async function save() {
@@ -104,7 +117,7 @@ function NotesEditor({ leadId, initialNotes, onSave }: { leadId: string; initial
           className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-light transition-colors disabled:opacity-50">
           <Check className="w-3 h-3" />
         </button>
-        <button onClick={() => { setValue(initialNotes ?? ""); setEditing(false); }}
+        <button onClick={() => { setValue(sanitizeLeadNotes(initialNotes)); setEditing(false); }}
           className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
           <X className="w-3 h-3" />
         </button>
@@ -161,16 +174,16 @@ export default function SavedLeadsPage() {
   function exportCSV() {
     const esc = (v: string | number | null | undefined) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const headers = [
-      "Company", "Domain", "Email", "Niche", "Title", "Source",
+      "Company", "Domain", "Email", "Niche", "Title", "Lead Type",
       "Match %", "Quality Score", "Pipeline Status", "Source URL",
       "Notes", "Saved Date",
     ];
     const rows = leads.map(l => [
       esc(l.company), esc(l.domain), esc(l.email),
-      esc(l.niche), esc(displayLeadTitle(l)), esc(l.source),
+      esc(l.niche), esc(displayLeadTitle(l)), esc(displayLeadSource(l)),
       esc(l.confidence), esc(l.qualityScore),
       esc(l.status), esc(l.sourceUrl),
-      esc(l.notes), esc(new Date(l.savedAt).toLocaleDateString()),
+      esc(sanitizeLeadNotes(l.notes)), esc(new Date(l.savedAt).toLocaleDateString()),
     ].join(","));
     // UTF-8 BOM makes Excel open the file correctly without garbled characters
     const bom = "﻿";
@@ -310,7 +323,7 @@ export default function SavedLeadsPage() {
                     {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
                   </div>
                   <div className="pt-3 border-t border-border/50">
-                    <NotesEditor leadId={lead.id} initialNotes={lead.notes}
+                    <NotesEditor leadId={lead.id} initialNotes={sanitizeLeadNotes(lead.notes)}
                       onSave={notes => setLeads(prev => prev.map(l => l.id===lead.id ? {...l,notes} : l))} />
                   </div>
                 </div>
