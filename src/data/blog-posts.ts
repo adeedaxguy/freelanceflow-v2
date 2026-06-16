@@ -102,7 +102,7 @@ export const STATIC_POSTS: BlogPost[] = [
     published: true,
     coverImage: null,
     readTime: 9,
-    createdAt: new Date("2026-06-16"),
-    updatedAt: new Date("2026-06-16"),
+    createdAt: new Date("2026-06-16T12:19:21Z"),
+    updatedAt: new Date("2026-06-16T12:19:21Z"),
   }
 ];
