@@ -114,36 +114,32 @@ The GA4 tag `G-WRSW1WG2DY` is hardcoded in `src/app/layout.tsx` — this is inte
 
 **This is the most important thing to understand.**
 
-The GitHub repo (`freelanceflow-v2`) is the source, but it is **NOT** directly connected to Vercel for auto-deploys. There is no CI/CD pipeline.
+The GitHub repo (`freelanceflow-v2`) is connected directly to the Vercel project `freelanceflow-v2`.
 
-Deployments happen via a shell script:
+```text
+push to main on GitHub -> Vercel production build -> icloseleads.com
+```
+
+### Production deploy flow
+
+1. Make changes in this GitHub repo.
+2. Commit and push to `main`.
+3. Vercel automatically builds and deploys the latest `main` commit to https://icloseleads.com.
+4. Verify the live site after the Vercel deployment finishes.
+
+### Legacy deploy script
+
+The old local deploy script still exists:
 
 ```bash
 bash ~/Documents/Claude/Projects/icloseleads/deploy-limits.sh
 ```
 
-### What deploy-limits.sh does
+Treat it as a legacy fallback only. Do not rely on it for normal production deploys.
 
-1. Copies specific files from two local workspace repos into a **deploy destination directory**
-2. Commits changes to a local git repo in the deploy destination
-3. Runs `vercel --prod` from the deploy destination directory
+### Important historical context
 
-### Why two source repos?
-
-Some features were built in a separate workspace (`main-project/`) and merged at deploy time:
-
-| Source | Files |
-|---|---|
-| `freelanceflow-v2/src/` | Homepage, blog, auth, most components, layout |
-| `main-project/src/` | `leads-aggregator.ts`, `local-leads-engine.ts`, dashboard/local-leads, dashboard/live-jobs, api/leads/search, api/local-leads/search, api/usage |
-
-**Implication for Codex:** If you edit files in GitHub, changes to the above `main-project/` files won't take effect until the deploy script is updated or those files are migrated into `freelanceflow-v2/src/`. For now, treat the GitHub repo as the canonical source for all files EXCEPT those listed above.
-
-### To deploy after making changes
-
-1. Edit files in the GitHub repo (`freelanceflow-v2/src/`)
-2. Commit and push to `main`
-3. The repo owner runs `deploy-limits.sh` locally — it picks up the latest files and deploys to Vercel
+Some older work used a separate local workspace (`main-project/`) and copied selected files into a generated deploy directory. That flow caused GitHub and production to drift. Going forward, keep deployable production code in this repo so GitHub `main` remains the source of truth.
 
 ---
 
