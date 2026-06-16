@@ -8,6 +8,7 @@ import {
   Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer,
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
+import BonusLeadsModal from "@/components/BonusLeadsModal";
 import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
@@ -32,6 +33,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const SEARCH_COOLDOWN_SECS = 30;
 const FORCE_COOLDOWN_SECS  = 180;
 const PAGE_SIZE = 20;
+const SS_REMOTE_KEY = "ff_ss_remote_results";
 
 interface UsageStats { plan: string; limit: number; used: number; remaining: number; nextReset: string; percentage: number; }
 interface SourceDiag { source: string; ok: boolean; fetched: number; kept: number; errorMessage?: string; }
@@ -85,8 +87,8 @@ function exportLeadsCSV(leads: AggregatedLead[], filename = "freelanceflow-leads
     escape(l.email ?? ""),
     escape(l.postedAt),
     escape(l.hoursAgo),
-    escape(l.tags.join(", ")),
-    escape(l.description.slice(0, 300)),
+    escape((l.tags ?? []).join(", ")),
+    escape((l.description ?? "").slice(0, 300)),
     escape(l.url),
   ].join(","));
 
@@ -232,6 +234,8 @@ export default function LeadsPage() {
   const [savedIds,        setSavedIds]       = useState<Set<string>>(new Set());
   const [showFilters,     setShowFilters]    = useState(false);
   const [searched,        setSearched]       = useState(false);
+  const [showBonus,       setShowBonus]      = useState(false);
+  const [bonusLeads,      setBonusLeads]     = useState(0);
   const [page,            setPage]           = useState(1);
   const [activeTab,       setActiveTab]      = useState<"leads" | "contacts">("leads");
   const [diagnostics,     setDiagnostics]    = useState<SearchDiagnostics | null>(null);
@@ -245,6 +249,25 @@ export default function LeadsPage() {
   const [forceCooldown,   setForceCooldown]  = useState(0);
 
   const resultsTopRef = useRef<HTMLDivElement>(null);
+
+  // Restore cached results on mount
+  useEffect(() => {
+    try {
+      // Clear stale lead caches on schema changes
+      if (sessionStorage.getItem("icl_cache_v") !== "4") {
+        sessionStorage.removeItem("ff_ss_live_results");
+        sessionStorage.removeItem("ff_ss_remote_results");
+        sessionStorage.removeItem("ff_ss_local_results");
+        sessionStorage.setItem("icl_cache_v", "4");
+        return;
+      }
+      const cached = sessionStorage.getItem(SS_REMOTE_KEY);
+      if (cached) {
+        const { leads: cl, fetchedAt: ft } = JSON.parse(cached) as { leads: AggregatedLead[]; fetchedAt: string };
+        setLeads(cl); setFetchedAt(ft); setSearched(true);
+      }
+    } catch {}
+  }, []);
 
   // Cooldown tickers
   useEffect(() => {
@@ -272,10 +295,10 @@ export default function LeadsPage() {
     if (keyword.trim()) {
       const kw = keyword.toLowerCase();
       r = r.filter(l =>
-        l.title.toLowerCase().includes(kw) ||
-        l.description.toLowerCase().includes(kw) ||
-        l.company.toLowerCase().includes(kw) ||
-        l.tags.some(t => t.toLowerCase().includes(kw))
+        (l.title ?? "").toLowerCase().includes(kw) ||
+        (l.description ?? "").toLowerCase().includes(kw) ||
+        (l.company ?? "").toLowerCase().includes(kw) ||
+        (l.tags ?? []).some(t => (t ?? "").toLowerCase().includes(kw))
       );
     }
     // Sort
@@ -343,7 +366,7 @@ export default function LeadsPage() {
       const data = await res.json() as SearchResponse;
 
       if (res.status === 429) {
-        setError(`Weekly limit reached. Resets ${data.nextReset ? new Date(data.nextReset).toLocaleDateString() : "next week"}. Upgrade for 500 leads/week.`);
+        setShowBonus(true);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
@@ -353,6 +376,7 @@ export default function LeadsPage() {
       setFetchedAt(data.fetchedAt ?? "");
       setDiagnostics(data.diagnostics ?? null);
       setSelectedSources([]);
+      try { sessionStorage.setItem(SS_REMOTE_KEY, JSON.stringify({ leads: data.leads ?? [], fetchedAt: data.fetchedAt ?? "" })); } catch {}
 
       if (!opts.freshOnly) setSearchCooldown(SEARCH_COOLDOWN_SECS);
       else                 setForceCooldown(FORCE_COOLDOWN_SECS);
@@ -739,7 +763,7 @@ export default function LeadsPage() {
                   const isSaved    = savedIds.has(lead.id);
                   const isSaving   = savingId === lead.id;
                   const isExpanded = expandedIds.has(lead.id);
-                  const descLong   = lead.description.length > 180;
+                  const descLong   = (lead.description ?? "").length > 180;
                   return (
                     <div key={lead.id}
                       className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-5 transition-all duration-200 hover:shadow-card-hover">
@@ -799,9 +823,9 @@ export default function LeadsPage() {
                             )}
                           </div>
 
-                          {lead.tags.length > 0 && (
+                          {(lead.tags ?? []).length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mb-3">
-                              {lead.tags.slice(0, 7).map(tag => (
+                              {(lead.tags ?? []).slice(0, 7).map(tag => (
                                 <span key={tag} className="px-2 py-0.5 rounded-md bg-surface border border-border text-xs text-muted-foreground">
                                   {tag}
                                 </span>
@@ -835,7 +859,7 @@ export default function LeadsPage() {
                             }
                           </button>
                           <Link
-                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company ?? "")}&domain=${encodeURIComponent(lead.domain ?? "")}&title=${encodeURIComponent(lead.title ?? "")}&description=${encodeURIComponent((lead.description ?? "").slice(0, 400))}&url=${encodeURIComponent(lead.url ?? "")}&niche=${encodeURIComponent(lead.niche ?? "")}&email=${encodeURIComponent(lead.email ?? "")}`}
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all shadow-glow-primary/20">
                             <Sparkles className="w-3.5 h-3.5" /> AI Apply
                           </Link>
@@ -989,6 +1013,14 @@ export default function LeadsPage() {
           <p className="text-xs text-muted-foreground mt-3">Scanning 11 sources in parallel</p>
         </div>
       )}
+
+      <BonusLeadsModal
+        isOpen={showBonus}
+        onClose={() => setShowBonus(false)}
+        onBonusClaimed={(newBonus) => { setBonusLeads(newBonus); setShowBonus(false); }}
+        source="remote-leads"
+        currentPlan={usage?.plan ?? "free"}
+      />
     </div>
   );
 }

@@ -19,66 +19,72 @@ const MEGA_FEATURES = [
     category: "Lead Discovery",
     icon: Search,
     color: "text-primary-light",
+    href: "/features/lead-discovery",
     items: [
-      { label: "7-Source Aggregator",   desc: "RemoteOK, Remotive, Reddit + more",     href: "/features#discovery" },
-      { label: "Quality Scoring",       desc: "0–100 AI confidence per lead",          href: "/features#scoring" },
-      { label: "Niche Targeting",       desc: "15+ freelance niches supported",        href: "/features#niches" },
-      { label: "Smart Deduplication",   desc: "Never see the same lead twice",         href: "/features#dedup" },
+      { label: "11-Source Aggregator",  desc: "RemoteOK, Reddit, Himalayas + more",   href: "/features/lead-discovery" },
+      { label: "AI Quality Scoring",    desc: "0–100 confidence score per lead",      href: "/features/lead-discovery#scoring" },
+      { label: "Niche Targeting",       desc: "15+ freelance niches supported",       href: "/features/lead-discovery#niches" },
+      { label: "Smart Deduplication",   desc: "Never see the same lead twice",        href: "/features/lead-discovery#dedup" },
     ],
   },
   {
     category: "CRM Pipeline",
     icon: Layers,
     color: "text-accent",
+    href: "/features/crm-pipeline",
     items: [
-      { label: "6-Stage Pipeline",      desc: "New → Contacted → Won → Lost",         href: "/features#crm" },
-      { label: "Lead Notes",            desc: "Private notes per opportunity",         href: "/features#notes" },
-      { label: "Status Tracking",       desc: "Move leads with one click",             href: "/features#status" },
-      { label: "CSV Export",            desc: "Export your pipeline anytime",          href: "/features#export" },
+      { label: "6-Stage Pipeline",      desc: "New → Contacted → Won → Lost",        href: "/features/crm-pipeline" },
+      { label: "Lead Notes",            desc: "Private notes per opportunity",        href: "/features/crm-pipeline#notes" },
+      { label: "Status Tracking",       desc: "Move leads with one click",            href: "/features/crm-pipeline#status" },
+      { label: "CSV Export",            desc: "Export your pipeline anytime",         href: "/features/crm-pipeline#export" },
     ],
   },
   {
     category: "AI Proposal Engine",
     icon: Sparkles,
     color: "text-gold",
+    href: "/features/ai-proposals",
     items: [
-      { label: "Groq-Powered AI",       desc: "llama-3.3-70b for human-like copy",    href: "/features#ai" },
-      { label: "Niche Personalisation", desc: "Tailored to every job posting",        href: "/features#personalization" },
-      { label: "Custom Templates",      desc: "Save & reuse winning formats",         href: "/features#templates" },
-      { label: "Follow-Up Writer",      desc: "AI-crafted follow-up sequences",       href: "/features#followup" },
+      { label: "Groq-Powered AI",       desc: "llama-3.3-70b for human-like copy",   href: "/features/ai-proposals" },
+      { label: "Niche Personalisation", desc: "Tailored to every job posting",       href: "/features/ai-proposals#personalisation" },
+      { label: "Custom Templates",      desc: "Save & reuse winning formats",        href: "/features/ai-proposals#templates" },
+      { label: "Follow-Up Writer",      desc: "AI-crafted follow-up sequences",      href: "/features/ai-proposals#followup" },
     ],
   },
   {
     category: "Outreach & Email",
     icon: Mail,
     color: "text-blue-400",
+    href: "/features/email-outreach",
     items: [
-      { label: "One-Click Send",        desc: "Send via Resend, logged instantly",    href: "/features#email" },
-      { label: "Campaign Builder",      desc: "Multi-step outreach sequences",        href: "/features#campaigns" },
-      { label: "Sent History",          desc: "Full log of every email sent",         href: "/features#history" },
-      { label: "No Duplicates",         desc: "Prevent repeat outreach automatically", href: "/features#nodup" },
+      { label: "One-Click Send",        desc: "Send via Gmail, logged instantly",    href: "/features/email-outreach" },
+      { label: "Campaign Builder",      desc: "Multi-step outreach sequences",       href: "/features/email-outreach#campaigns" },
+      { label: "Open & Click Tracking", desc: "See who opened, who clicked",         href: "/features/email-outreach#tracking" },
+      { label: "No Duplicates",         desc: "Prevent repeat outreach automatically", href: "/features/email-outreach#dedup" },
     ],
   },
   {
     category: "Analytics",
     icon: BarChart2,
     color: "text-green-400",
+    href: "/features/analytics",
     items: [
-      { label: "Dashboard Overview",   desc: "Leads, proposals, replies at a glance", href: "/features#analytics" },
-      { label: "Source Breakdown",     desc: "Which sources convert best",            href: "/features#sources" },
-      { label: "Pipeline Reports",     desc: "Win rate and conversion tracking",      href: "/features#pipeline" },
-      { label: "Weekly Usage Stats",   desc: "Track your quota and resets",          href: "/features#usage" },
+      { label: "Dashboard Overview",    desc: "Leads, proposals, replies at a glance", href: "/features/analytics" },
+      { label: "Source Breakdown",      desc: "Which sources convert best",           href: "/features/analytics#sources" },
+      { label: "Pipeline Reports",      desc: "Win rate and conversion tracking",     href: "/features/analytics#pipeline" },
+      { label: "Revenue Tracking",      desc: "Monthly revenue won, automatically",  href: "/features/analytics#revenue" },
     ],
   },
   {
-    category: "Platform",
+    category: "Free Tools",
     icon: Shield,
     color: "text-purple-400",
+    href: "/features/free-tools",
     items: [
-      { label: "Free Tools",           desc: "Rate calculator, subject line gen",    href: "/features#tools" },
-      { label: "Blog & Resources",     desc: "Freelance guides and strategies",      href: "/blog" },
-      { label: "Support Chat",         desc: "AI help + human escalation 24/7",     href: "/features#support" },
-      { label: "Mobile Optimised",     desc: "Works beautifully on any device",     href: "/features#mobile" },
+      { label: "Rate Calculator",       desc: "Know exactly what to charge",         href: "/features/free-tools#rate" },
+      { label: "Subject Line Generator",desc: "AI subject lines that get opened",    href: "/features/free-tools#subject" },
+      { label: "Red Flag Detector",     desc: "Spot bad clients before you sign",    href: "/features/free-tools#redflags" },
+      { label: "Blog & Resources",      desc: "Freelance guides and strategies",     href: "/blog" },
     ],
   },
 ];
@@ -93,11 +99,26 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
+  const [bannerH, setBannerH] = useState(44);
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    // Measure the fixed banner height so navbar sits directly below it
+    const measure = () => {
+      const banner = document.getElementById("top-banner");
+      if (banner) setBannerH(banner.getBoundingClientRect().height);
+    };
+    // Small delay to let the banner render fully on first load
+    setTimeout(measure, 50);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > bannerH);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [bannerH]);
 
   // Close menus on outside click
   useEffect(() => {
@@ -116,10 +137,13 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={cn(
-      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-      scrolled ? "bg-surface/80 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
-    )}>
+    <nav
+      style={{ top: scrolled ? 0 : bannerH }}
+      className={cn(
+        "fixed left-0 right-0 z-50 transition-all duration-300",
+        scrolled ? "bg-surface/95 backdrop-blur-xl border-b border-border/50 shadow-lg" : "bg-transparent"
+      )}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -168,10 +192,11 @@ export default function Navbar() {
                         const CatIcon = cat.icon;
                         return (
                           <div key={cat.category} className="space-y-1">
-                            <div className={cn("flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider mb-2", cat.color)}>
+                            <Link href={cat.href} onClick={() => setMegaOpen(false)}
+                              className={cn("flex items-center gap-1.5 px-2 py-1 text-xs font-bold uppercase tracking-wider mb-2 rounded-lg hover:bg-white/5 transition-colors", cat.color)}>
                               <CatIcon className="w-3.5 h-3.5" />
                               {cat.category}
-                            </div>
+                            </Link>
                             {cat.items.map((item) => (
                               <Link key={item.label} href={item.href} onClick={() => setMegaOpen(false)}
                                 className="block px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
@@ -277,47 +302,62 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — full-screen overlay below navbar */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-surface/95 backdrop-blur-xl border-t border-border overflow-hidden">
-            <div className="px-4 py-4 space-y-1">
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            className="md:hidden fixed inset-x-0 bg-[#0d0a1a]/98 backdrop-blur-xl border-t border-border shadow-2xl z-40 overflow-y-auto"
+            style={{ top: bannerH + 64, maxHeight: `calc(100dvh - ${bannerH + 64}px)` }}
+          >
+            <div className="px-5 py-5 space-y-1">
               <Link href="/features" onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
-                <Zap className="w-4 h-4 text-primary-light" /> Features
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 active:bg-white/10 transition-colors">
+                <Zap className="w-5 h-5 text-primary-light flex-shrink-0" /> Features
               </Link>
               {otherLinks.map(l => (
                 <Link key={l.href} href={l.href} onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 active:bg-white/10 transition-colors">
                   {l.label}
                 </Link>
               ))}
-              <div className="pt-2 border-t border-border space-y-2">
+
+              <div className="pt-3 mt-3 border-t border-border/60 space-y-3">
                 {session ? (
                   <>
                     <Link href="/dashboard" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
-                      Dashboard
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-foreground hover:bg-white/5 transition-colors">
+                      <LayoutDashboard className="w-5 h-5 text-muted-foreground" /> Dashboard
                     </Link>
                     <button onClick={() => { setIsOpen(false); void signOut(); }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors">
-                      Sign Out
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/10 transition-colors">
+                      <LogOut className="w-5 h-5" /> Sign Out
                     </button>
                   </>
                 ) : (
                   <>
                     <Link href="/auth" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors">
+                      Sign In
+                    </Link>
                     <Link href="/auth?mode=signup" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
-                      Get Started Free
+                      className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-primary hover:bg-primary-light text-white text-base font-bold transition-colors shadow-glow-primary/50">
+                      <Zap className="w-4 h-4" /> Get Started Free
                     </Link>
                   </>
                 )}
+              </div>
+
+              {/* Quick stats inside mobile menu */}
+              <div className="pt-4 pb-2 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1"><Star className="w-3 h-3 text-gold fill-gold" /> Free Plan</span>
+                <span>•</span>
+                <span>23 live sources</span>
+                <span>•</span>
+                <span>No credit card</span>
               </div>
             </div>
           </motion.div>

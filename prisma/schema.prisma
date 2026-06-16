@@ -31,6 +31,12 @@ model User {
   referralSource   String?
   weeklyLeads      Int       @default(0)
   weeklyLeadReset  DateTime  @default(now())
+  bonusLeads       Int       @default(0)
+  whatsapp         String?
+  marketingConsent Boolean   @default(false)
+  bonusClaimed     String?   // JSON array of claimed bonus types e.g. ["subscribe","share"]
+  referralCode     String?   @unique
+  referredBy       String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -176,6 +182,34 @@ model SupportTicket {
 
   @@index([userId])
   @@index([status])
+}
+
+model BlogComment {
+  id          String   @id @default(cuid())
+  postSlug    String
+  parentId    String?
+  authorName  String
+  authorEmail String
+  content     String
+  approved    Boolean  @default(true)
+  ip          String?
+  createdAt   DateTime @default(now())
+
+  parent      BlogComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     BlogComment[] @relation("Replies")
+
+  @@index([postSlug])
+  @@index([parentId])
+  @@index([approved])
+}
+
+model BlogCommentRateLimit {
+  id        String   @id @default(cuid())
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([ip])
+  @@index([createdAt])
 }
 
 model FollowUp {

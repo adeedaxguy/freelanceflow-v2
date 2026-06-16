@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 
 export const PLAN_LIMITS = {
-  free:   { leadsPerWeek: 20,  proposalsPerMonth: 10,  campaigns: 1 },
-  pro:    { leadsPerWeek: 500, proposalsPerMonth: 999, campaigns: 10 },
-  agency: { leadsPerWeek: 999, proposalsPerMonth: 999, campaigns: 999 },
+  free:   { leadsPerWeek: 20,     proposalsPerMonth: 10,  campaigns: 1 },
+  pro:    { leadsPerWeek: 999999, proposalsPerMonth: 999, campaigns: 10 },
+  agency: { leadsPerWeek: 999999, proposalsPerMonth: 999, campaigns: 999 },
 } as const;
 
 export type Plan = keyof typeof PLAN_LIMITS;
@@ -14,12 +14,13 @@ export async function checkAndIncrementLeads(
 ): Promise<{ allowed: boolean; remaining: number; plan: string }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true },
+    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
   });
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
 
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const limit = PLAN_LIMITS[plan].leadsPerWeek;
+  const baseLimit = PLAN_LIMITS[plan].leadsPerWeek;
+  const limit = baseLimit >= 999999 ? baseLimit : baseLimit + (user.bonusLeads ?? 0);
 
   // Reset weekly counter if 7+ days have passed
   const now = new Date();
@@ -33,6 +34,10 @@ export async function checkAndIncrementLeads(
       where: { id: userId },
       data: { weeklyLeads: 0, weeklyLeadReset: now },
     });
+  }
+
+  if (limit >= 999999) {
+    return { allowed: true, remaining: 99999, plan };
   }
 
   const remaining = Math.max(0, limit - currentCount);
@@ -50,24 +55,27 @@ export async function checkAndIncrementLeads(
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true },
+    select: { plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
   });
   if (!user) return null;
 
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
-  const limit = PLAN_LIMITS[plan].leadsPerWeek;
+  const baseLimit = PLAN_LIMITS[plan].leadsPerWeek;
+  const limit = baseLimit >= 999999 ? baseLimit : baseLimit + (user.bonusLeads ?? 0);
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
   const daysSinceReset = (now.getTime() - resetDate.getTime()) / 86_400_000;
   const weeklyLeads = daysSinceReset >= 7 ? 0 : user.weeklyLeads;
   const nextReset = new Date(resetDate.getTime() + 7 * 86_400_000);
 
+  const isUnlimited = limit >= 999999;
   return {
     plan,
-    limit,
+    limit: isUnlimited ? 99999 : limit,
     used: weeklyLeads,
-    remaining: Math.max(0, limit - weeklyLeads),
+    remaining: isUnlimited ? 99999 : Math.max(0, limit - weeklyLeads),
     nextReset: nextReset.toISOString(),
-    percentage: Math.round((weeklyLeads / limit) * 100),
+    percentage: isUnlimited ? 0 : Math.round((weeklyLeads / limit) * 100),
+    unlimited: isUnlimited,
   };
 }

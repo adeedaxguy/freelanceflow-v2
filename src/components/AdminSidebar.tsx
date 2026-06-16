@@ -5,18 +5,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard, Users, Mail, Search, BookOpen,
-  Settings, MessageSquare, Zap, ChevronRight, BarChart2
+  Settings, MessageSquare, Zap, ChevronRight, BarChart2, Gift
 } from "lucide-react";
 
 const adminLinks = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard, exact: true },
-  { label: "Users", href: "/admin/users", icon: Users },
-  { label: "All Emails", href: "/admin/emails", icon: Mail },
-  { label: "All Leads", href: "/admin/leads", icon: Search },
-  { label: "Blog CMS", href: "/admin/blog", icon: BookOpen },
-  { label: "Contacts", href: "/admin/contacts", icon: MessageSquare },
-  { label: "Analytics", href: "/admin/analytics", icon: BarChart2 },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Dashboard",   href: "/admin",              icon: LayoutDashboard, exact: true },
+  { label: "Users",       href: "/admin/users",         icon: Users },
+  { label: "Marketing",   href: "/admin/marketing",     icon: Gift },
+  { label: "All Emails",  href: "/admin/emails",        icon: Mail },
+  { label: "All Leads",   href: "/admin/leads",         icon: Search },
+  { label: "Blog CMS",    href: "/admin/blog",          icon: BookOpen },
+  { label: "Contacts",    href: "/admin/contacts",      icon: MessageSquare },
+  { label: "Analytics",   href: "/admin/analytics",     icon: BarChart2 },
+  { label: "Settings",    href: "/admin/settings",      icon: Settings },
 ];
 
 export default function AdminSidebar() {

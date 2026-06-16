@@ -1,26 +1,86 @@
-import type { MetadataRoute } from "next";
-import { STATIC_POSTS } from "@/data/blog-posts";
+import { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://freelanceflow.io";
+const BASE_URL = "https://icloseleads.com";
+
+// Programmatic landing pages — /for/[industry]
+const INDUSTRY_PAGES = [
+  "web-designers",
+  "marketing-agencies",
+  "freelance-copywriters",
+  "seo-consultants",
+  "graphic-designers",
+  "video-editors",
+  "social-media-managers",
+  "wordpress-developers",
+  "shopify-experts",
+  "virtual-assistants",
+  "mobile-app-developers",
+  "data-scientists",
+];
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/features`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.5 },
-    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+    // Core marketing — highest priority
+    { url: BASE_URL,                                    lastModified: now, changeFrequency: "weekly",  priority: 1.0 },
+    { url: `${BASE_URL}/pricing`,                       lastModified: now, changeFrequency: "weekly",  priority: 0.95 },
+    { url: `${BASE_URL}/features`,                      lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+
+    // Feature pages — excellent for long-tail SEO
+    { url: `${BASE_URL}/features/lead-discovery`,       lastModified: now, changeFrequency: "monthly", priority: 0.88 },
+    { url: `${BASE_URL}/features/ai-proposals`,         lastModified: now, changeFrequency: "monthly", priority: 0.88 },
+    { url: `${BASE_URL}/features/crm-pipeline`,         lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE_URL}/features/email-outreach`,       lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+    { url: `${BASE_URL}/features/analytics`,            lastModified: now, changeFrequency: "monthly", priority: 0.82 },
+    { url: `${BASE_URL}/features/free-tools`,           lastModified: now, changeFrequency: "monthly", priority: 0.82 },
+
+    // Free tools — great organic entry points
+    { url: `${BASE_URL}/tools/lead-calculator`,         lastModified: now, changeFrequency: "monthly", priority: 0.85 },
+
+    // Blog hub
+    { url: `${BASE_URL}/blog`,                          lastModified: now, changeFrequency: "daily",   priority: 0.85 },
+
+    // Company
+    { url: `${BASE_URL}/about`,                         lastModified: now, changeFrequency: "monthly", priority: 0.75 },
+    { url: `${BASE_URL}/contact`,                       lastModified: now, changeFrequency: "monthly", priority: 0.65 },
+    { url: `${BASE_URL}/help`,                          lastModified: now, changeFrequency: "weekly",  priority: 0.65 },
+    { url: `${BASE_URL}/changelog`,                     lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
+    { url: `${BASE_URL}/careers`,                       lastModified: now, changeFrequency: "weekly",  priority: 0.6 },
+    { url: `${BASE_URL}/affiliate`,                     lastModified: now, changeFrequency: "monthly", priority: 0.65 },
+    { url: `${BASE_URL}/status`,                        lastModified: now, changeFrequency: "hourly",  priority: 0.5 },
+    { url: `${BASE_URL}/press`,                         lastModified: now, changeFrequency: "monthly", priority: 0.55 },
+
+    // Legal
+    { url: `${BASE_URL}/privacy`,                       lastModified: now, changeFrequency: "yearly",  priority: 0.4 },
+    { url: `${BASE_URL}/terms`,                         lastModified: now, changeFrequency: "yearly",  priority: 0.4 },
+    { url: `${BASE_URL}/cookie-policy`,                 lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
   ];
 
-  const blogPages: MetadataRoute.Sitemap = STATIC_POSTS.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.updatedAt,
+  // /for/[industry] programmatic pages — great for niche SEO
+  const industryPages: MetadataRoute.Sitemap = INDUSTRY_PAGES.map(slug => ({
+    url: `${BASE_URL}/for/${slug}`,
+    lastModified: now,
     changeFrequency: "monthly" as const,
-    priority: 0.7,
+    priority: 0.87,
   }));
 
-  return [...staticPages, ...blogPages];
+  // Dynamic blog posts from DB
+  let blogEntries: MetadataRoute.Sitemap = [];
+  try {
+    const posts = await prisma.blogPost.findMany({
+      where: { published: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    blogEntries = posts.map(post => ({
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
+  } catch { /* blog table may not exist yet */ }
+
+  return [...staticPages, ...industryPages, ...blogEntries];
 }

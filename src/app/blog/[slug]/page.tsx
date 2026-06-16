@@ -6,6 +6,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
+import BlogComments from "@/components/BlogComments";
 import { formatDate } from "@/lib/utils";
 import { STATIC_POSTS } from "@/data/blog-posts";
 
@@ -292,23 +293,38 @@ interface BlogPostPageProps {
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = STATIC_POSTS.find((p) => p.slug === params.slug);
-  if (!post) return { title: "Post Not Found" };
-
-  return {
-    title: post.title,
-    description: post.excerpt ?? undefined,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt ?? undefined,
-      type: "article",
-      publishedTime: post.createdAt.toISOString(),
-    },
-  };
+  const staticPost = STATIC_POSTS.find((p) => p.slug === params.slug);
+  if (staticPost) {
+    return {
+      title: staticPost.title,
+      description: staticPost.excerpt ?? undefined,
+      openGraph: { title: staticPost.title, description: staticPost.excerpt ?? undefined, type: "article", publishedTime: staticPost.createdAt.toISOString() },
+    };
+  }
+  // Try DB
+  try {
+    const { prisma } = await import("@/lib/prisma");
+    const dbPost = await prisma.blogPost.findUnique({ where: { slug: params.slug } });
+    if (dbPost) {
+      return {
+        title: dbPost.title,
+        description: dbPost.excerpt ?? undefined,
+        openGraph: { title: dbPost.title, description: dbPost.excerpt ?? undefined, type: "article", publishedTime: dbPost.createdAt.toISOString() },
+      };
+    }
+  } catch {}
+  return { title: "Post Not Found" };
 }
 
 export function generateStaticParams() {
   return STATIC_POSTS.map((post) => ({ slug: post.slug }));
+}
+
+function inlineFormat(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`(.*?)`/g, '<code class="bg-white/10 px-1 rounded text-sm font-mono">$1</code>');
 }
 
 function renderContent(content: string): ReactNode {
@@ -318,78 +334,134 @@ function renderContent(content: string): ReactNode {
 
   while (i < lines.length) {
     const line = lines[i] ?? "";
-    if (line.startsWith("## ")) {
+
+    if (line.startsWith("#### ")) {
+      elements.push(<h4 key={i} className="text-lg font-bold text-foreground mt-6 mb-2">{line.slice(5)}</h4>);
+    } else if (line.startsWith("### ")) {
+      elements.push(<h3 key={i} className="text-xl font-bold text-foreground mt-8 mb-3">{line.slice(4)}</h3>);
+    } else if (line.startsWith("## ")) {
       elements.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(3)}</h2>);
-    } else if (line.startsWith("**") && line.endsWith("**")) {
-      elements.push(<p key={i} className="font-semibold text-foreground mb-2">{line.slice(2, -2)}</p>);
+    } else if (line.startsWith("# ")) {
+      elements.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(2)}</h2>);
+    } else if (line.startsWith("> ")) {
+      elements.push(
+        <blockquote key={i} className="border-l-4 border-primary/40 pl-5 py-1 my-4 italic text-muted-foreground bg-white/5 rounded-r-lg">
+          <span dangerouslySetInnerHTML={{ __html: inlineFormat(line.slice(2)) }} />
+        </blockquote>
+      );
     } else if (line.startsWith("- ")) {
       const items: string[] = [];
       while (i < lines.length && (lines[i] ?? "").startsWith("- ")) {
         items.push((lines[i] ?? "").slice(2));
         i++;
       }
-      elements.push(<ul key={i} className="list-disc pl-6 space-y-1 mb-4 text-muted-foreground">{items.map((item, j) => <li key={j}>{item}</li>)}</ul>);
+      elements.push(
+        <ul key={i} className="list-disc pl-6 space-y-1.5 mb-4 text-muted-foreground">
+          {items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: inlineFormat(item) }} />)}
+        </ul>
+      );
+      continue;
+    } else if (/^\d+\.\s/.test(line)) {
+      const items: string[] = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i] ?? "")) {
+        items.push((lines[i] ?? "").replace(/^\d+\.\s/, ""));
+        i++;
+      }
+      elements.push(
+        <ol key={i} className="list-decimal pl-6 space-y-1.5 mb-4 text-muted-foreground">
+          {items.map((item, j) => <li key={j} dangerouslySetInnerHTML={{ __html: inlineFormat(item) }} />)}
+        </ol>
+      );
       continue;
     } else if (line.startsWith("---")) {
       elements.push(<hr key={i} className="border-border my-8" />);
     } else if (line.trim() === "") {
-      // skip
+      // skip blank lines
     } else {
-      const bold = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>');
-      elements.push(<p key={i} className="text-muted-foreground leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: bold }} />);
+      elements.push(
+        <p key={i} className="text-muted-foreground leading-relaxed mb-4"
+          dangerouslySetInnerHTML={{ __html: inlineFormat(line) }} />
+      );
     }
     i++;
   }
   return elements;
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = STATIC_POSTS.find((p) => p.slug === params.slug);
-  if (!post) notFound();
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  // 1. Check static posts first
+  const staticPost = STATIC_POSTS.find((p) => p.slug === params.slug);
+  const staticContent = staticPost ? (FULL_POSTS[params.slug] ?? "Full article coming soon.") : null;
 
-  const content = FULL_POSTS[params.slug] ?? "Full article coming soon.";
+  // 2. If not static, fetch from DB
+  let dbPost: { id: string; title: string; slug: string; excerpt: string | null; content: string; category: string; readTime: number; createdAt: Date; published: boolean } | null = null;
+  if (!staticPost) {
+    try {
+      const { prisma } = await import("@/lib/prisma");
+      dbPost = await prisma.blogPost.findUnique({ where: { slug: params.slug, published: true } });
+    } catch {}
+    if (!dbPost) notFound();
+  }
+
+  const post = staticPost ?? dbPost!;
+  // Detect if content is HTML (manually entered) vs markdown (cron-published from blog-queue)
+  const rawContent = staticPost ? (staticContent ?? "") : (dbPost?.content ?? "");
+  const isHtml = !staticPost && rawContent.trimStart().startsWith("<");
   const relatedPosts = STATIC_POSTS.filter((p) => p.slug !== params.slug).slice(0, 3);
 
   return (
     <>
       <Navbar />
-      <main className="pt-16">
-        <article className="max-w-3xl mx-auto px-4 py-24">
+      <main className="pt-[108px]">
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
           {/* Back */}
-          <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm mb-8 transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Back to Blog
+          <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm mb-10 transition-colors group">
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to Blog
           </Link>
 
           {/* Header */}
-          <div className="mb-8">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary-light border border-primary/20 mb-4">
+          <header className="mb-10">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary-light border border-primary/20 mb-5">
               {post.category}
             </span>
-            <h1 className="text-4xl font-extrabold text-foreground leading-tight mb-4">{post.title}</h1>
-            {post.excerpt && <p className="text-muted-foreground text-lg leading-relaxed">{post.excerpt}</p>}
-            <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground leading-tight tracking-tight mb-5">
+              {post.title}
+            </h1>
+            {post.excerpt && (
+              <p className="text-muted-foreground text-lg leading-relaxed mb-5">{post.excerpt}</p>
+            )}
+            <div className="flex items-center gap-4 text-sm text-muted-foreground border-t border-border pt-5">
               <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{formatDate(post.createdAt)}</span>
               <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{post.readTime} min read</span>
             </div>
-          </div>
+          </header>
 
           {/* Content */}
-          <div className="border-t border-border pt-8">
-            {renderContent(content)}
-          </div>
+          {isHtml ? (
+            <div className="blog-content" dangerouslySetInnerHTML={{ __html: rawContent }} />
+          ) : (
+            <div className="blog-content">
+              {renderContent(rawContent)}
+            </div>
+          )}
 
           {/* Author */}
-          <div className="mt-12 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center text-white font-bold flex-shrink-0">FF</div>
+          <div className="mt-14 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center text-white font-bold text-sm flex-shrink-0">iCL</div>
             <div>
-              <div className="text-foreground font-semibold">FreelanceFlow Team</div>
-              <p className="text-muted-foreground text-sm mt-1">We study what works in freelance client acquisition so you don&apos;t have to. Subscribe to get our best insights weekly.</p>
+              <div className="text-foreground font-semibold">iCloseLeads Team</div>
+              <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
+                Helping freelancers build sustainable client pipelines through direct outreach and AI-powered tools.
+              </p>
             </div>
           </div>
+
+          {/* Comments */}
+          <BlogComments slug={post.slug} />
         </article>
 
         {/* Related Posts */}
-        <section className="py-16 bg-surface">
+        <section className="py-16 bg-surface border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-foreground mb-8">Related Articles</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -411,8 +483,10 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
         "headline": post.title,
         "description": post.excerpt,
         "datePublished": post.createdAt.toISOString(),
-        "author": { "@type": "Organization", "name": "FreelanceFlow" },
-        "publisher": { "@type": "Organization", "name": "FreelanceFlow", "url": "https://freelanceflow.io" },
+        "dateModified": post.createdAt.toISOString(),
+        "author": { "@type": "Organization", "name": "iCloseLeads", "url": "https://icloseleads.com" },
+        "publisher": { "@type": "Organization", "name": "iCloseLeads", "logo": { "@type": "ImageObject", "url": "https://icloseleads.com/icon.svg" }, "url": "https://icloseleads.com" },
+        "mainEntityOfPage": { "@type": "WebPage", "@id": `https://icloseleads.com/blog/${post.slug}` },
       }) }} />
     </>
   );

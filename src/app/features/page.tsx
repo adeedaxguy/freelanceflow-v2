@@ -5,9 +5,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "FreelanceFlow Features — AI-Powered Client Outreach for Freelancers",
-  description: "Explore FreelanceFlow's features: Hunter.io lead discovery, GPT-4o proposal generation, automated outreach, analytics, and more.",
-  openGraph: { title: "FreelanceFlow Features", description: "Everything you need to find and close freelance clients." },
+  metadataBase: new URL("https://icloseleads.com"),
+  title: "iCloseLeads Features — AI-Powered Client Acquisition for Freelancers",
+  description: "Explore all iCloseLeads features: 11-source lead discovery, AI proposal generator, 6-stage CRM pipeline, cold email outreach, analytics, and free tools for freelancers.",
+  keywords: ["freelance lead generation tool", "AI proposal generator freelancers", "freelance CRM software", "cold email outreach freelancers", "best tools for freelancers 2025"],
+  openGraph: { title: "iCloseLeads Features", description: "Everything you need to find and close freelance clients." },
+  alternates: { canonical: "https://icloseleads.com/features" },
 };
 
 const features = [

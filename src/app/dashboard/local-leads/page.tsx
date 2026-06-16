@@ -1,0 +1,1398 @@
+"use client";
+
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import {
+  MapPin, Search, Globe, Phone, Star, ExternalLink, Bookmark,
+  CheckCircle, Sparkles, ChevronDown, ChevronUp, AlertCircle,
+  X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
+  Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
+  Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
+  Key, Lock, Unlock, ArrowRight, Filter,
+} from "lucide-react";
+import Link from "next/link";
+import type { LocalLead } from "@/app/api/local-leads/search/route";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const ITEMS_PER_PAGE       = 10;
+const FREE_PLAN_LIMIT      = 100;          // 100 leads per 24 hours
+const LOCAL_LEADS_KEY      = "ff_local_leads_viewed";
+const LOCAL_LEADS_RESET_KEY = "ff_local_leads_reset"; // timestamp of last reset
+const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
+const SS_LOCAL_KEY         = "ff_ss_local_results";
+const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
+
+// 150+ keyword suggestions grouped by category
+const KEYWORD_CATEGORIES: Record<string, string[]> = {
+  "🔧 Trades & Construction": [
+    "plumber","electrician","carpenter","roofer","painter","decorator","tiler",
+    "glazier","plasterer","bricklayer","scaffolder","welder","joiner","fencer",
+    "flooring","damp proofing","insulation","solar panel installer","window fitter",
+    "kitchen fitter","bathroom fitter","loft conversion","extension builder",
+  ],
+  "🏡 Home Services": [
+    "landscaper","gardener","tree surgeon","cleaning service","window cleaner",
+    "carpet cleaner","pressure washing","handyman","locksmith","pest control",
+    "hvac","heating engineer","boiler repair","air conditioning","chimney sweep",
+    "gutter cleaning","ironing service","domestic cleaner","end of tenancy cleaning",
+  ],
+  "🚗 Automotive": [
+    "mechanic","car repair","auto body shop","car wash","car detailing",
+    "tyre fitting","mot centre","van repair","motorcycle repair","windscreen repair",
+    "car dealership","car valeting","breakdown recovery",
+  ],
+  "🏥 Health & Medical": [
+    "dentist","dental clinic","orthodontist","doctor","gp surgery","clinic",
+    "pharmacy","optician","optometrist","physiotherapist","chiropractor","osteopath",
+    "podiatrist","audiologist","private hospital","cosmetic surgeon","dermatologist",
+    "nutritionist","personal trainer","gym","yoga studio","pilates",
+  ],
+  "🐾 Animals": [
+    "vet","veterinarian","animal clinic","pet grooming","dog grooming","dog walker",
+    "pet shop","pet boarding","horse trainer","kennels","cattery",
+  ],
+  "💇 Beauty & Wellness": [
+    "hair salon","hairdresser","barber","nail salon","beauty salon","spa",
+    "massage","waxing","tanning salon","tattoo studio","piercing",
+    "eyebrow threading","eyelash extensions","makeup artist",
+  ],
+  "🍽️ Food & Hospitality": [
+    "restaurant","cafe","coffee shop","bakery","pizza","takeaway","pub","bar",
+    "hotel","bed and breakfast","guest house","catering","food truck",
+    "wedding caterer","butcher","fishmonger","deli","ice cream shop",
+  ],
+  "📚 Education & Childcare": [
+    "nursery","childcare","daycare","primary school","tutoring","music teacher",
+    "driving school","language school","dance school","martial arts","swimming lessons",
+    "art classes","cooking classes","coding school",
+  ],
+  "💼 Professional Services": [
+    "accountant","bookkeeper","tax advisor","solicitor","lawyer","estate agent",
+    "architect","surveyor","financial advisor","insurance broker","mortgage broker",
+    "recruitment agency","hr consultant","business consultant","marketing agency",
+    "graphic design studio","web design agency","it support","printing company",
+  ],
+  "🛍️ Retail & Shops": [
+    "florist","jeweller","tailor","dry cleaner","laundry","shoe repair",
+    "watch repair","electronics repair","phone repair","furniture store",
+    "antique shop","gift shop","toy shop","bookshop","pharmacy","opticians",
+  ],
+  "📸 Creative": [
+    "photographer","videographer","recording studio","art gallery","interior designer",
+    "event planner","wedding photographer","event venue","party supplies",
+  ],
+  "🏗️ Storage & Logistics": [
+    "self storage","removal company","courier","freight","logistics","warehousing",
+  ],
+};
+
+const KEYWORD_SUGGESTIONS = Object.values(KEYWORD_CATEGORIES).flat();
+
+// Worldwide city suggestions grouped by region
+const LOCATION_GROUPS: Record<string, string[]> = {
+  "🇬🇧 United Kingdom": [
+    "London, UK","Manchester, UK","Birmingham, UK","Glasgow, UK","Leeds, UK",
+    "Liverpool, UK","Sheffield, UK","Bristol, UK","Edinburgh, UK","Leicester, UK",
+    "Cardiff, UK","Belfast, UK","Nottingham, UK","Newcastle, UK","Southampton, UK",
+    "Brighton, UK","Oxford, UK","Cambridge, UK","Coventry, UK","Reading, UK",
+  ],
+  "🇺🇸 United States": [
+    "New York, NY","Los Angeles, CA","Chicago, IL","Houston, TX","Phoenix, AZ",
+    "Philadelphia, PA","San Antonio, TX","San Diego, CA","Dallas, TX","San Jose, CA",
+    "Austin, TX","Jacksonville, FL","Fort Worth, TX","Columbus, OH","Charlotte, NC",
+    "Indianapolis, IN","San Francisco, CA","Seattle, WA","Denver, CO","Boston, MA",
+    "Nashville, TN","Las Vegas, NV","Portland, OR","Memphis, TN","Atlanta, GA",
+    "Miami, FL","Minneapolis, MN","Tampa, FL","New Orleans, LA","Tucson, AZ",
+  ],
+  "🇨🇦 Canada": [
+    "Toronto, Canada","Vancouver, Canada","Calgary, Canada","Montreal, Canada",
+    "Edmonton, Canada","Ottawa, Canada","Winnipeg, Canada","Quebec City, Canada",
+    "Hamilton, Canada","Kitchener, Canada","Halifax, Canada","London, Canada",
+    "Victoria, Canada","Saskatoon, Canada","Regina, Canada",
+  ],
+  "🇦🇺 Australia": [
+    "Sydney, Australia","Melbourne, Australia","Brisbane, Australia","Perth, Australia",
+    "Adelaide, Australia","Gold Coast, Australia","Canberra, Australia",
+    "Newcastle, Australia","Wollongong, Australia","Hobart, Australia",
+    "Geelong, Australia","Townsville, Australia","Darwin, Australia",
+  ],
+  "🇳🇿 New Zealand": [
+    "Auckland, New Zealand","Wellington, New Zealand","Christchurch, New Zealand",
+    "Hamilton, New Zealand","Tauranga, New Zealand","Dunedin, New Zealand",
+  ],
+  "🇩🇪 Germany": [
+    "Berlin, Germany","Hamburg, Germany","Munich, Germany","Cologne, Germany",
+    "Frankfurt, Germany","Stuttgart, Germany","Düsseldorf, Germany","Leipzig, Germany",
+    "Dortmund, Germany","Essen, Germany","Bremen, Germany","Dresden, Germany",
+  ],
+  "🇫🇷 France": [
+    "Paris, France","Lyon, France","Marseille, France","Toulouse, France",
+    "Nice, France","Nantes, France","Strasbourg, France","Bordeaux, France",
+    "Montpellier, France","Rennes, France","Lille, France",
+  ],
+  "🇪🇸 Spain": [
+    "Madrid, Spain","Barcelona, Spain","Valencia, Spain","Seville, Spain",
+    "Zaragoza, Spain","Málaga, Spain","Murcia, Spain","Palma, Spain","Bilbao, Spain",
+  ],
+  "🇮🇹 Italy": [
+    "Rome, Italy","Milan, Italy","Naples, Italy","Turin, Italy","Palermo, Italy",
+    "Genoa, Italy","Bologna, Italy","Florence, Italy","Venice, Italy","Bari, Italy",
+  ],
+  "🇳🇱 Netherlands": [
+    "Amsterdam, Netherlands","Rotterdam, Netherlands","The Hague, Netherlands",
+    "Utrecht, Netherlands","Eindhoven, Netherlands","Groningen, Netherlands",
+  ],
+  "🇧🇪 Belgium": [
+    "Brussels, Belgium","Antwerp, Belgium","Ghent, Belgium","Bruges, Belgium","Liège, Belgium",
+  ],
+  "🇵🇱 Poland": [
+    "Warsaw, Poland","Kraków, Poland","Łódź, Poland","Wrocław, Poland","Poznań, Poland",
+    "Gdańsk, Poland","Szczecin, Poland","Katowice, Poland",
+  ],
+  "🇵🇹 Portugal": [
+    "Lisbon, Portugal","Porto, Portugal","Braga, Portugal","Coimbra, Portugal","Funchal, Portugal",
+  ],
+  "🇨🇭 Switzerland": [
+    "Zurich, Switzerland","Geneva, Switzerland","Basel, Switzerland","Bern, Switzerland","Lausanne, Switzerland",
+  ],
+  "🇸🇪 Scandinavia": [
+    "Stockholm, Sweden","Gothenburg, Sweden","Malmö, Sweden",
+    "Oslo, Norway","Bergen, Norway","Trondheim, Norway",
+    "Copenhagen, Denmark","Aarhus, Denmark",
+    "Helsinki, Finland","Tampere, Finland","Espoo, Finland",
+  ],
+  "🇦🇪 Middle East": [
+    "Dubai, UAE","Abu Dhabi, UAE","Sharjah, UAE",
+    "Riyadh, Saudi Arabia","Jeddah, Saudi Arabia",
+    "Doha, Qatar","Kuwait City, Kuwait","Muscat, Oman","Manama, Bahrain",
+  ],
+  "🇿🇦 Africa": [
+    "Cape Town, South Africa","Johannesburg, South Africa","Durban, South Africa","Pretoria, South Africa",
+    "Lagos, Nigeria","Nairobi, Kenya","Accra, Ghana","Cairo, Egypt","Casablanca, Morocco",
+  ],
+  "🇮🇳 India": [
+    "Mumbai, India","Delhi, India","Bangalore, India","Hyderabad, India","Chennai, India",
+    "Kolkata, India","Pune, India","Ahmedabad, India","Jaipur, India","Surat, India",
+  ],
+  "🌏 Asia Pacific": [
+    "Singapore","Tokyo, Japan","Osaka, Japan","Seoul, South Korea","Busan, South Korea",
+    "Hong Kong","Taipei, Taiwan","Bangkok, Thailand","Kuala Lumpur, Malaysia",
+    "Jakarta, Indonesia","Manila, Philippines","Ho Chi Minh City, Vietnam","Hanoi, Vietnam",
+  ],
+  "🌎 Latin America": [
+    "São Paulo, Brazil","Rio de Janeiro, Brazil","Buenos Aires, Argentina",
+    "Santiago, Chile","Bogotá, Colombia","Lima, Peru","Mexico City, Mexico",
+    "Guadalajara, Mexico","Monterrey, Mexico","Caracas, Venezuela",
+  ],
+};
+
+const LOCATION_SUGGESTIONS = Object.values(LOCATION_GROUPS).flat();
+
+// ─── Helper components ────────────────────────────────────────────────────────
+function CopyBtn({ text }: { text: string }) {
+  const [ok, setOk] = useState(false);
+  return (
+    <button
+      onClick={() => void navigator.clipboard.writeText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); })}
+      className="flex items-center gap-1 text-xs text-muted-foreground hover:text-accent transition-colors ml-1"
+    >
+      {ok ? <CheckCircle className="w-3 h-3 text-accent"/> : <Copy className="w-3 h-3"/>}
+      {ok ? "Copied!" : "Copy"}
+    </button>
+  );
+}
+
+function WebsiteBadge({ status, tech, age }: { status: LocalLead["websiteStatus"]; tech?: string; age?: string }) {
+  if (status === "none") return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-semibold">
+      <WifiOff className="w-3 h-3"/> No Website (verified)
+    </span>
+  );
+  if (status === "unknown") return (
+    <span title="Website status not confirmed — OSM data rarely includes website URLs. Verify via Google Maps." className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted/40 text-muted-foreground border border-border font-medium cursor-help">
+      <AlertCircle className="w-3 h-3"/> Website unverified
+    </span>
+  );
+  if (status === "unreachable") return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 font-semibold">
+      <AlertCircle className="w-3 h-3"/> Site Down
+    </span>
+  );
+  if (status === "outdated") return (
+    <span title={tech ?? age ?? ""} className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium cursor-help">
+      <Clock className="w-3 h-3"/> Outdated {tech ? `(${tech.split(" ").slice(0,2).join(" ")})` : age ? `(${age})` : ""}
+    </span>
+  );
+  return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 font-medium">
+      <Wifi className="w-3 h-3"/> Live Website
+    </span>
+  );
+}
+
+function UrgencyBadge({ urgency }: { urgency: LocalLead["urgency"] }) {
+  if (urgency === "high") return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/25 font-bold animate-pulse">
+      <Flame className="w-3 h-3"/> Hot Lead
+    </span>
+  );
+  if (urgency === "medium") return (
+    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">
+      <Activity className="w-3 h-3"/> Warm Lead
+    </span>
+  );
+  return null;
+}
+
+function SourceBadge({ source }: { source: LocalLead["source"] }) {
+  const cfg = {
+    yelp: { label: "Yelp",      cls: "bg-red-500/10 text-red-400 border-red-500/20" },
+    here: { label: "HERE Maps", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+    osm:  { label: "OSM",       cls: "bg-green-500/10 text-green-400 border-green-500/20" },
+    demo: { label: "Preview",   cls: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+  }[source] ?? { label: source, cls: "bg-muted text-muted-foreground border-border" };
+  return (
+    <span className={`text-[10px] px-1.5 py-0.5 rounded-md border font-medium ${cfg.cls}`}>
+      {cfg.label}
+    </span>
+  );
+}
+
+function OpportunityBadge({ type }: { type: LocalLead["opportunityType"] }) {
+  if (type === "no_website")       return <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-medium">New Website</span>;
+  if (type === "outdated_website") return <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">Redesign</span>;
+  if (type === "modernise")        return <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 font-medium">Modernise</span>;
+  return                                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">SEO / Improve</span>;
+}
+
+// ─── Daily limit banner ───────────────────────────────────────────────────────
+function DailyLimitBanner({ resetAt }: { resetAt: Date | null }) {
+  return (
+    <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/8 to-primary/5 p-6 text-center space-y-4">
+      <div className="w-14 h-14 rounded-2xl bg-gold/15 flex items-center justify-center mx-auto">
+        <Clock className="w-7 h-7 text-gold"/>
+      </div>
+      <div>
+        <h3 className="text-foreground font-bold text-lg">You&apos;ve used your 100 free local leads today</h3>
+        <p className="text-muted-foreground text-sm mt-1 max-w-md mx-auto leading-relaxed">
+          Free plan resets every 24 hours.
+          {resetAt && (
+            <> Your next 100 leads unlock at <strong className="text-foreground">{resetAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
+          )}
+        </p>
+      </div>
+      <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold">
+        <span>🚀</span> Pro plan coming soon — unlimited local searches every day
+      </div>
+    </div>
+  );
+}
+
+// ─── Yelp API connector panel ─────────────────────────────────────────────────
+function YelpConnector({ onConnected }: { onConnected: (key: string) => void }) {
+  const [open,    setOpen]    = useState(false);
+  const [apiKey,  setApiKey]  = useState("");
+  const [saving,  setSaving]  = useState(false);
+  const [saved,   setSaved]   = useState(false);
+  const [err,     setErr]     = useState("");
+
+  const handleSave = async () => {
+    if (!apiKey.trim() || apiKey.trim().length < 20) {
+      setErr("Please enter a valid Yelp API key (40+ characters)");
+      return;
+    }
+    setSaving(true); setErr("");
+    try {
+      // Save to localStorage for this session + persist in user settings via API
+      localStorage.setItem(LOCAL_YELP_KEY_KEY, apiKey.trim());
+      const res = await fetch("/api/user/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "yelp_api_key", value: apiKey.trim() }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        onConnected(apiKey.trim());
+        setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
+      } else {
+        // API might not exist — still save to localStorage and pass it
+        onConnected(apiKey.trim());
+        setSaved(true);
+        setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
+      }
+    } catch {
+      // Offline fallback — still use in-memory
+      localStorage.setItem(LOCAL_YELP_KEY_KEY, apiKey.trim());
+      onConnected(apiKey.trim());
+      setSaved(true);
+      setTimeout(() => { setOpen(false); setSaved(false); }, 1200);
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="bg-surface border border-border rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-primary/5 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center flex-shrink-0">
+            <Key className="w-4 h-4 text-red-400"/>
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-foreground">Connect Yelp API for more results</p>
+            <p className="text-xs text-muted-foreground">Free tier: 500 searches/day · Add your API key below</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">
+            Optional
+          </span>
+          {open ? <ChevronUp className="w-4 h-4 text-muted-foreground"/> : <ChevronDown className="w-4 h-4 text-muted-foreground"/>}
+        </div>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Get a free Yelp API key at{" "}
+            <a href="https://www.yelp.com/developers/v3/manage_app" target="_blank" rel="noopener noreferrer"
+              className="text-primary-light hover:underline">
+              yelp.com/developers
+            </a>{" "}
+            — it&apos;s free with 500 searches/day. Once connected, you&apos;ll get ratings, reviews, photos, and phone numbers for every business.
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={apiKey}
+              onChange={e => { setApiKey(e.target.value); setErr(""); }}
+              placeholder="Paste your Yelp API key here…"
+              type="password"
+              className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 transition-all font-mono"
+            />
+            <button
+              onClick={() => void handleSave()}
+              disabled={saving || !apiKey.trim()}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${saved ? "bg-accent/10 text-accent border border-accent/30" : "bg-primary hover:bg-primary-light text-white"} disabled:opacity-50`}
+            >
+              {saved ? <><CheckCircle className="w-3.5 h-3.5"/> Saved!</> : saving ? "Saving…" : <><Unlock className="w-3.5 h-3.5"/> Connect</>}
+            </button>
+          </div>
+          {err && <p className="text-xs text-destructive">{err}</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+function Pagination({ page, total, perPage, onChange }: { page: number; total: number; perPage: number; onChange: (p: number) => void }) {
+  const pages = Math.ceil(total / perPage);
+  if (pages <= 1) return null;
+  return (
+    <div className="flex items-center justify-between pt-2">
+      <p className="text-sm text-muted-foreground">
+        Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
+      </p>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onChange(page - 1)} disabled={page === 1}
+          className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 disabled:opacity-40 transition-all"
+        >
+          <ChevronLeft className="w-4 h-4"/>
+        </button>
+        {Array.from({ length: Math.min(pages, 7) }, (_, i) => {
+          let p = i + 1;
+          // sliding window for large page counts
+          if (pages > 7) {
+            const start = Math.max(1, Math.min(page - 3, pages - 6));
+            p = start + i;
+          }
+          return (
+            <button key={p} onClick={() => onChange(p)}
+              className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${p === page ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
+              {p}
+            </button>
+          );
+        })}
+        <button
+          onClick={() => onChange(page + 1)} disabled={page === pages}
+          className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 disabled:opacity-40 transition-all"
+        >
+          <ChevronRight className="w-4 h-4"/>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Lead Card ────────────────────────────────────────────────────────────────
+function LeadCard({ lead, onSave, isSaved, isSaving }: {
+  lead: LocalLead; onSave: (l: LocalLead) => void; isSaved: boolean; isSaving: boolean;
+}) {
+  const [expanded,    setExpanded]    = useState(false);
+  const [showPitch,   setShowPitch]   = useState(false);
+  const [copiedPitch, setCopiedPitch] = useState(false);
+
+  const fullPitch = [
+    `Subject: ${lead.pitchSubject}`,
+    "",
+    lead.pitchOpener,
+    "",
+    "Here's what I can help with:",
+    ...lead.pitchPoints.map(p => `• ${p}`),
+    "",
+    `Would you be open to a quick 10-minute call to explore what's possible for ${lead.name}?`,
+    "",
+    "Best,",
+    "[Your name]",
+  ].join("\n");
+
+  const borderCls =
+    (lead.websiteStatus === "none" || lead.websiteStatus === "unknown") ? "border-red-500/20 hover:border-red-500/40 shadow-red-500/5" :
+    lead.websiteStatus === "unreachable" ? "border-orange-500/25 hover:border-orange-500/50"             :
+    lead.websiteStatus === "outdated"    ? "border-yellow-500/20 hover:border-yellow-500/40"              :
+    "border-border hover:border-primary/30";
+
+  const scoreCls =
+    lead.score >= 90 ? "text-red-400 font-bold" :
+    lead.score >= 70 ? "text-yellow-400 font-semibold" :
+    "text-muted-foreground";
+
+  const scoreBarCls =
+    lead.score >= 90 ? "bg-red-400" :
+    lead.score >= 70 ? "bg-yellow-400" :
+    lead.score >= 50 ? "bg-primary/60" :
+    "bg-muted-foreground/30";
+
+  const allEmails = [
+    ...(lead.email ? [{ addr: lead.email, type: "verified" as const }] : []),
+    ...(lead.guessedEmails ?? []).filter(e => e !== lead.email).map(e => ({ addr: e, type: "guessed" as const })),
+  ];
+
+  const proposalDomain = lead.website
+    ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
+    : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".com";
+
+  return (
+    <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          {/* Badge row 1 */}
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <WebsiteBadge status={lead.websiteStatus} tech={lead.websiteTech} age={lead.websiteAge}/>
+            <OpportunityBadge type={lead.opportunityType}/>
+            <UrgencyBadge urgency={lead.urgency}/>
+            {lead.rating != null && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 font-medium">
+                <Star className="w-3 h-3 fill-yellow-400"/> {lead.rating.toFixed(1)}
+                {lead.reviewCount != null && <span className="opacity-60 ml-0.5">({lead.reviewCount})</span>}
+              </span>
+            )}
+          </div>
+
+          {/* Badge row 2 */}
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+            {(lead.categoryLabel || lead.category) && (
+              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20 font-medium capitalize">
+                {lead.categoryLabel ?? lead.category}
+              </span>
+            )}
+            <SourceBadge source={lead.source}/>
+            {lead.revenueEst && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-medium">
+                <DollarSign className="w-3 h-3"/> {lead.revenueEst}/mo potential
+              </span>
+            )}
+            <span className={`text-xs ml-auto ${scoreCls}`} title="Priority score (0–100)">
+              Score {lead.score}
+            </span>
+          </div>
+
+          {/* Name */}
+          <h3 className="text-foreground font-bold text-lg mb-2 group-hover:text-primary-light transition-colors">{lead.name}</h3>
+
+          {/* Details */}
+          <div className="space-y-1.5 mb-3">
+            {lead.address && (
+              <p className="text-muted-foreground text-sm flex items-start gap-1.5">
+                <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-primary-light mt-0.5"/> {lead.address}
+              </p>
+            )}
+
+            {/* Phone — prominently displayed */}
+            {lead.phone ? (
+              <div className="flex items-center gap-1.5 text-sm">
+                <Phone className="w-3.5 h-3.5 flex-shrink-0 text-accent"/>
+                <a href={`tel:${lead.phone}`} className="text-accent font-mono font-semibold hover:underline">{lead.phone}</a>
+                <CopyBtn text={lead.phone}/>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground/60 flex items-center gap-1 italic">
+                  <Phone className="w-3 h-3"/> No phone in OSM data —
+                </span>
+                <a
+                  href={`https://www.google.com/search?q=${encodeURIComponent(lead.name + " " + lead.city + " phone number")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary-light hover:underline font-medium flex items-center gap-0.5"
+                >
+                  Find phone <ExternalLink className="w-2.5 h-2.5"/>
+                </a>
+              </div>
+            )}
+
+            {/* Emails */}
+            {allEmails.length > 0 ? allEmails.map(({ addr, type }) => (
+              <div key={addr} className="flex items-center gap-1.5 text-sm">
+                <Mail className={`w-3.5 h-3.5 flex-shrink-0 ${type === "verified" ? "text-primary-light" : "text-muted-foreground"}`}/>
+                <a href={`mailto:${addr}`} className={`hover:underline truncate max-w-xs ${type === "verified" ? "text-primary-light" : "text-muted-foreground"}`}>
+                  {addr}
+                </a>
+                {type === "guessed" && <span className="text-[10px] text-muted-foreground/60 italic">(guessed)</span>}
+                <CopyBtn text={addr}/>
+              </div>
+            )) : null}
+
+            {/* Website */}
+            {lead.website ? (
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Globe className="w-3.5 h-3.5 flex-shrink-0"/>
+                <a href={lead.website} target="_blank" rel="noopener noreferrer"
+                  className="hover:text-primary-light hover:underline truncate max-w-xs">
+                  {lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]}
+                </a>
+                <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-50"/>
+              </div>
+            ) : (
+              <p className="text-sm flex items-center gap-1.5 font-medium">
+                {lead.websiteStatus === "none"
+                  ? <><Globe className="w-3.5 h-3.5 flex-shrink-0 text-red-400/70 shrink-0"/><span className="text-red-400/70">No website confirmed — prime opportunity</span></>
+                  : <><Globe className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground/50 shrink-0"/><span className="text-muted-foreground/60">Website status unverified — check Google Maps</span></>
+                }
+              </p>
+            )}
+
+            {lead.yelpUrl && (
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Star className="w-3.5 h-3.5 flex-shrink-0 text-red-400"/>
+                <a href={lead.yelpUrl} target="_blank" rel="noopener noreferrer"
+                  className="hover:text-red-400 hover:underline text-xs">
+                  View on Yelp
+                </a>
+                <ExternalLink className="w-3 h-3 opacity-50"/>
+              </div>
+            )}
+          </div>
+
+          {/* Score bar */}
+          <div className="mb-3">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className={`h-full rounded-full transition-all ${scoreBarCls}`}
+                style={{ width: `${lead.score}%` }}/>
+            </div>
+          </div>
+
+          {/* Pitch toggle */}
+          <button onClick={() => setExpanded(v => !v)}
+            className="flex items-center gap-2 text-sm font-semibold text-primary-light hover:text-primary transition-colors">
+            <Lightbulb className="w-4 h-4 text-yellow-400"/> What to Pitch
+            {expanded ? <ChevronUp className="w-3.5 h-3.5"/> : <ChevronDown className="w-3.5 h-3.5"/>}
+          </button>
+          {expanded && (
+            <ul className="mt-2.5 space-y-1.5">
+              {lead.pitchPoints.map((pt, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0"/> {pt}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Action column */}
+        <div className="flex flex-col gap-2 flex-shrink-0 w-[120px]">
+          <a href={lead.mapsUrl} target="_blank" rel="noopener noreferrer"
+            title="Search this business on Google Maps to see phone, hours &amp; reviews"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
+            <MapPin className="w-3.5 h-3.5"/> Google Maps
+          </a>
+          <button onClick={() => setShowPitch(v => !v)}
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border transition-all ${showPitch ? "bg-yellow-400/15 border-yellow-400/40 text-yellow-400" : "border-yellow-400/30 text-yellow-400 hover:bg-yellow-400/10"}`}>
+            <Sparkles className="w-3.5 h-3.5"/> {showPitch ? "Hide Pitch" : "Get Pitch"}
+          </button>
+          <button onClick={() => onSave(lead)} disabled={isSaved || isSaving}
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${isSaved ? "bg-accent/10 text-accent border border-accent/30 cursor-default" : "bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20"}`}>
+            {isSaved
+              ? <><CheckCircle className="w-3.5 h-3.5"/> Saved</>
+              : <><Bookmark className="w-3.5 h-3.5"/>{isSaving ? "…" : "Save Lead"}</>
+            }
+          </button>
+          <Link
+            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.name)}&domain=${encodeURIComponent(proposalDomain)}&title=${encodeURIComponent(`Website for ${lead.name}`)}&description=${encodeURIComponent(lead.pitchOpener.slice(0, 400))}&niche=web-development`}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
+            <Sparkles className="w-3.5 h-3.5"/> AI Proposal
+          </Link>
+        </div>
+      </div>
+
+      {/* Full pitch panel */}
+      {showPitch && (
+        <div className="mt-4 pt-4 border-t border-border/50">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary-light"/> Ready-to-Send Cold Pitch
+            </h4>
+            <button
+              onClick={() => { void navigator.clipboard.writeText(fullPitch).then(() => { setCopiedPitch(true); setTimeout(() => setCopiedPitch(false), 2000); }); }}
+              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all font-medium ${copiedPitch ? "bg-accent/10 text-accent border-accent/30" : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"}`}>
+              {copiedPitch ? <><CheckCircle className="w-3 h-3"/> Copied!</> : <><Copy className="w-3 h-3"/> Copy Pitch</>}
+            </button>
+          </div>
+          <div className="bg-surface border border-border rounded-xl p-4 space-y-3 text-sm">
+            <div className="pb-2 border-b border-border">
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Subject Line</span>
+              <p className="text-foreground font-semibold mt-0.5">{lead.pitchSubject}</p>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">{lead.pitchOpener}</p>
+            <div>
+              <p className="text-foreground font-medium mb-1.5">Here&apos;s what I can help with:</p>
+              <ul className="space-y-1">
+                {lead.pitchPoints.map((pt, i) => (
+                  <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                    <span className="text-accent mt-0.5 flex-shrink-0">•</span>{pt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-muted-foreground">
+              Would you be open to a quick 10-minute call to explore what&apos;s possible for <strong className="text-foreground">{lead.name}</strong>?
+            </p>
+            <p className="text-muted-foreground text-xs border-t border-border pt-2">
+              Best,<br/><span className="italic opacity-60">[Your name]</span>
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+export default function LocalLeadsPage() {
+  const [keyword,    setKeyword]    = useState("");
+  const [location,   setLocation]   = useState("");
+  const [filter,     setFilter]     = useState<"all"|"no_website"|"outdated_website"|"has_website">("no_website");
+  const [results,    setResults]    = useState<LocalLead[]>([]);
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState("");
+  const [meta,       setMeta]       = useState<{ source?: string; geocoded?: boolean; cached?: boolean; sources?: string[] } | null>(null);
+  const [savedIds,   setSavedIds]   = useState<Set<string>>(new Set());
+  const [savingId,   setSavingId]   = useState<string | null>(null);
+  const [saveError,  setSaveError]  = useState<string | null>(null);
+  const [showSugg,       setShowSugg]       = useState<"keyword" | "location" | null>(null);
+  const [kwCategory,     setKwCategory]     = useState<string | null>(null);
+  const [locRegion,      setLocRegion]      = useState<string | null>(null);
+  const [page,           setPage]           = useState(1);
+  const [leadsViewed,    setLeadsViewed]    = useState(0);
+  const [userPlan,       setUserPlan]       = useState<string>("free");
+  const [yelpKey,        setYelpKey]        = useState("");
+  const [fsqKey,         setFsqKey]         = useState("");
+  // Extra filters
+  const [hasPhone,       setHasPhone]       = useState(false);
+  const [minRating,      setMinRating]      = useState(0);
+  const [showFilters,    setShowFilters]    = useState(false);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Load persisted state from localStorage — with 24hr auto-reset
+  useEffect(() => {
+    const resetTs  = parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0", 10);
+    const now      = Date.now();
+    const elapsed  = now - resetTs;
+    if (elapsed >= 24 * 60 * 60 * 1000 || resetTs === 0) {
+      // 24 hours passed — reset counter
+      localStorage.setItem(LOCAL_LEADS_KEY,       "0");
+      localStorage.setItem(LOCAL_LEADS_RESET_KEY, String(now));
+      setLeadsViewed(0);
+    } else {
+      const viewed = parseInt(localStorage.getItem(LOCAL_LEADS_KEY) ?? "0", 10);
+      setLeadsViewed(isNaN(viewed) ? 0 : viewed);
+    }
+    setYelpKey(localStorage.getItem(LOCAL_YELP_KEY_KEY) ?? "");
+    setFsqKey(localStorage.getItem(LOCAL_FSQ_KEY_KEY)   ?? "");
+    // Restore cached results so they persist when switching tabs
+    try {
+      const cached = sessionStorage.getItem(SS_LOCAL_KEY);
+      if (cached) {
+        const { results: cr, keyword: kw, location: loc } = JSON.parse(cached) as { results: LocalLead[]; keyword: string; location: string };
+        setResults(cr); setKeyword(kw); setLocation(loc);
+      }
+    } catch {}
+    // Fetch user plan to bypass limits for paid plans
+    fetch("/api/usage").then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.plan) setUserPlan(d.plan);
+    }).catch(() => {});
+  }, []);
+
+  // Reset time for display
+  const resetAt = (() => {
+    if (typeof window === "undefined") return null;
+    const resetTs = parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0", 10);
+    return resetTs ? new Date(resetTs + 24 * 60 * 60 * 1000) : null;
+  })();
+
+  const isPaidPlan  = userPlan === "pro" || userPlan === "agency";
+  const isOverLimit = !isPaidPlan && leadsViewed >= FREE_PLAN_LIMIT;
+  const remaining   = isPaidPlan ? 99999 : Math.max(0, FREE_PLAN_LIMIT - leadsViewed);
+
+  const doSearch = useCallback(async () => {
+    if (!keyword.trim() || !location.trim() || isOverLimit) return;
+    setLoading(true); setError(""); setPage(1); setShowSugg(null);
+    try {
+      const body: Record<string, unknown> = {
+        keyword: keyword.trim(), location: location.trim(), filter,
+      };
+      if (yelpKey) body.yelpKey = yelpKey;
+      if (fsqKey)  body.foursquareKey = fsqKey;
+
+      const res = await fetch("/api/local-leads/search", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json() as {
+        results?: LocalLead[]; source?: string; sources?: string[];
+        total?: number; geocoded?: boolean; cached?: boolean; error?: string;
+      };
+      if (!res.ok) { setError(data.error ?? "Search failed"); return; }
+      if (!data.geocoded) {
+        setError(`Could not find "${location}" — try a city name like "Chicago, IL" or "Sydney, Australia".`);
+        return;
+      }
+      const newResults = data.results ?? [];
+      setResults(newResults);
+      setMeta({ source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources });
+      try { sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify({ results: newResults, keyword: keyword.trim(), location: location.trim() })); } catch {}
+
+      // Track leads viewed for daily limit
+      const newCount = leadsViewed + newResults.length;
+      setLeadsViewed(newCount);
+      localStorage.setItem(LOCAL_LEADS_KEY, String(newCount));
+      // Set reset timestamp on first search of the day
+      if (!localStorage.getItem(LOCAL_LEADS_RESET_KEY) || parseInt(localStorage.getItem(LOCAL_LEADS_RESET_KEY) ?? "0") === 0) {
+        localStorage.setItem(LOCAL_LEADS_RESET_KEY, String(Date.now()));
+      }
+
+      // Scroll results into view
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+    } catch { setError("Network error. Please try again."); }
+    finally { setLoading(false); }
+  }, [keyword, location, filter, isOverLimit, leadsViewed, yelpKey, fsqKey]);
+
+  const handleSave = async (lead: LocalLead) => {
+    if (savedIds.has(lead.id)) return;
+    setSavingId(lead.id); setSaveError(null);
+    try {
+      const domain = lead.website
+        ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
+        : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".local";
+      const res = await fetch("/api/leads/save", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company:     lead.name,
+          domain,
+          email:       lead.email ?? (lead.guessedEmails?.[0] ?? null),
+          phone:       lead.phone ?? null,
+          niche:       lead.categoryLabel ?? lead.category ?? "local business",
+          title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${lead.websiteStatus === "none" ? "No website" : lead.websiteStatus === "outdated" ? "Outdated site" : "Has website"})`,
+          description: lead.pitchOpener,
+          sourceUrl:   lead.mapsUrl ?? null,
+          source:      `local_business_${lead.source}`,
+          isManual:    true,
+          notes: [
+            `Address: ${lead.address}`,
+            `Phone: ${lead.phone ?? "None"}`,
+            `Website: ${lead.website ?? "None"} (${lead.websiteStatus}${lead.websiteTech ? ` — ${lead.websiteTech}` : ""}${lead.websiteAge ? ` — ${lead.websiteAge}` : ""})`,
+            lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
+            lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
+            lead.guessedEmails?.length ? `Guessed Emails: ${lead.guessedEmails.join(", ")}` : null,
+            `Data Source: ${lead.source.toUpperCase()}`,
+            `Priority Score: ${lead.score}/100 (${lead.urgency} urgency)`,
+            "",
+            "Pitch Points:",
+            ...lead.pitchPoints.map(p => `• ${p}`),
+          ].filter(Boolean).join("\n"),
+        }),
+      });
+      if (res.ok) setSavedIds(p => new Set([...p, lead.id]));
+      else {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        setSaveError(d.error ?? "Save failed");
+      }
+    } catch { setSaveError("Network error"); }
+    finally { setSavingId(null); }
+  };
+
+  // Apply all client-side filters: website status + phone + rating
+  const filteredResults = results.filter(r => {
+    // Website status filter (the main Show: selector)
+    // "No Website" shows confirmed none + unverified (OSM unknown) — both worth pitching
+    if (filter === "no_website"       && r.websiteStatus !== "none" && r.websiteStatus !== "unknown") return false;
+    if (filter === "outdated_website" && r.websiteStatus !== "outdated" && r.websiteStatus !== "unreachable") return false;
+    if (filter === "has_website"      && (!r.website || r.websiteStatus === "none" || r.websiteStatus === "unknown")) return false;
+    // Extra filters
+    if (hasPhone  && !r.phone)                    return false;
+    if (minRating && (r.rating ?? 0) < minRating) return false;
+    return true;
+  });
+  const pagedResults  = filteredResults.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  // Counts from ALL results so the badges always show the full breakdown
+  const noWebsite     = results.filter(r => r.websiteStatus === "none" || r.websiteStatus === "unknown").length;
+  const outdated      = results.filter(r => r.websiteStatus === "outdated" || r.websiteStatus === "unreachable").length;
+  const hotLeads      = filteredResults.filter(r => r.urgency === "high").length;
+  const withPhone     = filteredResults.filter(r => !!r.phone).length;
+  const filtersActive = hasPhone || minRating > 0 || filter !== "all";
+  const hasDemo       = meta?.sources?.includes("demo");
+  const hasYelp      = meta?.sources?.includes("yelp");
+  const hasFsq       = meta?.sources?.includes("foursquare");
+
+  const sourceLabelMap: Record<string, string> = {
+    yelp:            "Yelp",
+    here:            "HERE Maps",
+    foursquare:      "Foursquare",
+    tomtom:          "TomTom",
+    geoapify:        "Geoapify",
+    radar:           "Radar",
+    bing:            "Bing Local",
+    "companies-house": "Companies House",
+    sirene:          "SIRENE (FR)",
+    abn:             "ABN (AU)",
+    opencorporates:  "OpenCorporates",
+    osm:             "OpenStreetMap",
+    photon:          "Photon/OSM",
+    nominatim:       "Nominatim/OSM",
+    demo:            "Preview Data",
+  };
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <div className="flex flex-col xl:flex-row gap-6 items-start">
+      {/* ── Main column ────────────────────────────────── */}
+      <div className="flex-1 min-w-0 space-y-6">
+
+      {/* Header */}
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2.5 flex-wrap">
+          <div className="w-9 h-9 rounded-xl bg-gradient-hero flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-white"/>
+          </div>
+          Local Business Leads
+          <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-semibold">FREE · LIVE DATA</span>
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1.5 max-w-2xl leading-relaxed">
+          Find local businesses with no website or outdated sites — real-time data from OpenStreetMap
+          with optional Yelp integration for ratings, reviews, and phone numbers.
+        </p>
+      </div>
+
+      {/* Daily usage bar — free plan only */}
+      {!isOverLimit && !isPaidPlan && (
+        <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-xs font-semibold text-foreground">Daily free leads</p>
+              <p className="text-xs text-muted-foreground">{leadsViewed} / {FREE_PLAN_LIMIT} today · resets in 24h</p>
+            </div>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${leadsViewed / FREE_PLAN_LIMIT > 0.8 ? "bg-red-400" : leadsViewed / FREE_PLAN_LIMIT > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
+                style={{ width: `${Math.min(100, (leadsViewed / FREE_PLAN_LIMIT) * 100)}%` }}
+              />
+            </div>
+          </div>
+          <span className="flex-shrink-0 text-xs text-primary-light font-medium">🚀 Pro coming soon</span>
+        </div>
+      )}
+
+      {/* Daily limit hit */}
+      {isOverLimit && <DailyLimitBanner resetAt={resetAt} />}
+
+      {!isOverLimit && (
+        <>
+          {/* How it works */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { icon: BarChart2,  color: "text-primary-light", bg: "bg-primary/10",    title: "Multi-Source Data",   desc: "Pulls from OpenStreetMap — global coverage, thousands of real businesses. Connect Yelp for even more." },
+              { icon: Wifi,       color: "text-accent",        bg: "bg-accent/10",     title: "Live Website Check",  desc: "Every site is validated in real-time for status, tech stack, and age — know exactly what to pitch." },
+              { icon: TrendingUp, color: "text-yellow-400",    bg: "bg-yellow-500/10", title: "Revenue Estimates",   desc: "See the monthly revenue potential for each opportunity — prioritise leads worth the most to you." },
+            ].map(({ icon: Icon, color, bg, title, desc }) => (
+              <div key={title} className="bg-surface border border-border rounded-xl p-4 flex gap-3">
+                <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
+                  <Icon className={`w-4 h-4 ${color}`}/>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* API Connectors */}
+          <YelpConnector onConnected={(k) => { setYelpKey(k); }} />
+
+          {/* Search form */}
+          <div className="bg-surface border border-border rounded-2xl p-5 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Keyword with grouped category dropdown */}
+              <div className="relative">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Business Type</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
+                  <input value={keyword} onChange={e => { setKeyword(e.target.value); setKwCategory(null); }}
+                    onFocus={() => setShowSugg("keyword")} onBlur={() => setTimeout(() => setShowSugg(null), 300)}
+                    onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
+                    placeholder="e.g. plumber, dentist, bakery…"
+                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                </div>
+                {showSugg === "keyword" && (
+                  <div onMouseDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
+                    {keyword === "" && !kwCategory ? (
+                      /* Show category browser when nothing typed */
+                      <>
+                        <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Browse by Category</p>
+                        {Object.keys(KEYWORD_CATEGORIES).map(cat => (
+                          <button key={cat} onMouseDown={(e) => { e.preventDefault(); setKwCategory(cat); }}
+                            className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center justify-between">
+                            {cat}
+                            <ChevronDown className="w-3 h-3 text-muted-foreground -rotate-90"/>
+                          </button>
+                        ))}
+                      </>
+                    ) : kwCategory && keyword === "" ? (
+                      /* Show items in selected category */
+                      <>
+                        <button onMouseDown={(e) => { e.preventDefault(); setKwCategory(null); }}
+                          className="w-full text-left px-3 py-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 border-b border-border">
+                          <ChevronDown className="w-3 h-3 rotate-90"/> Back
+                        </button>
+                        <p className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{kwCategory}</p>
+                        {KEYWORD_CATEGORIES[kwCategory]!.map(s => (
+                          <button key={s} onMouseDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); setKwCategory(null); }}
+                            className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 capitalize transition-colors">
+                            {s}
+                          </button>
+                        ))}
+                      </>
+                    ) : (
+                      /* Filtered search results */
+                      KEYWORD_SUGGESTIONS.filter(s => s.toLowerCase().includes(keyword.toLowerCase())).slice(0, 30).map(s => (
+                        <button key={s} onMouseDown={(e) => { e.preventDefault(); setKeyword(s); setShowSugg(null); }}
+                          className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 capitalize transition-colors">
+                          {s}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Location with grouped region dropdown */}
+              <div className="relative">
+                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">City / Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
+                  <input value={location} onChange={e => { setLocation(e.target.value); setLocRegion(null); }}
+                    onFocus={() => setShowSugg("location")} onBlur={() => setTimeout(() => setShowSugg(null), 300)}
+                    onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
+                    placeholder="e.g. Manchester, UK or Dubai, UAE"
+                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                </div>
+                {showSugg === "location" && (
+                  <div onMouseDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
+                    {location === "" && !locRegion ? (
+                      /* Show region browser */
+                      <>
+                        <p className="px-3 pt-2.5 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Browse by Region</p>
+                        {Object.keys(LOCATION_GROUPS).map(region => (
+                          <button key={region} onMouseDown={(e) => { e.preventDefault(); setLocRegion(region); }}
+                            className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors flex items-center justify-between">
+                            {region}
+                            <ChevronDown className="w-3 h-3 text-muted-foreground -rotate-90"/>
+                          </button>
+                        ))}
+                      </>
+                    ) : locRegion && location === "" ? (
+                      /* Show cities in region */
+                      <>
+                        <button onMouseDown={(e) => { e.preventDefault(); setLocRegion(null); }}
+                          className="w-full text-left px-3 py-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 border-b border-border">
+                          <ChevronDown className="w-3 h-3 rotate-90"/> Back
+                        </button>
+                        <p className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{locRegion}</p>
+                        {LOCATION_GROUPS[locRegion]!.map(s => (
+                          <button key={s} onMouseDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); setLocRegion(null); }}
+                            className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors">
+                            {s}
+                          </button>
+                        ))}
+                      </>
+                    ) : (
+                      /* Filtered search */
+                      LOCATION_SUGGESTIONS.filter(s => s.toLowerCase().includes(location.toLowerCase())).slice(0, 30).map(s => (
+                        <button key={s} onMouseDown={(e) => { e.preventDefault(); setLocation(s); setShowSugg(null); }}
+                          className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-primary/5 transition-colors">
+                          {s}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Website status filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-semibold text-muted-foreground hidden sm:block">Show:</span>
+              {([
+                { v: "no_website",       l: "No/Unknown Website", i: WifiOff,   c: "text-red-400" },
+                { v: "outdated_website", l: "Outdated Site",      i: Clock,     c: "text-yellow-400" },
+                { v: "has_website",      l: "Has Website",        i: Wifi,      c: "text-green-400" },
+                { v: "all",              l: "All",                i: Building2, c: "text-muted-foreground" },
+              ] as const).map(({ v, l, i: Icon, c }) => (
+                <button key={v} onClick={() => setFilter(v)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filter === v ? "bg-primary/15 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30"}`}>
+                  <Icon className={`w-3.5 h-3.5 ${filter === v ? "text-primary-light" : c}`}/>{l}
+                </button>
+              ))}
+              <span title="Website data comes from OpenStreetMap which rarely stores website URLs. 'No/Unknown Website' includes both confirmed no-website (Yelp/HERE) and unverified (OSM). Always confirm via Google Maps before pitching." className="flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors">
+                <Info className="w-3.5 h-3.5"/>
+              </span>
+            </div>
+
+            {/* Extra filters row */}
+            <div className="flex items-center gap-2 flex-wrap border-t border-border/50 pt-3">
+              {/* Has phone toggle */}
+              <button
+                onClick={() => { setHasPhone(v => !v); setPage(1); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${hasPhone ? "bg-accent/15 border-accent/40 text-accent" : "border-border text-muted-foreground hover:border-accent/30"}`}>
+                <Phone className="w-3.5 h-3.5"/> Has Phone
+              </button>
+
+              {/* Min rating */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Min rating:</span>
+                {[0, 3, 3.5, 4, 4.5].map(r => (
+                  <button key={r} onClick={() => { setMinRating(r); setPage(1); }}
+                    className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all ${minRating === r ? "bg-yellow-500/15 border-yellow-500/40 text-yellow-400" : "border-border text-muted-foreground hover:border-yellow-500/30"}`}>
+                    {r === 0 ? "Any" : `${r}★`}
+                  </button>
+                ))}
+              </div>
+
+              {/* Clear extra filters */}
+              {(hasPhone || minRating > 0 || filter !== "all") && (
+                <button onClick={() => { setHasPhone(false); setMinRating(0); setFilter("all"); setPage(1); }}
+                  className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-3 h-3"/> Clear filters
+                </button>
+              )}
+
+              {/* Search button */}
+              <button onClick={() => void doSearch()} disabled={loading || !keyword.trim() || !location.trim()}
+                className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-glow-primary/20">
+                {loading
+                  ? <><RefreshCw className="w-4 h-4 animate-spin"/> Searching…</>
+                  : <><Search className="w-4 h-4"/> Find Businesses</>
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Errors */}
+          {(error || saveError) && (
+            <div className="flex items-center gap-3 text-destructive bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
+              <AlertCircle className="w-4 h-4 flex-shrink-0"/>
+              <p className="text-sm">{error || saveError}</p>
+              <button onClick={() => { setError(""); setSaveError(null); }} className="ml-auto text-destructive/60 hover:text-destructive">
+                <X className="w-4 h-4"/>
+              </button>
+            </div>
+          )}
+
+          {/* Results section */}
+          <div ref={resultsRef}>
+            {/* OSM-only info banner (no system API paths exposed) */}
+            {!hasDemo && !loading && results.length > 0 && !hasYelp && (
+              <div className="flex items-start gap-3 bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 mb-4">
+                <Info className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <span className="text-foreground font-semibold">OpenStreetMap data</span>
+                  {" "}— {filteredResults.length} businesses found. Connect your Yelp API key above for deeper coverage with ratings, reviews, and phone numbers.
+                </p>
+              </div>
+            )}
+
+            {/* Results header */}
+            {results.length > 0 && !loading && (
+              <div className="flex items-center gap-3 flex-wrap text-sm mb-4">
+                <span className="text-foreground font-bold">{filteredResults.length} businesses found</span>
+                {/* Show "X total, Y after filters" context when filters reduce count */}
+                {filtersActive && filteredResults.length !== results.length && (
+                  <span className="text-muted-foreground text-xs">
+                    ({results.length} total · filtered to {filteredResults.length})
+                  </span>
+                )}
+                {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no website</span>}
+                {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated/down</span>}
+                {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
+                <div className="ml-auto flex items-center gap-2 flex-wrap">
+                  {(meta?.sources ?? []).filter(s => s !== "demo").map(s => (
+                    <span key={s} className="text-xs bg-surface text-muted-foreground px-2 py-0.5 rounded-full border border-border">
+                      {sourceLabelMap[s] ?? s}
+                    </span>
+                  ))}
+                  {meta?.cached && (
+                    <span className="flex items-center gap-1 text-xs bg-surface text-muted-foreground px-2 py-0.5 rounded-full border border-border">
+                      <Clock className="w-3 h-3"/> Cached (24hr)
+                    </span>
+                  )}
+                  {meta?.source === "live" && !hasDemo && (
+                    <span className="flex items-center gap-1 text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full border border-accent/20 font-medium">
+                      <Zap className="w-3 h-3"/> Live data
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Loading overlay — keep old results visible underneath */}
+            {loading && (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+                  <MapPin className="w-7 h-7 text-primary-light"/>
+                </div>
+                <p className="text-foreground font-semibold">Searching for local leads…</p>
+                <p className="text-muted-foreground text-sm">Finding {keyword} businesses in {location}</p>
+              </div>
+            )}
+
+            {/* Filters reduced results to zero — show clear message */}
+            {!loading && results.length > 0 && filteredResults.length === 0 && filtersActive && (
+              <div className="text-center py-10 border border-dashed border-border rounded-2xl space-y-3">
+                <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto border border-yellow-500/20">
+                  <Filter className="w-6 h-6 text-yellow-400"/>
+                </div>
+                <div>
+                  <p className="text-foreground font-semibold">No results match your filters</p>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    {results.length} businesses found, but none match
+                    {filter === "no_website" ? " the No Website filter — all businesses in this area have a website listed" : ""}
+                    {filter === "outdated_website" ? " the Outdated Site filter — no outdated/unreachable sites detected in this area" : ""}
+                    {filter === "has_website" ? " the Has Website filter — none of these businesses have a website on record" : ""}
+                    {hasPhone ? `${filter !== "all" ? " and" : ""} the Has Phone filter` : ""}
+                    {minRating > 0 ? `${(filter !== "all" || hasPhone) ? " and" : ""} the ${minRating}★ minimum rating` : ""}.
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    {filter === "no_website" || filter === "outdated_website"
+                      ? "Try a different area or keyword — website data varies by location."
+                      : "Connect Yelp or Foursquare for richer data including ratings and phone numbers."}
+                  </p>
+                </div>
+                <button onClick={() => { setHasPhone(false); setMinRating(0); setFilter("all"); setPage(1); }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all">
+                  <X className="w-3.5 h-3.5"/> Clear filters to see {results.length} results
+                </button>
+              </div>
+            )}
+
+            {/* Result cards (paginated) */}
+            {!loading && pagedResults.length > 0 && (
+              <div className="space-y-4">
+                {pagedResults.map(lead => (
+                  <LeadCard key={lead.id} lead={lead} onSave={handleSave}
+                    isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}/>
+                ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {!loading && filteredResults.length > ITEMS_PER_PAGE && (
+              <div className="mt-6">
+                <Pagination
+                  page={page}
+                  total={filteredResults.length}
+                  perPage={ITEMS_PER_PAGE}
+                  onChange={(p) => {
+                    setPage(p);
+                    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Empty state — never searched */}
+            {!loading && !error && results.length === 0 && !meta && (
+              <div className="text-center py-20 border border-dashed border-border rounded-2xl space-y-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-hero/10 flex items-center justify-center mx-auto border border-primary/20">
+                  <MapPin className="w-10 h-10 text-primary-light"/>
+                </div>
+                <div>
+                  <h3 className="text-foreground font-bold text-lg">Find your next local client</h3>
+                  <p className="text-muted-foreground max-w-sm mx-auto text-sm mt-1.5 leading-relaxed">
+                    Search by trade type and city to discover real businesses that need a website or digital upgrade —
+                    with their phone number, guessed email, and a ready-to-send pitch.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">Popular searches</p>
+                  <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto">
+                    {[["plumber","Chicago, IL"],["electrician","Los Angeles, CA"],["dentist","Sydney, Australia"],["mechanic","Toronto, Canada"],["bakery","London, UK"]].map(([k, l]) => (
+                      <button key={k} onClick={() => { setKeyword(k ?? ""); setLocation(l ?? ""); }}
+                        className="px-3 py-1.5 rounded-lg border border-border text-xs text-muted-foreground hover:border-primary/40 hover:text-primary-light transition-all">
+                        {k} in {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state — searched but nothing found */}
+            {!loading && !error && results.length === 0 && meta && (
+              <div className="text-center py-16 border border-dashed border-border rounded-2xl space-y-4">
+                <div className="w-16 h-16 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto border border-yellow-500/20">
+                  <MapPin className="w-8 h-8 text-yellow-400"/>
+                </div>
+                <div>
+                  <h3 className="text-foreground font-bold text-lg">No businesses found for this search</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto text-sm mt-1.5 leading-relaxed">
+                    Try a different city, broaden your search term, or connect Yelp for much deeper coverage.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
+                  <button onClick={() => void doSearch()}
+                    className="px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:border-primary/40 hover:text-primary-light transition-all">
+                    Try again
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+      </div>{/* end main column */}
+
+      {/* ── Right sidebar ──────────────────────────────── */}
+      <aside className="xl:w-72 w-full flex-shrink-0 space-y-4 xl:sticky xl:top-6">
+
+        {/* Search Stats */}
+        <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart2 className="w-4 h-4 text-primary-light" />
+            <h3 className="text-sm font-bold text-foreground">Search Stats</h3>
+          </div>
+          {results.length > 0 ? (
+            <div className="space-y-2.5">
+              {[
+                { label: "Total found",    value: results.length,                                                          color: "text-foreground" },
+                { label: "No website",     value: noWebsite,                                                               color: "text-red-400" },
+                { label: "Outdated sites", value: outdated,                                                                color: "text-yellow-400" },
+                { label: "With phone",     value: withPhone,                                                               color: "text-accent" },
+                { label: "Hot leads",      value: results.filter(r => r.urgency === "high").length,                        color: "text-orange-400" },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{label}</span>
+                  <span className={`font-bold ${color}`}>{value}</span>
+                </div>
+              ))}
+              {!isPaidPlan && (
+                <div className="pt-2 mt-1 border-t border-border/60">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
+                    <span>Daily usage</span>
+                    <span>{leadsViewed} / {FREE_PLAN_LIMIT}</span>
+                  </div>
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${leadsViewed / FREE_PLAN_LIMIT > 0.8 ? "bg-red-400" : leadsViewed / FREE_PLAN_LIMIT > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
+                      style={{ width: `${Math.min(100, (leadsViewed / FREE_PLAN_LIMIT) * 100)}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-xs">Search a location to see stats</p>
+          )}
+        </div>
+
+        {/* Data Sources */}
+        <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe className="w-4 h-4 text-accent" />
+            <h3 className="text-sm font-bold text-foreground">Data Sources</h3>
+          </div>
+          <div className="space-y-2">
+            {[
+              { name: "OpenStreetMap", status: "active",  note: "Addresses & POIs" },
+              { name: "Yelp",          status: yelpKey ? "active" : "connect", note: yelpKey ? "Ratings & phones ✓" : "Connect for ratings" },
+              { name: "Foursquare",    status: fsqKey  ? "active" : "connect", note: fsqKey  ? "Places data ✓"     : "Connect for places" },
+              { name: "TomTom",        status: "active",  note: "Business search" },
+              { name: "Geoapify",      status: "active",  note: "Geocoding & POIs" },
+            ].map(({ name, status, note }) => (
+              <div key={name} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-1.5 h-1.5 rounded-full ${status === "active" ? "bg-accent" : "bg-muted-foreground/40"}`} />
+                  <span className="text-foreground">{name}</span>
+                </div>
+                <span className={`${status === "connect" ? "text-primary-light" : "text-muted-foreground"}`}>{note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pro Tips */}
+        <div className="bg-surface border border-border rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-gold" />
+            <h3 className="text-sm font-bold text-foreground">Pro Tips</h3>
+          </div>
+          <ul className="space-y-2.5">
+            {[
+              "Filter 'No Website' to find the best web design opportunities.",
+              "Connect Yelp to get phone numbers and ratings on results.",
+              "Use Google Maps link to verify website status before pitching.",
+              "Try different keyword synonyms — 'electrician' vs 'electrical contractor'.",
+              "Search smaller towns for less competition and easier wins.",
+            ].map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                <ArrowRight className="w-3 h-3 text-primary-light flex-shrink-0 mt-0.5" />
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Plan status */}
+        {isPaidPlan ? (
+          <div className="bg-gradient-to-br from-accent/10 to-primary/5 border border-accent/20 rounded-2xl p-4 text-center">
+            <div className="text-lg mb-1">✦</div>
+            <h3 className="text-sm font-bold text-foreground mb-1 capitalize">{userPlan} Plan Active</h3>
+            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, all sources active, no daily limits.</p>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
+              ✓ Unlimited local leads
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 text-center">
+            <div className="text-lg mb-1">🚀</div>
+            <h3 className="text-sm font-bold text-foreground mb-1">Pro Plan Coming Soon</h3>
+            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, Yelp built-in, phone enrichment, priority support.</p>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
+              ✦ You&apos;re on free early access
+            </div>
+          </div>
+        )}
+
+      </aside>
+      </div>{/* end flex row */}
+    </div>
+  );
+}

@@ -1,15 +1,20 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://freelanceflow.io";
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/dashboard/", "/admin/", "/auth/"],
+        disallow: [
+          "/api/",
+          "/dashboard/",
+          "/admin/",
+          "/auth/",
+        ],
       },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: "https://icloseleads.com/sitemap.xml",
+    host: "https://icloseleads.com",
   };
 }

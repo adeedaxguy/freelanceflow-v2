@@ -35,6 +35,9 @@ export async function POST(req: NextRequest) {
 
   const { name, email, password, expertise, referralSource } = parsed.data;
 
+  // Extract referral code from referralSource if it starts with "ref:"
+  const refCode = referralSource?.startsWith("ref:") ? referralSource.slice(4) : null;
+
   try {
     // Explicit select on findUnique — prevents crash if DB columns are not yet migrated
     const existing = await prisma.user.findUnique({
@@ -57,11 +60,20 @@ export async function POST(req: NextRequest) {
         password:       hashed,
         expertise:      JSON.stringify(expertise),
         referralSource: referralSource || null,
+        referredBy:     refCode || null,
         plan:           "free",
         role:           "USER",
       },
       select: { id: true, email: true, name: true },
     });
+
+    // Credit referrer with 300 bonus leads
+    if (refCode) {
+      await prisma.user.updateMany({
+        where: { referralCode: refCode },
+        data:  { bonusLeads: { increment: 300 } },
+      }).catch(() => {}); // silent fail — referral code may not exist
+    }
 
     return NextResponse.json({ user }, { status: 201 });
 
