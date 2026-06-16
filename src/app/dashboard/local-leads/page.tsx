@@ -19,6 +19,7 @@ const ITEMS_PER_PAGE       = 10;
 const FREE_PLAN_LIMIT      = 100;          // 100 leads per 24 hours
 const LOCAL_LEADS_KEY      = "ff_local_leads_viewed";
 const LOCAL_LEADS_RESET_KEY = "ff_local_leads_reset"; // timestamp of last reset
+const LOCAL_LEADS_LIMIT_KEY = "ff_local_leads_daily_limit";
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
@@ -593,8 +594,10 @@ export default function LocalLeadsPage() {
   const [locRegion,      setLocRegion]      = useState<string | null>(null);
   const [page,           setPage]           = useState(1);
   const [leadsViewed,    setLeadsViewed]    = useState(0);
+  const [dailyLimit,     setDailyLimit]     = useState(FREE_PLAN_LIMIT);
   const [userPlan,       setUserPlan]       = useState<string>("free");
   const [showBonus,      setShowBonus]      = useState(false);
+  const [limitNotice,    setLimitNotice]    = useState("");
   const [yelpKey,        setYelpKey]        = useState("");
   const [fsqKey,         setFsqKey]         = useState("");
   // Extra filters
@@ -605,6 +608,7 @@ export default function LocalLeadsPage() {
   const usageScope = session?.user?.email ?? "";
   const localLeadsKey = usageScope ? `${LOCAL_LEADS_KEY}:${usageScope}` : LOCAL_LEADS_KEY;
   const localLeadsResetKey = usageScope ? `${LOCAL_LEADS_RESET_KEY}:${usageScope}` : LOCAL_LEADS_RESET_KEY;
+  const localLeadsLimitKey = usageScope ? `${LOCAL_LEADS_LIMIT_KEY}:${usageScope}` : LOCAL_LEADS_LIMIT_KEY;
 
   // Load persisted state from localStorage — with 24hr auto-reset
   useEffect(() => {
@@ -625,10 +629,14 @@ export default function LocalLeadsPage() {
       // 24 hours passed — reset counter
       localStorage.setItem(localLeadsKey,       "0");
       localStorage.setItem(localLeadsResetKey, String(now));
+      localStorage.setItem(localLeadsLimitKey, String(FREE_PLAN_LIMIT));
       setLeadsViewed(0);
+      setDailyLimit(FREE_PLAN_LIMIT);
     } else {
       const viewed = parseInt(localStorage.getItem(localLeadsKey) ?? "0", 10);
+      const storedLimit = parseInt(localStorage.getItem(localLeadsLimitKey) ?? String(FREE_PLAN_LIMIT), 10);
       setLeadsViewed(isNaN(viewed) ? 0 : viewed);
+      setDailyLimit(Number.isFinite(storedLimit) && storedLimit >= FREE_PLAN_LIMIT ? storedLimit : FREE_PLAN_LIMIT);
     }
     setYelpKey(localStorage.getItem(LOCAL_YELP_KEY_KEY) ?? "");
     setFsqKey(localStorage.getItem(LOCAL_FSQ_KEY_KEY)   ?? "");
@@ -644,7 +652,7 @@ export default function LocalLeadsPage() {
     fetch("/api/usage").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.plan) setUserPlan(d.plan);
     }).catch(() => {});
-  }, [sessionStatus, localLeadsKey, localLeadsResetKey]);
+  }, [sessionStatus, localLeadsKey, localLeadsResetKey, localLeadsLimitKey]);
 
   // Reset time for display
   const resetAt = (() => {
@@ -654,12 +662,11 @@ export default function LocalLeadsPage() {
   })();
 
   const isPaidPlan  = userPlan === "pro" || userPlan === "agency";
-  const isOverLimit = !isPaidPlan && leadsViewed >= FREE_PLAN_LIMIT;
-  const remaining   = isPaidPlan ? 99999 : Math.max(0, FREE_PLAN_LIMIT - leadsViewed);
+  const isOverLimit = !isPaidPlan && leadsViewed >= dailyLimit;
 
   const doSearch = useCallback(async () => {
     if (!keyword.trim() || !location.trim() || isOverLimit) return;
-    setLoading(true); setError(""); setPage(1); setShowSugg(null);
+    setLoading(true); setError(""); setLimitNotice(""); setPage(1); setShowSugg(null);
     try {
       const body: Record<string, unknown> = {
         keyword: keyword.trim(), location: location.trim(), filter,
@@ -683,13 +690,20 @@ export default function LocalLeadsPage() {
         setError(`Could not find "${location}" — try a city name like "Chicago, IL" or "Sydney, Australia".`);
         return;
       }
-      const newResults = data.results ?? [];
+      const rawResults = data.results ?? [];
+      const allowedCount = isPaidPlan ? rawResults.length : Math.max(0, dailyLimit - leadsViewed);
+      const newResults = isPaidPlan ? rawResults : rawResults.slice(0, allowedCount);
+      if (!isPaidPlan && rawResults.length > newResults.length) {
+        setLimitNotice(
+          `Showing the first ${newResults.length} businesses available in your free daily allowance. Claim bonus leads to keep searching.`
+        );
+      }
       setResults(newResults);
       setMeta({ source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources });
       try { sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify({ results: newResults, keyword: keyword.trim(), location: location.trim() })); } catch {}
 
       // Track leads viewed for daily limit
-      const newCount = leadsViewed + newResults.length;
+      const newCount = isPaidPlan ? leadsViewed : Math.min(dailyLimit, leadsViewed + newResults.length);
       setLeadsViewed(newCount);
       localStorage.setItem(localLeadsKey, String(newCount));
       // Set reset timestamp on first search of the day
@@ -701,7 +715,7 @@ export default function LocalLeadsPage() {
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, isOverLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
+  }, [keyword, location, filter, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -795,12 +809,12 @@ export default function LocalLeadsPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-xs font-semibold text-foreground">Daily free leads</p>
-              <p className="text-xs text-muted-foreground">{leadsViewed} / {FREE_PLAN_LIMIT} today · resets in 24h</p>
+              <p className="text-xs text-muted-foreground">{leadsViewed} / {dailyLimit} today · resets in 24h</p>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${leadsViewed / FREE_PLAN_LIMIT > 0.8 ? "bg-red-400" : leadsViewed / FREE_PLAN_LIMIT > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
-                style={{ width: `${Math.min(100, (leadsViewed / FREE_PLAN_LIMIT) * 100)}%` }}
+                className={`h-full rounded-full transition-all ${leadsViewed / dailyLimit > 0.8 ? "bg-red-400" : leadsViewed / dailyLimit > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
+                style={{ width: `${Math.min(100, (leadsViewed / dailyLimit) * 100)}%` }}
               />
             </div>
           </div>
@@ -811,7 +825,7 @@ export default function LocalLeadsPage() {
       {/* Daily limit hit */}
       {isOverLimit && (
         <div className="bg-surface border border-border rounded-2xl p-6 text-center">
-          <p className="text-foreground font-semibold mb-2">You've used your {FREE_PLAN_LIMIT} free local leads today</p>
+          <p className="text-foreground font-semibold mb-2">You've used your {dailyLimit} free local leads today</p>
           <p className="text-muted-foreground text-sm mb-4">Unlock +300 more leads instantly — free.</p>
           <button onClick={() => setShowBonus(true)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
@@ -820,7 +834,7 @@ export default function LocalLeadsPage() {
         </div>
       )}
 
-      {!isOverLimit && (
+      {(!isOverLimit || results.length > 0 || loading || error || saveError) && (
         <>
           {/* How it works */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1001,7 +1015,7 @@ export default function LocalLeadsPage() {
               )}
 
               {/* Search button */}
-              <button onClick={() => void doSearch()} disabled={loading || !keyword.trim() || !location.trim()}
+              <button onClick={() => void doSearch()} disabled={loading || !keyword.trim() || !location.trim() || isOverLimit}
                 className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-glow-primary/20">
                 {loading
                   ? <><RefreshCw className="w-4 h-4 animate-spin"/> Searching…</>
@@ -1019,6 +1033,13 @@ export default function LocalLeadsPage() {
               <button onClick={() => { setError(""); setSaveError(null); }} className="ml-auto text-destructive/60 hover:text-destructive">
                 <X className="w-4 h-4"/>
               </button>
+            </div>
+          )}
+
+          {limitNotice && !loading && (
+            <div className="flex items-center gap-3 text-primary-light bg-primary/10 border border-primary/20 rounded-xl px-4 py-3">
+              <Info className="w-4 h-4 flex-shrink-0"/>
+              <p className="text-sm">{limitNotice}</p>
             </div>
           )}
 
@@ -1206,11 +1227,11 @@ export default function LocalLeadsPage() {
                 <div className="pt-2 mt-1 border-t border-border/60">
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
                     <span>Daily usage</span>
-                    <span>{leadsViewed} / {FREE_PLAN_LIMIT}</span>
+                    <span>{leadsViewed} / {dailyLimit}</span>
                   </div>
                   <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${leadsViewed / FREE_PLAN_LIMIT > 0.8 ? "bg-red-400" : leadsViewed / FREE_PLAN_LIMIT > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
-                      style={{ width: `${Math.min(100, (leadsViewed / FREE_PLAN_LIMIT) * 100)}%` }} />
+                    <div className={`h-full rounded-full transition-all ${leadsViewed / dailyLimit > 0.8 ? "bg-red-400" : leadsViewed / dailyLimit > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
+                      style={{ width: `${Math.min(100, (leadsViewed / dailyLimit) * 100)}%` }} />
                   </div>
                 </div>
               )}
@@ -1295,11 +1316,11 @@ export default function LocalLeadsPage() {
         isOpen={showBonus}
         onClose={() => setShowBonus(false)}
         onBonusClaimed={(newBonus) => {
-          setLeadsViewed(0); // reset counter after bonus — fresh start
+          const nextLimit = Math.max(dailyLimit, FREE_PLAN_LIMIT + newBonus);
+          setDailyLimit(nextLimit);
           setShowBonus(false);
-          // update localStorage to reflect bonus
           if (typeof window !== "undefined") {
-            localStorage.setItem(localLeadsKey, "0");
+            localStorage.setItem(localLeadsLimitKey, String(nextLimit));
             localStorage.setItem(localLeadsResetKey, String(Date.now()));
           }
         }}

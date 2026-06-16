@@ -18,8 +18,8 @@ const SOURCE_COPY: Record<string, { title: string; body: string; bonus: number }
   },
   "local-leads": {
     title: "Extra Local Business Leads",
-    body: "Free early access is active. Reset your local lead counter and keep finding real businesses to pitch.",
-    bonus: 100,
+    body: "Free early access is active. Add more local lead allowance and keep finding real businesses to pitch.",
+    bonus: 300,
   },
 };
 
