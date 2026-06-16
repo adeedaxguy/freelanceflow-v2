@@ -1315,8 +1315,8 @@ export default function LocalLeadsPage() {
       <BonusLeadsModal
         isOpen={showBonus}
         onClose={() => setShowBonus(false)}
-        onBonusClaimed={(newBonus) => {
-          const nextLimit = Math.max(dailyLimit, FREE_PLAN_LIMIT + newBonus);
+        onBonusClaimed={(newBonus, claim) => {
+          const nextLimit = Math.max(dailyLimit, claim?.localDailyLimit ?? FREE_PLAN_LIMIT + newBonus);
           setDailyLimit(nextLimit);
           setLimitNotice("");
           setShowBonus(false);
