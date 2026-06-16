@@ -231,6 +231,14 @@ function WebsiteBadge({ status, tech, age }: { status: LocalLead["websiteStatus"
   );
 }
 
+function websiteStatusLabel(status: LocalLead["websiteStatus"]) {
+  if (status === "none") return "No website";
+  if (status === "unknown") return "Website unverified";
+  if (status === "outdated") return "Outdated site";
+  if (status === "unreachable") return "Site down";
+  return "Has website";
+}
+
 function UrgencyBadge({ urgency }: { urgency: LocalLead["urgency"] }) {
   if (urgency === "high") return (
     <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 border border-red-500/25 font-bold animate-pulse">
@@ -474,7 +482,17 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
 
   const proposalDomain = lead.website
     ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
-    : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".com";
+    : "";
+  const proposalParams = new URLSearchParams({
+    company: lead.name,
+    title: `Website for ${lead.name}`,
+    description: lead.pitchOpener.slice(0, 400),
+    niche: "web-development",
+    leadType: "local-business",
+  });
+  if (proposalDomain) proposalParams.set("domain", proposalDomain);
+  if (lead.mapsUrl) proposalParams.set("url", lead.mapsUrl);
+  const proposalHref = `/dashboard/proposal/new?${proposalParams.toString()}`;
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
@@ -632,7 +650,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
             }
           </button>
           <Link
-            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.name)}&domain=${encodeURIComponent(proposalDomain)}&title=${encodeURIComponent(`Website for ${lead.name}`)}&description=${encodeURIComponent(lead.pitchOpener.slice(0, 400))}&niche=web-development`}
+            href={proposalHref}
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
             <Sparkles className="w-3.5 h-3.5"/> AI Proposal
           </Link>
@@ -824,7 +842,7 @@ export default function LocalLeadsPage() {
           email:       lead.email ?? (lead.guessedEmails?.[0] ?? null),
           phone:       lead.phone ?? null,
           niche:       lead.categoryLabel ?? lead.category ?? "local business",
-          title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${lead.websiteStatus === "none" ? "No website" : lead.websiteStatus === "outdated" ? "Outdated site" : "Has website"})`,
+          title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${websiteStatusLabel(lead.websiteStatus)})`,
           description: lead.pitchOpener,
           sourceUrl:   lead.mapsUrl ?? null,
           source:      `local_business_${lead.source}`,

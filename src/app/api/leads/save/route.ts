@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import type { Prisma } from "@prisma/client";
 
 export const dynamic = 'force-dynamic';
 
@@ -50,14 +51,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid data", details: parsed.error.flatten() }, { status: 400 });
     }
     const d = parsed.data;
+    const company = d.company.trim();
+    const domain = d.domain.trim().toLowerCase();
+    const phone = d.phone?.trim() || null;
+
+    const duplicateChecks: Prisma.LeadWhereInput[] = [];
+    if (d.sourceUrl) duplicateChecks.push({ sourceUrl: d.sourceUrl });
+    if (d.title) duplicateChecks.push({ company, domain, title: d.title });
+    else duplicateChecks.push({ company, domain });
+    if (phone && d.source?.startsWith("local_business")) duplicateChecks.push({ company, phone });
+
+    const existing = await prisma.lead.findFirst({
+      where: { userId: session.user.id, OR: duplicateChecks },
+      orderBy: { savedAt: "desc" },
+      select: { id: true, company: true, domain: true, status: true, savedAt: true, sourceUrl: true },
+    });
+
+    if (existing) {
+      return NextResponse.json({ lead: existing, duplicate: true }, { status: 200 });
+    }
 
     const lead = await prisma.lead.create({
       data: {
         userId:         session.user.id,
-        company:        d.company,
-        domain:         d.domain,
+        company,
+        domain,
         email:          d.email          ?? null,
-        phone:          d.phone          ?? null,
+        phone,
         confidence:     d.confidence     ?? null,
         qualityScore:   d.qualityScore   ?? null,
         bestMatchScore: d.bestMatchScore ?? null,

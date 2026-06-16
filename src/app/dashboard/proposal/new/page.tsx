@@ -63,8 +63,11 @@ function NewProposalInner() {
   const jobUrl      = params.get("url") ?? "";
   const niche       = params.get("niche") ?? "";
   const emailParam  = params.get("email") ?? "";
+  const leadType    = params.get("leadType") ?? "";
 
   const hasEmail = emailParam.length > 0;
+  const isLocalBusinessLead = leadType === "local-business";
+  const sourcePageLabel = isLocalBusinessLead ? "Business Profile" : "Source Page";
 
   const [subject,    setSubject]    = useState("");
   const [body,       setBody]       = useState("");
@@ -191,7 +194,7 @@ function NewProposalInner() {
     <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 space-y-5 pb-10">
       {/* Header */}
       <div className="flex items-start gap-4">
-        <Link href="/dashboard/leads"
+        <Link href={isLocalBusinessLead ? "/dashboard/local-leads" : "/dashboard/leads"}
           className="mt-1 p-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all flex-shrink-0">
           <ArrowLeft className="w-4 h-4" />
         </Link>
@@ -240,7 +243,7 @@ function NewProposalInner() {
             <div className="flex-1">
               <p className="text-amber-300 font-semibold text-sm mb-1">No email found for this lead</p>
               <p className="text-amber-400/80 text-xs leading-relaxed mb-3">
-                We couldn't find a contact email for {company || "this company"}. You can apply directly on their job listing, or copy your AI-generated proposal to paste into the application form.
+                We couldn't find a contact email for {company || "this company"}. Copy the proposal and use it on the source page, business profile, contact form, or phone outreach.
               </p>
               {jobUrl && (
                 <a
@@ -250,7 +253,7 @@ function NewProposalInner() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-hero text-white font-bold text-sm shadow-glow-primary hover:opacity-90 transition-all"
                 >
                   <Globe className="w-4 h-4" />
-                  Apply on Source Website
+                  Open {sourcePageLabel}
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
@@ -262,7 +265,7 @@ function NewProposalInner() {
       {/* Job brief */}
       {cleanDescription && (
         <div className="bg-surface border border-border rounded-xl p-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Job Brief</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">{isLocalBusinessLead ? "Lead Brief" : "Job Brief"}</p>
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{cleanDescription}</p>
         </div>
       )}
@@ -366,7 +369,7 @@ function NewProposalInner() {
               <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Mail className="w-4 h-4 text-muted-foreground" /> Found an email?
               </h2>
-              <p className="text-xs text-muted-foreground">If you found a contact email on their website, enter it here to prepare a Gmail draft.</p>
+              <p className="text-xs text-muted-foreground">If you found a contact email on their website or business profile, enter it here to prepare a Gmail draft.</p>
               <input
                 type="email"
                 value={toEmail}
@@ -381,7 +384,7 @@ function NewProposalInner() {
           <div className="bg-surface border border-border rounded-2xl p-5 space-y-4">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-primary-light" /> Proposal
-              {!hasEmail && <span className="text-xs text-muted-foreground font-normal">— copy and paste into the application form</span>}
+              {!hasEmail && <span className="text-xs text-muted-foreground font-normal">— copy and use for manual outreach</span>}
             </h2>
 
             <div>
@@ -502,7 +505,7 @@ function NewProposalInner() {
               <a href={jobUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <Globe className="w-4 h-4" />
-                Or apply directly on the source website
+                Or open the {isLocalBusinessLead ? "business profile" : "source page"}
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
