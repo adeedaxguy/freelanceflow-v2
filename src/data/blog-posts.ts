@@ -79,4 +79,17 @@ export const STATIC_POSTS: BlogPost[] = [
     createdAt: new Date("2025-02-25"),
     updatedAt: new Date("2025-02-25"),
   },
+  {
+    id: "7",
+    title: "How SEO Consultants Find Local Clients Using Lead Tools",
+    slug: "how-seo-consultants-find-local-clients",
+    excerpt: "Most SEO consultants waste hours manually hunting for prospects. Here is how to use lead tools to fill your pipeline with qualified local business clients fast.",
+    content: "",
+    category: "Strategy",
+    published: true,
+    coverImage: null,
+    readTime: 8,
+    createdAt: new Date("2026-06-16"),
+    updatedAt: new Date("2026-06-16"),
+  },
 ];
