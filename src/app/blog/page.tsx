@@ -50,7 +50,7 @@ export default async function BlogPage() {
   const allPosts: BlogPost[] = [
     ...dbPosts,
     ...staticOnly,
-  ];
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   return (
     <>
