@@ -91,7 +91,7 @@ export const STATIC_POSTS: BlogPost[] = [
     readTime: 8,
     createdAt: new Date("2026-06-16"),
     updatedAt: new Date("2026-06-16"),
-  },,
+  },
   {
     id: "8",
     title: "How Web Designers Can Find Local Business Clients in 2026",
