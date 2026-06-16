@@ -391,7 +391,7 @@ function renderContent(content: string): ReactNode {
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // 1. Check static posts first
   const staticPost = STATIC_POSTS.find((p) => p.slug === params.slug);
-  const staticContent = staticPost ? (FULL_POSTS[params.slug] ?? "Full article coming soon.") : null;
+  const staticContent = staticPost ? (FULL_POSTS[params.slug] ?? staticPost.content ?? "Full article coming soon.") : null;
 
   // 2. If not static, fetch from DB
   let dbPost: { id: string; title: string; slug: string; excerpt: string | null; content: string; category: string; readTime: number; createdAt: Date; published: boolean } | null = null;
