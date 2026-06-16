@@ -5,7 +5,7 @@ import {
   Settings, Bell, Trash2, Save, AlertTriangle, CheckCircle,
   Brain, Shield, Activity, Lock, Eye, RefreshCw,
   Server, Database, Globe, Cpu, ShieldCheck, Clock, Layers,
-  Plug, Key, ExternalLink, Copy, EyeOff,
+  Plug, Key, ExternalLink, Copy, EyeOff, ChevronDown,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -85,12 +85,12 @@ const INTEGRATIONS = [
     color:    "text-accent",
     bg:       "bg-accent/10",
     border:   "border-accent/20",
-    desc:     "Powers AI proposals, Deal Closer, and follow-ups when you want to use your own model key.",
+    desc:     "Optional. Add your own model key only if you want dedicated proposal generation capacity.",
     settingKey: "groq_api_key",
     placeholder: "gsk_…",
     docsUrl:  "https://console.groq.com/keys",
     docsLabel:"Open model console →",
-    hint:     "Paste a key from your model provider console.",
+    hint:     "iCloseLeads works without this. Paste a key only if you want to use your own quota.",
   },
   {
     id:       "hunter",
@@ -99,12 +99,12 @@ const INTEGRATIONS = [
     color:    "text-primary-light",
     bg:       "bg-primary/10",
     border:   "border-primary/20",
-    desc:     "Finds and verifies contact emails for companies you discover when you want extra enrichment.",
+    desc:     "Optional. Add your own enrichment key only if you want deeper email verification.",
     settingKey: "hunter_api_key",
     placeholder: "hnt_…",
     docsUrl:  "https://hunter.io/api-keys",
     docsLabel:"Get Hunter key →",
-    hint:     "Paste a Hunter account key to use your own enrichment allowance.",
+    hint:     "iCloseLeads works without this. Paste a key only if you want to use your own enrichment allowance.",
   },
 ];
 
@@ -171,7 +171,7 @@ function IntegrationCard({
             <p className={`font-bold text-sm ${integ.color}`}>{integ.label}</p>
             {isConnected
               ? <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/20 font-bold">✓ Connected</span>
-              : <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border font-medium">Not connected</span>
+              : <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20 font-medium">Optional</span>
             }
           </div>
           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{integ.desc}</p>
@@ -209,8 +209,18 @@ function IntegrationCard({
         </div>
       )}
 
-      {/* Input when not connected or editing */}
-      {(!isConnected || editing) && (
+      {!isConnected && !editing && (
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <p className="text-xs text-muted-foreground">No action needed for normal use.</p>
+          <button onClick={() => setEditing(true)}
+            className="px-3 py-2 rounded-xl border border-border text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all">
+            Add key
+          </button>
+        </div>
+      )}
+
+      {/* Input when adding or replacing a key */}
+      {editing && (
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">{integ.hint}</p>
           <div className="flex gap-2">
@@ -247,6 +257,7 @@ export default function SettingsPage() {
   const [deleteOpen,    setDeleteOpen]    = useState(false);
   const [saved,         setSaved]         = useState(false);
   const [savedKeys,     setSavedKeys]     = useState<Record<string, string>>({});
+  const [showAdvancedKeys, setShowAdvancedKeys] = useState(false);
 
   // Load integration keys from localStorage on mount
   useEffect(() => {
@@ -496,42 +507,64 @@ export default function SettingsPage() {
       {/* ── INTEGRATIONS ── */}
       {tab === "integrations" && (
         <div className="space-y-5">
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
-            <Plug className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5" />
+          <div className="bg-accent/10 border border-accent/20 rounded-2xl p-4 sm:p-5 flex items-start gap-3">
+            <CheckCircle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-foreground font-semibold text-sm">Your API Integrations</p>
+              <p className="text-foreground font-semibold text-sm">No setup needed</p>
               <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                Connect optional account keys for AI generation and contact enrichment. Keys are stored encrypted and only used on your account.
+                iCloseLeads works out of the box. Leads, AI proposals, Gmail prepare mode, saved leads, and local business coverage are managed automatically.
               </p>
             </div>
           </div>
 
-          {INTEGRATIONS.map(integ => (
-            <IntegrationCard
-              key={integ.id}
-              integ={integ}
-              savedValue={savedKeys[integ.settingKey] ?? ""}
-              onSaved={handleKeyUpdate}
-            />
-          ))}
-
-          <div className="bg-gradient-card border border-border rounded-2xl p-4 sm:p-5">
-            <h3 className="text-foreground font-semibold text-sm mb-3 flex items-center gap-2">
-              <Key className="w-4 h-4 text-primary-light"/> Why connect your own keys?
-            </h3>
-            <div className="space-y-2">
-              {[
-                "Your keys stay on your account — no shared rate limits with other users",
-                "Use your own model key when you want dedicated AI proposal capacity",
-                "Add contact enrichment when you want deeper email verification",
-                "The local lead coverage engine is managed automatically by iCloseLeads",
-              ].map(tip => (
-                <div key={tip} className="flex items-start gap-2.5 text-sm">
-                  <CheckCircle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground text-xs leading-relaxed">{tip}</span>
+          <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
+            <button
+              onClick={() => setShowAdvancedKeys(v => !v)}
+              className="w-full flex items-center justify-between gap-3 p-4 sm:p-5 text-left hover:bg-primary/5 transition-colors"
+            >
+              <div className="flex items-start gap-3">
+                <Key className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
+                <div>
+                  <h3 className="text-foreground font-semibold text-sm">Advanced optional API keys</h3>
+                  <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
+                    Only use this if you want your own AI or contact-enrichment quota. Most users can leave it closed.
+                  </p>
                 </div>
-              ))}
-            </div>
+              </div>
+              <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${showAdvancedKeys ? "rotate-180" : ""}`} />
+            </button>
+
+            {showAdvancedKeys && (
+              <div className="border-t border-border/60 p-4 sm:p-5 space-y-4">
+                {INTEGRATIONS.map(integ => (
+                  <IntegrationCard
+                    key={integ.id}
+                    integ={integ}
+                    savedValue={savedKeys[integ.settingKey] ?? ""}
+                    onSaved={handleKeyUpdate}
+                  />
+                ))}
+
+                <div className="bg-background/40 border border-border rounded-2xl p-4">
+                  <h3 className="text-foreground font-semibold text-sm mb-3 flex items-center gap-2">
+                    <Key className="w-4 h-4 text-primary-light"/> Why add your own key?
+                  </h3>
+                  <div className="space-y-2">
+                    {[
+                      "Your keys stay on your account and are only used for your requests",
+                      "Use your own model key when you want dedicated AI proposal capacity",
+                      "Add contact enrichment when you want deeper email verification",
+                      "The local lead coverage engine stays managed automatically by iCloseLeads",
+                    ].map(tip => (
+                      <div key={tip} className="flex items-start gap-2.5 text-sm">
+                        <CheckCircle className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground text-xs leading-relaxed">{tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
