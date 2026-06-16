@@ -13,6 +13,22 @@ type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
 interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
 interface ApiResponse { leads: LeadExt[]; total: number; page: number; totalPages: number; }
 
+function displayLeadTitle(lead: LeadExt) {
+  if (!lead.title) return null;
+  if (!lead.source?.startsWith("local_business")) return lead.title;
+
+  const websiteLine = lead.notes?.match(/^Website:\s*(.+)$/im)?.[1]?.toLowerCase() ?? "";
+  const label =
+    websiteLine.includes("unknown")     ? "Website unverified" :
+    websiteLine.includes("outdated")    ? "Outdated site" :
+    websiteLine.includes("unreachable") ? "Site down" :
+    websiteLine.includes("none")        ? "No website" :
+    null;
+
+  if (!label) return lead.title;
+  return lead.title.replace(/\((?:Has website|No website|Website unverified|Outdated site|Site down)\)$/i, `(${label})`);
+}
+
 const CRM_PIPELINE: { value: CRMStatus; label: string; color: string; bg: string; desc: string }[] = [
   { value: "NEW",       label: "New",        color: "text-blue-400",    bg: "bg-blue-500/10 border-blue-500/20",     desc: "Just discovered" },
   { value: "CONTACTED", label: "Contacted",  color: "text-purple-400",  bg: "bg-purple-500/10 border-purple-500/20", desc: "Proposal sent" },
@@ -151,7 +167,7 @@ export default function SavedLeadsPage() {
     ];
     const rows = leads.map(l => [
       esc(l.company), esc(l.domain), esc(l.email),
-      esc(l.niche), esc(l.title), esc(l.source),
+      esc(l.niche), esc(displayLeadTitle(l)), esc(l.source),
       esc(l.confidence), esc(l.qualityScore),
       esc(l.status), esc(l.sourceUrl),
       esc(l.notes), esc(new Date(l.savedAt).toLocaleDateString()),
@@ -245,7 +261,7 @@ export default function SavedLeadsPage() {
                   <div key={lead.id} onClick={() => router.push(`/dashboard/proposal/${lead.id}`)}
                     className="bg-background border border-border rounded-lg p-2 hover:border-primary/30 transition-all cursor-pointer">
                     <div className="font-medium text-xs text-foreground line-clamp-1">{lead.company}</div>
-                    {lead.title && <div className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{lead.title}</div>}
+                    {displayLeadTitle(lead) && <div className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{displayLeadTitle(lead)}</div>}
                     {lead.email && <div className="text-[10px] text-accent mt-1 flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{lead.email}</div>}
                   </div>
                 ))}
@@ -268,7 +284,7 @@ export default function SavedLeadsPage() {
                         <h3 className="font-semibold text-foreground text-sm">{lead.company}</h3>
                         <StatusDropdown current={lead.status} onChange={s => void updateStatus(lead.id, s)} />
                       </div>
-                      {lead.title && <p className="text-xs text-muted-foreground mt-0.5">{lead.title}</p>}
+                      {displayLeadTitle(lead) && <p className="text-xs text-muted-foreground mt-0.5">{displayLeadTitle(lead)}</p>}
                     </div>
                     <div className="flex items-center gap-2">
                       {lead.sourceUrl && (
