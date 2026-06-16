@@ -1318,6 +1318,7 @@ export default function LocalLeadsPage() {
         onBonusClaimed={(newBonus) => {
           const nextLimit = Math.max(dailyLimit, FREE_PLAN_LIMIT + newBonus);
           setDailyLimit(nextLimit);
+          setLimitNotice("");
           setShowBonus(false);
           if (typeof window !== "undefined") {
             localStorage.setItem(localLeadsLimitKey, String(nextLimit));
