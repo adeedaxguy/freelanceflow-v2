@@ -37,7 +37,7 @@ Here are 7 methods that genuinely work in 2025.
 
 The single highest-ROI thing you can do today is use a tool that monitors multiple job boards, Reddit, LinkedIn, and HackerNews simultaneously for clients actively looking for your skills.
 
-[iCloseLeads](https://icloseleads.com) aggregates leads from up to 25 source integrations including RemoteOK, WeWorkRemotely, Reddit freelancing communities, HackerNews Hiring threads, and more. Instead of checking 10 tabs every morning, you get scored, filtered leads matching your niche — in one place.
+[iCloseLeads](https://icloseleads.com) aggregates leads from 23 live sources including RemoteOK, WeWorkRemotely, Reddit freelancing communities, HackerNews Hiring threads, and more. Instead of checking 10 tabs every morning, you get scored, filtered leads matching your niche — in one place.
 
 **Why it works:** You reach clients *at the moment they need help*, which is the highest-intent moment possible. Response rates from these leads are 3–5x higher than cold outreach to random companies.
 
@@ -289,7 +289,7 @@ Best for: Responding to job board posts or LinkedIn job listings
 >
 > Happy to jump on a call this week — what works for you?
 
-**Pro tip:** Use [iCloseLeads](https://icloseleads.com) to find these job posts across up to 25 source integrations simultaneously, then use the built-in AI Proposal Writer to generate personalized emails in seconds.
+**Pro tip:** Use [iCloseLeads](https://icloseleads.com) to find these job posts across 23 sources simultaneously, then use the built-in AI Proposal Writer to generate personalized emails in seconds.
 
 ### Template 3: The Referral Email
 
@@ -488,7 +488,7 @@ Good email marketers practically print money for their clients. If you can demon
 
 ## How to Find Clients in Any of These Niches
 
-Once you've chosen a niche, finding clients is the next challenge. [iCloseLeads](https://icloseleads.com) monitors up to 25 source integrations — job boards, Reddit, HackerNews, local business databases — for opportunities matching your specific niche.
+Once you've chosen a niche, finding clients is the next challenge. [iCloseLeads](https://icloseleads.com) monitors 23 live sources — job boards, Reddit, HackerNews, local business databases — for opportunities matching your specific niche.
 
 Select your niche, hit search, and get scored leads delivered instantly.
 
@@ -827,7 +827,7 @@ Your goal: have 3–5 active lead generation methods running simultaneously.
 
 Job boards — RemoteOK, WeWorkRemotely, Remotive, etc. — post hundreds of freelance opportunities every day. The problem is checking them all manually takes 30–60 minutes.
 
-Solution: Use [iCloseLeads](https://icloseleads.com) to monitor up to 25 source integrations simultaneously. You get scored, filtered leads for your niche delivered in one dashboard. Daily lead-checking time: under 10 minutes.
+Solution: Use [iCloseLeads](https://icloseleads.com) to monitor 23 sources simultaneously. You get scored, filtered leads for your niche delivered in one dashboard. Daily lead-checking time: under 10 minutes.
 
 ## Tactic 2: The "Dream 100" Outreach List
 
@@ -1075,7 +1075,7 @@ Before the reviews, here's the criteria we used:
 [iCloseLeads](https://icloseleads.com) is built specifically for freelancers and covers the entire client acquisition journey in one platform.
 
 **What it does:**
-- Monitors up to 25 source integrations (RemoteOK, WeWorkRemotely, Reddit, HackerNews, job boards) simultaneously
+- Monitors 23 live sources (RemoteOK, WeWorkRemotely, Reddit, HackerNews, job boards) simultaneously
 - Scores leads by relevance to your niche using keyword matching
 - Includes a Local Business Leads engine to find businesses without websites in any city
 - AI Proposal Writer generates personalized proposals in seconds
@@ -1195,7 +1195,7 @@ Cold calling made sense when phones were the only way to reach someone directly.
 
 The best type of outreach is one where the prospect already wants help. Job boards, Reddit hiring threads, and HackerNews hiring posts are full of people actively looking for freelancers right now.
 
-[iCloseLeads](https://icloseleads.com) monitors up to 25 source integrations simultaneously and delivers these high-intent leads to your dashboard. You reach out to people who've already raised their hand — response rates of 30–60% are common.
+[iCloseLeads](https://icloseleads.com) monitors 23 sources simultaneously and delivers these high-intent leads to your dashboard. You reach out to people who've already raised their hand — response rates of 30–60% are common.
 
 **How it works:** Select your niche → get scored leads → send a targeted proposal → close the deal. No cold calls, no gatekeepers, no voicemail.
 
@@ -1530,7 +1530,7 @@ Your pitch: show them what their competitors' social looks like, then show them 
 
 ### 2. Job Boards and Hiring Posts
 
-Hundreds of "social media manager" positions are posted weekly on job boards — many are contract-friendly. [iCloseLeads](https://icloseleads.com) surfaces these from up to 25 source integrations including RemoteOK, WeWorkRemotely, and niche industry job boards.
+Hundreds of "social media manager" positions are posted weekly on job boards — many are contract-friendly. [iCloseLeads](https://icloseleads.com) surfaces these from 23 sources including RemoteOK, WeWorkRemotely, and niche industry job boards.
 
 ### 3. E-commerce Brands
 
@@ -2468,7 +2468,7 @@ That's it. Ten minutes a day prevents thousands of dollars from slipping away.
 
 A CRM is only as good as the leads going into it. Manually hunting job boards wastes the time you just saved from tracking.
 
-<a href="https://icloseleads.com">iCloseLeads</a> pulls leads from up to 25 source integrations simultaneously — including RemoteOK, WeWorkRemotely, HackerNews Hiring, Reddit freelancing communities, and local business databases. Every lead is scored by niche so you're not wading through irrelevant posts.
+<a href="https://icloseleads.com">iCloseLeads</a> pulls leads from 23 sources simultaneously — including RemoteOK, WeWorkRemotely, HackerNews Hiring, Reddit freelancing communities, and local business databases. Every lead is scored by niche so you're not wading through irrelevant posts.
 
 Instead of starting your morning by checking 10 tabs and copy-pasting leads into a spreadsheet, you start with a scored, filtered list matched to your skills. That's what goes into stage 1 of your pipeline.
 

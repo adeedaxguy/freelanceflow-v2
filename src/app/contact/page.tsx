@@ -45,8 +45,8 @@ export default function ContactPage() {
               {/* Contact Info */}
               <div className="space-y-6">
                 {[
-                  { icon: Mail, title: "Email Us", value: "hello@icloseleads.com", sub: "For general enquiries" },
-                  { icon: MessageSquare, title: "Support", value: "support@icloseleads.com", sub: "For technical help" },
+                  { icon: Mail, title: "Email Us", value: "hello@freelanceflow.io", sub: "For general enquiries" },
+                  { icon: MessageSquare, title: "Support", value: "support@freelanceflow.io", sub: "For technical help" },
                   { icon: Clock, title: "Response Time", value: "Under 4 hours", sub: "Monday – Friday, 9am–6pm EST" },
                 ].map((item) => {
                   const Icon = item.icon;

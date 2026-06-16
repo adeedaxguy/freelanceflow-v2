@@ -49,7 +49,7 @@ export default function BonusLeadsModal({
   }
 
   function handleShare(platform: "linkedin" | "twitter") {
-    const text = encodeURIComponent(`Just found a free tool that finds freelance clients automatically — up to 25 source integrations, AI proposals, local business leads. Try it: ${result?.referralUrl ?? "https://icloseleads.com"}`);
+    const text = encodeURIComponent(`Just found a free tool that finds freelance clients automatically — 23 live sources, AI proposals, local business leads. Try it: ${result?.referralUrl ?? "https://icloseleads.com"}`);
     const url = platform === "linkedin"
       ? `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(result?.referralUrl ?? "https://icloseleads.com")}`
       : `https://twitter.com/intent/tweet?text=${text}`;

@@ -32,7 +32,7 @@ export default function Sidebar() {
           <div className="w-8 h-8 rounded-xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
             <Zap className="w-4 h-4 text-white" />
           </div>
-          <span className="font-extrabold text-foreground text-lg">iCloseLeads</span>
+          <span className="font-extrabold text-foreground text-lg">FreelanceFlow</span>
         </Link>
       </div>
 

@@ -4,8 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "About iCloseLeads — Built for Freelancers Who Mean Business",
-  description: "iCloseLeads is on a mission to help freelancers worldwide escape platform dependency and build sustainable client pipelines through AI-powered outreach.",
+  title: "About FreelanceFlow — Built for Freelancers Who Mean Business",
+  description: "FreelanceFlow is on a mission to help freelancers worldwide escape platform dependency and build sustainable client pipelines through AI-powered outreach.",
 };
 
 const team = [
@@ -31,7 +31,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-dot-pattern bg-dot-sm opacity-30" />
           <div className="max-w-4xl mx-auto px-4 text-center relative">
             <h1 className="text-5xl font-extrabold text-foreground mb-6">
-              We Built iCloseLeads <br />
+              We Built FreelanceFlow <br />
               <span className="gradient-text">Because We Needed It</span>
             </h1>
             <p className="text-muted-foreground text-xl leading-relaxed">
@@ -47,7 +47,7 @@ export default function AboutPage() {
             <div className="prose-custom space-y-4 text-muted-foreground leading-relaxed">
               <p>The freelance market is massive — over 73 million freelancers in the US alone — but most of them are stuck on marketplaces that take a huge cut, control the relationship, and commoditize their skills.</p>
               <p>Direct outreach is 3x more effective than marketplace bidding, but it requires finding verified contacts, writing personalized proposals, and tracking everything — which takes more time than most freelancers have.</p>
-              <p>iCloseLeads solves all three problems in a single platform. We help freelancers find leads, write personalized proposals, and send outreach with enterprise-grade deliverability.</p>
+              <p>FreelanceFlow solves all three problems in a single platform. We use Hunter.io to find verified email addresses, GPT-4o to write personalized proposals, and Resend to send them with enterprise-grade deliverability.</p>
               <p>Our users report finding their first lead in under 2 minutes and landing their first new client within 2 weeks of consistent outreach.</p>
             </div>
           </div>

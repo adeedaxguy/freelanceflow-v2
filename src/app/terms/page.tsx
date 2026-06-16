@@ -3,8 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — iCloseLeads",
-  description: "iCloseLeads Terms of Service. Read our terms of use, acceptable use policy, and service agreement.",
+  title: "Terms of Service — FreelanceFlow",
+  description: "FreelanceFlow Terms of Service. Read our terms of use, acceptable use policy, and service agreement.",
 };
 
 export default function TermsPage() {
@@ -19,12 +19,12 @@ export default function TermsPage() {
           <div className="space-y-10 text-muted-foreground leading-relaxed">
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">1. Acceptance of Terms</h2>
-              <p>By accessing or using iCloseLeads (the &quot;Service&quot;), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the Service.</p>
+              <p>By accessing or using FreelanceFlow (the &quot;Service&quot;), you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access the Service.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">2. Service Description</h2>
-              <p>iCloseLeads provides AI-powered lead discovery and email outreach tools for freelancers. The Service includes lead discovery, AI proposal generation, CRM tracking, and email outreach tools.</p>
+              <p>FreelanceFlow provides AI-powered lead discovery and email outreach tools for freelancers. The Service includes email address discovery via Hunter.io, AI proposal generation via OpenAI, and email delivery via Resend.</p>
             </section>
 
             <section>
@@ -34,7 +34,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">4. Acceptable Use Policy</h2>
-              <p className="mb-2">You agree NOT to use iCloseLeads to:</p>
+              <p className="mb-2">You agree NOT to use FreelanceFlow to:</p>
               <ul className="list-disc pl-6 space-y-1">
                 <li>Send unsolicited bulk commercial email (spam)</li>
                 <li>Harass, threaten, or harm recipients</li>
@@ -57,12 +57,12 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">7. Intellectual Property</h2>
-              <p>The iCloseLeads platform, its original content, features, and functionality are owned by iCloseLeads, Inc. Content you create (proposals, email copy) remains your intellectual property.</p>
+              <p>The FreelanceFlow platform, its original content, features, and functionality are owned by FreelanceFlow, Inc. Content you create (proposals, email copy) remains your intellectual property.</p>
             </section>
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">8. Limitation of Liability</h2>
-              <p>iCloseLeads shall not be liable for any indirect, incidental, special, consequential, or punitive damages. Our total liability shall not exceed the amount paid by you in the 12 months preceding the claim.</p>
+              <p>FreelanceFlow shall not be liable for any indirect, incidental, special, consequential, or punitive damages. Our total liability shall not exceed the amount paid by you in the 12 months preceding the claim.</p>
             </section>
 
             <section>
@@ -77,7 +77,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">11. Contact</h2>
-              <p>Questions about these Terms? Contact us at legal@icloseleads.com.</p>
+              <p>Questions about these Terms? Contact us at legal@freelanceflow.io.</p>
             </section>
           </div>
         </div>

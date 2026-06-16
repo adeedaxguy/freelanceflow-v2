@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   metadataBase: new URL("https://icloseleads.com"),
   title: "iCloseLeads Features — AI-Powered Client Acquisition for Freelancers",
-  description: "Explore all iCloseLeads features: lead discovery across up to 25 source integrations, AI proposal generator, 6-stage CRM pipeline, cold email outreach, analytics, and free tools for freelancers.",
+  description: "Explore all iCloseLeads features: 11-source lead discovery, AI proposal generator, 6-stage CRM pipeline, cold email outreach, analytics, and free tools for freelancers.",
   keywords: ["freelance lead generation tool", "AI proposal generator freelancers", "freelance CRM software", "cold email outreach freelancers", "best tools for freelancers 2025"],
   openGraph: { title: "iCloseLeads Features", description: "Everything you need to find and close freelance clients." },
   alternates: { canonical: "https://icloseleads.com/features" },
@@ -44,7 +44,7 @@ const features = [
   {
     icon: Mail,
     title: "Automated Outreach via Resend",
-    description: "Send beautifully formatted emails directly from iCloseLeads using Resend's enterprise-grade email infrastructure. Track every open, click, and response.",
+    description: "Send beautifully formatted emails directly from FreelanceFlow using Resend's enterprise-grade email infrastructure. Track every open, click, and response.",
     highlights: ["Enterprise deliverability", "HTML + plain text", "Reply tracking", "Spam score checking"],
     color: "from-blue-500/20 to-blue-500/5",
     iconColor: "text-blue-400",
@@ -136,7 +136,7 @@ export default function FeaturesPage() {
         <section className="py-24 bg-surface">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-4">iCloseLeads vs. The Alternatives</h2>
+              <h2 className="text-4xl font-bold text-foreground mb-4">FreelanceFlow vs. The Alternatives</h2>
               <p className="text-muted-foreground">Why smart freelancers choose direct outreach over platform dependency.</p>
             </div>
 
@@ -145,7 +145,7 @@ export default function FeaturesPage() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left px-6 py-4 text-sm font-semibold text-muted-foreground">Feature</th>
-                    <th className="text-center px-6 py-4 text-sm font-bold text-primary-light">iCloseLeads</th>
+                    <th className="text-center px-6 py-4 text-sm font-bold text-primary-light">FreelanceFlow</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Upwork</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Fiverr</th>
                     <th className="text-center px-6 py-4 text-sm font-semibold text-muted-foreground">Manual Email</th>

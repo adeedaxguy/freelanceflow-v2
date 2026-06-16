@@ -38,10 +38,10 @@ const SOURCES = [
   { name: "Arbeitnow", color: "#FFD166", leads: "120+" },
   { name: "Jobicy", color: "#F472B6", leads: "90+" },
   { name: "Working Nomads", color: "#34D399", leads: "100+" },
-  { name: "GitHub Issues", color: "#A78BFA", leads: "80+" },
+  { name: "GitHub Jobs", color: "#A78BFA", leads: "80+" },
   { name: "HN Hiring", color: "#FB923C", leads: "60+" },
-  { name: "Remote.co", color: "#38BDF8", leads: "110+" },
-  { name: "Craigslist", color: "#E879F9", leads: "70+" },
+  { name: "Himalayas", color: "#38BDF8", leads: "110+" },
+  { name: "Jobspresso", color: "#E879F9", leads: "70+" },
 ];
 
 const BENEFITS = [
@@ -54,7 +54,7 @@ const BENEFITS = [
 ];
 
 const FAQS = [
-  { q: "How many freelance job boards does iCloseLeads search?", a: "iCloseLeads simultaneously searches 11 live freelance sources including Remote OK, Remotive, Reddit (/r/forhire, /r/hiring), WeWorkRemotely, Arbeitnow, Jobicy, Working Nomads, GitHub Issues, Hacker News Hiring, Remote.co, and Craigslist. New sources are added regularly." },
+  { q: "How many freelance job boards does iCloseLeads search?", a: "iCloseLeads simultaneously searches 11 live sources including Remote OK, Remotive, Reddit (/r/forhire, /r/hiring), WeWorkRemotely, Arbeitnow, Jobicy, Working Nomads, GitHub Issues, Hacker News Hiring, Himalayas, and Jobspresso. New sources are added regularly." },
   { q: "How is the AI quality score calculated?", a: "Each lead is scored 0–100 based on relevance to your selected niche, recency of posting, presence of budget/rate signals, quality of the job description, and keyword match strength. Leads scoring 80+ are typically worth prioritising." },
   { q: "How often are results updated?", a: "Searches are cached for 30 minutes by default to ensure fast results. Use the Force Refresh button to bypass the cache and pull the absolute latest results from all 11 sources in real time." },
   { q: "Can I filter by niche, source, or time range?", a: "Yes. You can filter by 15+ niches (Web Development, Design, SEO, AI/ML, Blockchain, Writing, etc.), by specific source (e.g. only show Remote OK results), by time range (12h / 24h / 48h / 72h / 7 days), and sort by Freshest, Best Match, Best Quality, or Has Budget." },

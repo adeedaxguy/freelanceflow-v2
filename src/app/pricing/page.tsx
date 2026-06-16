@@ -7,8 +7,8 @@ import PricingCard from "@/components/PricingCard";
 import { PRICING_TIERS } from "@/data/marketing";
 
 export const metadata: Metadata = {
-  title: "iCloseLeads Pricing — Affordable Plans for Freelancers",
-  description: "Start free, upgrade when ready. iCloseLeads offers plans from $0 to $79/mo with AI proposals, lead discovery, and email outreach.",
+  title: "FreelanceFlow Pricing — Affordable Plans for Freelancers",
+  description: "Start free, upgrade when ready. FreelanceFlow offers plans from $0 to $79/mo with AI proposals, lead discovery, and email outreach.",
 };
 
 const billingFAQ = [
@@ -79,7 +79,7 @@ export default function PricingPage() {
         </section>
       </main>
       <Footer />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "PriceSpecification", "name": "iCloseLeads Pricing", "priceCurrency": "USD" }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "PriceSpecification", "name": "FreelanceFlow Pricing", "priceCurrency": "USD" }) }} />
     </>
   );
 }

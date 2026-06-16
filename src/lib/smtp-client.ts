@@ -110,7 +110,7 @@ export async function smtpSend(
 
       switch (state) {
         case 0: // waiting for 220 greeting
-          if (code === 220) { state = 1; write("EHLO icloseleads.com"); }
+          if (code === 220) { state = 1; write("EHLO freelanceflow.io"); }
           else done(new Error(`Bad greeting: ${line}`));
           break;
 
@@ -134,7 +134,7 @@ export async function smtpSend(
               activeSock = tlsSock;
               activeSock.on("data", onData);
               state = 3;
-              write("EHLO icloseleads.com");
+              write("EHLO freelanceflow.io");
             });
           } else done(new Error(`STARTTLS failed: ${line}`));
           break;

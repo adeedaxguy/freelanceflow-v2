@@ -36,13 +36,13 @@ export async function POST(req: NextRequest) {
     await smtpSend(
       cfg,
       toEmail,
-      "✅ iCloseLeads — SMTP Connection Successful",
-      `Hi,\n\nYour SMTP connection is working correctly.\n\nYou can now send emails directly from iCloseLeads using ${cfg.fromEmail}.\n\n— iCloseLeads`,
+      "✅ FreelanceFlow — SMTP Connection Successful",
+      `Hi,\n\nYour SMTP connection is working correctly.\n\nYou can now send emails directly from FreelanceFlow using ${cfg.fromEmail}.\n\n— FreelanceFlow`,
       `<div style="font-family:sans-serif;padding:24px;max-width:520px">
         <h2 style="color:#7C3AED">✅ SMTP Connected!</h2>
         <p>Your SMTP connection is working correctly.</p>
-        <p>You can now send emails directly from iCloseLeads using <strong>${cfg.fromEmail}</strong>.</p>
-        <p style="color:#888;font-size:12px">— iCloseLeads</p>
+        <p>You can now send emails directly from FreelanceFlow using <strong>${cfg.fromEmail}</strong>.</p>
+        <p style="color:#888;font-size:12px">— FreelanceFlow</p>
       </div>`,
     );
     return NextResponse.json({ success: true, message: `Test email sent to ${toEmail}` });

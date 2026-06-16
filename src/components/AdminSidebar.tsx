@@ -34,7 +34,7 @@ export default function AdminSidebar() {
             <Zap className="w-4 h-4 text-white" />
           </div>
           <div>
-            <div className="font-bold text-foreground text-sm">iCloseLeads</div>
+            <div className="font-bold text-foreground text-sm">FreelanceFlow</div>
             <div className="text-xs text-accent font-medium">Admin Panel</div>
           </div>
         </Link>

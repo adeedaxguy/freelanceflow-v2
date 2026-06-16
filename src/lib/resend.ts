@@ -26,8 +26,8 @@ export interface SendEmailResult {
 
 export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
   const client = getResendClient();
-  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hello@icloseleads.com";
-  const fromName = params.fromName ?? "iCloseLeads";
+  const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hello@freelanceflow.io";
+  const fromName = params.fromName ?? "FreelanceFlow";
 
   const { data, error } = await client.emails.send({
     from: `${fromName} <${fromEmail}>`,
@@ -67,7 +67,7 @@ function emailToHtml(text: string): string {
   <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
     ${paragraphs}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
-    <p style="color:#888;font-size:12px;margin:0;">Sent via iCloseLeads — <a href="https://icloseleads.com" style="color:#7C3AED;">icloseleads.com</a></p>
+    <p style="color:#888;font-size:12px;margin:0;">Sent via FreelanceFlow — <a href="https://freelanceflow.io" style="color:#7C3AED;">freelanceflow.io</a></p>
   </div>
 </body>
 </html>`;

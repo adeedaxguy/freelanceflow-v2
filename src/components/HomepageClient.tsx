@@ -205,9 +205,9 @@ const FEATURES = [
     icon: <Search className="w-5 h-5 text-primary-light" />,
     tag: "Discovery",
     tagColor: "#9F67FF",
-    title: "25 Source Integrations, One Search",
-    desc: "We combine 11 freelance lead sources with local business data integrations. Every result is fresh, real, deduplicated, and scored.",
-    stat: "25 integrations",
+    title: "7 Live Sources, One Search",
+    desc: "We simultaneously scrape Reddit, Remote OK, Remotive, WeWorkRemotely, Arbeitnow, Jobicy, and Working Nomads. Every result is fresh, real, and scored.",
+    stat: "7 sources",
   },
   {
     icon: <Bot className="w-5 h-5 text-accent" />,
@@ -267,7 +267,7 @@ const FAQS = [
   },
   {
     q: "Where do the leads come from?",
-    a: "iCloseLeads pulls from up to 25 source integrations: 11 freelance lead sources including RemoteOK, Remotive, Arbeitnow, Jobicy, WeWorkRemotely, Working Nomads, HackerNews Hiring, GitHub Issues, Remote.co, Craigslist, and Reddit communities, plus 14 local business integrations including OpenStreetMap, Yelp, HERE Maps, TomTom, Geoapify, and more. Every lead is a real person or business actively looking for help.",
+    a: "iCloseLeads pulls from 23 real sources in parallel — including RemoteOK, Remotive, Arbeitnow, Jobicy, WeWorkRemotely, WorkingNomads, Himalayas, HackerNews Hiring, GitHub Issues, The Muse, Reddit (6 subreddits with /r/forhire, /r/hiring and more), ProBlogger, and WP Hired. For Local Business Leads we use OpenStreetMap, Yelp, HERE Maps, TomTom, and Geoapify. Every lead is a real person or business actively looking for help.",
   },
   {
     q: "How does the AI proposal writing work?",
@@ -433,7 +433,7 @@ export default function HomepageClient() {
           {/* Sub */}
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            iCloseLeads searches across <strong className="text-foreground">up to 25 source integrations</strong>, scores every lead with AI, and writes personalized proposals in 3 seconds — so you spend time closing, not searching.
+            iCloseLeads searches <strong className="text-foreground">23 live sources</strong> simultaneously, scores every lead with AI, and writes personalized proposals in 3 seconds — so you spend time closing, not searching.
           </motion.p>
 
           {/* CTAs */}
@@ -570,7 +570,7 @@ export default function HomepageClient() {
                 <Reveal delay={0.1}>
                   <StepCard n="1" icon={<Search className="w-5 h-5" />}
                     title="Search your niche"
-                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches up to 25 source integrations and returns scored, deduplicated leads in seconds." />
+                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches 23 live sources and returns scored, deduplicated leads in seconds." />
                 </Reveal>
                 <Reveal delay={0.2}>
                   <StepCard n="2" icon={<Sparkles className="w-5 h-5" />}
@@ -974,7 +974,7 @@ export default function HomepageClient() {
                     ))}
 
                     <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground border-t border-border/40 pt-3">
-                      <span><strong className="text-foreground">25 integrations</strong> monitored</span>
+                      <span><strong className="text-foreground">23 sources</strong> monitored</span>
                       <span className="text-primary-light font-semibold cursor-pointer hover:underline">View all 340 →</span>
                     </div>
                   </div>
@@ -986,12 +986,12 @@ export default function HomepageClient() {
             <Reveal delay={0} className="order-1 lg:order-2">
               <Badge color="primary">Live Jobs Feed</Badge>
               <h3 className="mt-4 text-3xl sm:text-4xl font-extrabold text-foreground leading-tight tracking-tight">
-                25 source integrations. One feed.{" "}
+                23 live sources. One feed.{" "}
                 <span className="gradient-text">Updated every hour.</span>
               </h3>
               <p className="mt-4 text-muted-foreground text-lg leading-relaxed">
                 Stop checking Upwork manually. iCloseLeads scans RemoteOK, Reddit, HackerNews,
-                WeWorkRemotely, GitHub Issues, and local business data sources — scores every match for you.
+                WeWorkRemotely, GitHub Issues and 18 more sources — scores every match for you.
               </p>
 
               {/* Stats row */}

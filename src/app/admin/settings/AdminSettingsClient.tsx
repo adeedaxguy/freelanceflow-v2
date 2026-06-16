@@ -114,7 +114,7 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
           <Settings className="w-6 h-6 text-primary-light" />
           Platform Settings
         </h1>
-        <p className="text-muted-foreground mt-1">Full control over the iCloseLeads platform. Changes take effect immediately.</p>
+        <p className="text-muted-foreground mt-1">Full control over the FreelanceFlow platform. Changes take effect immediately.</p>
       </div>
 
       {error && (
@@ -125,8 +125,8 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
       <Section title="Site Configuration" icon={<Globe className="w-4 h-4 text-primary-light" />}>
         <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("site", ["site_name", "support_email", "maintenance_mode"]); }}
           className="space-y-4">
-          <Field label="Site Name" value={get("site_name")} onChange={v => set("site_name", v)} placeholder="iCloseLeads" />
-          <Field label="Support Email" value={get("support_email")} onChange={v => set("support_email", v)} type="email" placeholder="support@icloseleads.com" />
+          <Field label="Site Name" value={get("site_name")} onChange={v => set("site_name", v)} placeholder="FreelanceFlow" />
+          <Field label="Support Email" value={get("support_email")} onChange={v => set("support_email", v)} type="email" placeholder="support@freelanceflow.io" />
 
           <div className="flex items-center justify-between p-4 bg-gold/5 border border-gold/10 rounded-xl">
             <div>
@@ -231,7 +231,7 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
             hint="Free at resend.com — powers email sending from the platform." />
           <Field label="From Email (Resend)" value={get("resend_from_email")} onChange={v => set("resend_from_email", v)}
             type="email" placeholder="outreach@yourverifieddomain.com"
-            hint="Must be a verified domain in Resend. iCloseLeads uses onboarding@resend.dev on free tier." />
+            hint="Must be a verified domain in Resend. FreelanceFlow uses onboarding@resend.dev on free tier." />
           <SaveBtn sectionKey="apikeys" />
         </form>
       </Section>
@@ -240,7 +240,7 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
       <Section title="Email Configuration" icon={<Mail className="w-4 h-4 text-primary-light" />}>
         <div className="space-y-3 text-sm">
           <p className="text-muted-foreground">
-            iCloseLeads uses <a href="https://resend.com" target="_blank" rel="noreferrer" className="text-primary-light hover:underline">Resend</a> for transactional email.
+            FreelanceFlow uses <a href="https://resend.com" target="_blank" rel="noreferrer" className="text-primary-light hover:underline">Resend</a> for transactional email.
             Add your Resend API key above to enable email sending.
           </p>
           <div className="px-4 py-3 rounded-xl bg-surface border border-border space-y-2">
