@@ -44,26 +44,55 @@ const US_STATE_CODES = [
   "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK",
   "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY", "DC",
 ];
+const US_STATE_NAMES = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida",
+  "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine",
+  "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska",
+  "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas",
+  "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
+];
 const COUNTRY_FILTER_SCAN_LIMIT = 2000;
 const US_STATE_ADDRESS_RE = new RegExp(`,\\s*(?:${US_STATE_CODES.join("|")})(?:\\s+\\d{5}(?:-\\d{4})?)?\\b`);
+const US_STATE_ZIP_RE = new RegExp(`,\\s*(?:${US_STATE_CODES.join("|")})\\s+\\d{5}(?:-\\d{4})?\\b`, "i");
+const US_STATE_NAME_RE = new RegExp(`\\b(?:${US_STATE_NAMES.join("|")})\\b`, "i");
+const UK_POSTCODE_RE = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i;
+
+function decodeMaybe(value: string | null) {
+  if (!value) return "";
+  try { return decodeURIComponent(value.replace(/\+/g, " ")); } catch { return value; }
+}
 
 function matchesCountryFilter(
-  lead: Pick<PrismaLead, "company" | "domain" | "notes" | "title" | "description" | "sourceUrl">,
+  lead: Pick<PrismaLead, "company" | "domain" | "email" | "phone" | "notes" | "title" | "description" | "sourceUrl">,
   country: string | null,
 ) {
   const blob = [
-    lead.notes, lead.domain, lead.sourceUrl, lead.title, lead.description, lead.company,
+    lead.notes,
+    lead.domain,
+    lead.email,
+    lead.phone,
+    lead.sourceUrl,
+    decodeMaybe(lead.sourceUrl),
+    lead.title,
+    lead.description,
+    lead.company,
   ].filter(Boolean).join(" ");
 
   if (country === "uk") {
-    return /(united kingdom|great britain|england|scotland|wales|northern ireland|\buk\b)/i.test(blob)
-      || /\.(?:co\.)?uk(?:\/|$)/i.test(blob);
+    return /(country:\s*(?:uk|gb|gbr|united kingdom|great britain)\b|united kingdom|great britain|england|scotland|wales|northern ireland|\buk\b)/i.test(blob)
+      || /\.(?:co\.)?uk(?:\/|$)/i.test(blob)
+      || UK_POSTCODE_RE.test(blob)
+      || /\+44\b/.test(blob);
   }
 
   if (country === "usa") {
-    return /(united states|usa|u\.s\.a\.|u\.s\.)/i.test(blob)
+    return /(country:\s*(?:us|usa|united states|united states of america)\b|united states|usa|u\.s\.a\.|u\.s\.)/i.test(blob)
       || /\.us(?:\/|$)/i.test(blob)
-      || US_STATE_ADDRESS_RE.test(blob);
+      || US_STATE_ADDRESS_RE.test(blob)
+      || US_STATE_ZIP_RE.test(blob)
+      || US_STATE_NAME_RE.test(blob)
+      || /\+1\b/.test(blob);
   }
 
   return true;

@@ -739,6 +739,7 @@ export default function LocalLeadsPage() {
           isManual:    true,
           notes: [
             `Address: ${lead.address}`,
+            lead.country ? `Country: ${lead.country}` : null,
             `Phone: ${lead.phone ?? "None"}`,
             `Website: ${lead.website ?? "None"} (${lead.websiteStatus}${lead.websiteTech ? ` — ${lead.websiteTech}` : ""}${lead.websiteAge ? ` — ${lead.websiteAge}` : ""})`,
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
