@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from "next/server";
+import type { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +18,12 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    let session: Session | null = null;
+    try {
+      session = await getServerSession(authOptions) as Session | null;
+    } catch (sessionError) {
+      console.error("Support chat session lookup failed:", sessionError);
+    }
     const body: unknown = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
@@ -25,21 +31,27 @@ export async function POST(req: NextRequest) {
     const { messages, email } = parsed.data;
     const { reply, shouldCreateTicket } = await supportChat(messages);
 
+    let ticketCreated = false;
     if (shouldCreateTicket) {
       const userEmail = email ?? session?.user?.email ?? "unknown@user.com";
       const firstMsg = messages.find(m => m.role === "user")?.content ?? "Support request";
-      await prisma.supportTicket.create({
-        data: {
-          userId:   session?.user?.id ?? null,
-          email:    userEmail,
-          subject:  firstMsg.slice(0, 100),
-          messages: JSON.stringify(messages),
-          status:   "open",
-        },
-      });
+      try {
+        await prisma.supportTicket.create({
+          data: {
+            userId:   session?.user?.id ?? null,
+            email:    userEmail,
+            subject:  firstMsg.slice(0, 100),
+            messages: JSON.stringify(messages),
+            status:   "open",
+          },
+        });
+        ticketCreated = true;
+      } catch (ticketError) {
+        console.error("Support ticket creation failed:", ticketError);
+      }
     }
 
-    return NextResponse.json({ reply, ticketCreated: shouldCreateTicket });
+    return NextResponse.json({ reply, ticketCreated });
   } catch (err) {
     console.error("Support chat error:", err);
     return NextResponse.json({ error: "Failed" }, { status: 500 });

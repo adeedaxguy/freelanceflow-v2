@@ -3,26 +3,33 @@ import HomepageClient from "@/components/HomepageClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
-  title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-  description: "Find high-quality clients with AI-powered lead discovery, personalized proposals, and safe Gmail-ready outreach. Start free — no credit card required.",
+  title: "Freelance Lead Generation Software for Remote Jobs and Local Business Leads",
+  description: "Find remote job leads, local business leads, and live job opportunities. Generate AI proposals, prepare Gmail outreach, and track every freelance client in one CRM.",
   keywords: [
-    "freelance lead generation", "find freelance clients", "AI proposal generator",
-    "freelance CRM", "client acquisition for freelancers", "cold email outreach",
-    "remote job leads", "freelancer tools 2025", "automated outreach freelancer"
+    "freelance lead generation",
+    "remote job leads",
+    "local business leads",
+    "live job leads",
+    "find freelance clients",
+    "AI proposal generator",
+    "freelance CRM",
+    "client acquisition for freelancers",
+    "businesses without websites",
+    "cold email outreach for freelancers"
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://icloseleads.com",
     siteName: "iCloseLeads",
-    title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-    description: "Stop chasing clients. Let iCloseLeads find them with AI-powered lead discovery and proposal generation.",
+    title: "Freelance Lead Generation Software for Remote Jobs and Local Business Leads",
+    description: "Find remote job leads, local business leads, and live job opportunities, then turn each signal into AI-assisted outreach and a tracked freelance pipeline.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "iCloseLeads — AI-Powered Client Acquisition",
-    description: "Find high-quality clients with AI-powered lead discovery. Free to start.",
+    title: "Remote Jobs, Local Business Leads, and AI Proposals",
+    description: "Find better freelance leads, draft sharper outreach, and track every client opportunity in one workflow.",
     creator: "@icloseleads",
   },
   robots: {
@@ -58,17 +65,21 @@ const softwareJsonLd = {
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "url": "https://icloseleads.com",
-  "description": "Find high-quality clients with AI-powered lead discovery, personalized proposals, and automated outreach.",
+  "description": "Freelance lead generation software for finding remote job leads, local business leads, live job opportunities, AI proposals, Gmail-ready outreach, and CRM pipeline tracking.",
+  "featureList": [
+    "Remote job lead discovery",
+    "Local business lead generation",
+    "Live job opportunity feed",
+    "AI proposal generator",
+    "Gmail-ready outreach preparation",
+    "Freelance CRM pipeline",
+    "Lead scoring and analytics"
+  ],
   "offers": {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD",
-    "description": "Free plan available. Pro from $29/month.",
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "reviewCount": "320",
+    "description": "Free early access plan available.",
   },
 };
 

@@ -6,16 +6,16 @@ import { MessageCircle, X, Send, Bot, User, Loader2, ChevronDown } from "lucide-
 interface Message { role: "user" | "assistant"; content: string; }
 
 const QUICK_QUESTIONS = [
-  "How do I find more leads?",
-  "How does AI Proposal work?",
-  "How to upgrade my plan?",
-  "Why am I not getting leads?",
+  "Find remote job leads",
+  "Write a local business pitch",
+  "How do Live Jobs work?",
+  "What should I do first?",
 ];
 
 export default function FloatingChat() {
   const [open,       setOpen]      = useState(false);
   const [messages,   setMessages]  = useState<Message[]>([
-    { role: "assistant", content: "Hi! I'm iCloseLeads's AI assistant. How can I help you find clients and grow your freelance business today? 🚀" },
+    { role: "assistant", content: "Hi, I'm iCloseLeads AI. I can help you find remote jobs, local business leads, live job opportunities, or draft a sharper outreach message." },
   ]);
   const [input,      setInput]     = useState("");
   const [loading,    setLoading]   = useState(false);
@@ -49,6 +49,7 @@ export default function FloatingChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: updated.map(m => ({ role: m.role, content: m.content })) }),
       });
+      if (!res.ok) throw new Error("Chat request failed");
       type ChatResponse = { reply?: string; ticketCreated?: boolean; error?: string };
       const data = await res.json() as ChatResponse;
       const reply = data.reply ?? "Sorry, I couldn't get a response. Please try again.";
@@ -56,7 +57,7 @@ export default function FloatingChat() {
       if (data.ticketCreated) setTicket(true);
       if (!open) setUnread(n => n + 1);
     } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Network error. Please check your connection and try again." }]);
+      setMessages(prev => [...prev, { role: "assistant", content: "I hit a connection issue, but you can try again right here. Ask for a remote job search workflow, a local business pitch, or a proposal draft." }]);
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export default function FloatingChat() {
                 </div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors">
+            <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors" aria-label="Minimize chat">
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
@@ -115,7 +116,7 @@ export default function FloatingChat() {
             )}
             {ticket && (
               <div className="text-xs text-center text-muted-foreground bg-primary/5 border border-primary/10 rounded-xl px-3 py-2">
-                ✅ A support ticket has been created. Our team will follow up via email.
+                A support ticket has been created. Our team will follow up via email.
               </div>
             )}
             <div ref={bottomRef} />
@@ -135,16 +136,22 @@ export default function FloatingChat() {
 
           {/* Input */}
           <div className="px-4 py-3 border-t border-border flex-shrink-0">
-            <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2 focus-within:border-primary/50">
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                void sendMessage(input);
+              }}
+              className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2 focus-within:border-primary/50"
+            >
               <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void sendMessage(input); }}}
-                placeholder="Ask anything…"
+                placeholder="Ask for leads, pitches, or help..."
                 className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none" />
-              <button onClick={() => void sendMessage(input)} disabled={!input.trim() || loading}
+              <button type="submit" disabled={!input.trim() || loading}
+                aria-label="Send chat message"
                 className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0">
                 <Send className="w-3.5 h-3.5" />
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

@@ -8,9 +8,10 @@ import {
 import Link from "next/link";
 import {
   ArrowRight, Search, Sparkles, BarChart2, Check, Zap,
-  ChevronDown, Star, Shield, Globe, Users, TrendingUp,
-  Target, Layers, Bot, Send, Mail, Play, ExternalLink,
-  CheckCircle2, X, AlertCircle, Clock, DollarSign,
+  ChevronDown, Star, Shield, Globe, TrendingUp,
+  Target, Layers, Bot, Send, Play, ExternalLink,
+  CheckCircle2, X,
+  Briefcase, Building2, Radio, MapPin, SlidersHorizontal,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,16 +20,6 @@ import TestimonialCard from "@/components/TestimonialCard";
 import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
 
 // ── Variants ────────────────────────────────────────────────────────
-const fadeUp = {
-  hidden:  { opacity: 0, y: 32 },
-  visible: (d: number = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.65, delay: d, ease: [0.22, 1, 0.36, 1] } }),
-};
-const fadeIn = {
-  hidden:  { opacity: 0 },
-  visible: (d: number = 0) => ({ opacity: 1, transition: { duration: 0.5, delay: d } }),
-};
-const stagger = { visible: { transition: { staggerChildren: 0.09 } } };
-
 // ── Scroll Reveal ────────────────────────────────────────────────────
 function Reveal({ children, delay = 0, y = 28, className = "" }: {
   children: React.ReactNode; delay?: number; y?: number; className?: string;
@@ -143,29 +134,6 @@ function FAQItem({ q, a, i }: { q: string; a: string; i: number }) {
   );
 }
 
-// ── Animated Checkmark row ────────────────────────────────────────────
-function CheckRow({ text, delay = 0 }: { text: string; delay?: number }) {
-  return (
-    <motion.li variants={fadeUp} custom={delay} className="flex items-start gap-3 text-sm text-muted-foreground">
-      <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
-      <span>{text}</span>
-    </motion.li>
-  );
-}
-
-// ── Orbiting dots ─────────────────────────────────────────────────────
-function OrbitDot({ r, angle, color, size = 6 }: { r: number; angle: number; color: string; size?: number }) {
-  return (
-    <motion.div
-      className={`absolute rounded-full`}
-      style={{ width: size, height: size, background: color, boxShadow: `0 0 ${size * 2}px ${color}` }}
-      animate={{ rotate: [angle, angle + 360] }}
-      transition={{ duration: 12 + r / 10, repeat: Infinity, ease: "linear" }}
-      transformTemplate={({ rotate }) => `rotate(${rotate}deg) translateX(${r}px) rotate(-${rotate}deg)`}
-    />
-  );
-}
-
 // ── Step card ────────────────────────────────────────────────────────
 function StepCard({ n, icon, title, desc, isLast }: {
   n: string; icon: React.ReactNode; title: string; desc: string; isLast?: boolean;
@@ -193,80 +161,412 @@ function StepCard({ n, icon, title, desc, isLast }: {
 }
 
 // ── Data ─────────────────────────────────────────────────────────────
-const PAIN_POINTS = [
-  { icon: <Clock className="w-5 h-5" />, bad: "Wasting hours scrolling job boards manually", good: "Get 100+ qualified leads in 30 seconds" },
-  { icon: <AlertCircle className="w-5 h-5" />, bad: "Sending generic proposals that get ignored", good: "AI writes personalized outreach for each lead" },
-  { icon: <X className="w-5 h-5" />, bad: "No system — leads fall through the cracks", good: "Built-in CRM tracks every deal to close" },
+type LeadEngine = {
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  eyebrow: string;
+  title: string;
+  promise: string;
+  seoLine: string;
+  pitch: string;
+  route: string;
+  color: string;
+  metrics: Array<{ label: string; value: string }>;
+  filters: string[];
+  leads: Array<{ name: string; detail: string; score: number; signal: string; cta: string }>;
+  playbook: string[];
+  keywords: string[];
+};
+
+const LEAD_ENGINES: LeadEngine[] = [
+  {
+    id: "remote-jobs",
+    icon: <Briefcase className="w-5 h-5" />,
+    label: "Remote Jobs",
+    eyebrow: "First priority",
+    title: "Remote job leads before the crowd floods the inbox",
+    promise: "Track fresh remote freelance jobs, contract roles, and async hiring posts by niche, then turn the best matches into personal pitches.",
+    seoLine: "Built for searches like remote freelance jobs, remote job leads, freelance job alerts, and work from home client opportunities.",
+    pitch: "The best remote jobs do not stay quiet for long. iCloseLeads helps you spot the ones that match your skill before every freelancer on the internet sends the same proposal.",
+    route: "/dashboard/leads",
+    color: "#9F67FF",
+    metrics: [
+      { label: "Best for", value: "Retainers and contract roles" },
+      { label: "Speed angle", value: "Freshest first" },
+      { label: "Pitch style", value: "Proof-led intro" },
+    ],
+    filters: ["WordPress", "Meta ads", "SEO", "React", "Copywriting"],
+    leads: [
+      { name: "B2B SaaS needs Webflow cleanup", detail: "Remote contract - marketing site refresh", score: 94, signal: "Posted recently", cta: "Lead with speed and proof" },
+      { name: "Founder hiring Meta ads specialist", detail: "Growth role - paid social testing", score: 91, signal: "Budget mentioned", cta: "Pitch a 14-day test plan" },
+      { name: "Agency needs overflow WordPress help", detail: "Async freelance support", score: 86, signal: "Urgent delivery window", cta: "Offer a rescue sprint" },
+    ],
+    playbook: [
+      "Search one niche at a time so the score stays meaningful.",
+      "Open with the specific job signal, not your life story.",
+      "Use the AI proposal draft as a starting point, then add one sharp proof point.",
+    ],
+    keywords: ["remote freelance jobs", "remote job leads", "freelance job alerts", "remote contract work"],
+  },
+  {
+    id: "local-business-leads",
+    icon: <Building2 className="w-5 h-5" />,
+    label: "Local Business Leads",
+    eyebrow: "Second priority",
+    title: "Local businesses with visible buying signals",
+    promise: "Find local business leads that need websites, SEO, booking flows, ads, content, or modernization without manually digging through maps for hours.",
+    seoLine: "Designed around high-intent searches like local business leads, businesses without websites, outdated website leads, and web design clients.",
+    pitch: "A local business with a weak website is not a random prospect. It is a business already losing trust, bookings, or calls. That makes your outreach feel useful instead of cold.",
+    route: "/dashboard/local-leads",
+    color: "#00E5A0",
+    metrics: [
+      { label: "Best for", value: "Web, SEO, ads, content" },
+      { label: "Buying clue", value: "No site or outdated site" },
+      { label: "Pitch style", value: "Revenue gap" },
+    ],
+    filters: ["No website", "Outdated site", "Has phone", "High rating", "City search"],
+    leads: [
+      { name: "Family dental clinic", detail: "Outdated site - strong local reviews", score: 89, signal: "Modernization angle", cta: "Pitch booking improvements" },
+      { name: "Cleaning company in Houston", detail: "No verified website - phone present", score: 82, signal: "Direct contact path", cta: "Pitch lead capture page" },
+      { name: "Local fitness studio", detail: "Mobile site issues - active business", score: 78, signal: "Service demand", cta: "Pitch conversion audit" },
+    ],
+    playbook: [
+      "Start with a helpful observation from the business profile.",
+      "Tie the website or marketing gap to calls, bookings, or local trust.",
+      "Keep the ask small: a quick audit, simple mockup, or 15-minute review.",
+    ],
+    keywords: ["local business leads", "businesses without websites", "outdated website leads", "web design clients"],
+  },
+  {
+    id: "live-jobs",
+    icon: <Radio className="w-5 h-5" />,
+    label: "Live Jobs",
+    eyebrow: "Third priority",
+    title: "Live job signals you can act on today",
+    promise: "Watch public hiring demand, urgent project posts, and fresh client requests in one live feed so you do not miss timing-sensitive opportunities.",
+    seoLine: "Useful for live job leads, real-time freelance leads, urgent hiring posts, and fresh freelance opportunities.",
+    pitch: "Some leads are won because your offer is better. Others are won because you show up while the problem is still hot. Live Jobs is built for that second window.",
+    route: "/dashboard/live-jobs",
+    color: "#FFD166",
+    metrics: [
+      { label: "Best for", value: "Fast-moving opportunities" },
+      { label: "Timing cue", value: "Urgency and recency" },
+      { label: "Pitch style", value: "Solve it now" },
+    ],
+    filters: ["Urgent", "With budget", "With email", "Freshest first", "Source mix"],
+    leads: [
+      { name: "Startup needs landing page this week", detail: "Launch support - public request", score: 92, signal: "Deadline stated", cta: "Offer a 48-hour scope" },
+      { name: "Creator hiring email funnel help", detail: "Revenue project - clear need", score: 84, signal: "Contact signal found", cta: "Pitch quick funnel review" },
+      { name: "Small team needs analytics setup", detail: "Tracking issue - immediate pain", score: 80, signal: "Specific problem", cta: "Send diagnostic plan" },
+    ],
+    playbook: [
+      "Sort by freshness when timing matters more than volume.",
+      "Use contact filters when you want direct outreach-ready opportunities.",
+      "Save the lead and generate a proposal before context gets stale.",
+    ],
+    keywords: ["live job leads", "real-time freelance leads", "fresh freelance opportunities", "urgent hiring posts"],
+  },
 ];
 
 const FEATURES = [
   {
-    icon: <Search className="w-5 h-5 text-primary-light" />,
-    tag: "Discovery",
+    icon: <SlidersHorizontal className="w-5 h-5 text-primary-light" />,
+    tag: "Lead Filters",
     tagColor: "#9F67FF",
-    title: "Live Lead Channels, One Search",
-    desc: "We scan remote hiring signals, local business opportunities, community requests, and curated freelance feeds. Every result is fresh, real, and scored.",
-    stat: "Live channels",
+    title: "Search by niche, signal, urgency, and contact fit",
+    desc: "Filter remote jobs, local businesses, and live job leads by skill, location, contact data, budget clues, freshness, and website status.",
+    stat: "Cleaner search",
   },
   {
     icon: <Bot className="w-5 h-5 text-accent" />,
-    tag: "AI Engine",
+    tag: "AI Proposal",
     tagColor: "#00E5A0",
-    title: "Proposals That Actually Get Replies",
-    desc: "AI reads the lead context and writes a cold email that sounds like you wrote it, not like a generic template. Personalized in 3 seconds.",
-    stat: "3-sec generation",
+    title: "Draft outreach that sounds researched",
+    desc: "The proposal generator reads the opportunity context and turns it into a practical opener, value angle, subject line, and next step.",
+    stat: "Human tone",
   },
   {
     icon: <Target className="w-5 h-5 text-gold" />,
     tag: "Scoring",
     tagColor: "#FFD166",
-    title: "Quality Score 0–100 on Every Lead",
-    desc: "Our AI rates every lead on relevance, recency, and signal strength. You see only what's worth your time — not a sea of noise.",
-    stat: "100% scored",
+    title: "Know why a lead is worth your time",
+    desc: "Lead scores blend relevance, freshness, urgency, business fit, and contact readiness so you can prioritize instead of guessing.",
+    stat: "Signal-based",
   },
   {
     icon: <Layers className="w-5 h-5 text-blue-400" />,
     tag: "CRM",
     tagColor: "#60A5FA",
-    title: "6-Stage Pipeline — Built In",
-    desc: "Move leads through New → Contacted → Replied → Follow-Up → Won → Lost. One dashboard, full visibility. No spreadsheets.",
+    title: "A pipeline built for solo closers",
+    desc: "Move leads from saved to contacted, replied, follow-up, won, or lost. Keep remote jobs and local business leads in one clean workflow.",
     stat: "6 stages",
   },
   {
     icon: <Send className="w-5 h-5 text-pink-400" />,
     tag: "Outreach",
     tagColor: "#F472B6",
-    title: "Gmail-Ready Outreach",
-    desc: "Prepare polished emails in Gmail compose, review them manually, and keep your outreach history organized inside iCloseLeads.",
+    title: "Gmail-ready, review-first outreach",
+    desc: "Prepare polished drafts in Gmail, review every line yourself, and log the outreach inside iCloseLeads without risky auto-send behavior.",
     stat: "Safe prep",
   },
   {
     icon: <BarChart2 className="w-5 h-5 text-purple-400" />,
     tag: "Analytics",
     tagColor: "#A78BFA",
-    title: "Know What's Working",
-    desc: "Open rates, reply rates, pipeline conversion, revenue won — all in one clean dashboard. Iterate on data, not guesses.",
+    title: "See which lead engine is working",
+    desc: "Track searches, saved leads, prepared proposals, outreach volume, and pipeline movement so your client acquisition becomes measurable.",
     stat: "Full analytics",
   },
 ];
 
-const SOURCES = ["Remote jobs", "Local businesses", "Startup hiring", "Community requests", "Marketing leads", "Design leads", "Developer leads", "SEO leads", "Agency overflow", "Public web signals"];
+const SOURCES = ["Remote job leads", "Local business leads", "Live job signals", "Startup hiring", "Urgent projects", "Website gaps", "Marketing leads", "Design leads", "SEO leads", "Public demand"];
 
 const STATS = [
-  { to: 2847, suffix: "+", label: "Active Freelancers", sub: "signed up this month", color: "text-primary-light" },
-  { to: 40000, suffix: "+", label: "Leads Found Monthly", sub: "across multiple channels", color: "text-accent" },
-  { to: 94, suffix: "%", label: "Open Rate on AI Proposals", sub: "vs 21% industry avg", color: "text-gold" },
-  { to: 18, suffix: "k", prefix: "$", label: "Avg First-Month Revenue", sub: "for Pro users", color: "text-blue-400" },
+  { to: 3, suffix: "", prefix: "", label: "Core lead engines", sub: "remote, local, and live jobs", color: "text-primary-light" },
+  { to: 16, suffix: "+", prefix: "", label: "Signal paths monitored", sub: "fresh demand in one workflow", color: "text-accent" },
+  { to: 100, suffix: "", prefix: "", label: "Free daily lead allowance", sub: "during early access", color: "text-gold" },
+  { to: 6, suffix: "", prefix: "", label: "Pipeline stages", sub: "from saved lead to won deal", color: "text-blue-400" },
 ];
 
 const FAQS = [
-  { q: "Is it really free to start?", a: "Yes — the Free plan gives you fresh leads, AI-powered proposals, the full CRM pipeline, and all 3 free tools. No credit card, no trial expiry." },
-  { q: "Where exactly do the leads come from?", a: "We combine live hiring signals, local business opportunities, community requests, startup openings, and public web signals. Every lead is scored so you can focus on the strongest matches." },
-  { q: "How good is the AI proposal writing?", a: "The AI reads the lead's job posting, your niche, and your preferred tone to write a unique, personal cold email. Most users report a 3-5x improvement in response rate vs their old templates." },
-  { q: "Will other users see the same leads as me?", a: "No. iCloseLeads runs per-user deduplication — you'll never be shown a lead you've already saved or emailed, and our system filters out leads that heavily overlapping users have already contacted." },
+  { q: "What are the top three iCloseLeads features?", a: "The homepage now focuses on the three lead engines freelancers use most: Remote Jobs for contract and freelance roles, Local Business Leads for web design, SEO, ads, and marketing clients, and Live Jobs for urgent public hiring signals." },
+  { q: "Is it really free to start?", a: "Yes. The Free plan gives you fresh lead discovery, AI-assisted proposals, local business search, live job signals, the CRM pipeline, and useful freelancer tools during early access. No credit card is required." },
+  { q: "Can I use it to find remote freelance jobs?", a: "Yes. Remote Jobs is built for niche searches like WordPress, Meta ads, SEO, React, design, copywriting, and other freelance skills. It helps you find relevant remote job leads and draft a better first message." },
+  { q: "Can I use it for local business lead generation?", a: "Yes. Local Business Leads helps freelancers find businesses with useful outreach angles such as no website, outdated website, phone available, active local profile, or high review potential." },
+  { q: "How does the AI proposal writing work without sounding generic?", a: "The proposal workflow starts from the actual lead context: the job title, business type, visible pain, niche, and your service angle. You still review and edit the message before sending, which keeps the outreach human." },
   { q: "Can I cancel at any time?", a: "Yes — cancel anytime from your profile with zero friction. You keep access until the end of your billing period. No cancellation fees." },
-  { q: "How do I connect Stripe for payments?", a: "If you're running the self-hosted version, go to Admin → Settings → Payment Gateway, paste your Stripe keys and price IDs, and you're live. The guide in GO_LIVE_GUIDE.md walks you through every step." },
 ];
+
+function LeadEngineShowcase() {
+  const [activeId, setActiveId] = useState(LEAD_ENGINES[0]!.id);
+  const active = LEAD_ENGINES.find(engine => engine.id === activeId) ?? LEAD_ENGINES[0]!;
+
+  return (
+    <section className="py-24 px-4 relative overflow-hidden" id="lead-engines">
+      <div className="absolute inset-0 bg-gradient-to-b from-surface/0 via-surface/45 to-surface/0 pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative">
+        <SectionHeading
+          badge="Lead Engines"
+          badgeColor="gold"
+          title={<>Three ways to find your<br />next serious client</>}
+          sub="Remote jobs first, local business leads second, live jobs third. Each path has a different buying signal, pitch angle, and search workflow."
+        />
+
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-[0.82fr_1.18fr] gap-6 items-stretch">
+          <Reveal className="space-y-3">
+            {LEAD_ENGINES.map((engine, i) => {
+              const isActive = engine.id === active.id;
+              return (
+                <button
+                  key={engine.id}
+                  onClick={() => setActiveId(engine.id)}
+                  className={`w-full text-left rounded-2xl border p-5 transition-all ${isActive ? "border-primary/50 bg-primary/10 shadow-glow-primary" : "border-border bg-gradient-card hover:border-primary/30 hover:bg-surface"}`}
+                >
+                  <div className="flex items-start gap-4">
+                    <span
+                      className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 border"
+                      style={{ color: engine.color, background: `${engine.color}16`, borderColor: `${engine.color}35` }}
+                    >
+                      {engine.icon}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-bold">{engine.eyebrow}</span>
+                      <span className={`block mt-1 font-bold ${isActive ? "text-foreground" : "text-foreground/85"}`}>{i + 1}. {engine.label}</span>
+                      <span className="block mt-1 text-sm font-semibold text-foreground/80 leading-snug">{engine.title}</span>
+                      <span className="block mt-1.5 text-sm text-muted-foreground leading-relaxed">{engine.promise}</span>
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="h-full rounded-2xl border border-border bg-gradient-card overflow-hidden">
+              <div className="border-b border-border bg-background/40 p-5 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <Badge color={active.id === "live-jobs" ? "gold" : active.id === "local-business-leads" ? "accent" : "primary"}>
+                      {active.label}
+                    </Badge>
+                    <h3 className="mt-4 text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">{active.title}</h3>
+                    <p className="mt-3 text-muted-foreground leading-relaxed">{active.pitch}</p>
+                  </div>
+                  <Link
+                    href={active.route}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-all flex-shrink-0"
+                  >
+                    Try this engine <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {active.metrics.map(metric => (
+                    <div key={metric.label} className="rounded-xl border border-border bg-background/55 p-3">
+                      <div className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground font-bold">{metric.label}</div>
+                      <div className="mt-1 text-sm font-semibold text-foreground">{metric.value}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-5 sm:p-6">
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {active.filters.map(filter => (
+                    <span key={filter} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">
+                      {filter}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="space-y-3">
+                  {active.leads.map((lead, i) => (
+                    <motion.div
+                      key={lead.name}
+                      initial={{ opacity: 0, x: 12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.08 }}
+                      className="rounded-2xl border border-border bg-background/70 p-4"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${active.color}16`, color: active.color }}>
+                          {active.id === "local-business-leads" ? <MapPin className="w-5 h-5" /> : active.id === "live-jobs" ? <Radio className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-bold text-foreground">{lead.name}</h4>
+                            <span className="rounded-full bg-accent/10 border border-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent">Score {lead.score}</span>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">{lead.detail}</p>
+                          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                            <span className="rounded-full bg-gold/10 border border-gold/20 px-2.5 py-1 text-gold">{lead.signal}</span>
+                            <span className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-1 text-primary-light">{lead.cta}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground mb-3">
+                    <Sparkles className="w-4 h-4 text-primary-light" />
+                    Recommended playbook
+                  </div>
+                  <ul className="space-y-2">
+                    {active.playbook.map(item => (
+                      <li key={item} className="flex gap-2 text-sm text-muted-foreground leading-relaxed">
+                        <CheckCircle2 className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">{active.seoLine}</p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function OpportunityCommandCenter() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = LEAD_ENGINES[activeIndex] ?? LEAD_ENGINES[0]!;
+  const bars = active.leads.map(lead => lead.score);
+
+  return (
+    <TiltCard className="relative">
+      <div className="relative rounded-2xl border border-border overflow-hidden bg-gradient-card shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-surface/80">
+          <div className="flex gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-destructive/60" />
+            <div className="w-3 h-3 rounded-full bg-gold/60" />
+            <div className="w-3 h-3 rounded-full bg-accent/60" />
+          </div>
+          <span className="text-xs text-muted-foreground ml-2 font-mono">iCloseLeads - Opportunity Command Center</span>
+        </div>
+
+        <div className="p-5">
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            {LEAD_ENGINES.map((engine, i) => (
+              <button
+                key={engine.id}
+                onClick={() => setActiveIndex(i)}
+                className={`rounded-xl border px-2.5 py-2 text-xs font-bold transition-all ${i === activeIndex ? "border-primary/45 bg-primary/15 text-foreground" : "border-border bg-background text-muted-foreground hover:border-primary/30"}`}
+              >
+                {engine.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl bg-background border border-border">
+            <Search className="w-4 h-4 text-primary-light flex-shrink-0" />
+            <span className="text-sm text-foreground font-medium">{active.keywords[0]}</span>
+            <span className="ml-auto text-xs text-muted-foreground">Freshest first</span>
+            <motion.div className="w-2 h-2 rounded-full bg-accent" animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }} />
+          </div>
+
+          <div className="rounded-2xl border border-border bg-background/60 p-4 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Signal strength</span>
+              <span className="text-xs font-bold" style={{ color: active.color }}>{active.label}</span>
+            </div>
+            <div className="space-y-3">
+              {bars.map((score, i) => (
+                <div key={`${active.id}-${i}`} className="flex items-center gap-3">
+                  <span className="w-16 text-xs text-muted-foreground">Lead {i + 1}</span>
+                  <div className="h-2 flex-1 rounded-full bg-border overflow-hidden">
+                    <motion.div
+                      key={`${active.id}-${score}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${score}%` }}
+                      transition={{ duration: 0.55, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${active.color}, #00E5A0)` }}
+                    />
+                  </div>
+                  <span className="w-8 text-right text-xs font-bold text-foreground">{score}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={active.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              className="rounded-2xl border border-primary/20 bg-primary/5 p-4"
+            >
+              <div className="flex items-center gap-2 mb-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-accent" />
+                <span className="text-xs font-semibold text-foreground">AI pitch angle</span>
+                <span className="ml-auto text-[10px] text-accent font-medium">Review before sending</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {active.leads[0]?.cta}. Open with the exact signal, show one relevant proof point, and ask for a small next step.
+              </p>
+              <Link href={active.route} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-light transition-colors">
+                Explore {active.label} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+      <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -right-4 top-24 px-3 py-2 rounded-xl glass-card border border-accent/25 text-xs font-semibold text-foreground shadow-xl hidden lg:flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+        Fresh signal found
+      </motion.div>
+    </TiltCard>
+  );
+}
 
 
 // ── Early Access Banner (dismissible) ────────────────────────────────────────
@@ -286,7 +586,7 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
             ✦ FREE
           </span>
           <span className="text-white/80">
-            <strong className="text-white">Early Access</strong> — all features unlocked, no credit card.
+            <strong className="text-white">Early Access</strong> — core lead tools free, no credit card.
           </span>
           <span className="text-white/40 hidden sm:inline">·</span>
           <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
@@ -398,8 +698,8 @@ export default function HomepageClient() {
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
               </div>
-              <span className="text-foreground font-semibold">2,847 freelancers</span>
-              <span className="text-muted-foreground">found clients this week</span>
+              <span className="text-foreground font-semibold">Remote, local, and live leads</span>
+              <span className="text-muted-foreground">in one focused workflow</span>
             </div>
           </motion.div>
 
@@ -427,7 +727,7 @@ export default function HomepageClient() {
           {/* Sub */}
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            iCloseLeads searches <strong className="text-foreground">live lead channels</strong> simultaneously, scores every lead with AI, and writes personalised proposals in 3 seconds — so you spend time closing, not searching.
+            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live job opportunities, then turns each signal into a sharper pitch, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
@@ -450,9 +750,9 @@ export default function HomepageClient() {
             className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
-              { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Live in 60 seconds" },
-              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Live lead channels" },
-              { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "94% open rate on proposals" },
+              { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Remote jobs first" },
+              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Local business discovery" },
+              { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "Review-first Gmail outreach" },
             ].map(({ icon, t }) => (
               <div key={t} className="flex items-center gap-1.5">{icon}<span>{t}</span></div>
             ))}
@@ -461,7 +761,7 @@ export default function HomepageClient() {
           {/* Source pills */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-2 mt-8">
-            <span className="text-xs text-muted-foreground mr-1">Pulling live leads from multiple channels:</span>
+            <span className="text-xs text-muted-foreground mr-1">Lead engines and high-intent signals:</span>
             {SOURCES.map((s, i) => (
               <motion.span key={s} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1 + i * 0.06 }}
@@ -481,52 +781,7 @@ export default function HomepageClient() {
         </motion.div>
       </section>
 
-      {/* ════════════════════════════════════════════
-          PROBLEM → SOLUTION
-      ════════════════════════════════════════════ */}
-      <section className="py-24 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-surface/0 via-surface/40 to-surface/0 pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative">
-          <SectionHeading
-            badge="The Real Problem"
-            badgeColor="gold"
-            title={<>Why most freelancers<br />struggle to find clients</>}
-            sub="It's not your skills. It's your system. Here's exactly what's going wrong — and how iCloseLeads fixes it."
-          />
-
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PAIN_POINTS.map((p, i) => (
-              <Reveal key={i} delay={i * 0.12}>
-                <TiltCard>
-                  <motion.div whileHover={{ borderColor: "rgba(159,103,255,0.4)" }}
-                    className="bg-gradient-card border border-border rounded-2xl p-6 h-full group cursor-default">
-                    {/* Before */}
-                    <div className="flex items-start gap-3 mb-5 p-3.5 rounded-xl bg-destructive/5 border border-destructive/15">
-                      <div className="w-7 h-7 rounded-lg bg-destructive/10 flex items-center justify-center text-destructive flex-shrink-0 mt-0.5">
-                        <X className="w-3.5 h-3.5" />
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-snug">{p.bad}</p>
-                    </div>
-                    {/* Arrow */}
-                    <div className="flex justify-center mb-5">
-                      <motion.div animate={{ y: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                        <ChevronDown className="w-5 h-5 text-primary-light/50" />
-                      </motion.div>
-                    </div>
-                    {/* After */}
-                    <div className="flex items-start gap-3 p-3.5 rounded-xl bg-accent/5 border border-accent/15">
-                      <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center text-accent flex-shrink-0 mt-0.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                      </div>
-                      <p className="text-sm text-foreground font-medium leading-snug">{p.good}</p>
-                    </div>
-                  </motion.div>
-                </TiltCard>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <LeadEngineShowcase />
 
       {/* ════════════════════════════════════════════
           STATS BAR
@@ -557,29 +812,30 @@ export default function HomepageClient() {
               <SectionHeading
                 badge="How It Works"
                 badgeColor="primary"
-                title={<>From zero to<br />first reply in one hour</>}
+                title={<>From lead signal to<br />confident outreach</>}
+                sub="The homepage promise is simple: find the right opportunity, understand the angle, write a useful message, and keep every follow-up visible."
                 center={false}
               />
               <div className="mt-10 space-y-0">
                 <Reveal delay={0.1}>
                   <StepCard n="1" icon={<Search className="w-5 h-5" />}
-                    title="Search your niche"
-                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches live channels and returns scored, deduplicated leads in seconds." />
+                    title="Pick the lead engine"
+                    desc="Start with Remote Jobs for contract work, Local Business Leads for service businesses, or Live Jobs for fresh public demand. The search language changes with the opportunity type." />
                 </Reveal>
                 <Reveal delay={0.2}>
-                  <StepCard n="2" icon={<Sparkles className="w-5 h-5" />}
-                    title="Generate an AI proposal"
-                    desc="Click any lead. Our AI reads the posting and writes a personalized cold email in your voice in under 3 seconds. Edit freely, then prepare it in Gmail." />
+                  <StepCard n="2" icon={<Target className="w-5 h-5" />}
+                    title="Qualify by signal, not volume"
+                    desc="Use relevance, freshness, urgency, contact readiness, and website status to separate real opportunities from noisy listings." />
                 </Reveal>
                 <Reveal delay={0.3}>
-                  <StepCard n="3" icon={<Send className="w-5 h-5" />}
-                    title="Prepare and track"
-                    desc="Open Gmail compose with the message prefilled, review it, and send manually. iCloseLeads logs the prepared outreach in your history." />
+                  <StepCard n="3" icon={<Sparkles className="w-5 h-5" />}
+                    title="Write the first message with context"
+                    desc="Generate an AI-assisted proposal that references the actual lead, your niche, and the business reason they should reply. Edit it so it still sounds like you." />
                 </Reveal>
                 <Reveal delay={0.4}>
-                  <StepCard n="4" icon={<DollarSign className="w-5 h-5" />}
-                    title="Follow up and close" isLast
-                    desc="Move leads through your 6-stage CRM. iCloseLeads reminds you when to follow up, so no deal ever falls through the cracks." />
+                  <StepCard n="4" icon={<Send className="w-5 h-5" />}
+                    title="Prepare, save, and follow up" isLast
+                    desc="Open Gmail with the draft prepared, save the lead, and keep the deal moving through your freelance CRM until it becomes a client or a clean no." />
                 </Reveal>
               </div>
             </div>
@@ -587,86 +843,7 @@ export default function HomepageClient() {
             {/* Right: animated dashboard preview */}
             <Reveal delay={0.15}>
               <div className="lg:sticky lg:top-32">
-                <TiltCard className="relative">
-                  <div className="relative rounded-2xl border border-border overflow-hidden bg-gradient-card shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
-                    {/* Window chrome */}
-                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border bg-surface/80">
-                      <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                        <div className="w-3 h-3 rounded-full bg-gold/60" />
-                        <div className="w-3 h-3 rounded-full bg-accent/60" />
-                      </div>
-                      <span className="text-xs text-muted-foreground ml-2 font-mono">iCloseLeads — Lead Search</span>
-                    </div>
-                    <div className="p-5">
-                      {/* Search bar */}
-                      <div className="flex items-center gap-3 mb-5 px-4 py-2.5 rounded-xl bg-background border border-border">
-                        <Search className="w-4 h-4 text-primary-light flex-shrink-0" />
-                        <span className="text-sm text-foreground font-medium">React developer</span>
-                        <span className="ml-auto text-xs text-muted-foreground">23 leads found</span>
-                        <motion.div className="w-2 h-2 rounded-full bg-accent" animate={{ opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }} />
-                      </div>
-
-                      {/* Lead cards */}
-                      {[
-                        { co: "Acme Corp",        role: "React Frontend Dev",    score: 94, tag: "High" },
-                        { co: "StartupXYZ",       role: "Full-stack engineer",   score: 88, tag: "High" },
-                        { co: "DesignHub Agency", role: "React + Next.js",       score: 76, tag: "Good" },
-                        { co: "TechVentures",     role: "Remote React dev",      score: 71, tag: "Good" },
-                      ].map((l, i) => (
-                        <motion.div key={l.co}
-                          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.5 + i * 0.15 }}
-                          whileHover={{ x: 4, backgroundColor: "rgba(124,58,237,0.06)" }}
-                          className="flex items-center gap-3 py-2.5 px-3 rounded-xl mb-1.5 cursor-pointer transition-colors group">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-hero flex items-center justify-center text-white font-bold text-xs flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                            {l.co[0]}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-foreground text-xs font-semibold truncate">{l.co}</p>
-                            <p className="text-muted-foreground text-xs truncate">{l.role}</p>
-                          </div>
-                          <div className={`px-2 py-0.5 rounded-full text-[11px] font-bold border flex-shrink-0 ${l.score >= 85 ? "bg-accent/10 text-accent border-accent/25" : "bg-gold/10 text-gold border-gold/25"}`}>
-                            {l.score}
-                          </div>
-                        </motion.div>
-                      ))}
-
-                      {/* Proposal preview */}
-                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }}
-                        className="mt-4 p-4 rounded-xl bg-primary/6 border border-primary/20">
-                        <div className="flex items-center gap-2 mb-2.5">
-                          <Sparkles className="w-3.5 h-3.5 text-accent" />
-                          <span className="text-xs font-semibold text-foreground">AI Proposal — Acme Corp</span>
-                          <span className="ml-auto text-[10px] text-accent font-medium">Generated in 2.3s</span>
-                        </div>
-                        {[
-                          "Hi — I noticed Acme Corp is looking for a React developer and your stack caught my eye immediately.",
-                          "I've shipped production React apps for 12+ SaaS companies in the past 3 years...",
-                        ].map((line, i) => (
-                          <motion.p key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.7 + i * 0.3 }}
-                            className="text-xs text-muted-foreground mb-1.5 leading-relaxed">{line}</motion.p>
-                        ))}
-                        <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.4 }}
-                          whileHover={{ scale: 1.02 }}
-                          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary text-white text-xs font-semibold">
-                          <Mail className="w-3 h-3" /> Send Email
-                        </motion.button>
-                      </motion.div>
-                    </div>
-                  </div>
-                  {/* Floating badges */}
-                  <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -right-4 top-20 px-3 py-2 rounded-xl glass-card border border-accent/25 text-xs font-semibold text-foreground shadow-xl hidden lg:flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                    94 score — Top lead
-                  </motion.div>
-                  <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -left-4 bottom-24 px-3 py-2 rounded-xl glass-card border border-gold/25 text-xs font-semibold text-foreground shadow-xl hidden lg:flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-                    Proposal sent ✓
-                  </motion.div>
-                </TiltCard>
+                <OpportunityCommandCenter />
               </div>
             </Reveal>
           </div>
@@ -731,7 +908,7 @@ export default function HomepageClient() {
             badge="Real Results"
             badgeColor="gold"
             title={<>What freelancers are<br />saying after 30 days</>}
-            sub="Not made-up success stories. These are real people who used iCloseLeads to land real clients."
+            sub="The pattern is simple: better lead timing, more relevant outreach, and a cleaner follow-up system."
           />
 
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -749,9 +926,9 @@ export default function HomepageClient() {
           {/* Bottom number strip */}
           <Reveal delay={0.3} className="mt-14 grid grid-cols-3 gap-4">
             {[
-              { n: "3×", label: "average response rate increase" },
-              { n: "47min", label: "average time to first lead" },
-              { n: "$18k", label: "average first-month revenue on Pro" },
+              { n: "3", label: "lead engines built around real buying signals" },
+              { n: "1", label: "workflow from lead discovery to follow-up" },
+              { n: "6", label: "pipeline stages for every client opportunity" },
             ].map(({ n, label }) => (
               <div key={label} className="text-center p-5 rounded-2xl bg-gradient-card border border-border">
                 <div className="text-3xl font-extrabold gradient-text mb-1">{n}</div>
@@ -771,7 +948,7 @@ export default function HomepageClient() {
           <SectionHeading
             badge="Pricing"
             title={<>Free during Early Access.<br />Pro plans coming soon.</>}
-            sub="Everything is 100% free right now. Pro & Agency plans are launching soon — sign up free to lock in early access."
+            sub="Start with the core lead discovery, AI proposal, CRM, and outreach workflow for free during early access. Pro and Agency plans are launching soon."
           />
 
           <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -787,7 +964,7 @@ export default function HomepageClient() {
 
           <Reveal delay={0.35} className="mt-8 text-center">
             <p className="text-muted-foreground text-sm">
-              All features are <strong className="text-foreground">free during Early Access</strong>. Paid plans launch soon — no surprise charges, ever.
+              Core features are <strong className="text-foreground">free during Early Access</strong>. Paid plans launch later with clear limits and no surprise charges.
             </p>
           </Reveal>
         </div>
@@ -841,7 +1018,7 @@ export default function HomepageClient() {
                   Stop waiting for clients<br />to come to you.
                 </h2>
                 <p className="text-muted-foreground text-xl mb-10 max-w-lg mx-auto leading-relaxed">
-                  Join 2,847 freelancers already finding clients with AI. 100% free during early access — start in 60 seconds.
+                  Start with remote job leads, local business leads, and live job signals. Then write a better pitch and track every follow-up without leaving the workflow.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -855,15 +1032,15 @@ export default function HomepageClient() {
                   <Link href="/auth?mode=signup&plan=pro"
                     className="flex items-center gap-2 px-8 py-4 rounded-2xl border border-gold/30 hover:border-gold/60 text-gold font-semibold text-base transition-all hover:-translate-y-0.5 hover:bg-gold/5">
                     <Star className="w-4 h-4 fill-gold" />
-                    Start Pro — $29/mo
+                    See Early Access
                   </Link>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> No credit card</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> 100% free during Early Access</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> All features unlocked</span>
-                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> No limits right now</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> Free early access</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> Remote, local, and live leads</span>
+                  <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent" /> Review-first outreach</span>
                 </div>
               </div>
             </div>
