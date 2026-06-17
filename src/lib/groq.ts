@@ -168,56 +168,165 @@ Best,
 [Your Name]`;
 }
 
+function hasAny(text: string, terms: string[]): boolean {
+  return terms.some(term => text.includes(term));
+}
+
+function withSignupFlow(answer: string, nextStep = "Create a free early access account, run one real search, and save the first lead worth pursuing. No card is needed while Pro and Agency plans are being prepared."): string {
+  return `${answer}
+
+Best next step: ${nextStep}`;
+}
+
+function buildLeadEngineRecommendation(message: string): string {
+  const lower = message.toLowerCase();
+
+  if (hasAny(lower, ["website", "web design", "wordpress", "seo", "local", "dentist", "cleaning", "restaurant", "clinic", "contractor"])) {
+    return withSignupFlow(`I would start you with Local Business Leads.
+
+Why: your service is easiest to sell when a business has a visible gap: no website, an outdated site, weak booking flow, poor mobile trust, or no clear call-to-action. That gives you a natural reason to reach out without sounding random.
+
+Simple play:
+1. Search one service category plus one city.
+2. Filter for no website or outdated site.
+3. Prioritize businesses with phone numbers, strong reviews, or clear service demand.
+4. Generate a pitch that ties the gap to calls, bookings, or local trust.`);
+  }
+
+  if (hasAny(lower, ["ads", "meta", "facebook", "google ads", "paid social", "media buyer", "funnel"])) {
+    return withSignupFlow(`I would start you with Remote Jobs, then use Live Jobs for fresh urgent posts.
+
+Why: Meta ads and paid growth buyers usually reveal intent through hiring posts, budget language, launch deadlines, or founder requests. You want active demand, not cold guessing.
+
+Simple play:
+1. Search "Meta ads", "paid social", or "media buyer".
+2. Sort newest first.
+3. Look for budget, urgency, niche, or campaign goals.
+4. Pitch a small test plan instead of a vague "I can run ads" message.`);
+  }
+
+  return withSignupFlow(`I would start with Remote Jobs first, then use Local Business Leads as your steady outbound lane.
+
+Why: Remote Jobs catches people already asking for help, while Local Business Leads gives you a repeatable prospecting system when job boards slow down.
+
+Simple play:
+1. Pick one niche.
+2. Find active demand in Remote Jobs.
+3. Save the best leads.
+4. Use AI Proposal to draft the first message.
+5. Prepare it in Gmail and track follow-up in the pipeline.`);
+}
+
 function buildLocalSupportReply(messages: Array<{ role: "user" | "assistant"; content: string }>): { reply: string; shouldCreateTicket: boolean } {
   const lastMessage = messages[messages.length - 1]?.content ?? "";
   const lower = lastMessage.toLowerCase();
-  const urgentBug = /\b(error|bug|broken|not working|failed|can't|cannot|stuck|login|signup|payment|billing)\b/i.test(lastMessage);
+  const urgentBug = /\b(error|bug|broken|not working|failed|can't|cannot|stuck|payment|billing)\b/i.test(lastMessage) ||
+    (/\b(login|signup|sign up)\b/i.test(lastMessage) && /\b(issue|problem|error|broken|not working|failed|can't|cannot|stuck)\b/i.test(lastMessage));
+
+  if (hasAny(lower, ["which", "best for me", "where should i start", "what should i do first", "recommend", "i do ", "my niche", "my service"])) {
+    return {
+      reply: buildLeadEngineRecommendation(lastMessage),
+      shouldCreateTicket: false,
+    };
+  }
+
+  if (!urgentBug && hasAny(lower, ["sign up", "signup", "create account", "get started", "start free", "free account", "join", "try it"])) {
+    return {
+      reply: `Yes - the best move is to start with the free early access account.
+
+You do not need a card right now. Inside, you can test the real workflow:
+1. Find remote job leads, local business leads, or live job signals.
+2. Save the leads that look worth pursuing.
+3. Generate a draft proposal or pitch.
+4. Prepare Gmail outreach and track follow-up.
+
+Pro and Agency plans are coming later, so free early access is the cleanest way to try the platform before paid plans launch.`,
+      shouldCreateTicket: false,
+    };
+  }
 
   if (/\b(write|draft|generate|proposal|pitch|cold email|subject line|outreach|message)\b/i.test(lastMessage)) {
     return {
-      reply: buildLocalContentDraft(lastMessage),
+      reply: `${buildLocalContentDraft(lastMessage)}
+
+If you want this to be sharper, use the free account with a real lead selected. The AI proposal flow can pull in the lead context, business type, niche, and outreach angle so the message feels less generic.`,
       shouldCreateTicket: false,
     };
   }
 
   if (lower.includes("live")) {
     return {
-      reply: `Live Jobs is for timing-sensitive opportunities. Use it when you want fresh hiring signals, urgent posts, or contact-ready leads. The best move is speed plus relevance: reply while the problem is still active, mention the exact signal, and offer a small next step such as a quick audit, scope review, or 48-hour sprint.`,
+      reply: withSignupFlow(`Live Jobs is for timing-sensitive opportunities: fresh hiring signals, urgent posts, contact-ready leads, and public requests where speed matters.
+
+The winning angle is not "I saw your post." It is: "I saw the exact problem, here is the fastest low-risk next step."
+
+Use it when:
+1. The post is fresh.
+2. The need is urgent or specific.
+3. There is a contact path or clear application link.
+4. You can pitch a small next step, like an audit, quick scope review, or 48-hour sprint.`),
       shouldCreateTicket: false,
     };
   }
 
   if (lower.includes("remote") || lower.includes("job")) {
     return {
-      reply: `For Remote Jobs, start narrow: choose one niche such as WordPress, Meta ads, SEO, React, design, or copywriting, then sort by freshness first. The strongest remote job leads usually have three signals: a clear problem, recent posting activity, and enough detail to write a specific proposal.
+      reply: withSignupFlow(`Remote Jobs should be your first engine if you want people who are already asking for help.
+
+Start narrow: choose one niche such as WordPress, Meta ads, SEO, React, design, or copywriting, then sort by freshness first. The strongest remote job leads usually have three signals: a clear problem, recent posting activity, and enough detail to write a specific proposal.
 
 Best workflow:
 1. Search one niche.
 2. Open the best scored lead.
 3. Generate a proposal.
 4. Add one proof point from your own work.
-5. Prepare it in Gmail and save the lead for follow-up.`,
+5. Prepare it in Gmail and save the lead for follow-up.`),
       shouldCreateTicket: false,
     };
   }
 
   if (lower.includes("local") || lower.includes("business") || lower.includes("website")) {
     return {
-      reply: `For Local Business Leads, the best angles are not "do you need a website?" The better angle is tied to money: missed calls, weak trust, slow booking, poor mobile experience, or no clear next step.
+      reply: withSignupFlow(`For Local Business Leads, the best angles are not "do you need a website?" The better angle is tied to money: missed calls, weak trust, slow booking, poor mobile experience, or no clear next step.
 
 Try this:
 1. Search a service niche plus city.
 2. Filter for no website or outdated site.
 3. Prioritize businesses with a phone number or strong reviews.
 4. Open the map/profile to verify the business.
-5. Pitch one specific improvement, not a full rebuild immediately.`,
+5. Pitch one specific improvement, not a full rebuild immediately.`),
       shouldCreateTicket: false,
     };
   }
 
-  if (lower.includes("free") || lower.includes("price") || lower.includes("plan")) {
+  if (hasAny(lower, ["free", "price", "pricing", "plan", "paid", "cost", "agency", "pro", "card", "trial"])) {
     return {
-      reply: `You can start free during early access. The free workflow is enough to test the core platform: find remote job leads, search local business leads, inspect live job signals, generate proposals, save leads, and track follow-ups. No card is needed to start.`,
+      reply: `Right now, the right path is free early access.
+
+No card is needed. Pro and Agency are being prepared, but they are not the main thing to worry about yet. The free account is meant to let you test the core product honestly:
+1. Remote job lead discovery.
+2. Local business lead discovery.
+3. Live job signals.
+4. AI proposals and pitch drafts.
+5. Saved leads, Gmail-ready outreach, and follow-up tracking.
+
+Best next step: start free, run one search in your niche, and see if the leads are useful before any paid plan launches.`,
+      shouldCreateTicket: false,
+    };
+  }
+
+  if (hasAny(lower, ["how does it work", "what is this", "what do you do", "features", "explain", "platform"])) {
+    return {
+      reply: withSignupFlow(`iCloseLeads is a freelance lead generation workspace. It helps you move from "where do I find clients?" to "which lead should I pitch next?"
+
+The simple version:
+1. Remote Jobs finds active hiring demand.
+2. Local Business Leads finds businesses with practical outreach angles.
+3. Live Jobs catches fresh, timing-sensitive opportunities.
+4. AI Proposal helps turn the lead context into a useful message.
+5. The CRM keeps the lead, pitch, and follow-up in one place.
+
+The goal is not to blast generic cold emails. The goal is to find better signals and write more relevant outreach.`),
       shouldCreateTicket: false,
     };
   }
@@ -226,20 +335,20 @@ Try this:
     return {
       reply: `I can help troubleshoot this. Please try one quick check first: refresh the page, sign out and back in if this is account-related, then repeat the action once. If it still fails, send the exact page name and what you clicked.
 
-I have also flagged this as a support issue so the team can review it from the backend if needed.`,
+If it still fails, I can route it as a support issue with the exact page and action so it can be reviewed properly.`,
       shouldCreateTicket: true,
     };
   }
 
   return {
-    reply: `I can help with lead discovery, remote jobs, local business leads, live jobs, AI proposals, Gmail-ready outreach, campaigns, saved leads, and CRM follow-up.
+    reply: withSignupFlow(`I can help with lead discovery, remote jobs, local business leads, live jobs, AI proposals, Gmail-ready outreach, campaigns, saved leads, and CRM follow-up.
 
 If you want the fastest path to a client, start here:
 1. Pick one service niche.
 2. Use Remote Jobs first for active demand.
 3. Use Local Business Leads when you want direct business owners.
 4. Use Live Jobs when timing matters.
-5. Generate a proposal, personalize the first two lines, and save the lead for follow-up.`,
+5. Generate a proposal, personalize the first two lines, and save the lead for follow-up.`),
     shouldCreateTicket: false,
   };
 }
@@ -267,7 +376,16 @@ Common issues and fixes:
 - "Lead limit reached" → Explain the current plan limit and suggest waiting for reset or upgrading when plans are active
 - "Email not sending" → iCloseLeads prepares Gmail drafts by default; users review and send inside Gmail
 
-Answer helpfully and concisely. You may draft short proposal, pitch, subject line, and outreach content directly. If you cannot resolve an account or product issue after 2 exchanges, say: "ESCALATE: [brief description of issue]" so a ticket can be raised.`;
+Conversion guidance:
+- Answer the user's actual question first.
+- Then suggest the best next step inside iCloseLeads.
+- Until Pro and Agency plans launch, guide qualified users toward free early access signup.
+- Do not imply paid plans are live. Say Pro and Agency are coming soon or being prepared.
+- Do not tell users to buy or configure an external AI API.
+- Do not name raw data providers or imply the platform is built from free sources.
+- Avoid fake guarantees, fake revenue claims, and pushy language.
+
+Answer helpfully and concisely. You may draft short proposal, pitch, subject line, and outreach content directly. If it is relevant, end with a natural free signup next step such as: "Best next step: create a free early access account and run one search in your niche." If you cannot resolve an account or product issue after 2 exchanges, say: "ESCALATE: [brief description of issue]" so a ticket can be raised.`;
 
   if (!apiKey) {
     return buildLocalSupportReply(messages);

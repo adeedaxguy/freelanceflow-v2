@@ -1,21 +1,35 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, User, Loader2, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { MessageCircle, X, Send, Bot, User, Loader2, ChevronDown, ArrowRight } from "lucide-react";
 
 interface Message { role: "user" | "assistant"; content: string; }
 
 const QUICK_QUESTIONS = [
+  "Which lead engine should I use?",
   "Find remote job leads",
-  "Write a local business pitch",
-  "How do Live Jobs work?",
-  "What should I do first?",
+  "Is it free right now?",
+  "Write a local pitch",
 ];
+
+function shouldShowSignupCta(message: Message): boolean {
+  if (message.role !== "assistant") return false;
+  const content = message.content.toLowerCase();
+  return [
+    "free early access",
+    "free account",
+    "start free",
+    "create a free",
+    "no card",
+    "best next step",
+  ].some(phrase => content.includes(phrase));
+}
 
 export default function FloatingChat() {
   const [open,       setOpen]      = useState(false);
   const [messages,   setMessages]  = useState<Message[]>([
-    { role: "assistant", content: "Hi, I'm iCloseLeads AI. I can help you find remote jobs, local business leads, live job opportunities, or draft a sharper outreach message." },
+    { role: "assistant", content: "Hi, I'm iCloseLeads AI. Tell me what kind of clients you want, and I'll point you to the best lead engine, explain the workflow, or draft a pitch. Free early access is open while Pro and Agency plans are being prepared." },
   ]);
   const [input,      setInput]     = useState("");
   const [loading,    setLoading]   = useState(false);
@@ -41,6 +55,7 @@ export default function FloatingChat() {
     const updated = [...messages, userMsg];
     setMessages(updated);
     setInput("");
+    if (inputRef.current) inputRef.current.value = "";
     setLoading(true);
 
     try {
@@ -99,8 +114,19 @@ export default function FloatingChat() {
                 <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center ${msg.role === "user" ? "bg-primary text-white" : "bg-primary/15 text-primary-light"}`}>
                   {msg.role === "user" ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                 </div>
-                <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed ${msg.role === "user" ? "bg-primary text-white rounded-tr-sm" : "bg-background border border-border text-foreground rounded-tl-sm"}`}>
-                  {msg.content}
+                <div className="max-w-[80%]">
+                  <div className={`rounded-xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary text-white rounded-tr-sm" : "bg-background border border-border text-foreground rounded-tl-sm"}`}>
+                    {msg.content}
+                  </div>
+                  {shouldShowSignupCta(msg) && (
+                    <Link
+                      href="/auth?mode=signup"
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold text-accent hover:border-accent/45 hover:bg-accent/15 transition-colors"
+                    >
+                      Start free
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
@@ -139,11 +165,17 @@ export default function FloatingChat() {
             <form
               onSubmit={e => {
                 e.preventDefault();
-                void sendMessage(input);
+                void sendMessage(inputRef.current?.value ?? input);
               }}
               className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2 focus-within:border-primary/50"
             >
               <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void sendMessage(inputRef.current?.value ?? input);
+                  }
+                }}
                 placeholder="Ask for leads, pitches, or help..."
                 className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none" />
               <button type="submit" disabled={!input.trim() || loading}
