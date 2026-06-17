@@ -85,6 +85,29 @@ function normalizedHref(value: string) {
   return toUrl(value)?.href ?? value.trim();
 }
 
+async function writeShareText(text: string) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Fall through to the textarea copy path for stricter browser contexts.
+    }
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
+  textarea.style.top = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  document.body.removeChild(textarea);
+  if (!copied) throw new Error("Clipboard unavailable");
+}
+
 export default function BonusLeadsModal({
   isOpen,
   onClose,
@@ -144,8 +167,7 @@ export default function BonusLeadsModal({
 
   const copyShareText = async () => {
     try {
-      if (!navigator.clipboard) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(sharePostText);
+      await writeShareText(sharePostText);
       setCopiedPost(true);
       window.setTimeout(() => setCopiedPost(false), 2500);
     } catch {
