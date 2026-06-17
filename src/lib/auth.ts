@@ -62,6 +62,11 @@ export const authOptions: NextAuthOptions = {
           GitHubProvider({
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            authorization: {
+              params: {
+                scope: "read:user user:email",
+              },
+            },
           }),
         ]
       : []),
@@ -111,10 +116,17 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // Handle OAuth sign-in / account creation for Google and GitHub
       const isOAuth = account?.provider === "google" || account?.provider === "github";
-      if (isOAuth && user.email) {
+      if (isOAuth) {
+        if (!user.email) {
+          return "/auth?error=GitHubEmailUnavailable";
+        }
+
+        const normalizedEmail = user.email.trim().toLowerCase();
+        user.email = normalizedEmail;
+
         try {
           const existing = await prisma.user.findUnique({
-            where: { email: user.email },
+            where: { email: normalizedEmail },
             select: { id: true, role: true, plan: true, suspended: true },
           });
 
@@ -127,8 +139,8 @@ export const authOptions: NextAuthOptions = {
             // Create new OAuth account
             const newUser = await prisma.user.create({
               data: {
-                email: user.email,
-                name:  user.name ?? user.email.split("@")[0],
+                email: normalizedEmail,
+                name:  user.name ?? normalizedEmail.split("@")[0],
                 plan:  "free",
                 role:  "USER",
               },

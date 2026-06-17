@@ -97,6 +97,8 @@ All secrets live in **Vercel environment variables** — never hardcoded.
 | `DATABASE_URL` | Neon PostgreSQL connection string |
 | `NEXTAUTH_SECRET` | NextAuth session signing |
 | `NEXTAUTH_URL` | `https://icloseleads.com` |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google sign-in |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub sign-in |
 | `HUNTER_API_KEY` | Hunter.io email finder |
 | `OPENAI_API_KEY` | GPT-4o-mini for proposals/replies |
 | `RESEND_API_KEY` | Transactional email delivery |

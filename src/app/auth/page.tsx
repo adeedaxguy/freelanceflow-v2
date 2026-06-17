@@ -2,9 +2,9 @@
 
 import { useState, useEffect, Suspense, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn, useSession } from "next-auth/react";
+import { getProviders, signIn, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Eye, EyeOff, Check, Loader2, Chrome, Zap } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Check, Loader2, Zap } from "lucide-react";
 import Link from "next/link";
 import { NICHES } from "@/types";
 import Logo from "@/components/Logo";
@@ -13,6 +13,17 @@ const REFERRAL_OPTIONS = [
   "Google Search", "Reddit", "Twitter / X", "LinkedIn", "Friend / Referral",
   "YouTube", "ProductHunt", "Newsletter", "Other",
 ];
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  Configuration: "This sign-in method is not configured yet. Please use email or Google while we finish setup.",
+  AccessDenied: "Access was denied. Please try again or use another sign-in method.",
+  OAuthSignin: "GitHub sign-in could not start. Please try again.",
+  OAuthCallback: "GitHub did not complete sign-in. Please try again.",
+  OAuthCreateAccount: "We could not create your account from GitHub. Please try email sign-up.",
+  OAuthAccountNotLinked: "This email is already linked to another sign-in method. Sign in with that method first.",
+  GitHubEmailUnavailable: "GitHub did not share an email address. Add a verified public email on GitHub or use email sign-up.",
+  CredentialsSignin: "Invalid email or password.",
+};
 
 function strengthLabel(p: string): { label: string; color: string; width: string } {
   if (!p) return { label: "", color: "bg-border", width: "0%" };
@@ -53,6 +64,8 @@ function AuthForm() {
   const [showPwd,   setShowPwd]   = useState(false);
   const [loading,   setLoading]   = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
+  const [oauthProviders, setOauthProviders] = useState({ google: true, github: true });
   const [error,     setError]     = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [referral,  setReferral]  = useState("");
@@ -66,12 +79,39 @@ function AuthForm() {
   }, [params]);
 
   useEffect(() => {
+    const authError = params.get("error");
+    if (!authError) return;
+    setError(AUTH_ERROR_MESSAGES[authError] ?? "Sign-in failed. Please try again.");
+  }, [params]);
+
+  useEffect(() => {
+    let active = true;
+    void getProviders()
+      .then(providers => {
+        if (!active) return;
+        setOauthProviders({
+          google: Boolean(providers?.google),
+          github: Boolean(providers?.github),
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setOauthProviders({ google: true, github: true });
+      });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
     if (status === "authenticated") router.replace("/dashboard");
   }, [status, router]);
 
   const strength = strengthLabel(password);
 
   const handleGoogleSignIn = async () => {
+    if (!oauthProviders.google) {
+      setError("Google sign-in is not available right now. Please use email sign-in.");
+      return;
+    }
     setGoogleLoading(true);
     setError("");
     try {
@@ -83,11 +123,17 @@ function AuthForm() {
   };
 
   const handleGitHubSignIn = async () => {
+    if (!oauthProviders.github) {
+      setError("GitHub sign-in is not configured yet. Please use Google or email for now.");
+      return;
+    }
+    setGithubLoading(true);
     setError("");
     try {
       await signIn("github", { callbackUrl: "/dashboard" });
     } catch {
       setError("GitHub sign-in failed. Please try again.");
+      setGithubLoading(false);
     }
   };
 
@@ -133,8 +179,6 @@ function AuthForm() {
   const toggleExpertise = (id: string) => {
     setExpertise(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id].slice(0, 4));
   };
-
-  const hasGoogle = true; // Google button shown always; will gracefully fail if not configured
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -221,7 +265,7 @@ function AuthForm() {
                     <button
                       type="button"
                       onClick={() => void handleGoogleSignIn()}
-                      disabled={googleLoading}
+                      disabled={googleLoading || githubLoading}
                       className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all disabled:opacity-60 hover:border-primary/30"
                     >
                       {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
@@ -231,9 +275,10 @@ function AuthForm() {
                     <button
                       type="button"
                       onClick={() => void handleGitHubSignIn()}
-                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all hover:border-primary/30"
+                      disabled={googleLoading || githubLoading}
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-surface hover:bg-surface/80 text-foreground text-sm font-medium transition-all disabled:opacity-60 hover:border-primary/30"
                     >
-                      <GitHubIcon />
+                      {githubLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitHubIcon />}
                       GitHub
                     </button>
                   </div>

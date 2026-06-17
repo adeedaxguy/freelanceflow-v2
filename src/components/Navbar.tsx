@@ -21,10 +21,10 @@ const MEGA_FEATURES = [
     icon: Search,
     color: "text-primary-light",
     items: [
-      { label: "Live Lead Engine",       desc: "Remote jobs, local signals, and more",  href: "/features/lead-discovery" },
-      { label: "Quality Scoring",       desc: "0–100 AI confidence per lead",          href: "/features/lead-discovery#scoring" },
-      { label: "Niche Targeting",       desc: "15+ freelance niches supported",        href: "/features/lead-discovery#niches" },
-      { label: "Smart Deduplication",   desc: "Never see the same lead twice",         href: "/features/lead-discovery#dedup" },
+      { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/features/lead-discovery" },
+      { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/features/lead-discovery#use-cases" },
+      { label: "Lead Scoring",          desc: "Prioritise fit, urgency, and contactability", href: "/features/lead-discovery#capabilities" },
+      { label: "Discovery Workflow",    desc: "Search, qualify, save, and pitch",            href: "/features/lead-discovery#workflow" },
     ],
   },
   {
@@ -32,10 +32,10 @@ const MEGA_FEATURES = [
     icon: Layers,
     color: "text-accent",
     items: [
-      { label: "6-Stage Pipeline",      desc: "New → Contacted → Won → Lost",         href: "/features/crm-pipeline" },
-      { label: "Lead Notes",            desc: "Private notes per opportunity",         href: "/features/crm-pipeline#notes" },
-      { label: "Status Tracking",       desc: "Move leads with one click",             href: "/features/crm-pipeline#status" },
-      { label: "CSV Export",            desc: "Export your pipeline anytime",          href: "/features/crm-pipeline#export" },
+      { label: "Saved Lead CRM",        desc: "Turn qualified leads into active prospects", href: "/features/crm-pipeline" },
+      { label: "Pipeline Stages",       desc: "Track new, contacted, replied, and won",     href: "/features/crm-pipeline#workflow" },
+      { label: "Lead Notes",            desc: "Keep pitch context beside every prospect",   href: "/features/crm-pipeline#capabilities" },
+      { label: "Pipeline Exports",      desc: "Keep ownership of your prospect data",       href: "/features/crm-pipeline#capabilities" },
     ],
   },
   {
@@ -43,10 +43,10 @@ const MEGA_FEATURES = [
     icon: Sparkles,
     color: "text-gold",
     items: [
-      { label: "Groq-Powered AI",       desc: "llama-3.3-70b for human-like copy",    href: "/features/ai-proposals" },
-      { label: "Niche Personalisation", desc: "Tailored to every job posting",        href: "/features/ai-proposals#personalisation" },
-      { label: "Custom Templates",      desc: "Save & reuse winning formats",         href: "/features/ai-proposals#templates" },
-      { label: "Follow-Up Writer",      desc: "AI-crafted follow-up sequences",       href: "/features/ai-proposals#followup" },
+      { label: "Proposal Drafts",       desc: "Write from real lead context",          href: "/features/ai-proposals" },
+      { label: "Personalised Hooks",    desc: "Open with the prospect's actual problem", href: "/features/ai-proposals#workflow" },
+      { label: "Portfolio Proof",       desc: "Add relevant links to strengthen trust", href: "/features/ai-proposals#capabilities" },
+      { label: "Follow-Up Ready",       desc: "Keep the next message connected",       href: "/features/ai-proposals#use-cases" },
     ],
   },
   {
@@ -54,10 +54,10 @@ const MEGA_FEATURES = [
     icon: Mail,
     color: "text-blue-400",
     items: [
-      { label: "Gmail Compose",         desc: "Prepare emails in Gmail safely",       href: "/features/email-outreach" },
-      { label: "Campaign Builder",      desc: "Multi-step outreach sequences",        href: "/features/email-outreach#campaigns" },
-      { label: "Outreach History",      desc: "Log prepared and sent emails",         href: "/features/email-outreach#tracking" },
-      { label: "No Duplicates",         desc: "Prevent repeat outreach automatically", href: "/features/email-outreach#dedup" },
+      { label: "Gmail Draft Mode",      desc: "Prepare, review, and send manually",    href: "/features/email-outreach" },
+      { label: "Safety Limits",         desc: "Visible guardrails for outreach volume", href: "/features/email-outreach#capabilities" },
+      { label: "Outreach Ledger",       desc: "Know who has already been contacted",   href: "/features/email-outreach#workflow" },
+      { label: "Follow-Up Context",     desc: "Keep email activity tied to the CRM",    href: "/features/email-outreach#use-cases" },
     ],
   },
   {
@@ -65,10 +65,10 @@ const MEGA_FEATURES = [
     icon: BarChart2,
     color: "text-green-400",
     items: [
-      { label: "Dashboard Overview",   desc: "Leads, proposals, replies at a glance", href: "/features/analytics" },
-      { label: "Channel Insights",     desc: "Which lead channels convert best",      href: "/features/analytics#sources" },
-      { label: "Pipeline Reports",     desc: "Win rate and conversion tracking",      href: "/features/analytics#pipeline" },
-      { label: "Weekly Usage Stats",   desc: "Track your quota and resets",          href: "/features/analytics#revenue" },
+      { label: "Dashboard Overview",   desc: "See prospecting activity at a glance",  href: "/features/analytics" },
+      { label: "Source Insights",      desc: "Learn which searches create pipeline",  href: "/features/analytics#capabilities" },
+      { label: "Pipeline Reports",     desc: "Spot where leads are getting stuck",    href: "/features/analytics#workflow" },
+      { label: "Usage Tracking",       desc: "Understand limits and weekly activity", href: "/features/analytics#capabilities" },
     ],
   },
   {
@@ -76,10 +76,10 @@ const MEGA_FEATURES = [
     icon: Shield,
     color: "text-purple-400",
     items: [
-      { label: "Free Tools",           desc: "Rate calculator, subject line gen",    href: "/features/free-tools" },
-      { label: "Blog & Resources",     desc: "Freelance guides and strategies",      href: "/blog" },
-      { label: "Support Chat",         desc: "AI help + human escalation 24/7",     href: "/features/free-tools#support" },
-      { label: "Mobile Optimised",     desc: "Works beautifully on any device",     href: "/features/free-tools#mobile" },
+      { label: "Free Tools",           desc: "Rates, subject lines, spam checks",     href: "/features/free-tools" },
+      { label: "Pricing Calculator",   desc: "Know what you should charge",          href: "/features/free-tools#workflow" },
+      { label: "Proposal Checks",      desc: "Improve readability and deliverability", href: "/features/free-tools#capabilities" },
+      { label: "Freelance Resources",  desc: "Guides for better client acquisition", href: "/blog" },
     ],
   },
 ];
@@ -192,8 +192,8 @@ export default function Navbar() {
                     <div className="px-5 py-3 border-t border-border/60 bg-gradient-to-r from-primary/5 to-accent/5 flex items-center justify-between">
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         {[
-                          { icon: Globe, label: "16 Live Sources" },
-                          { icon: Target, label: "15+ Niches" },
+                          { icon: Globe, label: "Live Lead Coverage" },
+                          { icon: Target, label: "Niche Targeting" },
                           { icon: Star,   label: "Free to Start" },
                           { icon: Users,  label: "No Credit Card" },
                         ].map(({ icon: Icon, label }) => (

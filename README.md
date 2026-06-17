@@ -185,6 +185,8 @@ Then run `npm run db:push` (or `prisma migrate deploy` in production).
 | `DATABASE_URL` | ✅ | SQLite: `file:./dev.db` · PostgreSQL: `postgresql://...` |
 | `NEXTAUTH_SECRET` | ✅ | Random secret: `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | ✅ | Your app URL (e.g., `https://yourdomain.com`) |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | ✅ | Google OAuth sign-in credentials |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | ✅ | GitHub OAuth App credentials |
 | `HUNTER_API_KEY` | ✅ | From [hunter.io/api-keys](https://hunter.io/api-keys) |
 | `OPENAI_API_KEY` | ✅ | From [platform.openai.com](https://platform.openai.com/api-keys) |
 | `RESEND_API_KEY` | ✅ | From [resend.com](https://resend.com/api-keys) |

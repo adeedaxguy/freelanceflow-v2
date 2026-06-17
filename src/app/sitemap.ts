@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { STATIC_POSTS } from "@/data/blog-posts";
+import { FEATURE_PAGES } from "@/data/feature-pages";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 
@@ -8,7 +9,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
 const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number }[] = [
   // Marketing
   { url: "",             changeFrequency: "weekly",  priority: 1.0  },
-  { url: "/features",    changeFrequency: "monthly", priority: 0.9  },
+  { url: "/features",    changeFrequency: "weekly",  priority: 0.9  },
+  ...FEATURE_PAGES.map(page => ({
+    url: page.path,
+    changeFrequency: "weekly" as const,
+    priority: 0.86,
+  })),
   { url: "/pricing",     changeFrequency: "weekly",  priority: 0.9  },
   { url: "/blog",        changeFrequency: "daily",   priority: 0.85 },
   { url: "/about",       changeFrequency: "monthly", priority: 0.8  },
