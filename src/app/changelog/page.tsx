@@ -15,7 +15,7 @@ const releases = [
     badge: "Latest",
     badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
     changes: [
-      { type: "feature", text: "19 live lead sources — added AuthenticJobs, JustRemote, FreelancerMap, and Gun.io" },
+      { type: "feature", text: "Expanded live lead coverage with more remote, freelance, and agency opportunity channels" },
       { type: "feature", text: "Multi-niche search — search up to 5 niches simultaneously in one query" },
       { type: "feature", text: "SEO Blog Editor — full Yoast-style editor with focus keyword scoring and Google preview" },
       { type: "feature", text: "Admin Panel v2 — revenue tracking, MRR charts, support tickets, audit log, broadcast messaging" },
@@ -32,7 +32,7 @@ const releases = [
     badgeColor: "",
     changes: [
       { type: "feature", text: "Dark/light mode toggle with system preference detection and no flash on load" },
-      { type: "feature", text: "Email enrichment via website scraping — find contact emails even without Hunter.io" },
+      { type: "feature", text: "Contact enrichment via website discovery — find useful contact paths even without a saved enrichment key" },
       { type: "feature", text: "Proposal templates — save and reuse your best performing templates" },
       { type: "improvement", text: "Sidebar navigation refresh with grouped sections and active state indicators" },
       { type: "improvement", text: "Lead deduplication — user-specific saved leads filtered from search results" },
@@ -45,7 +45,7 @@ const releases = [
     badge: null,
     badgeColor: "",
     changes: [
-      { type: "feature", text: "Upwork and WeWorkRemotely added as lead sources" },
+      { type: "feature", text: "More remote and freelance opportunity channels added to lead discovery" },
       { type: "feature", text: "Lead quality scoring — composite score based on email presence, recency, and signal strength" },
       { type: "feature", text: "Interactive onboarding tour for new users" },
       { type: "improvement", text: "Usage caps now show real-time remaining leads with visual progress bar" },
@@ -59,8 +59,8 @@ const releases = [
     badge: null,
     badgeColor: "",
     changes: [
-      { type: "feature", text: "AI proposal generator powered by GPT-4o — personalized proposals in under 10 seconds" },
-      { type: "feature", text: "Email sending via Resend with deliverability tracking" },
+      { type: "feature", text: "AI proposal generator — personalized proposals in under 10 seconds" },
+      { type: "feature", text: "Safe outreach prep with Gmail-ready drafts and history tracking" },
       { type: "feature", text: "Saved leads dashboard with pipeline status (New → Contacted → Replied → Won)" },
       { type: "improvement", text: "Lead card redesign with company logo, confidence badge, and quick-save action" },
     ],
@@ -72,8 +72,8 @@ const releases = [
     badgeColor: "bg-primary/10 text-primary-light border-primary/20",
     changes: [
       { type: "feature", text: "Complete platform rewrite in Next.js 14 with App Router and TypeScript" },
-      { type: "feature", text: "15 initial lead sources: RemoteOK, Remotive, Reddit, HimalaYas, Jobicy, and more" },
-      { type: "feature", text: "Hunter.io email enrichment integration" },
+      { type: "feature", text: "Initial live lead discovery channels for remote jobs, freelance posts, and communities" },
+      { type: "feature", text: "Contact enrichment integration" },
       { type: "feature", text: "Pro and Agency subscription plans via Stripe" },
       { type: "feature", text: "Admin panel with user management and usage monitoring" },
     ],

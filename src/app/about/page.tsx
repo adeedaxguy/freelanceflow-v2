@@ -47,7 +47,7 @@ export default function AboutPage() {
             <div className="prose-custom space-y-4 text-muted-foreground leading-relaxed">
               <p>The freelance market is massive — over 73 million freelancers in the US alone — but most of them are stuck on marketplaces that take a huge cut, control the relationship, and commoditize their skills.</p>
               <p>Direct outreach is 3x more effective than marketplace bidding, but it requires finding verified contacts, writing personalized proposals, and tracking everything — which takes more time than most freelancers have.</p>
-              <p>iCloseLeads solves all three problems in a single platform. We use Hunter.io to find verified email addresses, GPT-4o to write personalized proposals, and Resend to send them with enterprise-grade deliverability.</p>
+              <p>iCloseLeads solves all three problems in a single platform. It combines live lead discovery, contact enrichment, AI-assisted proposal writing, and Gmail-ready outreach so freelancers can move from research to follow-up without juggling spreadsheets.</p>
               <p>Our users report finding their first lead in under 2 minutes and landing their first new client within 2 weeks of consistent outreach.</p>
             </div>
           </div>

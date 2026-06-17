@@ -204,16 +204,16 @@ const FEATURES = [
     icon: <Search className="w-5 h-5 text-primary-light" />,
     tag: "Discovery",
     tagColor: "#9F67FF",
-    title: "16 Live Sources, One Search",
-    desc: "We simultaneously scan remote job boards, Reddit, Hacker News, GitHub bounty issues, and curated freelance feeds. Every result is fresh, real, and scored.",
-    stat: "16 sources",
+    title: "Live Lead Channels, One Search",
+    desc: "We scan remote hiring signals, local business opportunities, community requests, and curated freelance feeds. Every result is fresh, real, and scored.",
+    stat: "Live channels",
   },
   {
     icon: <Bot className="w-5 h-5 text-accent" />,
     tag: "AI Engine",
     tagColor: "#00E5A0",
     title: "Proposals That Actually Get Replies",
-    desc: "Groq's Llama 3.3 reads the lead context and writes a cold email that sounds like you wrote it — not like ChatGPT. Personalized in 3 seconds.",
+    desc: "AI reads the lead context and writes a cold email that sounds like you wrote it, not like a generic template. Personalized in 3 seconds.",
     stat: "3-sec generation",
   },
   {
@@ -236,9 +236,9 @@ const FEATURES = [
     icon: <Send className="w-5 h-5 text-pink-400" />,
     tag: "Outreach",
     tagColor: "#F472B6",
-    title: "Email Directly From the Platform",
-    desc: "Write, send, and track cold emails without leaving iCloseLeads. See who opened, who clicked, and when to follow up.",
-    stat: "1-click send",
+    title: "Gmail-Ready Outreach",
+    desc: "Prepare polished emails in Gmail compose, review them manually, and keep your outreach history organized inside iCloseLeads.",
+    stat: "Safe prep",
   },
   {
     icon: <BarChart2 className="w-5 h-5 text-purple-400" />,
@@ -250,19 +250,19 @@ const FEATURES = [
   },
 ];
 
-const SOURCES = ["Remote OK", "Remotive", "Reddit", "WeWorkRemotely", "Arbeitnow", "Jobicy", "Working Nomads", "Hacker News", "YC Jobs", "Authentic Jobs", "GitHub Bounties", "Smashing Jobs", "Dribbble Jobs", "Jobspresso", "Himalayas", "No Desk"];
+const SOURCES = ["Remote jobs", "Local businesses", "Startup hiring", "Community requests", "Marketing leads", "Design leads", "Developer leads", "SEO leads", "Agency overflow", "Public web signals"];
 
 const STATS = [
   { to: 2847, suffix: "+", label: "Active Freelancers", sub: "signed up this month", color: "text-primary-light" },
-  { to: 40000, suffix: "+", label: "Leads Found Monthly", sub: "across 16 sources", color: "text-accent" },
+  { to: 40000, suffix: "+", label: "Leads Found Monthly", sub: "across multiple channels", color: "text-accent" },
   { to: 94, suffix: "%", label: "Open Rate on AI Proposals", sub: "vs 21% industry avg", color: "text-gold" },
   { to: 18, suffix: "k", prefix: "$", label: "Avg First-Month Revenue", sub: "for Pro users", color: "text-blue-400" },
 ];
 
 const FAQS = [
-  { q: "Is it really free to start?", a: "Yes — the Free plan gives you fresh leads from all 16 sources, AI-powered proposals, the full CRM pipeline, and all 3 free tools. No credit card, no trial expiry." },
-  { q: "Where exactly do the leads come from?", a: "We pull from 7 real job boards and communities in real time: Reddit (/r/forhire, /r/hiring), Remote OK, Remotive, WeWorkRemotely, Arbeitnow, Jobicy, and Working Nomads. Every lead is a real person or company actively hiring." },
-  { q: "How good is the AI proposal writing?", a: "It uses Groq's Llama 3.3 70B — one of the fastest large language models available. It reads the lead's job posting, your niche, and your preferred tone to write a unique, personal cold email. Most users report a 3–5× improvement in response rate vs their old templates." },
+  { q: "Is it really free to start?", a: "Yes — the Free plan gives you fresh leads, AI-powered proposals, the full CRM pipeline, and all 3 free tools. No credit card, no trial expiry." },
+  { q: "Where exactly do the leads come from?", a: "We combine live hiring signals, local business opportunities, community requests, startup openings, and public web signals. Every lead is scored so you can focus on the strongest matches." },
+  { q: "How good is the AI proposal writing?", a: "The AI reads the lead's job posting, your niche, and your preferred tone to write a unique, personal cold email. Most users report a 3-5x improvement in response rate vs their old templates." },
   { q: "Will other users see the same leads as me?", a: "No. iCloseLeads runs per-user deduplication — you'll never be shown a lead you've already saved or emailed, and our system filters out leads that heavily overlapping users have already contacted." },
   { q: "Can I cancel at any time?", a: "Yes — cancel anytime from your profile with zero friction. You keep access until the end of your billing period. No cancellation fees." },
   { q: "How do I connect Stripe for payments?", a: "If you're running the self-hosted version, go to Admin → Settings → Payment Gateway, paste your Stripe keys and price IDs, and you're live. The guide in GO_LIVE_GUIDE.md walks you through every step." },
@@ -427,7 +427,7 @@ export default function HomepageClient() {
           {/* Sub */}
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            iCloseLeads searches <strong className="text-foreground">16 live sources</strong> simultaneously, scores every lead with AI, and writes personalised proposals in 3 seconds — so you spend time closing, not searching.
+            iCloseLeads searches <strong className="text-foreground">live lead channels</strong> simultaneously, scores every lead with AI, and writes personalised proposals in 3 seconds — so you spend time closing, not searching.
           </motion.p>
 
           {/* CTAs */}
@@ -451,7 +451,7 @@ export default function HomepageClient() {
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
               { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Live in 60 seconds" },
-              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "16 real lead sources" },
+              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Live lead channels" },
               { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "94% open rate on proposals" },
             ].map(({ icon, t }) => (
               <div key={t} className="flex items-center gap-1.5">{icon}<span>{t}</span></div>
@@ -461,7 +461,7 @@ export default function HomepageClient() {
           {/* Source pills */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-2 mt-8">
-            <span className="text-xs text-muted-foreground mr-1">Pulling live leads from 16 sources:</span>
+            <span className="text-xs text-muted-foreground mr-1">Pulling live leads from multiple channels:</span>
             {SOURCES.map((s, i) => (
               <motion.span key={s} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1 + i * 0.06 }}
@@ -564,7 +564,7 @@ export default function HomepageClient() {
                 <Reveal delay={0.1}>
                   <StepCard n="1" icon={<Search className="w-5 h-5" />}
                     title="Search your niche"
-                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches 7 live sources and returns scored, deduplicated leads in seconds." />
+                    desc="Type your skill — React dev, copywriter, designer, SEO. iCloseLeads searches live channels and returns scored, deduplicated leads in seconds." />
                 </Reveal>
                 <Reveal delay={0.2}>
                   <StepCard n="2" icon={<Sparkles className="w-5 h-5" />}

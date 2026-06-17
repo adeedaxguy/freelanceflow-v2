@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
 import { formatDate } from "@/lib/utils";
+import { getBlogCoverImage, getBlogCoverImageUrl, isHiddenBlogSlug } from "@/lib/blog-images";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { prisma } from "@/lib/prisma";
 
@@ -16,6 +17,7 @@ export const dynamic = 'force-dynamic';
 interface DbPost {
   id: string; slug: string; title: string; excerpt: string | null;
   content: string; category: string; published: boolean;
+  coverImage: string | null;
   readTime: number | null; author: string | null;
   metaTitle: string | null; metaDesc: string | null;
   focusKeyword: string | null; ogImage: string | null;
@@ -28,6 +30,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
 
 // ── Data fetch ────────────────────────────────────────────────────────────────
 async function getDbPost(slug: string): Promise<DbPost | null> {
+  if (isHiddenBlogSlug(slug)) return null;
   try {
     const post = await prisma.blogPost.findFirst({
       where: { slug, published: true },
@@ -45,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (dbPost) {
     const title   = dbPost.metaTitle  || dbPost.title;
     const desc    = dbPost.metaDesc   || dbPost.excerpt || "";
-    const image   = dbPost.ogImage    || "/og-image.png";
+    const image   = getBlogCoverImageUrl(BASE_URL, dbPost.slug, dbPost.ogImage, dbPost.coverImage);
     const canonicalUrl = dbPost.canonical || `${BASE_URL}/blog/${dbPost.slug}`;
 
     return {
@@ -76,14 +79,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Fall back to static post
   const post = STATIC_POSTS.find(p => p.slug === params.slug);
   if (!post) return { title: "Post Not Found" };
+  const image = getBlogCoverImageUrl(BASE_URL, post.slug, post.coverImage);
   return {
     title: post.title,
     description: post.excerpt ?? "",
+    alternates: { canonical: `${BASE_URL}/blog/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt ?? "",
       type: "article",
+      url: `${BASE_URL}/blog/${post.slug}`,
+      images: [{ url: image, width: 1200, height: 630 }],
       publishedTime: post.createdAt instanceof Date ? post.createdAt.toISOString() : String(post.createdAt),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt ?? "",
+      images: [image],
     },
   };
 }
@@ -201,7 +214,9 @@ function renderMarkdown(content: string): ReactNode {
   while (i < lines.length) {
     const line = lines[i] ?? "";
 
-    if (line.startsWith("## ")) {
+    if (line.startsWith("# ")) {
+      // Stored static content sometimes includes a duplicate H1; the page title already covers it.
+    } else if (line.startsWith("## ")) {
       nodes.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(3)}</h2>);
     } else if (line.startsWith("### ")) {
       nodes.push(<h3 key={i} className="text-xl font-semibold text-foreground mt-8 mb-3">{line.slice(4)}</h3>);
@@ -259,6 +274,8 @@ export default async function BlogPostPage({ params }: Props) {
     const updDate  = dbPost.updatedAt instanceof Date ? dbPost.updatedAt  : new Date(String(dbPost.updatedAt));
 
     // JSON-LD schema — use custom if set, else build Article schema
+    const coverImage = getBlogCoverImage(dbPost.slug, dbPost.ogImage, dbPost.coverImage);
+    const coverImageUrl = getBlogCoverImageUrl(BASE_URL, dbPost.slug, dbPost.ogImage, dbPost.coverImage);
     let jsonLd: object;
     try { jsonLd = JSON.parse(dbPost.schema ?? "{}") as object; } catch { jsonLd = {}; }
     if (!Object.keys(jsonLd).length) {
@@ -271,7 +288,7 @@ export default async function BlogPostPage({ params }: Props) {
         "dateModified":  updDate.toISOString(),
         "author": { "@type": "Person", "name": dbPost.author || "iCloseLeads Team" },
         "publisher": { "@type": "Organization", "name": "iCloseLeads", "url": BASE_URL },
-        "image": dbPost.ogImage || `${BASE_URL}/og-image.png`,
+        "image": coverImageUrl,
         "keywords": dbPost.focusKeyword || "",
         "url": `${BASE_URL}/blog/${dbPost.slug}`,
       };
@@ -314,10 +331,10 @@ export default async function BlogPostPage({ params }: Props) {
             </header>
 
             {/* Cover image */}
-            {dbPost.ogImage && (
+            {coverImage && (
               <div className="mb-10 rounded-2xl overflow-hidden border border-border">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={dbPost.ogImage} alt={dbPost.title} className="w-full object-cover max-h-72" />
+                <img src={coverImage} alt={dbPost.title} className="w-full object-cover max-h-72" />
               </div>
             )}
 
@@ -353,9 +370,11 @@ export default async function BlogPostPage({ params }: Props) {
   const post = STATIC_POSTS.find(p => p.slug === params.slug);
   if (!post) notFound();
 
-  const content = FULL_POSTS[params.slug] ?? "Full article coming soon. Subscribe to be notified.";
+  const content = post.content || FULL_POSTS[params.slug] || "Full article coming soon. Subscribe to be notified.";
   const relatedPosts = STATIC_POSTS.filter(p => p.slug !== params.slug).slice(0, 3);
   const postDate = post.createdAt instanceof Date ? post.createdAt : new Date(String(post.createdAt));
+  const coverImage = getBlogCoverImage(post.slug, post.coverImage);
+  const coverImageUrl = getBlogCoverImageUrl(BASE_URL, post.slug, post.coverImage);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -365,6 +384,7 @@ export default async function BlogPostPage({ params }: Props) {
     "datePublished": postDate.toISOString(),
     "author": { "@type": "Organization", "name": "iCloseLeads" },
     "publisher": { "@type": "Organization", "name": "iCloseLeads", "url": BASE_URL },
+    "image": coverImageUrl,
     "url": `${BASE_URL}/blog/${post.slug}`,
   };
 
@@ -388,6 +408,11 @@ export default async function BlogPostPage({ params }: Props) {
               <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{post.readTime} min read</span>
             </div>
           </header>
+
+          <div className="mb-10 rounded-2xl overflow-hidden border border-border">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={coverImage} alt={post.title} className="w-full object-cover max-h-72" />
+          </div>
 
           <div className="prose-content">
             {renderMarkdown(content)}

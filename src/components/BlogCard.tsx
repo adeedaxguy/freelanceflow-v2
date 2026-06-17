@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Calendar, Clock, Tag } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { getBlogCoverImage } from "@/lib/blog-images";
 import type { BlogPost } from "@/types";
 
 interface BlogCardProps {
@@ -17,14 +18,23 @@ const categoryColors: Record<string, string> = {
 
 export default function BlogCard({ post }: BlogCardProps) {
   const colorClass = categoryColors[post.category] ?? categoryColors["General"];
+  const coverImage = getBlogCoverImage(post.slug, post.coverImage);
 
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover flex flex-col"
     >
-      {/* Cover Image / Gradient Placeholder */}
+      {/* Cover Image */}
       <div className="h-48 bg-gradient-to-br from-primary/20 via-surface to-accent/10 relative overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={coverImage}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/65 via-background/10 to-transparent" />
         <div className="absolute inset-0 bg-dot-pattern bg-dot-sm opacity-30" />
         <div className="absolute bottom-4 left-4">
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${colorClass}`}>

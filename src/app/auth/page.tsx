@@ -155,13 +155,13 @@ function AuthForm() {
             Find your next<br /><span className="gradient-text">$10k client</span><br />in minutes.
           </h2>
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-            AI-powered leads from 7 real sources, personalized proposals, and automated outreach — all in one place.
+            AI-powered lead discovery, personalized proposals, and safe Gmail-ready outreach — all in one place.
           </p>
           <div className="space-y-3">
             {[
-              "20 free leads every week — no credit card",
+              "100 free leads per day during Early Access",
               "AI proposals powered by Groq (free tier)",
-              "16 lead sources: Reddit, RemoteOK, Jobicy & more",
+              "Live job and local business lead discovery",
               "Full CRM pipeline to track every deal",
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -185,7 +185,7 @@ function AuthForm() {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground relative z-10">© 2025 iCloseLeads. All rights reserved.</p>
+        <p className="text-xs text-muted-foreground relative z-10">© 2026 iCloseLeads. All rights reserved.</p>
       </div>
 
       {/* Right panel */}

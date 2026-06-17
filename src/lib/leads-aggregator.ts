@@ -48,22 +48,22 @@ export type LeadSource =
 
 /** Canonical display labels for every source — used by the UI source-filter chips */
 export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
-  remoteok:      "RemoteOK",
-  remotive:      "Remotive",
-  reddit:        "Reddit",
-  weworkremotely:"WeWorkRemotely",
-  arbeitnow:     "Arbeitnow",
-  jobicy:        "Jobicy",
-  workingnomads: "Working Nomads",
-  hackernews:    "Hacker News",
-  ycjobs:        "YC Jobs",
-  authenticjobs: "Authentic Jobs",
-  githubissues:  "GitHub Bounties",
-  smashingjobs:  "Smashing Jobs",
-  dribbble:      "Dribbble Jobs",
-  freelancermap: "Jobspresso",
-  himalayas:    "Himalayas",
-  nodesk:       "No Desk",
+  remoteok:      "Remote Jobs A",
+  remotive:      "Remote Jobs B",
+  reddit:        "Community Leads",
+  weworkremotely:"Remote Jobs C",
+  arbeitnow:     "Startup Jobs A",
+  jobicy:        "Remote Jobs D",
+  workingnomads: "Remote Jobs E",
+  hackernews:    "Founder Hiring",
+  ycjobs:        "Startup Jobs B",
+  authenticjobs: "Verified Jobs",
+  githubissues:  "Developer Requests",
+  smashingjobs:  "Design & Dev Jobs",
+  dribbble:      "Design Jobs",
+  freelancermap: "Contract Jobs",
+  himalayas:    "Startup Remote",
+  nodesk:       "Remote Jobs F",
 };
 
 export interface AggregatedLead {

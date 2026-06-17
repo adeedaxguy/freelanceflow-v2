@@ -21,7 +21,7 @@ const MEGA_FEATURES = [
     icon: Search,
     color: "text-primary-light",
     items: [
-      { label: "11-Source Aggregator",   desc: "RemoteOK, Remotive, Reddit + more",     href: "/features/lead-discovery" },
+      { label: "Live Lead Engine",       desc: "Remote jobs, local signals, and more",  href: "/features/lead-discovery" },
       { label: "Quality Scoring",       desc: "0–100 AI confidence per lead",          href: "/features/lead-discovery#scoring" },
       { label: "Niche Targeting",       desc: "15+ freelance niches supported",        href: "/features/lead-discovery#niches" },
       { label: "Smart Deduplication",   desc: "Never see the same lead twice",         href: "/features/lead-discovery#dedup" },
@@ -66,7 +66,7 @@ const MEGA_FEATURES = [
     color: "text-green-400",
     items: [
       { label: "Dashboard Overview",   desc: "Leads, proposals, replies at a glance", href: "/features/analytics" },
-      { label: "Source Breakdown",     desc: "Which sources convert best",            href: "/features/analytics#sources" },
+      { label: "Channel Insights",     desc: "Which lead channels convert best",      href: "/features/analytics#sources" },
       { label: "Pipeline Reports",     desc: "Win rate and conversion tracking",      href: "/features/analytics#pipeline" },
       { label: "Weekly Usage Stats",   desc: "Track your quota and resets",          href: "/features/analytics#revenue" },
     ],

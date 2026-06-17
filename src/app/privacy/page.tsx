@@ -79,7 +79,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">7. Third-Party Services</h2>
-              <p>We use the following third-party services: Hunter.io (email discovery), OpenAI (proposal generation), Resend (email delivery). Each service has its own privacy policy and data processing agreement.</p>
+              <p>We use trusted third-party services for contact enrichment, AI proposal generation, authentication, analytics, infrastructure, and email-related workflows. Each service has its own privacy policy and data processing agreement where applicable.</p>
             </section>
 
             <section>

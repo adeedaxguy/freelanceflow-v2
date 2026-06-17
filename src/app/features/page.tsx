@@ -22,9 +22,9 @@ const features = [
   },
   {
     icon: Search,
-    title: "Email Discovery via Hunter.io",
-    description: "Powered by Hunter.io's industry-leading email discovery engine. Get verified professional email addresses with confidence scores and LinkedIn profiles attached.",
-    highlights: ["Verified email addresses", "Confidence scores (0-100%)", "LinkedIn & phone data", "Bulk domain search"],
+    title: "Contact Discovery",
+    description: "Find useful contact paths for prospects you discover, with confidence cues and company context to help you verify before outreach.",
+    highlights: ["Email and contact signals", "Confidence cues", "Company context", "Profile enrichment"],
     color: "from-accent/20 to-accent/5",
     iconColor: "text-accent",
     iconBg: "bg-accent/15",
@@ -32,8 +32,8 @@ const features = [
   {
     icon: Sparkles,
     title: "AI Proposal Generation",
-    description: "GPT-4o writes personalized proposals for each prospect based on your niche, bio, portfolio, and the specific company. Every proposal is unique, professional, and designed to convert.",
-    highlights: ["GPT-4o powered", "Personalized per prospect", "Subject line optimization", "Tone customization"],
+    description: "AI writes personalized proposals for each prospect based on your niche, bio, portfolio, and the specific company. Every proposal is editable, professional, and designed to convert.",
+    highlights: ["AI-powered drafts", "Personalized per prospect", "Subject line optimization", "Tone customization"],
     color: "from-gold/20 to-gold/5",
     iconColor: "text-gold",
     iconBg: "bg-gold/15",

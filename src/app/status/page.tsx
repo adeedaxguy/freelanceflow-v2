@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 const services = [
   { name: "Lead Search & Aggregation", status: "operational", latency: "320ms" },
-  { name: "AI Proposal Generator (GPT-4o)", status: "operational", latency: "2.1s" },
-  { name: "Email Delivery (Resend)", status: "operational", latency: "180ms" },
-  { name: "Email Enrichment (Hunter.io)", status: "operational", latency: "410ms" },
+  { name: "AI Proposal Generator", status: "operational", latency: "2.1s" },
+  { name: "Gmail Compose Prep", status: "operational", latency: "180ms" },
+  { name: "Contact Enrichment", status: "operational", latency: "410ms" },
   { name: "Authentication & Sessions", status: "operational", latency: "95ms" },
   { name: "Billing & Subscriptions (Stripe)", status: "operational", latency: "220ms" },
   { name: "Dashboard & Web App", status: "operational", latency: "140ms" },
@@ -23,17 +23,17 @@ const services = [
 const incidents = [
   {
     date: "April 15, 2025",
-    title: "Elevated error rate on Upwork RSS feed",
+    title: "Elevated error rate on one lead channel",
     status: "resolved",
     duration: "43 minutes",
-    description: "Upwork RSS endpoint returned malformed XML for approximately 43 minutes. Lead results from Upwork were unavailable. All other 18 sources continued to serve normally. Issue resolved after source parser update deployed at 14:27 UTC.",
+    description: "One lead channel returned malformed data for approximately 43 minutes. Other lead channels continued to serve normally. Issue resolved after source parser update deployed at 14:27 UTC.",
   },
   {
     date: "March 28, 2025",
     title: "Increased proposal generation latency",
     status: "resolved",
     duration: "1 hour 12 minutes",
-    description: "GPT-4o API experienced elevated response times upstream at OpenAI, causing proposal generation to take 8-15 seconds instead of the normal 2-3 seconds. No data loss occurred. Resolved when OpenAI restored normal performance.",
+    description: "The AI proposal service experienced elevated response times upstream, causing proposal generation to take 8-15 seconds instead of the normal 2-3 seconds. No data loss occurred. Resolved when normal performance returned.",
   },
   {
     date: "February 10, 2025",

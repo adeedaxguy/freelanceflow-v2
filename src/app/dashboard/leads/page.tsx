@@ -437,7 +437,7 @@ export default function LeadsPage() {
             Find Leads
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Real-time opportunities from 16 sources — matched to your niche
+            Real-time opportunities from live channels — matched to your niche
           </p>
         </div>
         {fetchedAt && (
@@ -1096,7 +1096,7 @@ export default function LeadsPage() {
               </span>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-3">Scanning 16 sources in parallel</p>
+          <p className="text-xs text-muted-foreground mt-3">Scanning live channels in parallel</p>
         </div>
       )}
       </div>{/* end main column */}

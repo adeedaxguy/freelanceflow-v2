@@ -40,7 +40,7 @@ export default function TermsPage() {
                 <li>Harass, threaten, or harm recipients</li>
                 <li>Violate any applicable law including CAN-SPAM, GDPR, or CASL</li>
                 <li>Misrepresent your identity or impersonate others</li>
-                <li>Scrape or harvest data in ways that violate Hunter.io&apos;s terms</li>
+                <li>Scrape or harvest data in ways that violate third-party terms or applicable law</li>
                 <li>Send emails with false headers or misleading subject lines</li>
               </ul>
             </section>

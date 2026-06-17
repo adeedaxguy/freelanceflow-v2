@@ -43,7 +43,7 @@ const coverage = [
 const stats = [
   { value: "50,000+", label: "Registered Freelancers" },
   { value: "$2.1M", label: "Seed Funding Raised" },
-  { value: "19", label: "Lead Sources Integrated" },
+  { value: "Multi", label: "Lead Channels" },
   { value: "4.8/5", label: "Average User Rating" },
 ];
 
@@ -87,7 +87,7 @@ export default function PressPage() {
               <h2 className="text-2xl font-bold text-foreground mb-4">About iCloseLeads</h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>iCloseLeads is an AI-powered client acquisition platform that helps freelancers find, contact, and win clients — without relying on crowded marketplaces like Upwork or Fiverr.</p>
-                <p>Founded in 2024, iCloseLeads aggregates job postings and hiring signals from 16 live sources including job boards, Reddit, GitHub, and freelance communities. It enriches contacts with verified email addresses and uses GPT-4o to generate personalized proposals — all from a single dashboard.</p>
+                <p>Founded in 2024, iCloseLeads combines live hiring signals, local business opportunities, contact enrichment, and AI-assisted proposal writing — all from a single dashboard built for freelancers.</p>
                 <p>The company is headquartered remotely and has raised $2.1M in seed funding to accelerate product development and community growth.</p>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function PressPage() {
             <div className="p-6 rounded-2xl bg-surface border border-border">
               <h3 className="font-bold text-foreground mb-3">Approved Boilerplate</h3>
               <p className="text-muted-foreground text-xs leading-relaxed italic">
-                &quot;iCloseLeads is an AI-powered client acquisition platform that helps freelancers find and win clients without relying on crowded marketplaces. The platform aggregates leads from 16 live sources and uses AI to generate personalized outreach — all in one dashboard.&quot;
+                &quot;iCloseLeads is an AI-powered client acquisition platform that helps freelancers find and win clients without relying on crowded marketplaces. The platform combines live lead discovery, local business opportunities, CRM tracking, and AI-assisted outreach — all in one dashboard.&quot;
               </p>
             </div>
           </div>

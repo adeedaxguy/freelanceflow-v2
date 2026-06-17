@@ -4,7 +4,7 @@ import HomepageClient from "@/components/HomepageClient";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
   title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-  description: "Find high-quality clients with AI-powered lead discovery from 7 real sources, personalized proposals, and automated outreach. Start free — no credit card required.",
+  description: "Find high-quality clients with AI-powered lead discovery, personalized proposals, and safe Gmail-ready outreach. Start free — no credit card required.",
   keywords: [
     "freelance lead generation", "find freelance clients", "AI proposal generator",
     "freelance CRM", "client acquisition for freelancers", "cold email outreach",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "iCloseLeads — AI-Powered Client Acquisition",
-    description: "Find high-quality clients with AI. 7 real lead sources. Free to start.",
+    description: "Find high-quality clients with AI-powered lead discovery. Free to start.",
     creator: "@icloseleads",
   },
   robots: {

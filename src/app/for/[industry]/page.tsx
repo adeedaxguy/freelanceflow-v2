@@ -31,7 +31,7 @@ const INDUSTRIES: Record<string, {
       { icon: "📍", title: "Local Business Search", desc: "Find businesses in any city globally with website status detected automatically." },
       { icon: "✍️", title: "AI Proposal Writer", desc: "Generate a personalised cold email for each lead based on their business type and your services." },
       { icon: "📊", title: "CRM Pipeline", desc: "Track every prospect from cold lead to signed contract in a visual Kanban board." },
-      { icon: "📧", title: "Send via Gmail", desc: "Connect your Gmail and send proposals directly from iCloseLeads without switching tabs." },
+      { icon: "📧", title: "Prepare in Gmail", desc: "Open Gmail with a polished draft ready to review and send manually." },
     ],
     keywords: ["find web design clients", "local web design leads", "find businesses without websites"],
     cta: "Start Finding Web Design Clients Free",
@@ -48,10 +48,10 @@ const INDUSTRIES: Record<string, {
       "Manage your entire prospecting pipeline in the built-in CRM",
     ],
     features: [
-      { icon: "🔍", title: "Multi-Source Lead Discovery", desc: "23 live sources including local maps, job boards, Reddit, and GitHub Issues." },
+      { icon: "🔍", title: "Multi-Channel Lead Discovery", desc: "Live business, remote job, community, and public web signals in one workflow." },
       { icon: "🤖", title: "AI Proposal Generation", desc: "One-click proposals personalised to each prospect's business and your agency's services." },
       { icon: "📋", title: "Team Pipeline", desc: "Track prospects across your team with a shared CRM pipeline." },
-      { icon: "📬", title: "Email Campaigns", desc: "Send sequenced outreach campaigns directly from your own domain." },
+      { icon: "📬", title: "Outreach Campaigns", desc: "Prepare sequenced outreach and track follow-ups without losing context." },
     ],
     keywords: ["lead generation for marketing agencies", "agency prospecting tool", "find marketing clients"],
     cta: "Start Finding Agency Clients Free",
@@ -59,16 +59,16 @@ const INDUSTRIES: Record<string, {
   "freelance-copywriters": {
     name: "Freelance Copywriters",
     headline: "Find Copywriting Clients Who Are Actively Hiring — Right Now",
-    sub: "iCloseLeads scans 23 live sources including Reddit, job boards, and HackerNews every hour to surface companies actively looking for copywriters. No more cold pitching into the void.",
+    sub: "iCloseLeads scans live hiring and project signals to surface companies actively looking for copywriters. No more cold pitching into the void.",
     pain: "Most copywriters get clients through referrals or platforms that take a 20% cut. iCloseLeads gives you direct access to companies posting for copywriters — no middleman.",
     useCases: [
       "Filter leads by 'copywriting', 'content writing', or 'SEO content' niche",
-      "See real job posts from Reddit /r/forhire, RemoteOK, and WeWorkRemotely",
+      "See real job and project posts from live hiring channels",
       "Write personalised proposals with AI in under 60 seconds",
       "Track every lead in your pipeline from first email to signed contract",
     ],
     features: [
-      { icon: "⚡", title: "Live Jobs Feed", desc: "Real-time feed of copywriting jobs from 23 sources updated every hour." },
+      { icon: "⚡", title: "Live Jobs Feed", desc: "Real-time feed of copywriting opportunities updated frequently." },
       { icon: "✍️", title: "AI Proposals", desc: "Proposal writer trained on high-converting copywriter cold emails." },
       { icon: "📊", title: "Lead Scoring", desc: "Every lead is scored by AI so you focus on the highest-converting opportunities first." },
       { icon: "🔄", title: "Follow-Up Sequences", desc: "Automated 3-step follow-up sequences so no lead falls through the cracks." },
@@ -89,7 +89,7 @@ const INDUSTRIES: Record<string, {
     ],
     features: [
       { icon: "📍", title: "Local Lead Discovery", desc: "Find businesses by city and type with website status flagged automatically." },
-      { icon: "🔍", title: "Job Board Scanner", desc: "23 live job sources scanned hourly for SEO opportunities." },
+      { icon: "🔍", title: "Job Signal Scanner", desc: "Live hiring and project signals scanned for SEO opportunities." },
       { icon: "✍️", title: "Audit-Style Proposals", desc: "AI writes personalised SEO pitch emails referencing the prospect's specific situation." },
       { icon: "📊", title: "Pipeline Tracking", desc: "6-stage CRM designed for high-ticket service sales cycles." },
     ],
@@ -139,10 +139,10 @@ const INDUSTRIES: Record<string, {
   "shopify-developers": {
     name: "Shopify Developers",
     headline: "Find Shopify Clients Who Need Help — Before They Post on Upwork",
-    sub: "iCloseLeads scans live job boards, Reddit, and local business databases to surface ecommerce businesses that need Shopify development, theme work, or app integrations.",
-    pain: "The best Shopify clients never post on Upwork. They mention their problem on Reddit, post a job on RemoteOK, or they're a local retailer whose website clearly hasn't been touched since 2019.",
+    sub: "iCloseLeads scans live hiring, community, and local business signals to surface ecommerce businesses that need Shopify development, theme work, or app integrations.",
+    pain: "The best Shopify clients do not always post on marketplaces. They mention their problem in communities, publish hiring signals, or show obvious website gaps before they ask for proposals.",
     useCases: [
-      "Search 'Shopify', 'ecommerce', 'WooCommerce to Shopify migration' across 23 live sources",
+      "Search 'Shopify', 'ecommerce', 'WooCommerce to Shopify migration' across live lead channels",
       "Find local retailers with outdated or missing websites to pitch Shopify builds",
       "Write technical migration proposals with AI in 60 seconds",
       "Track every prospect from cold lead to retainer client",
@@ -264,7 +264,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
         <section className="py-12 px-4 border-y border-border">
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
-              { icon: <Zap className="w-5 h-5 text-primary-light" />, stat: "23", label: "Live sources" },
+              { icon: <Zap className="w-5 h-5 text-primary-light" />, stat: "Multi", label: "Lead channels" },
               { icon: <MapPin className="w-5 h-5 text-accent" />, stat: "50K+", label: "Cities covered" },
               { icon: <Users className="w-5 h-5 text-gold" />, stat: "2,847", label: "Freelancers using it" },
               { icon: <TrendingUp className="w-5 h-5 text-primary-light" />, stat: "100%", label: "Free to start" },

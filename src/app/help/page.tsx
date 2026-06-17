@@ -67,7 +67,7 @@ const faqs = [
     questions: [
       {
         q: "How do I find my first lead?",
-        a: "Go to Dashboard → Find Leads. Enter your niche (e.g., 'web development' or 'copywriting'), select your preferred sources, and click Search. iCloseLeads aggregates results from 16 live sources in seconds. You'll see leads sorted by freshness — the most recently posted jobs first.",
+        a: "Go to Dashboard → Find Leads. Enter your niche (e.g., 'web development' or 'copywriting'), choose your filters, and click Search. iCloseLeads aggregates live results in seconds. You'll see leads sorted by freshness — the most recently posted jobs first.",
       },
       {
         q: "What is a 'niche' and how should I choose mine?",
@@ -89,11 +89,11 @@ const faqs = [
     questions: [
       {
         q: "Where do the leads come from?",
-        a: "iCloseLeads aggregates from 16 live sources including: RemoteOK, Remotive, Reddit, WeWorkRemotely, Arbeitnow, Jobicy, Working Nomads, Hacker News, YC Jobs, Authentic Jobs, GitHub Bounties, Smashing Jobs, Dribbble Jobs, Jobspresso, Himalayas, and No Desk. New sources are added regularly.",
+        a: "iCloseLeads combines live hiring signals, public web opportunities, community posts, and local business coverage. New coverage is added regularly so users can find fresh opportunities without checking dozens of sites manually.",
       },
       {
         q: "Why don't I see leads from LinkedIn or Indeed?",
-        a: "LinkedIn and Indeed block automated access to their platforms via API and RSS. We only include sources that provide official, publicly accessible feeds to ensure reliability and compliance with their terms of service.",
+        a: "Some large platforms restrict automated access to their data. iCloseLeads focuses on reliable, compliant coverage that can be searched consistently and safely.",
       },
       {
         q: "What does the confidence score mean?",
@@ -101,7 +101,7 @@ const faqs = [
       },
       {
         q: "How do I filter leads to only show those with email addresses?",
-        a: "On the lead search results page, toggle the 'Has Email' filter. iCloseLeads enriches leads by scraping company websites and cross-referencing Hunter.io to find verified contact emails. Roughly 40-60% of leads will have an email address.",
+        a: "On the lead search results page, toggle the 'Has Email' filter. iCloseLeads enriches leads using company websites and contact discovery signals. Always verify contact details before outreach.",
       },
       {
         q: "Why are some leads showing the same company multiple times?",
@@ -115,15 +115,15 @@ const faqs = [
     questions: [
       {
         q: "How does the AI proposal generator work?",
-        a: "Click 'Generate Proposal' on any lead. Our AI (powered by GPT-4o) reads the job description, your profile (niche, bio, portfolio URL), and writes a personalized, professional proposal in under 10 seconds. You can edit it before sending.",
+        a: "Click 'Generate Proposal' on any lead. The AI reads the job description, your profile (niche, bio, portfolio URL), and writes a personalized, professional proposal in under 10 seconds. You can edit it before preparing outreach.",
       },
       {
         q: "Does iCloseLeads send emails on my behalf?",
-        a: "Yes, on Pro and Agency plans. iCloseLeads uses Resend for email delivery, which means your emails are sent from your own email address (you configure this in Settings → Email). We do not use shared IP pools — your deliverability is protected.",
+        a: "The safest default workflow is Gmail compose mode. iCloseLeads prepares the email draft, and you review and send manually from your own Gmail account.",
       },
       {
         q: "How do I set up my email address for sending?",
-        a: "Go to Dashboard → Settings → Email Setup. You'll add your email address and verify ownership via a DNS record. This ensures emails land in inboxes, not spam. The setup takes about 5 minutes.",
+        a: "Use the proposal page's 'Prepare in Gmail' action. It opens Gmail with the recipient, subject, and message filled in, so you stay in control before sending.",
       },
       {
         q: "Can I save and reuse proposal templates?",

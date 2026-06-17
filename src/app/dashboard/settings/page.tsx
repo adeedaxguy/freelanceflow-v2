@@ -35,28 +35,28 @@ const AI_MODELS = [
     stats: [{ label: "Avg latency", value: "~200ms" }, { label: "Parameters", value: "70B" }, { label: "Context", value: "128K" }],
   },
   {
-    provider: "Hunter.io",
-    model: "Email Finder API v2",
+    provider: "Contact Enrichment",
+    model: "Email Verification API",
     usedFor: ["Contact Discovery", "Email Verification"],
     speed: "~300ms",
     icon: "🎯",
     color: "text-primary-light",
     bg: "bg-primary/10",
     border: "border-primary/20",
-    description: "Hunter.io indexes 100M+ professional emails. Verified contacts so you only reach addresses that exist.",
+    description: "Optional enrichment helps verify professional contact paths before outreach.",
     status: "operational" as const,
     stats: [{ label: "Accuracy", value: "95%+" }, { label: "DB size", value: "100M+" }, { label: "Domains", value: "50M+" }],
   },
   {
-    provider: "OpenAI",
-    model: "GPT-4o + o3-mini",
+    provider: "Advanced AI",
+    model: "Reasoning + long-form proposal models",
     usedFor: ["Advanced Deal Strategy", "Long-form Proposals"],
     speed: "~1–3s",
     icon: "🧠",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
     border: "border-purple-500/20",
-    description: "GPT-4o and o3-mini coming for Pro users — deeper proposal nuance and multi-step deal strategy.",
+    description: "Advanced models coming for Pro users — deeper proposal nuance and multi-step deal strategy.",
     status: "coming_soon" as const,
     stats: [{ label: "Context", value: "128K" }, { label: "Reasoning", value: "o3-mini" }, { label: "For", value: "Pro users" }],
   },
@@ -94,7 +94,7 @@ const INTEGRATIONS = [
   },
   {
     id:       "hunter",
-    label:    "Hunter.io",
+    label:    "Contact Enrichment",
     icon:     "🎯",
     color:    "text-primary-light",
     bg:       "bg-primary/10",
@@ -102,8 +102,8 @@ const INTEGRATIONS = [
     desc:     "Optional. Add your own enrichment key only if you want deeper email verification.",
     settingKey: "hunter_api_key",
     placeholder: "hnt_…",
-    docsUrl:  "https://hunter.io/api-keys",
-    docsLabel:"Get Hunter key →",
+    docsUrl:  "#",
+    docsLabel:"Use your own enrichment key →",
     hint:     "iCloseLeads works without this. Paste a key only if you want to use your own enrichment allowance.",
   },
 ];
@@ -350,7 +350,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-4 mt-3 flex-wrap">
                   {[
                     { icon: Cpu,   label: "6 AI models",  color: "text-accent" },
-                    { icon: Globe, label: "16 sources",    color: "text-primary-light" },
+                    { icon: Globe, label: "Live channels", color: "text-primary-light" },
                     { icon: Clock, label: "<200ms avg",    color: "text-blue-400" },
                   ].map(({ icon: Icon, label, color }) => (
                     <div key={label} className="flex items-center gap-1.5">

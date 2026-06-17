@@ -11,7 +11,7 @@ export interface PricingTier {
 
 export const TESTIMONIALS: Testimonial[] = [
   { name: "Marcus Reid", role: "Full-Stack Developer", company: "Independent", avatar: "MR",
-    content: "In my first month I found 23 qualified leads across 16 sources and landed 2 contracts worth $18,000. The AI proposals are scarily good.", rating: 5, niche: "Web Development" },
+    content: "In my first month I found 23 qualified leads across multiple channels and landed 2 contracts worth $18,000. The AI proposals are scarily good.", rating: 5, niche: "Web Development" },
   { name: "Sofia Andersen", role: "Brand Designer", company: "Sofia Design Studio", avatar: "SA",
     content: "My response rate went from 3% to 19%. iCloseLeads handles the research and drafts my proposals — I just personalize and send.", rating: 5, niche: "UI/UX Design" },
   { name: "James Okafor", role: "SEO Consultant", company: "Growth.io", avatar: "JO",
@@ -22,13 +22,13 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     name: "Free",
     price: "$0",
-    description: "Full access to all features. No card, no limits. Seriously.",
-    limit: "20 leads/week",
+    description: "Full early access to core lead, proposal, and CRM tools. No card required.",
+    limit: "100 leads/day",
     features: [
-      "100 leads per week",
+      "100 leads per day during Early Access",
       "5 AI proposals per week",
       "3 free tools (Rate Calc, Subject Gen, Red Flag)",
-      "All 16 live sources included",
+      "Live job and local lead discovery",
       "3 active campaigns",
       "Community + email support",
     ],
@@ -44,7 +44,7 @@ export const PRICING_TIERS: PricingTier[] = [
     features: [
       "1,000 leads per week",
       "Unlimited AI proposals (Groq-powered)",
-      "All lead sources + priority freshness",
+      "Priority freshness across lead discovery",
       "10 active campaigns",
       "CSV export + CRM sync",
       "Analytics dashboard",

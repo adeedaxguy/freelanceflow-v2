@@ -166,7 +166,7 @@ export default function LeadCalculatorPage() {
                 <p className="text-foreground font-semibold mb-2">iCloseLeads finds your leads for free</p>
                 <p className="text-muted-foreground text-sm mb-4">
                   Stop spending {fmt(calc.timeCostPerWeek)}/week on manual prospecting.
-                  iCloseLeads finds, scores, and surfaces leads from 23 live sources automatically.
+                  iCloseLeads finds, scores, and surfaces live opportunities automatically.
                 </p>
                 <Link href="/auth?mode=signup"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">

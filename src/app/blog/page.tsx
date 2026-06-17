@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
 import { STATIC_POSTS } from "@/data/blog-posts";
+import { getBlogCoverImage, isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 import type { BlogPost } from "@/types";
 
@@ -43,19 +44,30 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         coverImage: true, readTime: true, createdAt: true, updatedAt: true,
       },
     });
-    dbPosts = raw.map(post => ({
-      ...post,
-      excerpt: post.excerpt ?? "",
-      coverImage: post.coverImage ?? null,
-    }));
+    dbPosts = raw
+      .filter(post => !isHiddenBlogSlug(post.slug) && post.excerpt?.trim().toLowerCase() !== "test excerpt")
+      .map(post => ({
+        ...post,
+        excerpt: post.excerpt ?? "",
+        coverImage: getBlogCoverImage(post.slug, post.coverImage),
+      }));
   } catch {
     dbPosts = [];
   }
 
   const dbSlugs = new Set(dbPosts.map(post => post.slug));
-  const staticOnly = STATIC_POSTS.filter(post => post.published && !dbSlugs.has(post.slug));
+  const staticOnly = STATIC_POSTS
+    .filter(post => post.published && !dbSlugs.has(post.slug) && !isHiddenBlogSlug(post.slug))
+    .map(post => ({ ...post, coverImage: getBlogCoverImage(post.slug, post.coverImage) }));
+  const seenTitles = new Set<string>();
   const publishedPosts = [...dbPosts, ...staticOnly]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .filter(post => {
+      const key = post.title.trim().toLowerCase();
+      if (seenTitles.has(key)) return false;
+      seenTitles.add(key);
+      return true;
+    });
   const categories = [
     "All",
     ...Array.from(new Set(publishedPosts.map(post => post.category).filter(Boolean))),
@@ -78,7 +90,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 Actionable strategies, templates, and insights to grow your freelance business.
               </p>
               <p className="text-sm text-muted-foreground mt-3">
-                {publishedPosts.length} articles · New posts daily
+                {publishedPosts.length} articles · Updated regularly
               </p>
             </div>
 

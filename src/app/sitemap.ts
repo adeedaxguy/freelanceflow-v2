@@ -1,4 +1,6 @@
 import { MetadataRoute } from "next";
+import { STATIC_POSTS } from "@/data/blog-posts";
+import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
@@ -39,16 +41,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const posts = await prisma.blogPost.findMany({
       where: { published: true },
-      select: { slug: true, updatedAt: true },
+      select: { slug: true, title: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
     });
-    blogEntries = posts.map(post => ({
+    const seenTitles = new Set<string>();
+    blogEntries = posts
+      .filter(post => !isHiddenBlogSlug(post.slug))
+      .filter(post => {
+        const key = post.title.trim().toLowerCase();
+        if (seenTitles.has(key)) return false;
+        seenTitles.add(key);
+        return true;
+      })
+      .map(post => ({
+        url: `${BASE_URL}/blog/${post.slug}`,
+        lastModified: post.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      }));
+  } catch { /* blog table may not exist yet */ }
+
+  const dbBlogUrls = new Set(blogEntries.map(entry => entry.url));
+  const staticBlogEntries = STATIC_POSTS
+    .filter(post => post.published && !isHiddenBlogSlug(post.slug))
+    .map(post => ({
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: post.updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.8,
-    }));
-  } catch { /* blog table may not exist yet */ }
+    }))
+    .filter(entry => !dbBlogUrls.has(entry.url));
 
-  return [...staticEntries, ...blogEntries];
+  return [...staticEntries, ...blogEntries, ...staticBlogEntries];
 }

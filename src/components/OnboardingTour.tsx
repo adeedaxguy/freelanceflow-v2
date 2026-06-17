@@ -58,7 +58,7 @@ const STEPS: TourStep[] = [
     icon:      Search,
     iconColor: "text-primary-light",
     title:     "Step 2 — Find your first leads",
-    body:      "Pick your niche, hit Search, and iCloseLeads pulls live job postings from 16 sources. Each lead is scored by how well it matches your niche — filter by score to focus only on the best fits.",
+    body:      "Pick your niche, hit Search, and iCloseLeads pulls live opportunities from multiple lead channels. Each lead is scored by how well it matches your niche — filter by score to focus only on the best fits.",
     selector:  'a[href="/dashboard/leads"]',
     href:      "/dashboard/leads",
     cta:       "Find leads →",
