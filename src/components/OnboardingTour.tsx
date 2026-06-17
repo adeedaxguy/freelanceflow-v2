@@ -300,7 +300,7 @@ export default function OnboardingTour() {
       {/* ── Spotlight hole (box-shadow trick) ─────────────────────────────── */}
       {rect && (
         <div
-          className="fixed z-[201] pointer-events-none transition-all duration-300"
+          className="fixed z-[201] pointer-events-none"
           style={{
             left:         rect.x - PADDING,
             top:          rect.y - PADDING,
@@ -316,7 +316,7 @@ export default function OnboardingTour() {
 
       {/* ── Tooltip card ─────────────────────────────────────────────────── */}
       <div
-        className="fixed z-[202] w-[calc(100vw-32px)] max-w-[340px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface border border-border rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4 transition-all duration-300"
+        className="fixed z-[202] w-[calc(100vw-32px)] max-w-[340px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface border border-border rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4"
         style={tip}
       >
         {/* Header row */}
