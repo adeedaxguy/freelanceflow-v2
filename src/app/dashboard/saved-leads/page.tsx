@@ -4,16 +4,25 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
-  Mail, Sparkles, ChevronDown, Search, ExternalLink, X,
+  Mail, Sparkles, ChevronDown, Search, ExternalLink, X, CalendarClock, MapPin,
 } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import type { Lead } from "@/types";
 
 type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
-interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
+type CountryFilter = "all" | "usa" | "uk";
+type LeadCountry = Exclude<CountryFilter, "all"> | null;
+interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; description?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
 interface ApiResponse { leads: LeadExt[]; total: number; page: number; totalPages: number; }
 const MAX_LEAD_NOTES_LENGTH = 5000;
 const USER_NOTES_MARKER = "\n\nUser Notes:\n";
+const COUNTRY_FILTERS: { value: CountryFilter; label: string }[] = [
+  { value: "all", label: "All countries" },
+  { value: "usa", label: "USA" },
+  { value: "uk", label: "UK" },
+];
+const US_STATE_CODES = "AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY|DC";
+const US_STATE_ADDRESS_RE = new RegExp(`,\\s*(?:${US_STATE_CODES})(?:\\s+\\d{5}(?:-\\d{4})?)?\\b`);
 
 function isLocalBusinessLead(lead: LeadExt) {
   return lead.source?.startsWith("local_business") ?? false;
@@ -58,6 +67,36 @@ function buildLeadNotes(existingNotes: string | null | undefined, userNotes: str
 
 function displayUserNotes(notes?: string | null) {
   return splitUserNotes(notes).userNotes;
+}
+
+function inferLeadCountry(lead: LeadExt): LeadCountry {
+  const blob = [
+    lead.notes, lead.domain, lead.sourceUrl, lead.title, lead.description, lead.company,
+  ].filter(Boolean).join(" ");
+
+  if (/(united kingdom|great britain|england|scotland|wales|northern ireland|\buk\b)/i.test(blob) || /\.(?:co\.)?uk(?:\/|$)/i.test(blob)) {
+    return "uk";
+  }
+  if (/(united states|usa|u\.s\.a\.|u\.s\.)/i.test(blob) || /\.us(?:\/|$)/i.test(blob) || US_STATE_ADDRESS_RE.test(blob)) {
+    return "usa";
+  }
+  return null;
+}
+
+function countryLabel(country: LeadCountry) {
+  if (country === "usa") return "USA";
+  if (country === "uk") return "UK";
+  return null;
+}
+
+function formatSavedDateTime(savedAt: Date | string) {
+  return new Date(savedAt).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function displayLeadTitle(lead: LeadExt) {
@@ -213,6 +252,7 @@ export default function SavedLeadsPage() {
   const [leads,        setLeads]       = useState<LeadExt[]>([]);
   const [loading,      setLoading]     = useState(true);
   const [statusFilter, setStatusFilter]= useState("all");
+  const [countryFilter,setCountryFilter]= useState<CountryFilter>("all");
   const [search,       setSearch]      = useState("");
   const [deleteId,     setDeleteId]    = useState<string | null>(null);
   const [deleting,     setDeleting]    = useState(false);
@@ -223,6 +263,7 @@ export default function SavedLeadsPage() {
     setLoading(true);
     const params = new URLSearchParams({ limit: "100" });
     if (statusFilter !== "all") params.set("status", statusFilter);
+    if (countryFilter !== "all") params.set("country", countryFilter);
     if (search) params.set("search", search);
     const res = await fetch(`/api/leads/save?${params.toString()}`);
     if (res.ok) {
@@ -231,7 +272,7 @@ export default function SavedLeadsPage() {
       setTotal(data.total);
     }
     setLoading(false);
-  }, [statusFilter, search]);
+  }, [statusFilter, countryFilter, search]);
 
   useEffect(() => { void fetchLeads(); }, [fetchLeads]);
 
@@ -258,14 +299,14 @@ export default function SavedLeadsPage() {
     const headers = [
       "Company", "Domain", "Email", "Niche", "Title", "Lead Type",
       "Match %", "Quality Score", "Pipeline Status", "Source URL",
-      "Notes", "Saved Date",
+      "Country", "Notes", "Saved Date & Time",
     ];
     const rows = leads.map(l => [
       esc(l.company), esc(l.domain), esc(l.email),
       esc(l.niche), esc(displayLeadTitle(l)), esc(displayLeadSource(l)),
       esc(l.confidence), esc(l.qualityScore),
       esc(l.status), esc(l.sourceUrl),
-      esc(displayUserNotes(l.notes)), esc(new Date(l.savedAt).toLocaleDateString()),
+      esc(countryLabel(inferLeadCountry(l))), esc(displayUserNotes(l.notes)), esc(formatSavedDateTime(l.savedAt)),
     ].join(","));
     // UTF-8 BOM makes Excel open the file correctly without garbled characters
     const bom = "﻿";
@@ -317,6 +358,19 @@ export default function SavedLeadsPage() {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
             className="pl-8 pr-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 w-40" />
         </div>
+        <div className="flex items-center gap-1 rounded-lg border border-border bg-surface p-1">
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground ml-1" />
+          {COUNTRY_FILTERS.map(country => (
+            <button
+              key={country.value}
+              type="button"
+              onClick={() => setCountryFilter(country.value)}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${countryFilter === country.value ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {country.label}
+            </button>
+          ))}
+        </div>
         <button onClick={() => setStatusFilter("all")}
           className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${statusFilter==="all" ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"}`}>
           All ({total})
@@ -357,6 +411,9 @@ export default function SavedLeadsPage() {
                     className="bg-background border border-border rounded-lg p-2 hover:border-primary/30 transition-all cursor-pointer">
                     <div className="font-medium text-xs text-foreground line-clamp-1">{lead.company}</div>
                     {displayLeadTitle(lead) && <div className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">{displayLeadTitle(lead)}</div>}
+                    <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
+                      <CalendarClock className="w-2.5 h-2.5" /> {formatSavedDateTime(lead.savedAt)}
+                    </div>
                     {lead.email && <div className="text-[10px] text-accent mt-1 flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{lead.email}</div>}
                   </div>
                 ))}
@@ -399,6 +456,8 @@ export default function SavedLeadsPage() {
                     </div>
                   </div>
                   <div className="flex items-center flex-wrap gap-3 text-xs text-muted-foreground mb-3">
+                    <span className="flex items-center gap-1 whitespace-nowrap"><CalendarClock className="w-3 h-3" />Saved {formatSavedDateTime(lead.savedAt)}</span>
+                    {countryLabel(inferLeadCountry(lead)) && <span className="flex items-center gap-1 whitespace-nowrap"><MapPin className="w-3 h-3" />{countryLabel(inferLeadCountry(lead))}</span>}
                     <span className="flex items-center gap-1"><Globe className="w-3 h-3" />{lead.domain}</span>
                     {lead.email && <span className="flex items-center gap-1 text-accent"><Mail className="w-3 h-3" />{lead.email}</span>}
                     {lead.niche && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">{lead.niche}</span>}
