@@ -18,11 +18,12 @@ const TABS: Array<{
   label: string;
   icon: React.ElementType;
   isLive?: boolean;
+  tourId?: string;
 }> = [
-  { href: "/dashboard",             label: "Home",  icon: LayoutDashboard },
-  { href: "/dashboard/leads",       label: "Jobs",  icon: Search },
-  { href: "/dashboard/live-jobs",   label: "Live",  icon: Radio,     isLive: true },
-  { href: "/dashboard/saved-leads", label: "Saved", icon: Bookmark },
+  { href: "/dashboard",             label: "Home",  icon: LayoutDashboard, tourId: "mobile-home" },
+  { href: "/dashboard/leads",       label: "Jobs",  icon: Search,          tourId: "mobile-jobs" },
+  { href: "/dashboard/live-jobs",   label: "Live",  icon: Radio,           isLive: true, tourId: "mobile-live" },
+  { href: "/dashboard/saved-leads", label: "Saved", icon: Bookmark,        tourId: "mobile-saved" },
 ];
 
 export default function MobileBottomNav() {
@@ -38,7 +39,7 @@ export default function MobileBottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
       <div className="flex items-stretch justify-around h-16">
-        {TABS.map(({ href, label, icon: Icon, isLive }) => {
+        {TABS.map(({ href, label, icon: Icon, isLive, tourId }) => {
           const active =
             pathname === href ||
             (href !== "/dashboard" && pathname.startsWith(href));
@@ -47,6 +48,7 @@ export default function MobileBottomNav() {
             <Link
               key={href}
               href={href}
+              data-tour={tourId}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 px-1 relative transition-colors ${
                 active ? "text-primary-light" : "text-muted-foreground hover:text-foreground"
               }`}
@@ -72,6 +74,8 @@ export default function MobileBottomNav() {
         {/* More — opens the full sidebar drawer */}
         <button
           onClick={openSidebar}
+          data-tour="mobile-more"
+          aria-label="Open full dashboard menu"
           className="flex flex-col items-center justify-center gap-0.5 flex-1 px-1 text-muted-foreground hover:text-foreground transition-colors"
         >
           <MoreHorizontal className="w-5 h-5" />

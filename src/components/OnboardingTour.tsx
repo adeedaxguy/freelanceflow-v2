@@ -4,7 +4,7 @@
  * OnboardingTour — spotlight-based step-by-step guide for new users.
  *
  * • Stores completion in localStorage (no DB needed).
- * • Each step highlights a sidebar nav item by its href selector.
+ * • Each step highlights a visible dashboard control on desktop or mobile.
  * • Full-screen dark overlay with a "cut-out" spotlight using box-shadow.
  * • Tooltip positioned to the right of the spotlight on desktop,
  *   below it on mobile.
@@ -26,8 +26,11 @@ interface TourStep {
   iconColor:   string;
   title:       string;
   body:        string;
-  /** CSS selector of the element to spotlight (sidebar nav link) */
+  mobileBody?: string;
+  /** CSS selector of the desktop element to spotlight */
   selector?:   string;
+  /** CSS selector of the mobile element to spotlight */
+  mobileSelector?: string;
   /** Navigate to this page when the step activates */
   href?:       string;
   /** CTA label for the primary button */
@@ -41,6 +44,7 @@ const STEPS: TourStep[] = [
     iconColor: "text-accent",
     title:     "Welcome to iCloseLeads 👋",
     body:      "Let's take a quick 60-second tour so you know exactly where everything is. You can skip at any time.",
+    mobileBody: "Let's take a quick 60-second tour of the mobile dashboard so you know where the lead engines, saved leads, and AI tools live.",
     cta:       "Let's go →",
   },
   {
@@ -49,7 +53,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-blue-400",
     title:     "Step 1 — Understand Gmail prepare mode",
     body:      "No email connection is required. iCloseLeads prepares each proposal in Gmail compose so you can review it and click Send manually from your own inbox.",
+    mobileBody: "No email connection is required. Use the More menu for setup and outreach tools; proposals open as prepared Gmail drafts so you stay in control.",
     selector:  'a[href="/dashboard/email-settings"]',
+    mobileSelector: '[data-tour="mobile-more"]',
     href:      "/dashboard/email-settings",
     cta:       "View setup →",
   },
@@ -59,7 +65,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-primary-light",
     title:     "Step 2 — Find your first leads",
     body:      "Pick your niche, hit Search, and iCloseLeads pulls live opportunities from multiple lead channels. Each lead is scored by how well it matches your niche — filter by score to focus only on the best fits.",
+    mobileBody: "Tap Jobs to find remote opportunities matched to your niche. Your saved leads and AI proposal workflow stay connected as you move.",
     selector:  'a[href="/dashboard/leads"]',
+    mobileSelector: '[data-tour="mobile-jobs"]',
     href:      "/dashboard/leads",
     cta:       "Find leads →",
   },
@@ -69,7 +77,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-accent",
     title:     "Step 3 — Track deals in your pipeline",
     body:      "Save leads and drag them through stages: New → Contacted → Replied → Negotiating → Won. You always see exactly where each deal stands at a glance.",
+    mobileBody: "Use More to open CRM Pipeline. Save good leads, then move them from New to Contacted, Replied, Negotiating, and Won.",
     selector:  'a[href="/dashboard/pipeline"]',
+    mobileSelector: '[data-tour="mobile-more"]',
     href:      "/dashboard/pipeline",
     cta:       "View pipeline →",
   },
@@ -79,7 +89,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-yellow-400",
     title:     "Step 4 — Close deals with AI",
     body:      "When a prospect replies, paste their message into AI Deal Closer. The AI detects their intent (price objection, timing issue, ready to buy…) and writes the perfect reply to move the deal forward.",
+    mobileBody: "AI Deal Closer lives under More on mobile. Paste a prospect reply and get a clear next message without leaving the dashboard.",
     selector:  'a[href="/dashboard/deal-closer"]',
+    mobileSelector: '[data-tour="mobile-more"]',
     href:      "/dashboard/deal-closer",
     cta:       "Try it →",
   },
@@ -89,7 +101,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-orange-400",
     title:     "Step 5 — Plan follow-ups",
     body:      "Most deals close on the 3rd or 4th touchpoint. Build a multi-step follow-up plan, then prepare each message in Gmail when it is time to reach out.",
+    mobileBody: "Follow-ups also live under More. Build your sequence, prepare each Gmail draft, and keep outreach moving without sending anything automatically.",
     selector:  'a[href="/dashboard/followups"]',
+    mobileSelector: '[data-tour="mobile-more"]',
     href:      "/dashboard/followups",
     cta:       "Plan follow-ups →",
   },
@@ -99,6 +113,7 @@ const STEPS: TourStep[] = [
     iconColor: "text-green-400",
     title:     "You're all set! 🎉",
     body:      "That's the full loop: find leads → prepare AI proposals in Gmail → close with AI → plan follow-ups. Go find your first lead and prepare your first proposal.",
+    mobileBody: "That's the mobile loop: Jobs for remote leads, Live for fresh hiring signals, Saved for follow-up, and More for the full toolkit.",
     cta:       "Start finding leads →",
     href:      "/dashboard/leads",
   },
@@ -108,22 +123,42 @@ const STEPS: TourStep[] = [
 interface Rect { x: number; y: number; w: number; h: number }
 
 function getRect(selector: string): Rect | null {
-  const el = document.querySelector(selector);
-  if (!el) return null;
-  const r = el.getBoundingClientRect();
-  return { x: r.left, y: r.top, w: r.width, h: r.height };
+  const elements = Array.from(document.querySelectorAll(selector));
+  for (const el of elements) {
+    const r = el.getBoundingClientRect();
+    if (r.width <= 1 || r.height <= 1) continue;
+    const style = window.getComputedStyle(el);
+    if (style.visibility === "hidden" || style.display === "none" || style.opacity === "0") continue;
+    return { x: r.left, y: r.top, w: r.width, h: r.height };
+  }
+  return null;
 }
 
 // ─── Tooltip position ─────────────────────────────────────────────────────────
 // Returns CSS left/top for the tooltip card, given the spotlight rect
 function tooltipPos(rect: Rect | null, cardW = 340, cardH = 260) {
-  if (!rect) return { left: "50%", top: "50%", transform: "translate(-50%,-50%)" };
-  const pad = 20;
+  const pad = 16;
   const vw  = window.innerWidth;
   const vh  = window.innerHeight;
+  const width = Math.min(cardW, Math.max(280, vw - pad * 2));
+
+  if (!rect) return { left: "50%", top: "50%", transform: "translate(-50%,-50%)" };
+
+  if (vw < 1024) {
+    const left = Math.max(pad, Math.min(rect.x + rect.w / 2 - width / 2, vw - width - pad));
+    const hasRoomAbove = rect.y - cardH - pad > pad;
+    const top = hasRoomAbove
+      ? Math.max(pad, rect.y - cardH - pad)
+      : Math.min(vh - cardH - pad, rect.y + rect.h + pad);
+    return {
+      left: `${left}px`,
+      top: `${Math.max(pad, top)}px`,
+      transform: "none",
+    };
+  }
 
   // Prefer right of spotlight
-  if (rect.x + rect.w + pad + cardW < vw) {
+  if (rect.x + rect.w + pad + width < vw) {
     return {
       left:  `${rect.x + rect.w + pad}px`,
       top:   `${Math.max(pad, Math.min(rect.y, vh - cardH - pad))}px`,
@@ -133,14 +168,14 @@ function tooltipPos(rect: Rect | null, cardW = 340, cardH = 260) {
   // Below
   if (rect.y + rect.h + pad + cardH < vh) {
     return {
-      left:  `${Math.max(pad, Math.min(rect.x, vw - cardW - pad))}px`,
+      left:  `${Math.max(pad, Math.min(rect.x, vw - width - pad))}px`,
       top:   `${rect.y + rect.h + pad}px`,
       transform: "none",
     };
   }
   // Above
   return {
-    left:  `${Math.max(pad, Math.min(rect.x, vw - cardW - pad))}px`,
+    left:  `${Math.max(pad, Math.min(rect.x, vw - width - pad))}px`,
     top:   `${Math.max(pad, rect.y - cardH - pad)}px`,
     transform: "none",
   };
@@ -152,7 +187,17 @@ export default function OnboardingTour() {
   const [step,    setStep]    = useState(0);
   const [visible, setVisible] = useState(false);
   const [rect,    setRect]    = useState<Rect | null>(null);
+  const [mobile,  setMobile]  = useState(false);
   const rafRef                = useRef<number>(0);
+
+  // Keep the tour aligned with the active dashboard navigation pattern.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => setMobile(window.innerWidth < 1024);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   // Show tour only for users who haven't completed it
   useEffect(() => {
@@ -178,12 +223,13 @@ export default function OnboardingTour() {
   // stays in sync even if the sidebar animates in)
   const updateRect = useCallback(() => {
     const s = STEPS[step];
-    if (s?.selector) {
-      setRect(getRect(s.selector));
+    const selector = mobile && s?.mobileSelector ? s.mobileSelector : s?.selector;
+    if (selector) {
+      setRect(getRect(selector));
     } else {
       setRect(null);
     }
-  }, [step]);
+  }, [mobile, step]);
 
   useEffect(() => {
     if (!visible) return;
@@ -225,7 +271,8 @@ export default function OnboardingTour() {
   const Icon = current.icon;
   const isFirst = step === 0;
   const isLast  = step === STEPS.length - 1;
-  const tip     = tooltipPos(rect);
+  const currentBody = mobile && current.mobileBody ? current.mobileBody : current.body;
+  const tip     = tooltipPos(rect, 340, mobile ? 320 : 260);
 
   const PADDING = 10; // px around spotlight rect
 
@@ -256,7 +303,7 @@ export default function OnboardingTour() {
 
       {/* ── Tooltip card ─────────────────────────────────────────────────── */}
       <div
-        className="fixed z-[202] w-[340px] bg-surface border border-border rounded-2xl shadow-2xl p-6 space-y-4 transition-all duration-300"
+        className="fixed z-[202] w-[calc(100vw-32px)] max-w-[340px] max-h-[calc(100vh-32px)] overflow-y-auto bg-surface border border-border rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4 transition-all duration-300"
         style={tip}
       >
         {/* Header row */}
@@ -282,7 +329,7 @@ export default function OnboardingTour() {
         </div>
 
         {/* Body */}
-        <p className="text-muted-foreground text-sm leading-relaxed">{current.body}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed">{currentBody}</p>
 
         {/* Progress dots */}
         <div className="flex items-center gap-1.5">

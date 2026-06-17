@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import {
   Search, Sparkles, Send, BarChart2,
-  Users, Mail, Bookmark,
+  Users, Mail, Bookmark, CheckCircle,
 } from "lucide-react";
 import EmailChart from "@/components/charts/EmailChart";
 import DashboardStats from "@/components/DashboardStats";
@@ -196,12 +196,14 @@ export default async function DashboardPage() {
           </div>
 
           {!isPro && (
-            <Link
-              href="/dashboard/upgrade"
-              className="mt-auto w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-hero text-white text-sm font-semibold transition-all shadow-glow-primary hover:opacity-90"
-            >
-              ⚡ Upgrade Plan
-            </Link>
+            <div className="mt-auto rounded-xl border border-accent/20 bg-accent/10 px-4 py-3">
+              <p className="flex items-center gap-2 text-sm font-semibold text-accent">
+                <CheckCircle className="w-4 h-4" /> Free launch access
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Remote jobs, live jobs, local business leads, and AI proposal prep are open while paid plans are being prepared.
+              </p>
+            </div>
           )}
         </div>
       </div>
