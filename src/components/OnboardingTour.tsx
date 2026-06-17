@@ -288,6 +288,14 @@ export default function OnboardingTour() {
   const tip     = tooltipPos(rect, 340, mobile ? 320 : 260);
 
   const PADDING = 10; // px around spotlight rect
+  const spotlight = rect && typeof window !== "undefined"
+    ? {
+        left:   Math.max(0, rect.x - PADDING),
+        top:    Math.max(0, rect.y - PADDING),
+        width:  Math.min(rect.w + PADDING * 2, window.innerWidth - Math.max(0, rect.x - PADDING)),
+        height: Math.min(rect.h + PADDING * 2, window.innerHeight - Math.max(0, rect.y - PADDING)),
+      }
+    : null;
 
   return (
     <>
@@ -298,14 +306,14 @@ export default function OnboardingTour() {
       />
 
       {/* ── Spotlight hole (box-shadow trick) ─────────────────────────────── */}
-      {rect && (
+      {spotlight && (
         <div
           className="fixed z-[201] pointer-events-none"
           style={{
-            left:         rect.x - PADDING,
-            top:          rect.y - PADDING,
-            width:        rect.w + PADDING * 2,
-            height:       rect.h + PADDING * 2,
+            left:         spotlight.left,
+            top:          spotlight.top,
+            width:        spotlight.width,
+            height:       spotlight.height,
             borderRadius: 14,
             boxShadow:    "0 0 0 9999px rgba(0,0,0,0.78)",
             outline:      "2px solid rgba(124,58,237,0.6)",
