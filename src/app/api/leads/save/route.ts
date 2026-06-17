@@ -35,7 +35,7 @@ const saveSchema = z.object({
 const patchSchema = z.object({
   id:          z.string().min(1),
   status:      z.enum(["NEW", "CONTACTED", "REPLIED", "NEGOTIATION", "FOLLOW_UP", "WON", "LOST"]).optional(),
-  notes:       z.string().optional().nullable(),
+  notes:       z.string().max(5000).optional().nullable(),
   description: z.string().max(10000).optional().nullable(),
 });
 
@@ -152,7 +152,7 @@ export async function GET(req: NextRequest) {
     where.OR = [
       { company: { contains: search } }, { domain:  { contains: search } },
       { email:   { contains: search } }, { niche:   { contains: search } },
-      { title:   { contains: search } },
+      { title:   { contains: search } }, { notes:   { contains: search } },
     ];
   }
   const [leads, total] = await Promise.all([

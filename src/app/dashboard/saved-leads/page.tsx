@@ -12,6 +12,8 @@ import type { Lead } from "@/types";
 type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
 interface LeadExt extends Omit<Lead, "status"> { status: CRMStatus; notes?: string | null; title?: string | null; sourceUrl?: string | null; source?: string | null; qualityScore?: number | null; }
 interface ApiResponse { leads: LeadExt[]; total: number; page: number; totalPages: number; }
+const MAX_LEAD_NOTES_LENGTH = 5000;
+const USER_NOTES_MARKER = "\n\nUser Notes:\n";
 
 function isLocalBusinessLead(lead: LeadExt) {
   return lead.source?.startsWith("local_business") ?? false;
@@ -24,6 +26,38 @@ function displayLeadSource(lead: LeadExt) {
 
 function sanitizeLeadNotes(notes?: string | null) {
   return (notes ?? "").replace(/^Data Source:\s*.+$/gim, "Lead Coverage: Live local search");
+}
+
+function looksLikeLeadContext(notes: string) {
+  return /^(Address|Phone|Website|Rating|Revenue Potential|Guessed Emails|Lead Coverage|Priority Score|Pitch Points):/im.test(notes);
+}
+
+function splitUserNotes(notes?: string | null) {
+  const cleaned = sanitizeLeadNotes(notes).trim();
+  if (!cleaned) return { context: "", userNotes: "" };
+
+  const marker = cleaned.match(/(?:^|\n)User Notes:\s*\n?/i);
+  if (marker?.index !== undefined) {
+    return {
+      context: cleaned.slice(0, marker.index).trim(),
+      userNotes: cleaned.slice(marker.index + marker[0].length).trim(),
+    };
+  }
+
+  if (looksLikeLeadContext(cleaned)) return { context: cleaned, userNotes: "" };
+  return { context: "", userNotes: cleaned };
+}
+
+function buildLeadNotes(existingNotes: string | null | undefined, userNotes: string) {
+  const context = splitUserNotes(existingNotes).context;
+  const cleanedUserNotes = userNotes.trim();
+  if (!context) return cleanedUserNotes;
+  if (!cleanedUserNotes) return context;
+  return `${context}${USER_NOTES_MARKER}${cleanedUserNotes}`;
+}
+
+function displayUserNotes(notes?: string | null) {
+  return splitUserNotes(notes).userNotes;
 }
 
 function displayLeadTitle(lead: LeadExt) {
@@ -81,48 +115,96 @@ function StatusDropdown({ current, onChange }: { current: string; onChange: (s: 
 }
 
 function NotesEditor({ leadId, initialNotes, onSave }: { leadId: string; initialNotes?: string | null; onSave: (notes: string) => void }) {
-  const [editing, setEditing] = useState(false);
-  const [value,   setValue]   = useState(sanitizeLeadNotes(initialNotes));
-  const [saving,  setSaving]  = useState(false);
+  const [value,      setValue]      = useState(displayUserNotes(initialNotes));
+  const [savedValue, setSavedValue] = useState(displayUserNotes(initialNotes));
+  const [saving,     setSaving]     = useState(false);
+  const [error,      setError]      = useState("");
+  const [saved,      setSaved]      = useState(false);
+  const contextLength = splitUserNotes(initialNotes).context.length;
+  const noteLimit = Math.max(0, MAX_LEAD_NOTES_LENGTH - contextLength - (contextLength ? USER_NOTES_MARKER.length : 0));
+
+  useEffect(() => {
+    const next = displayUserNotes(initialNotes);
+    setValue(next);
+    setSavedValue(next);
+    setSaved(false);
+    setError("");
+  }, [initialNotes]);
 
   async function save() {
+    if (value.length > noteLimit) {
+      setError("Note is too long");
+      return;
+    }
+    const nextNotes = buildLeadNotes(initialNotes, value);
     setSaving(true);
-    await fetch("/api/leads/save", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: leadId, notes: value }),
-    });
-    setSaving(false);
-    setEditing(false);
-    onSave(value);
+    setError("");
+    setSaved(false);
+    try {
+      const response = await fetch("/api/leads/save", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: leadId, notes: nextNotes }),
+      });
+
+      if (!response.ok) throw new Error("Save failed");
+
+      const trimmed = value.trim();
+      setValue(trimmed);
+      setSavedValue(trimmed);
+      setSaved(true);
+      onSave(nextNotes);
+    } catch {
+      setError("Could not save note");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  if (!editing) {
-    return (
-      <button onClick={() => setEditing(true)}
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors group">
-        <StickyNote className="w-3.5 h-3.5" />
-        {value ? <span className="line-clamp-1 max-w-[200px]">{value}</span>
-                : <span className="group-hover:text-primary-light italic">Add note…</span>}
-      </button>
-    );
-  }
+  const dirty = value.trim() !== savedValue;
+  const tooLong = value.length > noteLimit;
 
   return (
-    <div className="flex items-start gap-2 w-full">
-      <textarea value={value} onChange={e => setValue(e.target.value)} placeholder="Add a note about this lead…" autoFocus
-        className="flex-1 text-xs bg-background border border-border rounded-lg p-2 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 resize-none min-h-[56px]" />
-      <div className="flex flex-col gap-1">
-        <button onClick={() => void save()} disabled={saving}
-          className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-light transition-colors disabled:opacity-50">
-          <Check className="w-3 h-3" />
-        </button>
-        <button onClick={() => { setValue(sanitizeLeadNotes(initialNotes)); setEditing(false); }}
-          className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
-          <X className="w-3 h-3" />
-        </button>
+    <section className="rounded-xl border border-border/70 bg-background/45 p-3">
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
+          <StickyNote className="w-3.5 h-3.5 text-primary-light" />
+          Notes
+        </div>
+        <div className="text-[10px] text-muted-foreground">
+          {saving ? "Saving..." : saved ? "Saved" : dirty ? "Unsaved" : `${value.length}/${noteLimit}`}
+        </div>
       </div>
-    </div>
+      <textarea
+        value={value}
+        onChange={e => { setValue(e.target.value); setSaved(false); }}
+        placeholder="Next step, decision maker, objection, call recap..."
+        maxLength={noteLimit}
+        className="w-full min-h-[92px] resize-y rounded-lg border border-border bg-surface/70 p-3 text-sm leading-relaxed text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50"
+      />
+      <div className="mt-2 flex items-center justify-between gap-3">
+        <div className="min-h-4 text-[11px] text-destructive">{tooLong ? "Note is too long" : error}</div>
+        <div className="flex items-center gap-2">
+          {dirty && (
+            <button
+              type="button"
+              onClick={() => { setValue(savedValue); setError(""); setSaved(false); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-3.5 h-3.5" /> Cancel
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => void save()}
+            disabled={!dirty || saving || tooLong}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-xs font-semibold text-white hover:bg-primary-light transition-colors disabled:opacity-45 disabled:cursor-not-allowed"
+          >
+            <Check className="w-3.5 h-3.5" /> Save Note
+          </button>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -183,7 +265,7 @@ export default function SavedLeadsPage() {
       esc(l.niche), esc(displayLeadTitle(l)), esc(displayLeadSource(l)),
       esc(l.confidence), esc(l.qualityScore),
       esc(l.status), esc(l.sourceUrl),
-      esc(sanitizeLeadNotes(l.notes)), esc(new Date(l.savedAt).toLocaleDateString()),
+      esc(displayUserNotes(l.notes)), esc(new Date(l.savedAt).toLocaleDateString()),
     ].join(","));
     // UTF-8 BOM makes Excel open the file correctly without garbled characters
     const bom = "﻿";
@@ -323,7 +405,7 @@ export default function SavedLeadsPage() {
                     {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
                   </div>
                   <div className="pt-3 border-t border-border/50">
-                    <NotesEditor leadId={lead.id} initialNotes={sanitizeLeadNotes(lead.notes)}
+                    <NotesEditor leadId={lead.id} initialNotes={lead.notes}
                       onSave={notes => setLeads(prev => prev.map(l => l.id===lead.id ? {...l,notes} : l))} />
                   </div>
                 </div>
