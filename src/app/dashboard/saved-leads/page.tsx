@@ -294,6 +294,8 @@ export default function SavedLeadsPage() {
     void fetchLeads();
   }
 
+  const displayedLeads = countryFilter === "all" ? leads : leads.filter(lead => inferLeadCountry(lead) === countryFilter);
+
   function exportCSV() {
     const esc = (v: string | number | null | undefined) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const headers = [
@@ -301,7 +303,7 @@ export default function SavedLeadsPage() {
       "Match %", "Quality Score", "Pipeline Status", "Source URL",
       "Country", "Notes", "Saved Date & Time",
     ];
-    const rows = leads.map(l => [
+    const rows = displayedLeads.map(l => [
       esc(l.company), esc(l.domain), esc(l.email),
       esc(l.niche), esc(displayLeadTitle(l)), esc(displayLeadSource(l)),
       esc(l.confidence), esc(l.qualityScore),
@@ -320,7 +322,7 @@ export default function SavedLeadsPage() {
     URL.revokeObjectURL(url);
   }
 
-  const pipelineGroups = CRM_PIPELINE.map(s => ({ ...s, items: leads.filter(l => l.status === s.value) }));
+  const pipelineGroups = CRM_PIPELINE.map(s => ({ ...s, items: displayedLeads.filter(l => l.status === s.value) }));
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
@@ -344,9 +346,9 @@ export default function SavedLeadsPage() {
           <button onClick={() => void fetchLeads()} className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
             <RefreshCw className="w-4 h-4" />
           </button>
-          <button onClick={exportCSV} disabled={leads.length === 0}
+          <button onClick={exportCSV} disabled={displayedLeads.length === 0}
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-            <Download className="w-4 h-4" /> Export {leads.length > 0 ? `${leads.length} leads` : "CSV"}
+            <Download className="w-4 h-4" /> Export {displayedLeads.length > 0 ? `${displayedLeads.length} leads` : "CSV"}
           </button>
         </div>
       </div>
@@ -376,7 +378,7 @@ export default function SavedLeadsPage() {
           All ({total})
         </button>
         {CRM_PIPELINE.map(s => {
-          const cnt = leads.filter(l => l.status === s.value).length;
+          const cnt = displayedLeads.filter(l => l.status === s.value).length;
           return (
             <button key={s.value} onClick={() => setStatusFilter(s.value)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${statusFilter===s.value ? `${s.bg} ${s.color} border-current` : "border-border text-muted-foreground hover:text-foreground"}`}>
@@ -388,7 +390,7 @@ export default function SavedLeadsPage() {
 
       {loading ? (
         <div className="space-y-3">{[1,2,3].map(i=><div key={i} className="h-24 bg-surface border border-border rounded-2xl animate-pulse" />)}</div>
-      ) : leads.length === 0 ? (
+      ) : displayedLeads.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-border rounded-2xl bg-surface/50">
           <Bookmark className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <h3 className="text-foreground font-semibold mb-2">No leads saved yet</h3>
@@ -423,7 +425,7 @@ export default function SavedLeadsPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {leads.map(lead => (
+          {displayedLeads.map(lead => (
             <div key={lead.id} className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-5 transition-all">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 font-bold text-primary-light text-sm">

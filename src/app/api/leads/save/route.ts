@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import type { Prisma } from "@prisma/client";
+import type { Lead as PrismaLead, Prisma } from "@prisma/client";
 
 export const dynamic = 'force-dynamic';
 
@@ -44,59 +44,29 @@ const US_STATE_CODES = [
   "MA", "MD", "ME", "MI", "MN", "MO", "MS", "MT", "NC", "ND", "NE", "NH", "NJ", "NM", "NV", "NY", "OH", "OK",
   "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VA", "VT", "WA", "WI", "WV", "WY", "DC",
 ];
+const COUNTRY_FILTER_SCAN_LIMIT = 2000;
+const US_STATE_ADDRESS_RE = new RegExp(`,\\s*(?:${US_STATE_CODES.join("|")})(?:\\s+\\d{5}(?:-\\d{4})?)?\\b`);
 
-function textContains(field: "company" | "domain" | "email" | "niche" | "title" | "notes" | "description" | "sourceUrl", value: string): Prisma.LeadWhereInput {
-  return { [field]: { contains: value, mode: "insensitive" } };
-}
+function matchesCountryFilter(
+  lead: Pick<PrismaLead, "company" | "domain" | "notes" | "title" | "description" | "sourceUrl">,
+  country: string | null,
+) {
+  const blob = [
+    lead.notes, lead.domain, lead.sourceUrl, lead.title, lead.description, lead.company,
+  ].filter(Boolean).join(" ");
 
-function textContainsExactCase(field: "title" | "notes", value: string): Prisma.LeadWhereInput {
-  return { [field]: { contains: value } };
-}
-
-function countryWhere(country: string | null): Prisma.LeadWhereInput | null {
   if (country === "uk") {
-    return {
-      OR: [
-        textContains("notes", "United Kingdom"),
-        textContains("notes", "Great Britain"),
-        textContains("notes", "England"),
-        textContains("notes", "Scotland"),
-        textContains("notes", "Wales"),
-        textContains("notes", "Northern Ireland"),
-        textContains("notes", ", UK"),
-        textContains("title", ", UK"),
-        textContains("description", ", UK"),
-        textContains("domain", ".co.uk"),
-        { domain: { endsWith: ".uk", mode: "insensitive" } },
-        textContains("sourceUrl", ".co.uk"),
-        textContains("sourceUrl", ".uk"),
-      ],
-    };
+    return /(united kingdom|great britain|england|scotland|wales|northern ireland|\buk\b)/i.test(blob)
+      || /\.(?:co\.)?uk(?:\/|$)/i.test(blob);
   }
 
   if (country === "usa") {
-    const stateMatches = US_STATE_CODES.flatMap(code => [
-      textContainsExactCase("notes", `, ${code}`),
-      textContainsExactCase("title", `, ${code}`),
-    ]);
-
-    return {
-      OR: [
-        textContains("notes", "United States"),
-        textContains("notes", "USA"),
-        textContains("notes", "U.S."),
-        textContains("title", "United States"),
-        textContains("title", "USA"),
-        textContains("description", "United States"),
-        textContains("description", "USA"),
-        { domain: { endsWith: ".us", mode: "insensitive" } },
-        textContains("sourceUrl", ".us"),
-        ...stateMatches,
-      ],
-    };
+    return /(united states|usa|u\.s\.a\.|u\.s\.)/i.test(blob)
+      || /\.us(?:\/|$)/i.test(blob)
+      || US_STATE_ADDRESS_RE.test(blob);
   }
 
-  return null;
+  return true;
 }
 
 // ─── POST — save a lead ───────────────────────────────────────────────────────
@@ -207,6 +177,7 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get("status");
   const search = searchParams.get("search") ?? "";
   const country = searchParams.get("country");
+  const hasCountryFilter = country === "usa" || country === "uk";
   const where: Prisma.LeadWhereInput = { userId: session.user.id };
   const andFilters: Prisma.LeadWhereInput[] = [];
   if (status && status !== "all") where.status = status;
@@ -217,9 +188,22 @@ export async function GET(req: NextRequest) {
       { title:   { contains: search } }, { notes:   { contains: search } },
     ] });
   }
-  const countryFilter = countryWhere(country);
-  if (countryFilter) andFilters.push(countryFilter);
   if (andFilters.length > 0) where.AND = andFilters;
+
+  if (hasCountryFilter) {
+    const candidates = await prisma.lead.findMany({
+      where,
+      orderBy: { savedAt: "desc" },
+      take: COUNTRY_FILTER_SCAN_LIMIT,
+    });
+    const filtered = candidates.filter(lead => matchesCountryFilter(lead, country));
+    return NextResponse.json({
+      leads: filtered.slice((page - 1) * limit, page * limit),
+      total: filtered.length,
+      page,
+      totalPages: Math.ceil(filtered.length / limit),
+    });
+  }
 
   const [leads, total] = await Promise.all([
     prisma.lead.findMany({ where, orderBy: { savedAt: "desc" }, skip: (page - 1) * limit, take: limit }),
