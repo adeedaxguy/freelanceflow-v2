@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
@@ -125,6 +125,8 @@ export default function BonusLeadsModal({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [copiedPost, setCopiedPost] = useState(false);
+  const [copyFallback, setCopyFallback] = useState(false);
+  const shareTextRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -136,6 +138,7 @@ export default function BonusLeadsModal({
     setError("");
     setSuccess("");
     setCopiedPost(false);
+    setCopyFallback(false);
   }, [isOpen, source]);
 
   const shareUrl = useMemo(() => {
@@ -169,9 +172,14 @@ export default function BonusLeadsModal({
     try {
       await writeShareText(sharePostText);
       setCopiedPost(true);
+      setCopyFallback(false);
       window.setTimeout(() => setCopiedPost(false), 2500);
     } catch {
       setCopiedPost(false);
+      setCopyFallback(true);
+      shareTextRef.current?.focus();
+      shareTextRef.current?.select();
+      window.setTimeout(() => setCopyFallback(false), 3500);
     }
   };
 
@@ -290,10 +298,17 @@ export default function BonusLeadsModal({
                   className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-xs font-semibold text-primary-light transition-all hover:border-primary/40"
                 >
                   <Copy className="h-3.5 w-3.5" />
-                  {copiedPost ? "Copied" : "Copy text"}
+                  {copiedPost ? "Copied" : copyFallback ? "Text selected" : "Copy text"}
                 </button>
               </div>
-              <p className="whitespace-pre-line text-xs leading-relaxed text-muted-foreground">{sharePostText}</p>
+              <textarea
+                ref={shareTextRef}
+                readOnly
+                value={sharePostText}
+                onFocus={(event) => event.currentTarget.select()}
+                rows={6}
+                className="h-28 w-full resize-none rounded-lg border border-border bg-background/70 p-2.5 text-xs leading-relaxed text-muted-foreground outline-none focus:border-primary/50"
+              />
               <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/80">
                 We copy this before opening the share window. Paste it if the platform does not prefill the post text.
               </p>
