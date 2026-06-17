@@ -142,7 +142,13 @@ function tooltipPos(rect: Rect | null, cardW = 340, cardH = 260) {
   const vh  = window.innerHeight;
   const width = Math.min(cardW, Math.max(280, vw - pad * 2));
 
-  if (!rect) return { left: "50%", top: "50%", transform: "translate(-50%,-50%)" };
+  if (!rect) {
+    return {
+      left: `${Math.max(pad, (vw - width) / 2)}px`,
+      top: `${Math.max(pad, Math.min((vh - cardH) / 2, vh - cardH - pad))}px`,
+      transform: "none",
+    };
+  }
 
   if (vw < 1024) {
     const left = Math.max(pad, Math.min(rect.x + rect.w / 2 - width / 2, vw - width - pad));
