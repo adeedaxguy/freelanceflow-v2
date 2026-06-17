@@ -34,6 +34,7 @@ const US_STATE_ADDRESS_RE = new RegExp(`,\\s*(?:${US_STATE_CODES})(?:\\s+\\d{5}(
 const US_STATE_ZIP_RE = new RegExp(`,\\s*(?:${US_STATE_CODES})\\s+\\d{5}(?:-\\d{4})?\\b`, "i");
 const US_STATE_NAME_RE = new RegExp(`\\b(?:${US_STATE_NAMES.join("|")})\\b`, "i");
 const UK_POSTCODE_RE = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i;
+const UK_LOCAL_PLACE_RE = /\b(?:London|Manchester|Birmingham|Leeds|Glasgow|Sheffield|Liverpool|Bristol|Edinburgh|Cardiff|Belfast|Leicester|Coventry|Nottingham|Newcastle upon Tyne|Southampton|Portsmouth|Brighton|Oxford|Cambridge|York|Aberdeen|Dundee|Swansea|Plymouth|Derby|Reading|Luton|Milton Keynes|Northampton|Norwich|Exeter|Bath|Chester|Preston|Middlesbrough|Hull|Bradford|Wolverhampton|Stoke-on-Trent)\b/i;
 
 function isLocalBusinessLead(lead: LeadExt) {
   return lead.source?.startsWith("local_business") ?? false;
@@ -102,6 +103,7 @@ function inferLeadCountry(lead: LeadExt): LeadCountry {
     return "uk";
   }
   if (UK_POSTCODE_RE.test(blob) || /\+44\b/.test(blob)) return "uk";
+  if (isLocalBusinessLead(lead) && UK_LOCAL_PLACE_RE.test(blob)) return "uk";
   if (
     /(country:\s*(?:us|usa|united states|united states of america)\b|united states|usa|u\.s\.a\.|u\.s\.)/i.test(blob)
     || /\.us(?:\/|$)/i.test(blob)

@@ -57,6 +57,7 @@ const US_STATE_ADDRESS_RE = new RegExp(`,\\s*(?:${US_STATE_CODES.join("|")})(?:\
 const US_STATE_ZIP_RE = new RegExp(`,\\s*(?:${US_STATE_CODES.join("|")})\\s+\\d{5}(?:-\\d{4})?\\b`, "i");
 const US_STATE_NAME_RE = new RegExp(`\\b(?:${US_STATE_NAMES.join("|")})\\b`, "i");
 const UK_POSTCODE_RE = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i;
+const UK_LOCAL_PLACE_RE = /\b(?:London|Manchester|Birmingham|Leeds|Glasgow|Sheffield|Liverpool|Bristol|Edinburgh|Cardiff|Belfast|Leicester|Coventry|Nottingham|Newcastle upon Tyne|Southampton|Portsmouth|Brighton|Oxford|Cambridge|York|Aberdeen|Dundee|Swansea|Plymouth|Derby|Reading|Luton|Milton Keynes|Northampton|Norwich|Exeter|Bath|Chester|Preston|Middlesbrough|Hull|Bradford|Wolverhampton|Stoke-on-Trent)\b/i;
 
 function decodeMaybe(value: string | null) {
   if (!value) return "";
@@ -64,7 +65,7 @@ function decodeMaybe(value: string | null) {
 }
 
 function matchesCountryFilter(
-  lead: Pick<PrismaLead, "company" | "domain" | "email" | "phone" | "notes" | "title" | "description" | "sourceUrl">,
+  lead: Pick<PrismaLead, "company" | "domain" | "email" | "phone" | "notes" | "title" | "description" | "source" | "sourceUrl">,
   country: string | null,
 ) {
   const blob = [
@@ -83,7 +84,8 @@ function matchesCountryFilter(
     return /(country:\s*(?:uk|gb|gbr|united kingdom|great britain)\b|united kingdom|great britain|england|scotland|wales|northern ireland|\buk\b)/i.test(blob)
       || /\.(?:co\.)?uk(?:\/|$)/i.test(blob)
       || UK_POSTCODE_RE.test(blob)
-      || /\+44\b/.test(blob);
+      || /\+44\b/.test(blob)
+      || (lead.source?.startsWith("local_business") === true && UK_LOCAL_PLACE_RE.test(blob));
   }
 
   if (country === "usa") {
