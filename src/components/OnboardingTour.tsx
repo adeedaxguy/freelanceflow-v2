@@ -134,6 +134,16 @@ function getRect(selector: string): Rect | null {
   return null;
 }
 
+function sameRect(a: Rect | null, b: Rect | null): boolean {
+  if (!a || !b) return a === b;
+  return (
+    Math.abs(a.x - b.x) < 0.5 &&
+    Math.abs(a.y - b.y) < 0.5 &&
+    Math.abs(a.w - b.w) < 0.5 &&
+    Math.abs(a.h - b.h) < 0.5
+  );
+}
+
 // ─── Tooltip position ─────────────────────────────────────────────────────────
 // Returns CSS left/top for the tooltip card, given the spotlight rect
 function tooltipPos(rect: Rect | null, cardW = 340, cardH = 260) {
@@ -230,11 +240,8 @@ export default function OnboardingTour() {
   const updateRect = useCallback(() => {
     const s = STEPS[step];
     const selector = mobile && s?.mobileSelector ? s.mobileSelector : s?.selector;
-    if (selector) {
-      setRect(getRect(selector));
-    } else {
-      setRect(null);
-    }
+    const nextRect = selector ? getRect(selector) : null;
+    setRect(prev => sameRect(prev, nextRect) ? prev : nextRect);
   }, [mobile, step]);
 
   useEffect(() => {
