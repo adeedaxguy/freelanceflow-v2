@@ -24,6 +24,18 @@ const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
 
+type LocalLeadsCache = {
+  results?: LocalLead[];
+  keyword?: string;
+  location?: string;
+  filter?: "all"|"no_website"|"outdated_website"|"has_website";
+  hasPhone?: boolean;
+  minRating?: number;
+  page?: number;
+  meta?: { source?: string; geocoded?: boolean; cached?: boolean; sources?: string[] } | null;
+  savedIds?: string[];
+};
+
 // 150+ keyword suggestions grouped by category
 const KEYWORD_CATEGORIES: Record<string, string[]> = {
   "🔧 Trades & Construction": [
@@ -600,6 +612,7 @@ export default function LocalLeadsPage() {
   const [limitNotice,    setLimitNotice]    = useState("");
   const [yelpKey,        setYelpKey]        = useState("");
   const [fsqKey,         setFsqKey]         = useState("");
+  const [cacheReady,     setCacheReady]     = useState(false);
   // Extra filters
   const [hasPhone,       setHasPhone]       = useState(false);
   const [minRating,      setMinRating]      = useState(0);
@@ -644,15 +657,42 @@ export default function LocalLeadsPage() {
     try {
       const cached = sessionStorage.getItem(SS_LOCAL_KEY);
       if (cached) {
-        const { results: cr, keyword: kw, location: loc } = JSON.parse(cached) as { results: LocalLead[]; keyword: string; location: string };
-        setResults(cr); setKeyword(kw); setLocation(loc);
+        const parsed = JSON.parse(cached) as LocalLeadsCache;
+        if (Array.isArray(parsed.results)) setResults(parsed.results);
+        if (typeof parsed.keyword === "string") setKeyword(parsed.keyword);
+        if (typeof parsed.location === "string") setLocation(parsed.location);
+        if (parsed.filter && ["all", "no_website", "outdated_website", "has_website"].includes(parsed.filter)) setFilter(parsed.filter);
+        setHasPhone(Boolean(parsed.hasPhone));
+        setMinRating(typeof parsed.minRating === "number" ? parsed.minRating : 0);
+        setPage(typeof parsed.page === "number" && parsed.page > 0 ? parsed.page : 1);
+        setMeta(parsed.meta ?? null);
+        if (Array.isArray(parsed.savedIds)) setSavedIds(new Set(parsed.savedIds));
       }
     } catch {}
+    setCacheReady(true);
     // Fetch user plan to bypass limits for paid plans
     fetch("/api/usage").then(r => r.ok ? r.json() : null).then(d => {
       if (d?.plan) setUserPlan(d.plan);
     }).catch(() => {});
   }, [sessionStatus, localLeadsKey, localLeadsResetKey, localLeadsLimitKey]);
+
+  useEffect(() => {
+    if (!cacheReady) return;
+    try {
+      const payload: LocalLeadsCache = {
+        results,
+        keyword,
+        location,
+        filter,
+        hasPhone,
+        minRating,
+        page,
+        meta,
+        savedIds: [...savedIds],
+      };
+      sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [cacheReady, results, keyword, location, filter, hasPhone, minRating, page, meta, savedIds]);
 
   // Reset time for display
   const resetAt = (() => {
@@ -700,7 +740,19 @@ export default function LocalLeadsPage() {
       }
       setResults(newResults);
       setMeta({ source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources });
-      try { sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify({ results: newResults, keyword: keyword.trim(), location: location.trim() })); } catch {}
+      try {
+        sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify({
+          results: newResults,
+          keyword: keyword.trim(),
+          location: location.trim(),
+          filter,
+          hasPhone,
+          minRating,
+          page: 1,
+          meta: { source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources },
+          savedIds: [...savedIds],
+        } satisfies LocalLeadsCache));
+      } catch {}
 
       // Track leads viewed for daily limit
       const newCount = isPaidPlan ? leadsViewed : Math.min(dailyLimit, leadsViewed + newResults.length);
@@ -715,7 +767,7 @@ export default function LocalLeadsPage() {
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
+  }, [keyword, location, filter, hasPhone, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -984,7 +1036,7 @@ export default function LocalLeadsPage() {
                 { v: "has_website",      l: "Has Website",        i: Wifi,      c: "text-green-400" },
                 { v: "all",              l: "All",                i: Building2, c: "text-muted-foreground" },
               ] as const).map(({ v, l, i: Icon, c }) => (
-                <button key={v} onClick={() => setFilter(v)}
+                <button key={v} onClick={() => { setFilter(v); setPage(1); }}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filter === v ? "bg-primary/15 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30"}`}>
                   <Icon className={`w-3.5 h-3.5 ${filter === v ? "text-primary-light" : c}`}/>{l}
                 </button>

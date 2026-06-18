@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
   Mail, Sparkles, ChevronDown, Search, ExternalLink, X, CalendarClock, MapPin,
+  Phone,
 } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import type { Lead } from "@/types";
@@ -79,6 +80,44 @@ function buildLeadNotes(existingNotes: string | null | undefined, userNotes: str
 
 function displayUserNotes(notes?: string | null) {
   return splitUserNotes(notes).userNotes;
+}
+
+function contextField(notes: string | null | undefined, label: string) {
+  const context = splitUserNotes(notes).context;
+  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return context.match(new RegExp(`^${escapedLabel}:\\s*(.+)$`, "im"))?.[1]?.trim() ?? "";
+}
+
+function cleanContactValue(value?: string | null) {
+  const cleaned = (value ?? "").trim();
+  if (!cleaned || /^(none|null|undefined|unknown|n\/a)$/i.test(cleaned)) return "";
+  return cleaned;
+}
+
+function cleanWebsiteValue(value?: string | null) {
+  const cleaned = cleanContactValue(value?.replace(/\s+\(.+\)$/g, ""));
+  if (!cleaned || /^(none|unknown|website unverified)$/i.test(cleaned)) return "";
+  return cleaned;
+}
+
+function normalizeUrl(url: string) {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
+
+function getContactInfo(lead: LeadExt) {
+  const guessedEmails = contextField(lead.notes, "Guessed Emails")
+    .split(",")
+    .map(email => cleanContactValue(email.replace(/\s*\(guessed\)\s*$/i, "")))
+    .filter((email): email is string => Boolean(email));
+  const directEmail = cleanContactValue(lead.email);
+
+  return {
+    address: cleanContactValue(contextField(lead.notes, "Address")),
+    country: cleanContactValue(contextField(lead.notes, "Country")),
+    phone: cleanContactValue(lead.phone ?? contextField(lead.notes, "Phone")),
+    website: cleanWebsiteValue(contextField(lead.notes, "Website")),
+    emails: Array.from(new Set([directEmail, ...guessedEmails].filter((email): email is string => Boolean(email)))),
+  };
 }
 
 function decodeMaybe(value?: string | null) {
@@ -184,6 +223,59 @@ function StatusDropdown({ current, onChange }: { current: string; onChange: (s: 
         </div>
       )}
     </div>
+  );
+}
+
+function ContactInfo({ lead }: { lead: LeadExt }) {
+  const contact = getContactInfo(lead);
+  const mapsUrl = isLocalBusinessLead(lead) ? lead.sourceUrl : null;
+  const hasContact = contact.address || contact.country || contact.phone || contact.website || contact.emails.length > 0 || mapsUrl;
+  if (!hasContact) return null;
+
+  return (
+    <section className="rounded-xl border border-border/70 bg-background/45 p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-foreground">
+        <Phone className="w-3.5 h-3.5 text-accent" />
+        Contact Info
+      </div>
+      <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+        {contact.address && (
+          <div className="flex items-start gap-2 sm:col-span-2">
+            <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-light" />
+            <span>
+              {contact.address}
+              {contact.country && !contact.address.toLowerCase().includes(contact.country.toLowerCase()) ? `, ${contact.country}` : ""}
+            </span>
+          </div>
+        )}
+        {contact.phone && (
+          <a href={`tel:${contact.phone}`} className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 text-accent transition-colors hover:border-accent/40">
+            <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate font-mono">{contact.phone}</span>
+          </a>
+        )}
+        {contact.emails.map(email => (
+          <a key={email} href={`mailto:${email}`} className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 text-accent transition-colors hover:border-accent/40">
+            <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate">{email}</span>
+          </a>
+        ))}
+        {contact.website && (
+          <a href={normalizeUrl(contact.website)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 transition-colors hover:border-primary/40 hover:text-foreground">
+            <Globe className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate">{contact.website.replace(/^https?:\/\/(www\.)?/, "")}</span>
+            <ExternalLink className="ml-auto h-3 w-3 flex-shrink-0 opacity-60" />
+          </a>
+        )}
+        {mapsUrl && (
+          <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 transition-colors hover:border-primary/40 hover:text-foreground">
+            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+            <span className="truncate">Google Maps</span>
+            <ExternalLink className="ml-auto h-3 w-3 flex-shrink-0 opacity-60" />
+          </a>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -499,7 +591,8 @@ export default function SavedLeadsPage() {
                     {lead.niche && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">{lead.niche}</span>}
                     {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
                   </div>
-                  <div className="pt-3 border-t border-border/50">
+                  <div className="pt-3 border-t border-border/50 space-y-3">
+                    <ContactInfo lead={lead} />
                     <NotesEditor leadId={lead.id} initialNotes={lead.notes}
                       onSave={notes => setLeads(prev => prev.map(l => l.id===lead.id ? {...l,notes} : l))} />
                   </div>
