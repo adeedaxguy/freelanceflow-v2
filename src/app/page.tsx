@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     "businesses without websites",
     "cold email outreach for freelancers"
   ],
+  alternates: {
+    canonical: "https://icloseleads.com",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -45,17 +48,20 @@ const organizationJsonLd = {
   "url": "https://icloseleads.com",
   "logo": "https://icloseleads.com/og-image.png",
   "description": "AI-powered client acquisition platform for freelancers",
-  "sameAs": [
-    "https://twitter.com/icloseleads",
-    "https://github.com/icloseleads",
-    "https://linkedin.com/company/icloseleads",
-  ],
   "contactPoint": {
     "@type": "ContactPoint",
     "email": "hello@icloseleads.com",
     "contactType": "customer support",
     "availableLanguage": "English",
   },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "iCloseLeads",
+  "url": "https://icloseleads.com",
+  "description": "Freelance lead generation software for remote job leads, local business leads, live job opportunities, AI proposals, and CRM follow-up.",
 };
 
 const softwareJsonLd = {
@@ -83,12 +89,43 @@ const softwareJsonLd = {
   },
 };
 
+const useCaseItemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "iCloseLeads lead generation use cases",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Remote Job Leads",
+      "url": "https://icloseleads.com/use-cases/remote-job-leads",
+      "description": "Find fresh remote job leads, freelance job alerts, and contract opportunities by niche.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Local Business Leads",
+      "url": "https://icloseleads.com/use-cases/local-business-leads",
+      "description": "Find local businesses with no website, outdated websites, or visible marketing gaps.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Live Job Leads",
+      "url": "https://icloseleads.com/use-cases/live-job-leads",
+      "description": "Monitor live freelance opportunities and turn fresh demand into saved leads and outreach.",
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <>
       <HomepageClient />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(useCaseItemListJsonLd) }} />
     </>
   );
 }

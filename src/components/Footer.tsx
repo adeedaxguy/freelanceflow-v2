@@ -1,11 +1,15 @@
 "use client";
 import Link from "next/link";
-import { Twitter, Github, Linkedin, Mail } from "lucide-react";
+import { Github, Mail } from "lucide-react";
 import Logo from "./Logo";
 
 const footerLinks = {
   Product: [
     { label: "Features",   href: "/features"   },
+    { label: "Use Cases",  href: "/use-cases"  },
+    { label: "Remote Job Leads", href: "/use-cases/remote-job-leads" },
+    { label: "Local Business Leads", href: "/use-cases/local-business-leads" },
+    { label: "Live Job Leads", href: "/use-cases/live-job-leads" },
     { label: "Pricing",    href: "/pricing"     },
     { label: "Blog",       href: "/blog"        },
     { label: "Changelog",  href: "/changelog"   },
@@ -47,10 +51,8 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: Twitter,  href: "https://twitter.com/icloseleads", label: "Twitter"  },
-                { icon: Github,   href: "https://github.com/icloseleads",  label: "GitHub"   },
-                { icon: Linkedin, href: "https://linkedin.com/company/icloseleads", label: "LinkedIn" },
-                { icon: Mail,     href: "mailto:hello@icloseleads.com",     label: "Email"    },
+                { icon: Github, href: "https://github.com/adeedaxguy/freelanceflow-v2", label: "GitHub" },
+                { icon: Mail, href: "mailto:hello@icloseleads.com", label: "Email" },
               ].map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}

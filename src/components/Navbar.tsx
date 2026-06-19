@@ -21,10 +21,10 @@ const MEGA_FEATURES = [
     icon: Search,
     color: "text-primary-light",
     items: [
-      { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/features/lead-discovery" },
-      { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/features/lead-discovery#use-cases" },
+      { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/use-cases/remote-job-leads" },
+      { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/use-cases/local-business-leads" },
+      { label: "Live Job Leads",        desc: "Move first on fresh freelance demand",       href: "/use-cases/live-job-leads" },
       { label: "Lead Scoring",          desc: "Prioritise fit, urgency, and contactability", href: "/features/lead-discovery#capabilities" },
-      { label: "Discovery Workflow",    desc: "Search, qualify, save, and pitch",            href: "/features/lead-discovery#workflow" },
     ],
   },
   {

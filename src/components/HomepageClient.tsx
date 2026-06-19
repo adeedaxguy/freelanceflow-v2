@@ -171,6 +171,7 @@ type LeadEngine = {
   seoLine: string;
   pitch: string;
   route: string;
+  publicRoute: string;
   color: string;
   metrics: Array<{ label: string; value: string }>;
   filters: string[];
@@ -190,6 +191,7 @@ const LEAD_ENGINES: LeadEngine[] = [
     seoLine: "Built for searches like remote freelance jobs, remote job leads, freelance job alerts, and work from home client opportunities.",
     pitch: "The best remote jobs do not stay quiet for long. iCloseLeads helps you spot the ones that match your skill before every freelancer on the internet sends the same proposal.",
     route: "/dashboard/leads",
+    publicRoute: "/use-cases/remote-job-leads",
     color: "#9F67FF",
     metrics: [
       { label: "Best for", value: "Retainers and contract roles" },
@@ -219,6 +221,7 @@ const LEAD_ENGINES: LeadEngine[] = [
     seoLine: "Designed around high-intent searches like local business leads, businesses without websites, outdated website leads, and web design clients.",
     pitch: "A local business with a weak website is not a random prospect. It is a business already losing trust, bookings, or calls. That makes your outreach feel useful instead of cold.",
     route: "/dashboard/local-leads",
+    publicRoute: "/use-cases/local-business-leads",
     color: "#00E5A0",
     metrics: [
       { label: "Best for", value: "Web, SEO, ads, content" },
@@ -248,6 +251,7 @@ const LEAD_ENGINES: LeadEngine[] = [
     seoLine: "Useful for live job leads, real-time freelance leads, urgent hiring posts, and fresh freelance opportunities.",
     pitch: "Some leads are won because your offer is better. Others are won because you show up while the problem is still hot. Live Jobs is built for that second window.",
     route: "/dashboard/live-jobs",
+    publicRoute: "/use-cases/live-job-leads",
     color: "#FFD166",
     metrics: [
       { label: "Best for", value: "Fast-moving opportunities" },
@@ -393,12 +397,20 @@ function LeadEngineShowcase() {
                     <h3 className="mt-4 text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">{active.title}</h3>
                     <p className="mt-3 text-muted-foreground leading-relaxed">{active.pitch}</p>
                   </div>
-                  <Link
-                    href={active.route}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-all flex-shrink-0"
-                  >
-                    Try this engine <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <div className="flex flex-col gap-2 sm:items-end">
+                    <Link
+                      href={active.route}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-all flex-shrink-0"
+                    >
+                      Try this engine <ArrowRight className="w-4 h-4" />
+                    </Link>
+                    <Link
+                      href={active.publicRoute}
+                      className="inline-flex items-center justify-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Read use case <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">

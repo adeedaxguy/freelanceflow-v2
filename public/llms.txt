@@ -34,6 +34,18 @@ Follow-up planning and reminders so promising leads do not go cold after the fir
 ### Live Job Feed
 Real-time feed of freelance and remote opportunities matched to selected niches.
 
+### Remote Job Leads
+Use case page: https://icloseleads.com/use-cases/remote-job-leads
+Helps freelancers find fresh remote job leads, freelance job alerts, remote contract work, and niche-matched opportunities before the best prospects get crowded.
+
+### Local Business Leads
+Use case page: https://icloseleads.com/use-cases/local-business-leads
+Helps web designers, SEO consultants, marketers, and agencies find local businesses with no website, outdated websites, public contact signals, and visible growth gaps.
+
+### Live Job Leads
+Use case page: https://icloseleads.com/use-cases/live-job-leads
+Helps freelancers monitor fresh freelance opportunities, qualify urgency, save leads, draft proposals, and plan follow-up from one workspace.
+
 ### Deal Closer Tool
 Guides freelancers through the final stages of closing a deal, including pricing conversations, objections, and proposal finalization.
 
@@ -76,5 +88,9 @@ A: iCloseLeads was built by Adnan, a Top Rated Plus Upwork freelancer and web de
 - Website: https://icloseleads.com
 - Email: adnan@technodigg.com
 - Features: https://icloseleads.com/features
+- Use Cases: https://icloseleads.com/use-cases
+- Remote Job Leads: https://icloseleads.com/use-cases/remote-job-leads
+- Local Business Leads: https://icloseleads.com/use-cases/local-business-leads
+- Live Job Leads: https://icloseleads.com/use-cases/live-job-leads
 - Blog: https://icloseleads.com/blog
 - Pricing: https://icloseleads.com/#pricing
