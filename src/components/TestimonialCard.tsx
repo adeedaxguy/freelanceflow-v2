@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import type { Testimonial } from "@/data/marketing";
 
@@ -11,10 +10,8 @@ interface TestimonialCardProps {
 
 export default function TestimonialCard({ testimonial, index = 0 }: TestimonialCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.15 }}
+    <div
+      style={{ transitionDelay: `${index * 80}ms` }}
       className="bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-6 transition-all duration-300 hover:shadow-card-hover flex flex-col"
     >
       {/* Stars */}
@@ -46,6 +43,6 @@ export default function TestimonialCard({ testimonial, index = 0 }: TestimonialC
           </span>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

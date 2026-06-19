@@ -3,12 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
-  Menu, X, ChevronDown, LogOut, Settings, LayoutDashboard, User,
-  Search, Layers, Sparkles, Mail, BarChart2, FileText, Shield,
-  Zap, Globe, Target, Star, Users, BookOpen, ArrowRight,
+  Menu, X, ChevronDown,
+  Search, Layers, Sparkles, Mail, BarChart2, Shield,
+  Zap, Globe, Target, Star, Users, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Logo from "@/components/Logo";
@@ -88,11 +86,8 @@ export default function Navbar() {
   const [isOpen,       setIsOpen]       = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
   const [megaOpen,     setMegaOpen]     = useState(false);
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const megaRef  = useRef<HTMLDivElement>(null);
-  const userRef  = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { data: session } = useSession();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -104,7 +99,6 @@ export default function Navbar() {
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (megaRef.current && !megaRef.current.contains(e.target as Node)) setMegaOpen(false);
-      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -146,15 +140,8 @@ export default function Navbar() {
                 <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", megaOpen && "rotate-180")} />
               </button>
 
-              <AnimatePresence>
-                {megaOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[760px] bg-surface/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden"
-                  >
+              {megaOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[760px] bg-surface/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden">
                     {/* Top bar */}
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 to-accent/5">
                       <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
@@ -207,9 +194,8 @@ export default function Navbar() {
                         Get Started Free <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+              )}
             </div>
 
             {/* Other links */}
@@ -227,54 +213,13 @@ export default function Navbar() {
           {/* Right: Theme + CTA + User */}
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle size="sm" />
-            {session ? (
-              <div ref={userRef} className="relative">
-                <button onClick={() => setUserMenuOpen(v => !v)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface border border-border hover:border-primary/40 transition-all ml-1">
-                  <div className="w-7 h-7 rounded-full bg-gradient-hero flex items-center justify-center text-white text-xs font-bold overflow-hidden">
-                    {session.user?.image
-                      ? <img src={session.user.image} alt="" className="w-full h-full object-cover" />
-                      : (session.user?.name?.[0]?.toUpperCase() ?? "U")}
-                  </div>
-                  <span className="text-sm text-foreground max-w-24 truncate">{session.user?.name ?? "Account"}</span>
-                  <ChevronDown className={cn("w-3.5 h-3.5 text-muted-foreground transition-transform", userMenuOpen && "rotate-180")} />
-                </button>
-                <AnimatePresence>
-                  {userMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      className="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-xl shadow-xl overflow-hidden z-50">
-                      {[
-                        { icon: LayoutDashboard, label: "Dashboard",  href: "/dashboard" },
-                        { icon: User,            label: "Profile",    href: "/dashboard/profile" },
-                        { icon: Settings,        label: "Settings",   href: "/dashboard/settings" },
-                      ].map(({ icon: Icon, label, href }) => (
-                        <Link key={href} href={href} onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-white/5 transition-colors">
-                          <Icon className="w-4 h-4 text-muted-foreground" /> {label}
-                        </Link>
-                      ))}
-                      <button onClick={() => void signOut({ callbackUrl: "/" })}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors border-t border-border">
-                        <LogOut className="w-4 h-4" /> Sign Out
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <>
-                <Link href="/auth" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Sign In
-                </Link>
-                <Link href="/auth?mode=signup"
-                  className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
-                  Get Started Free
-                </Link>
-              </>
-            )}
+            <Link href="/auth" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Sign In
+            </Link>
+            <Link href="/auth?mode=signup"
+              className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
+              Get Started Free
+            </Link>
           </div>
 
           {/* Mobile: theme + hamburger */}
@@ -288,13 +233,8 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-surface/95 backdrop-blur-xl border-t border-border overflow-hidden">
+      {isOpen && (
+        <div className="md:hidden bg-surface/95 backdrop-blur-xl border-t border-border overflow-hidden">
             <div className="px-4 py-4 space-y-1">
               <Link href="/features" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
@@ -307,32 +247,16 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="pt-2 border-t border-border space-y-2">
-                {session ? (
-                  <>
-                    <Link href="/dashboard" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">
-                      Dashboard
-                    </Link>
-                    <button onClick={() => { setIsOpen(false); void signOut(); }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition-colors">
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/auth" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
-                    <Link href="/auth?mode=signup" onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
-                      Get Started Free
-                    </Link>
-                  </>
-                )}
+                <Link href="/auth" onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
+                <Link href="/auth?mode=signup" onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
+                  Get Started Free
+                </Link>
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </nav>
   );
 }

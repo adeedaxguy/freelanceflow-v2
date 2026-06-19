@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
 import {
-  motion, useScroll, useTransform, useInView,
-  AnimatePresence, useMotionValue, useSpring,
-} from "framer-motion";
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  type HTMLAttributes,
+  type MouseEvent,
+  type ReactNode,
+  type RefObject,
+  type SVGProps,
+} from "react";
 import Link from "next/link";
 import {
   ArrowRight, Search, Sparkles, BarChart2, Check, Zap,
@@ -19,10 +26,90 @@ import PricingCard from "@/components/PricingCard";
 import TestimonialCard from "@/components/TestimonialCard";
 import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
 
-// ── Variants ────────────────────────────────────────────────────────
+type MotionExtras = {
+  initial?: unknown;
+  animate?: unknown;
+  exit?: unknown;
+  transition?: unknown;
+  whileHover?: unknown;
+  layout?: unknown;
+};
+
+const motion = {
+  div: forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement> & MotionExtras>(
+    ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }, ref) => (
+      <div ref={ref} {...props} />
+    )
+  ),
+  h1: ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }: HTMLAttributes<HTMLHeadingElement> & MotionExtras) => (
+    <h1 {...props} />
+  ),
+  p: ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }: HTMLAttributes<HTMLParagraphElement> & MotionExtras) => (
+    <p {...props} />
+  ),
+  span: ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }: HTMLAttributes<HTMLSpanElement> & MotionExtras) => (
+    <span {...props} />
+  ),
+  svg: ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }: SVGProps<SVGSVGElement> & MotionExtras) => (
+    <svg {...props} />
+  ),
+  path: ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, whileHover: _whileHover, layout: _layout, ...props }: SVGProps<SVGPathElement> & MotionExtras) => (
+    <path {...props} />
+  ),
+};
+
+motion.div.displayName = "MotionDiv";
+
+function AnimatePresence({ children }: { children: ReactNode; mode?: string }) {
+  return <>{children}</>;
+}
+
+function useInView(ref: RefObject<Element>, { once = true, margin = "0px" }: { once?: boolean; margin?: string } = {}) {
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    if (!ref.current) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setInView(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setInView(false);
+        }
+      },
+      { rootMargin: margin }
+    );
+
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [margin, once, ref]);
+
+  return inView;
+}
+
+function useScroll(_: unknown = undefined) {
+  return { scrollYProgress: 0 };
+}
+
+function useTransform<T>(_: unknown, __: unknown[], output: T[]) {
+  return output[0] as T;
+}
+
+function useMotionValue(initial: number) {
+  const valueRef = useRef(initial);
+  return {
+    get: () => valueRef.current,
+    set: (next: number) => {
+      valueRef.current = next;
+    },
+  };
+}
+
 // ── Scroll Reveal ────────────────────────────────────────────────────
 function Reveal({ children, delay = 0, y = 28, className = "" }: {
-  children: React.ReactNode; delay?: number; y?: number; className?: string;
+  children: ReactNode; delay?: number; y?: number; className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -58,14 +145,12 @@ function Counter({ to, suffix = "", prefix = "", duration = 2200 }: {
 }
 
 // ── 3D Tilt Card ─────────────────────────────────────────────────────
-function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function TiltCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 300, damping: 30 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 300, damping: 30 });
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     x.set((e.clientX - rect.left) / rect.width - 0.5);
@@ -75,7 +160,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   return (
     <motion.div ref={ref} onMouseMove={handleMouseMove}
       onMouseLeave={() => { x.set(0); y.set(0); }}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      style={{ transformStyle: "preserve-3d" }}
       className={className}>
       {children}
     </motion.div>
@@ -83,7 +168,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 // ── Animated Tag Badge ────────────────────────────────────────────────
-function Badge({ children, color = "primary" }: { children: React.ReactNode; color?: "primary" | "accent" | "gold" }) {
+function Badge({ children, color = "primary" }: { children: ReactNode; color?: "primary" | "accent" | "gold" }) {
   const cls = color === "accent" ? "bg-accent/10 border-accent/25 text-accent"
     : color === "gold" ? "bg-gold/10 border-gold/25 text-gold"
     : "bg-primary/10 border-primary/25 text-primary-light";
@@ -96,7 +181,7 @@ function Badge({ children, color = "primary" }: { children: React.ReactNode; col
 
 // ── Section heading ───────────────────────────────────────────────────
 function SectionHeading({ badge, badgeColor, title, sub, center = true }: {
-  badge?: string; badgeColor?: "primary"|"accent"|"gold"; title: React.ReactNode; sub?: React.ReactNode; center?: boolean;
+  badge?: string; badgeColor?: "primary"|"accent"|"gold"; title: ReactNode; sub?: ReactNode; center?: boolean;
 }) {
   return (
     <Reveal className={center ? "text-center" : ""}>
@@ -693,7 +778,7 @@ export default function HomepageClient() {
           />
         ))}
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        <motion.div style={{ transform: `translateY(${heroY}px)`, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
 
           {/* Social proof chip */}
           <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}

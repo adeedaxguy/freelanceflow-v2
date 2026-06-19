@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Check, Zap, Clock, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PricingTier } from "@/data/marketing";
@@ -13,10 +12,8 @@ interface PricingCardProps {
 
 export default function PricingCard({ tier, index = 0 }: PricingCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+    <div
+      style={{ transitionDelay: `${index * 70}ms` }}
       className={cn(
         "relative flex flex-col rounded-2xl border p-8 transition-all duration-300",
         tier.highlight
@@ -88,6 +85,6 @@ export default function PricingCard({ tier, index = 0 }: PricingCardProps) {
           {tier.cta}
         </Link>
       )}
-    </motion.div>
+    </div>
   );
 }

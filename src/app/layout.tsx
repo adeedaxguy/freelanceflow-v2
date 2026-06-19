@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import FloatingChat from "@/components/FloatingChat";
-import CookieConsent from "@/components/CookieConsent";
+import DeferredClientChrome from "@/components/DeferredClientChrome";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -58,8 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <Providers>
           {children}
-          <FloatingChat />
-          <CookieConsent />
+          <DeferredClientChrome />
         </Providers>
       </body>
     </html>

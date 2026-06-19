@@ -48,7 +48,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       fontSize: {
         hero: ["72px", { lineHeight: "1.1", letterSpacing: "-2px", fontWeight: "700" }],
