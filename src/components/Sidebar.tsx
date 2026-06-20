@@ -9,7 +9,7 @@ import {
   FileText, Megaphone, User, Wrench, MessageCircle, Zap,
   CalendarDays, GitMerge, Mail, Menu, X, Radio, ChevronRight,
   LogOut, Crown, Shield, Sparkles, MapPin, ChevronLeft,
-  Command,
+  Command, Users,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
@@ -23,6 +23,7 @@ const NAV_GROUPS = [
       { href: "/dashboard/live-jobs",     label: "Live Jobs",            icon: Radio,   badge: "LIVE" },
       { href: "/dashboard/leads",         label: "Remote Jobs",          icon: Search },
       { href: "/dashboard/local-leads",   label: "Local Business Leads", icon: MapPin,  badge: "NEW" },
+      { href: "/dashboard/decision-makers", label: "Decision Makers",    icon: Users },
       { href: "/dashboard/saved-leads",   label: "Saved Leads",          icon: Bookmark },
       { href: "/dashboard/pipeline",      label: "CRM Pipeline",         icon: GitMerge },
     ],

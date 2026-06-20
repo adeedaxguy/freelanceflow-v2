@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
   Mail, Sparkles, ChevronDown, Search, ExternalLink, X, CalendarClock, MapPin,
-  Phone,
+  Phone, Users,
 } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import type { Lead } from "@/types";
@@ -194,6 +194,20 @@ function displayLeadTitle(lead: LeadExt) {
 
   if (!label) return lead.title;
   return lead.title.replace(/\((?:Has website|No website|Website unverified|Outdated site|Site down)\)$/i, `(${label})`);
+}
+
+function decisionMakerHref(lead: LeadExt) {
+  const contact = getContactInfo(lead);
+  const country = inferLeadCountry(lead);
+  const domain = contact.website ? normalizeUrl(contact.website).replace(/^https?:\/\/(www\.)?/, "").split("/")[0] : lead.domain;
+  const params = new URLSearchParams({
+    company: lead.company,
+    domain: domain ?? "",
+    location: contact.address,
+  });
+  if (contact.website) params.set("website", normalizeUrl(contact.website));
+  if (country) params.set("country", country === "usa" ? "us" : "uk");
+  return `/dashboard/decision-makers?${params.toString()}`;
 }
 
 const CRM_PIPELINE: { value: CRMStatus; label: string; color: string; bg: string; desc: string }[] = [
@@ -587,6 +601,10 @@ export default function SavedLeadsPage() {
                       <button onClick={() => router.push(`/dashboard/proposal/${lead.id}`)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20 text-xs font-medium transition-all">
                         <Sparkles className="w-3.5 h-3.5" /> Proposal
+                      </button>
+                      <button onClick={() => router.push(decisionMakerHref(lead))}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/10 text-accent border border-accent/25 hover:bg-accent/15 text-xs font-medium transition-all">
+                        <Users className="w-3.5 h-3.5" /> Decision
                       </button>
                       <button onClick={() => setDeleteId(lead.id)}
                         className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors">

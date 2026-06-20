@@ -7,7 +7,7 @@ import {
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
   Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  ArrowRight, Filter,
+  ArrowRight, Filter, Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -68,6 +68,13 @@ function matchesPhoneTypeFilter(lead: LocalLead, phoneTypeFilter: PhoneTypeFilte
   if (!lead.phone) return false;
   const info = getPhoneTypeInfo(lead.phone, lead.country);
   return phoneLineTypeMatchesFilter(info.type, phoneTypeFilter);
+}
+
+function decisionMakerCountryParam(country?: string) {
+  const value = (country ?? "").toLowerCase();
+  if (/\b(uk|gb|gbr|united kingdom|great britain|england|scotland|wales|northern ireland)\b/.test(value)) return "uk";
+  if (/\b(us|usa|united states|united states of america)\b/.test(value)) return "us";
+  return "";
 }
 
 // 150+ keyword suggestions grouped by category
@@ -429,6 +436,15 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
   if (proposalDomain) proposalParams.set("domain", proposalDomain);
   if (lead.mapsUrl) proposalParams.set("url", lead.mapsUrl);
   const proposalHref = `/dashboard/proposal/new?${proposalParams.toString()}`;
+  const decisionParams = new URLSearchParams({
+    company: lead.name,
+    location: lead.address || lead.city || "",
+  });
+  if (proposalDomain) decisionParams.set("domain", proposalDomain);
+  if (lead.website) decisionParams.set("website", lead.website);
+  const decisionCountry = decisionMakerCountryParam(lead.country);
+  if (decisionCountry) decisionParams.set("country", decisionCountry);
+  const decisionHref = `/dashboard/decision-makers?${decisionParams.toString()}`;
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
@@ -579,6 +595,11 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
               : <><Bookmark className="w-3.5 h-3.5"/>{isSaving ? "…" : "Save Lead"}</>
             }
           </button>
+          <Link
+            href={decisionHref}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/30 bg-primary/10 text-primary-light text-xs font-medium hover:bg-primary/20 transition-all">
+            <Users className="w-3.5 h-3.5"/> Decision
+          </Link>
           <Link
             href={proposalHref}
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">

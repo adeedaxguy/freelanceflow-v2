@@ -6,7 +6,7 @@ import {
   Search, LayoutDashboard, Radio, Bookmark,
   Send, BarChart2, Settings, FileText, Megaphone, User,
   Wrench, MessageCircle, Zap, CalendarDays, GitMerge,
-  Mail, MapPin, ArrowRight, Crown,
+  Mail, MapPin, ArrowRight, Crown, Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ const COMMANDS = [
   { id: "live-jobs",      label: "Live Jobs",              desc: "Real-time job feed",     href: "/dashboard/live-jobs",        icon: Radio,           group: "Navigate", badge: "LIVE" },
   { id: "leads",          label: "Find Leads",             desc: "Search for new leads",   href: "/dashboard/leads",            icon: Search,          group: "Navigate" },
   { id: "local-leads",    label: "Local Business Leads",   desc: "Nearby opportunities",   href: "/dashboard/local-leads",      icon: MapPin,          group: "Navigate" },
+  { id: "decision-makers",label: "Decision Makers",        desc: "Find US and UK decision makers", href: "/dashboard/decision-makers", icon: Users,      group: "Navigate" },
   { id: "saved-leads",    label: "Saved Leads",            desc: "Your saved leads",       href: "/dashboard/saved-leads",      icon: Bookmark,        group: "Navigate" },
   { id: "pipeline",       label: "CRM Pipeline",           desc: "Manage your deals",      href: "/dashboard/pipeline",         icon: GitMerge,        group: "Navigate" },
   { id: "deal-closer",    label: "AI Deal Closer",         desc: "Close more deals",       href: "/dashboard/deal-closer",      icon: Zap,             group: "AI Tools" },
