@@ -486,7 +486,7 @@ function outreachAngle(role: string, company: string) {
 }
 
 function candidateKey(candidate: CandidateDraft) {
-  return `${candidate.name.toLowerCase()}|${candidate.role.toLowerCase()}`;
+  return candidate.name.toLowerCase();
 }
 
 function dedupeCandidates(candidates: CandidateDraft[]) {
