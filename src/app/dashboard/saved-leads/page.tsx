@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import type { Lead } from "@/types";
+import { getPhoneTypeInfo, getPhoneTypeTone } from "@/lib/phone-type";
 
 type CRMStatus = "NEW" | "CONTACTED" | "REPLIED" | "FOLLOW_UP" | "WON" | "LOST";
 type CountryFilter = "all" | "usa" | "uk";
@@ -111,10 +112,17 @@ function getContactInfo(lead: LeadExt) {
     .filter((email): email is string => Boolean(email));
   const directEmail = cleanContactValue(lead.email);
 
+  const country = cleanContactValue(contextField(lead.notes, "Country"));
+  const phone = cleanContactValue(lead.phone ?? contextField(lead.notes, "Phone"));
+  const storedPhoneType = cleanContactValue(contextField(lead.notes, "Phone Type"));
+  const inferredPhoneType = getPhoneTypeInfo(phone, country);
+
   return {
     address: cleanContactValue(contextField(lead.notes, "Address")),
-    country: cleanContactValue(contextField(lead.notes, "Country")),
-    phone: cleanContactValue(lead.phone ?? contextField(lead.notes, "Phone")),
+    country,
+    phone,
+    phoneType: storedPhoneType || inferredPhoneType.label,
+    phoneTypeTone: getPhoneTypeTone(inferredPhoneType.type),
     website: cleanWebsiteValue(contextField(lead.notes, "Website")),
     emails: Array.from(new Set([directEmail, ...guessedEmails].filter((email): email is string => Boolean(email)))),
   };
@@ -252,6 +260,9 @@ function ContactInfo({ lead }: { lead: LeadExt }) {
           <a href={`tel:${contact.phone}`} className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 text-accent transition-colors hover:border-accent/40">
             <Phone className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="truncate font-mono">{contact.phone}</span>
+            <span className={`ml-auto rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${contact.phoneTypeTone}`}>
+              {contact.phoneType.replace(/\s*\(.+\)$/g, "").replace(/^Likely\s+/i, "")}
+            </span>
           </a>
         )}
         {contact.emails.map(email => (

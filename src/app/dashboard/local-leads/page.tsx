@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import type { LocalLead } from "@/app/api/local-leads/search/route";
+import { getPhoneTypeInfo, getPhoneTypeTone } from "@/lib/phone-type";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
@@ -380,6 +381,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
     ...(lead.email ? [{ addr: lead.email, type: "verified" as const }] : []),
     ...(lead.guessedEmails ?? []).filter(e => e !== lead.email).map(e => ({ addr: e, type: "guessed" as const })),
   ];
+  const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
 
   const proposalDomain = lead.website
     ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
@@ -442,9 +444,15 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
 
             {/* Phone — prominently displayed */}
             {lead.phone ? (
-              <div className="flex items-center gap-1.5 text-sm">
+              <div className="flex items-center gap-1.5 text-sm flex-wrap">
                 <Phone className="w-3.5 h-3.5 flex-shrink-0 text-accent"/>
                 <a href={`tel:${lead.phone}`} className="text-accent font-mono font-semibold hover:underline">{lead.phone}</a>
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPhoneTypeTone(phoneType.type)}`}
+                  title={`${phoneType.label}${phoneType.confidence === "low" ? " — carrier lookup is needed to verify mobile vs landline." : ""}`}
+                >
+                  {phoneType.shortLabel}
+                </span>
                 <CopyBtn text={lead.phone}/>
               </div>
             ) : (
@@ -776,6 +784,7 @@ export default function LocalLeadsPage() {
       const domain = lead.website
         ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
         : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".local";
+      const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
       const res = await fetch("/api/leads/save", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -793,6 +802,7 @@ export default function LocalLeadsPage() {
             `Address: ${lead.address}`,
             lead.country ? `Country: ${lead.country}` : null,
             `Phone: ${lead.phone ?? "None"}`,
+            lead.phone ? `Phone Type: ${phoneType.label}${phoneType.confidence === "low" ? " (not carrier-verified)" : ""}` : null,
             `Website: ${lead.website ?? "None"} (${lead.websiteStatus}${lead.websiteTech ? ` — ${lead.websiteTech}` : ""}${lead.websiteAge ? ` — ${lead.websiteAge}` : ""})`,
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
             lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
