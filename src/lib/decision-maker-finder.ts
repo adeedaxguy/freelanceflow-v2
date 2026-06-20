@@ -235,7 +235,7 @@ function validPersonName(name: string) {
   const clean = name.trim();
   if (clean.length < 5 || clean.length > 80) return false;
   if (!/\s/.test(clean)) return false;
-  if (/\b(?:company|limited|ltd|llc|inc|services|solutions|customer|privacy|terms|website|copyright)\b/i.test(clean)) return false;
+  if (/\b(?:company|limited|ltd|llc|inc|plc|group|holdings|services|solutions|customer|privacy|terms|website|copyright)\b/i.test(clean)) return false;
   return /^[A-Za-z][A-Za-z' .-]+[A-Za-z.]$/.test(clean);
 }
 
@@ -494,18 +494,105 @@ function companiesHouseUrl(companyNumber?: string, suffix = "") {
   return `https://find-and-update.company-information.service.gov.uk/company/${companyNumber}${suffix}`;
 }
 
+function extractCompaniesHouseSearchMatch(html: string, input: DecisionFinderInput) {
+  const results = Array.from(html.matchAll(/<li class="type-company">([\s\S]*?)<\/li>/gi))
+    .map(match => {
+      const block = match[1] ?? "";
+      const href = block.match(/href="\/company\/([A-Z0-9]+)"/i)?.[1] ?? "";
+      const title = titleCaseName(stripTags(block.match(/<h3>[\s\S]*?<\/h3>/i)?.[0] ?? ""));
+      return {
+        companyNumber: href,
+        title,
+        score: companyMatchScore(input.company, title),
+      };
+    })
+    .filter(result => result.companyNumber && result.score >= 0.72)
+    .sort((a, b) => b.score - a.score);
+  return results[0];
+}
+
+function extractCompaniesHousePublicOfficers(html: string, input: DecisionFinderInput, companyNumber: string): CandidateDraft[] {
+  const candidates: CandidateDraft[] = [];
+  const officerIds = Array.from(html.matchAll(/id="officer-name-(\d+)"/gi)).map(match => match[1]).filter(Boolean);
+  for (let i = 0; i < officerIds.length; i += 1) {
+    const id = officerIds[i]!;
+    const start = html.search(new RegExp(`id="officer-name-${id}"`, "i"));
+    const nextId = officerIds[i + 1];
+    const end = nextId ? html.search(new RegExp(`id="officer-name-${nextId}"`, "i")) : -1;
+    const block = html.slice(start, end > start ? end : undefined);
+    if (!new RegExp(`officer-status-tag-${id}[\\s\\S]*?>\\s*Active\\s*<`, "i").test(block)) continue;
+    if (new RegExp(`officer-resigned-on-${id}`, "i").test(block)) continue;
+
+    const rawName = stripTags(block.match(new RegExp(`<span id="officer-name-${id}"[\\s\\S]*?</span>`, "i"))?.[0] ?? "");
+    const role = titleCaseName(stripTags(block.match(new RegExp(`id="officer-role-${id}"[^>]*>[\\s\\S]*?</dd>`, "i"))?.[0] ?? "")) || "Company officer";
+    const name = titleCaseName(rawName);
+    if (!validPersonName(name)) continue;
+    candidates.push({
+      name,
+      role,
+      company: input.company,
+      country: "uk",
+      confidence: Math.min(92, 80 + seniorityBoost(role)),
+      evidenceLevel: "high",
+      sourceType: "UK Companies House public officer",
+      sourceUrl: companiesHouseUrl(companyNumber, "/officers"),
+      proof: `${name} is listed as an active ${role.toLowerCase()} on the public UK company record.`,
+      outreachAngle: outreachAngle(role, input.company),
+    });
+  }
+  return candidates;
+}
+
+async function searchCompaniesHousePublic(input: DecisionFinderInput) {
+  const candidates: CandidateDraft[] = [];
+  const evidence: DecisionFinderEvidence[] = [];
+  const searchUrl = `https://find-and-update.company-information.service.gov.uk/search?q=${encodeURIComponent(input.company)}`;
+  const searchHtml = await fetchHtml(searchUrl);
+  if (!searchHtml) {
+    evidence.push({
+      label: "Companies House",
+      status: "needs_key",
+      detail: "UK official registry checks are ready, but a Companies House API key is not configured and the public lookup did not respond.",
+      url: "https://developer.company-information.service.gov.uk/",
+    });
+    return { candidates, evidence };
+  }
+
+  const match = extractCompaniesHouseSearchMatch(searchHtml, input);
+  if (!match) {
+    evidence.push({
+      label: "Companies House",
+      status: "checked",
+      detail: "No close public UK company registry match was found for this business name.",
+      url: searchUrl,
+    });
+    return { candidates, evidence };
+  }
+
+  const officersUrl = companiesHouseUrl(match.companyNumber, "/officers");
+  const officersHtml = await fetchHtml(officersUrl);
+  if (officersHtml) {
+    candidates.push(...extractCompaniesHousePublicOfficers(officersHtml, input, match.companyNumber));
+  }
+
+  evidence.push({
+    label: "Companies House",
+    status: "checked",
+    detail: candidates.length
+      ? `Checked public UK company record ${match.companyNumber} and found ${candidates.length} active officer${candidates.length === 1 ? "" : "s"}.`
+      : `Checked public UK company record ${match.companyNumber}; no active named officers were exposed on the public page.`,
+    url: companiesHouseUrl(match.companyNumber),
+  });
+
+  return { candidates, evidence };
+}
+
 async function searchCompaniesHouse(input: DecisionFinderInput) {
   const candidates: CandidateDraft[] = [];
   const evidence: DecisionFinderEvidence[] = [];
   if (input.country !== "uk") return { candidates, evidence };
   if (!input.companiesHouseKey) {
-    evidence.push({
-      label: "Companies House",
-      status: "needs_key",
-      detail: "UK official registry checks are ready, but a Companies House API key is not configured yet.",
-      url: "https://developer.company-information.service.gov.uk/",
-    });
-    return { candidates, evidence };
+    return searchCompaniesHousePublic(input);
   }
 
   try {
