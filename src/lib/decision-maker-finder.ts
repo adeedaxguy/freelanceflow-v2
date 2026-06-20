@@ -1,4 +1,4 @@
-export type DecisionCountry = "us" | "uk";
+export type DecisionCountry = "us" | "uk" | "ca" | "au" | "nz" | "ie";
 
 export type DecisionEvidenceLevel = "high" | "medium" | "low";
 
@@ -173,6 +173,55 @@ const US_STATE_TO_OC: Record<string, string> = Object.fromEntries(
   Object.keys(US_STATE_NAMES).map(code => [code, `us_${code.toLowerCase()}`]),
 ) as Record<string, string>;
 
+const OPEN_CORPORATES_COUNTRY_JURISDICTIONS: Partial<Record<DecisionCountry, string>> = {
+  uk: "gb",
+  ca: "ca",
+  au: "au",
+  nz: "nz",
+  ie: "ie",
+};
+
+const COUNTRY_REGISTRY_LINKS: Partial<Record<DecisionCountry, DecisionFinderSearchLink[]>> = {
+  ca: [
+    {
+      label: "Canada business registries",
+      detail: "Open Canada's federal and provincial registry search for business records.",
+      url: "https://beta.canadasbusinessregistries.ca/search",
+    },
+    {
+      label: "Corporations Canada",
+      detail: "Check the federal corporation registry when the business is federally incorporated.",
+      url: "https://ised-isde.canada.ca/site/corporations-canada/en/online-filing-centre/search-corporation",
+    },
+  ],
+  au: [
+    {
+      label: "ASIC register search",
+      detail: "Open Australia's official company and business-name register search.",
+      url: "https://asic.gov.au/online-services/search-asic-registers/",
+    },
+    {
+      label: "ABN Lookup",
+      detail: "Search Australian Business Register records by business name or ABN.",
+      url: "https://abr.business.gov.au/",
+    },
+  ],
+  nz: [
+    {
+      label: "New Zealand Companies Register",
+      detail: "Open the official NZ Companies Office register search.",
+      url: "https://app.companiesoffice.govt.nz/companies/app/ui/pages/companies/search",
+    },
+  ],
+  ie: [
+    {
+      label: "Ireland CRO search",
+      detail: "Open Ireland's Companies Registration Office search portal.",
+      url: "https://core.cro.ie/",
+    },
+  ],
+};
+
 const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
 const COMPANY_SUFFIX_RE = /\b(?:incorporated|inc|limited|ltd|llc|plc|corp|corporation|company|co|services|service|group|holdings|partners|the)\b/gi;
@@ -237,6 +286,47 @@ function validPersonName(name: string) {
   if (!/\s/.test(clean)) return false;
   if (/\b(?:company|limited|ltd|llc|inc|plc|group|holdings|services|solutions|customer|privacy|terms|website|copyright)\b/i.test(clean)) return false;
   return /^[A-Za-z][A-Za-z' .-]+[A-Za-z.]$/.test(clean);
+}
+
+function validWebsitePersonName(name: string, input: DecisionFinderInput) {
+  if (!validPersonName(name)) return false;
+  const words = name.trim().split(/\s+/);
+  const sentenceWords = new Set([
+    "a",
+    "an",
+    "and",
+    "are",
+    "at",
+    "for",
+    "from",
+    "has",
+    "have",
+    "in",
+    "is",
+    "of",
+    "on",
+    "or",
+    "our",
+    "that",
+    "the",
+    "their",
+    "this",
+    "to",
+    "using",
+    "with",
+    "your",
+  ]);
+  const allowedNameParticles = new Set(["da", "de", "del", "di", "du", "la", "le", "van", "von"]);
+  if (words.some(word => {
+    const lower = word.replace(/[^a-z]/gi, "").toLowerCase();
+    return sentenceWords.has(lower) && !allowedNameParticles.has(lower);
+  })) return false;
+
+  const companyTokens = new Set(normalizeCompanyName(input.company).split(" ").filter(token => token.length > 2));
+  const nameTokens = normalizeCompanyName(name).split(" ").filter(token => token.length > 2);
+  if (nameTokens.some(token => companyTokens.has(token))) return false;
+
+  return true;
 }
 
 function normalizeCompanyName(value: string) {
@@ -418,7 +508,7 @@ function extractTextCandidates(html: string, pageUrl: string, input: DecisionFin
       const firstIsRole = ROLE_TERMS.some(role => role.toLowerCase() === first.toLowerCase());
       const name = titleCaseName(firstIsRole ? second : first);
       const role = firstIsRole ? first : second;
-      if (!validPersonName(name)) continue;
+      if (!validWebsitePersonName(name, input)) continue;
       const email = findNearbyEmail(name, emails);
       candidates.push({
         name,
@@ -973,10 +1063,12 @@ interface OCCompanyResponse {
 }
 
 function openCorporatesJurisdiction(input: DecisionFinderInput) {
-  if (input.country === "uk") return "gb";
-  const state = inferUsState(input.location);
-  if (state && US_STATE_TO_OC[state]) return US_STATE_TO_OC[state];
-  return null;
+  if (input.country === "us") {
+    const state = inferUsState(input.location);
+    if (state && US_STATE_TO_OC[state]) return US_STATE_TO_OC[state];
+    return null;
+  }
+  return OPEN_CORPORATES_COUNTRY_JURISDICTIONS[input.country] ?? null;
 }
 
 async function searchOpenCorporates(input: DecisionFinderInput) {
@@ -1092,7 +1184,7 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
       detail: "Open the official UK registry search for directors and persons with significant control.",
       url: `https://find-and-update.company-information.service.gov.uk/search?q=${encodeURIComponent(company)}`,
     });
-  } else {
+  } else if (input.country === "us") {
     const state = inferUsState(input.location);
     links.push({
       label: state ? `${state} business registry` : "US state business registry",
@@ -1103,6 +1195,8 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
         ? US_STATE_REGISTRY_URLS[state]
         : `https://www.google.com/search?q=${encodeURIComponent(`${company}${location} secretary of state business registry`)}`,
     });
+  } else {
+    links.push(...(COUNTRY_REGISTRY_LINKS[input.country] ?? []));
   }
 
   return links;
@@ -1141,6 +1235,38 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
       label: "US registry coverage",
       status: "checked",
       detail: "US business ownership data is split across state registries, so iCloseLeads provides official registry launch links instead of pretending there is one national owner database.",
+    });
+  }
+
+  if (input.country === "ca") {
+    evidence.push({
+      label: "Canada registry coverage",
+      status: "checked",
+      detail: "Canadian corporation records are split between federal and provincial registries, so iCloseLeads checks shared sources and opens official federal/provincial registry links for manual confirmation.",
+    });
+  }
+
+  if (input.country === "au") {
+    evidence.push({
+      label: "Australia registry coverage",
+      status: "checked",
+      detail: "Australian company and business-name records sit across ASIC and ABN Lookup. iCloseLeads checks shared sources and opens official registry links for confirmation.",
+    });
+  }
+
+  if (input.country === "nz") {
+    evidence.push({
+      label: "New Zealand registry coverage",
+      status: "checked",
+      detail: "New Zealand company records can be verified in the Companies Office register. iCloseLeads checks shared sources and opens the official register for confirmation.",
+    });
+  }
+
+  if (input.country === "ie") {
+    evidence.push({
+      label: "Ireland registry coverage",
+      status: "checked",
+      detail: "Irish company records can be verified in the Companies Registration Office portal. iCloseLeads checks shared sources and opens the official register for confirmation.",
     });
   }
 

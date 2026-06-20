@@ -49,9 +49,30 @@ function normalizeDomain(value: string) {
   }
 }
 
+const COUNTRY_OPTIONS: Array<{ code: DecisionCountry; label: string; longLabel: string; placeholder: string }> = [
+  { code: "us", label: "US", longLabel: "the US", placeholder: "Houston, TX" },
+  { code: "uk", label: "UK", longLabel: "the UK", placeholder: "Manchester, UK" },
+  { code: "ca", label: "CA", longLabel: "Canada", placeholder: "Toronto, ON" },
+  { code: "au", label: "AU", longLabel: "Australia", placeholder: "Sydney, NSW" },
+  { code: "nz", label: "NZ", longLabel: "New Zealand", placeholder: "Auckland, NZ" },
+  { code: "ie", label: "IE", longLabel: "Ireland", placeholder: "Dublin, Ireland" },
+];
+
+function countryLabel(country: DecisionCountry) {
+  return COUNTRY_OPTIONS.find(option => option.code === country)?.longLabel ?? "the selected market";
+}
+
+function locationPlaceholder(country: DecisionCountry) {
+  return COUNTRY_OPTIONS.find(option => option.code === country)?.placeholder ?? "City or region";
+}
+
 function inferCountryFromParams(country: string | null, location: string | null): DecisionCountry {
   const blob = `${country ?? ""} ${location ?? ""}`.toLowerCase();
   if (/\b(uk|gb|united kingdom|england|scotland|wales|northern ireland)\b/.test(blob)) return "uk";
+  if (/\b(ca|canada|ontario|quebec|british columbia|alberta|toronto|vancouver|montreal)\b/.test(blob)) return "ca";
+  if (/\b(au|australia|nsw|new south wales|victoria|queensland|sydney|melbourne|brisbane)\b/.test(blob)) return "au";
+  if (/\b(nz|new zealand|auckland|wellington|christchurch)\b/.test(blob)) return "nz";
+  if (/\b(ie|ireland|dublin|cork|galway|limerick)\b/.test(blob)) return "ie";
   return "us";
 }
 
@@ -248,7 +269,7 @@ function DecisionMakerFinderInner() {
             Decision Maker Finder
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Find the owner, founder, director, or manager most likely to approve your pitch. Built for US and UK businesses with registry checks, public knowledge signals, domain enrichment, proof links, confidence scores, and outreach angles.
+            Find the owner, founder, director, or manager most likely to approve your pitch. Built for US, UK, Canadian, Australian, New Zealand, and Irish businesses with registry checks, public knowledge signals, domain enrichment, proof links, confidence scores, and outreach angles.
           </p>
         </div>
 
@@ -260,6 +281,7 @@ function DecisionMakerFinderInner() {
           <div className="space-y-2 text-xs leading-relaxed">
             <p><span className="font-semibold text-foreground">US:</span> official site, public registry network, public profile signals, and state registry launch links.</p>
             <p><span className="font-semibold text-foreground">UK:</span> official site, Companies House officers/PSC, registry-network checks, and public profile signals.</p>
+            <p><span className="font-semibold text-foreground">CA/AU/NZ/IE:</span> official site, public knowledge, enrichment, registry-network checks, and official registry launch links.</p>
             <p><span className="font-semibold text-foreground">Enrichment:</span> domain contact records are used when an enrichment key is available.</p>
           </div>
         </div>
@@ -315,15 +337,15 @@ function DecisionMakerFinderInner() {
 
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Country</span>
-            <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-background p-1">
-              {(["us", "uk"] as const).map(option => (
+            <div className="grid grid-cols-3 gap-2 rounded-xl border border-border bg-background p-1">
+              {COUNTRY_OPTIONS.map(option => (
                 <button
-                  key={option}
+                  key={option.code}
                   type="button"
-                  onClick={() => setCountry(option)}
-                  className={`rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${country === option ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}
+                  onClick={() => setCountry(option.code)}
+                  className={`rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${country === option.code ? "bg-primary text-white" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  {option === "us" ? "US" : "UK"}
+                  {option.label}
                 </button>
               ))}
             </div>
@@ -336,7 +358,7 @@ function DecisionMakerFinderInner() {
               <input
                 value={location}
                 onChange={event => setLocation(event.target.value)}
-                placeholder={country === "us" ? "Houston, TX" : "Manchester, UK"}
+                placeholder={locationPlaceholder(country)}
                 className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary/50"
               />
             </div>
@@ -366,7 +388,7 @@ function DecisionMakerFinderInner() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-bold text-foreground">{result.candidates.length} decision-maker candidate{result.candidates.length === 1 ? "" : "s"}</h2>
-              <p className="text-sm text-muted-foreground">Evidence scan for {result.company} in {result.country === "us" ? "the US" : "the UK"}.</p>
+              <p className="text-sm text-muted-foreground">Evidence scan for {result.company} in {countryLabel(result.country)}.</p>
             </div>
             {result.domain && (
               <a

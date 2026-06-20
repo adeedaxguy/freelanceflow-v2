@@ -15,7 +15,7 @@ const UNLIMITED_EMAILS = new Set([
 
 const schema = z.object({
   company:  z.string().min(2).max(160).transform(s => s.trim()),
-  country:  z.enum(["us", "uk"]).default("us"),
+  country:  z.enum(["us", "uk", "ca", "au", "nz", "ie"]).default("us"),
   domain:   z.string().max(240).optional().nullable().transform(v => v?.trim() || undefined),
   website:  z.string().max(300).optional().nullable().transform(v => v?.trim() || undefined),
   location: z.string().max(160).optional().nullable().transform(v => v?.trim() || undefined),

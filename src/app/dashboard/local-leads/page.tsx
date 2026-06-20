@@ -74,6 +74,10 @@ function decisionMakerCountryParam(country?: string) {
   const value = (country ?? "").toLowerCase();
   if (/\b(uk|gb|gbr|united kingdom|great britain|england|scotland|wales|northern ireland)\b/.test(value)) return "uk";
   if (/\b(us|usa|united states|united states of america)\b/.test(value)) return "us";
+  if (/\b(ca|canada)\b/.test(value)) return "ca";
+  if (/\b(au|australia)\b/.test(value)) return "au";
+  if (/\b(nz|new zealand)\b/.test(value)) return "nz";
+  if (/\b(ie|ireland)\b/.test(value)) return "ie";
   return "";
 }
 
