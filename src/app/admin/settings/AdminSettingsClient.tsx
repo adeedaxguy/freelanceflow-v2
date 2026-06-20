@@ -221,7 +221,7 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
 
       {/* ── API Keys ── */}
       <Section title="API Keys" icon={<Key className="w-4 h-4 text-accent" />}>
-        <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("apikeys", ["groq_api_key", "resend_api_key", "resend_from_email", "yelp_api_key", "here_api_key"]); }}
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("apikeys", ["groq_api_key", "resend_api_key", "resend_from_email", "yelp_api_key", "here_api_key", "hunter_api_key", "opencorporates_api_key", "companies_house_key"]); }}
           className="space-y-4">
           <Field label="Groq API Key" value={get("groq_api_key")} onChange={v => set("groq_api_key", v)}
             sensitive placeholder="gsk_..."
@@ -241,6 +241,20 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
               <Field label="HERE Discover API Key" value={get("here_api_key")} onChange={v => set("here_api_key", v)}
                 sensitive placeholder="Your HERE API key"
                 hint="Free 250,000 calls/month at developer.here.com — adds international business data to local leads." />
+            </div>
+          </div>
+          <div className="pt-2 border-t border-border">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Decision Maker Finder (Agency)</p>
+            <div className="space-y-4">
+              <Field label="Hunter API Key" value={get("hunter_api_key")} onChange={v => set("hunter_api_key", v)}
+                sensitive placeholder="hunter_..."
+                hint="Optional domain-contact enrichment for named emails, roles, and confidence scores." />
+              <Field label="OpenCorporates API Key" value={get("opencorporates_api_key")} onChange={v => set("opencorporates_api_key", v)}
+                sensitive placeholder="OpenCorporates API token"
+                hint="Optional US/UK registry-network checks. Without this, the finder still uses no-key public sources and verification links." />
+              <Field label="Companies House API Key" value={get("companies_house_key")} onChange={v => set("companies_house_key", v)}
+                sensitive placeholder="Companies House API key"
+                hint="Recommended for UK decision-maker lookups: directors and persons with significant control." />
             </div>
           </div>
           <SaveBtn sectionKey="apikeys" />

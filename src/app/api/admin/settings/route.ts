@@ -70,5 +70,17 @@ export async function PATCH(req: NextRequest) {
 }
 
 function isSensitiveKey(key: string): boolean {
-  return ["stripe_secret_key", "stripe_webhook_secret", "groq_api_key", "resend_api_key"].includes(key);
+  return [
+    "stripe_secret_key",
+    "stripe_webhook_secret",
+    "groq_api_key",
+    "resend_api_key",
+    "yelp_api_key",
+    "here_api_key",
+    "hunter_api_key",
+    "opencorporates_api_key",
+    "opencorporates_api_token",
+    "companies_house_key",
+    "companies_house_api_key",
+  ].includes(key);
 }

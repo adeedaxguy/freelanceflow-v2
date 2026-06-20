@@ -213,6 +213,7 @@ function DecisionMakerFinderInner() {
     setError("");
     setResult(null);
     try {
+      const hunterKey = window.localStorage.getItem("ff_hunter_api_key") ?? "";
       const response = await fetch("/api/decision-makers/find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -221,6 +222,7 @@ function DecisionMakerFinderInner() {
           country,
           domain: cleanDomain || undefined,
           location: location || undefined,
+          hunterKey: hunterKey.length > 10 ? hunterKey : undefined,
         }),
       });
       const data = await response.json() as FinderResponse;
@@ -246,7 +248,7 @@ function DecisionMakerFinderInner() {
             Decision Maker Finder
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Find the owner, founder, director, or manager most likely to approve your pitch. Built for US and UK local businesses with proof links, confidence scores, and outreach angles.
+            Find the owner, founder, director, or manager most likely to approve your pitch. Built for US and UK businesses with registry checks, public knowledge signals, domain enrichment, proof links, confidence scores, and outreach angles.
           </p>
         </div>
 
@@ -256,8 +258,9 @@ function DecisionMakerFinderInner() {
             Coverage model
           </div>
           <div className="space-y-2 text-xs leading-relaxed">
-            <p><span className="font-semibold text-foreground">US:</span> official website evidence plus state registry and public profile launch links.</p>
-            <p><span className="font-semibold text-foreground">UK:</span> official website evidence plus Companies House officers/PSC when the registry key is configured.</p>
+            <p><span className="font-semibold text-foreground">US:</span> official site, public registry network, public profile signals, and state registry launch links.</p>
+            <p><span className="font-semibold text-foreground">UK:</span> official site, Companies House officers/PSC, registry-network checks, and public profile signals.</p>
+            <p><span className="font-semibold text-foreground">Enrichment:</span> domain contact records are used when an enrichment key is available.</p>
           </div>
         </div>
       </div>

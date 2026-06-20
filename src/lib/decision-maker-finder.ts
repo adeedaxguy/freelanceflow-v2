@@ -38,6 +38,8 @@ export interface DecisionFinderInput {
   website?: string;
   location?: string;
   companiesHouseKey?: string;
+  hunterKey?: string;
+  openCorporatesKey?: string;
 }
 
 export interface DecisionFinderResult {
@@ -105,6 +107,14 @@ const US_STATE_REGISTRY_URLS: Record<string, string> = {
   WA: "https://ccfs.sos.wa.gov/",
 };
 
+const WIKIDATA_ROLE_PROPERTIES: Record<string, string> = {
+  P112: "Founder",
+  P169: "Chief executive officer",
+  P488: "Chairperson",
+  P1037: "Director / manager",
+  P3320: "Board member",
+};
+
 const US_STATE_NAMES: Record<string, string> = {
   AL: "alabama",
   AK: "alaska",
@@ -159,8 +169,13 @@ const US_STATE_NAMES: Record<string, string> = {
   DC: "district of columbia",
 };
 
+const US_STATE_TO_OC: Record<string, string> = Object.fromEntries(
+  Object.keys(US_STATE_NAMES).map(code => [code, `us_${code.toLowerCase()}`]),
+) as Record<string, string>;
+
 const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
+const COMPANY_SUFFIX_RE = /\b(?:incorporated|inc|limited|ltd|llc|plc|corp|corporation|company|co|services|service|group|holdings|partners|the)\b/gi;
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -224,6 +239,31 @@ function validPersonName(name: string) {
   return /^[A-Za-z][A-Za-z' .-]+[A-Za-z.]$/.test(clean);
 }
 
+function normalizeCompanyName(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(COMPANY_SUFFIX_RE, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function companyMatchScore(query: string, candidate: string) {
+  const q = normalizeCompanyName(query);
+  const c = normalizeCompanyName(candidate);
+  if (!q || !c) return 0;
+  if (q === c) return 1;
+  const qTokens = new Set(q.split(" ").filter(token => token.length > 2));
+  const cTokens = new Set(c.split(" ").filter(token => token.length > 2));
+  if (qTokens.size === 1 && cTokens.size > 1) return c.startsWith(`${q} `) ? 0.62 : 0;
+  if (c.includes(q) || q.includes(c)) return 0.86;
+  if (qTokens.size === 0 || cTokens.size === 0) return 0;
+  let overlap = 0;
+  for (const token of qTokens) if (cTokens.has(token)) overlap += 1;
+  return overlap / Math.max(qTokens.size, cTokens.size);
+}
+
 function seniorityBoost(role: string) {
   const r = role.toLowerCase();
   if (/\b(owner|founder|ceo|chief executive|managing director|president|principal|partner)\b/.test(r)) return 10;
@@ -247,7 +287,7 @@ function outreachAngle(role: string, company: string) {
 }
 
 function candidateKey(candidate: CandidateDraft) {
-  return `${candidate.name.toLowerCase()}|${candidate.role.toLowerCase()}|${candidate.sourceUrl ?? ""}`;
+  return `${candidate.name.toLowerCase()}|${candidate.role.toLowerCase()}`;
 }
 
 function dedupeCandidates(candidates: CandidateDraft[]) {
@@ -548,6 +588,389 @@ async function searchCompaniesHouse(input: DecisionFinderInput) {
   return { candidates, evidence };
 }
 
+async function fetchJson<T>(url: string, timeoutMs = 8000, headers?: Record<string, string>) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "user-agent": "iCloseLeads Decision Maker Finder (+https://icloseleads.com)",
+        accept: "application/json",
+        ...(headers ?? {}),
+      },
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) return { ok: false as const, status: res.status, data: null };
+    return { ok: true as const, status: res.status, data: await res.json() as T };
+  } catch {
+    return { ok: false as const, status: 0, data: null };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+interface HunterDomainSearchResponse {
+  data?: {
+    domain?: string;
+    organization?: string;
+    emails?: Array<{
+      value?: string;
+      type?: string;
+      confidence?: number;
+      first_name?: string;
+      last_name?: string;
+      position?: string;
+      phone_number?: string;
+      sources?: Array<{ uri?: string; domain?: string; extracted_on?: string }>;
+    }>;
+  };
+  meta?: { results?: number };
+}
+
+function isDecisionRole(role: string) {
+  const lower = role.toLowerCase();
+  return ROLE_TERMS.some(term => lower.includes(term)) || /\b(founder|owner|ceo|director|partner|principal|manager|head)\b/.test(lower);
+}
+
+async function searchHunter(input: DecisionFinderInput) {
+  const candidates: CandidateDraft[] = [];
+  const evidence: DecisionFinderEvidence[] = [];
+  const domain = normalizeDomain(input.domain || input.website);
+  if (!domain) {
+    evidence.push({
+      label: "Email enrichment",
+      status: "skipped",
+      detail: "No company domain was available for contact enrichment.",
+    });
+    return { candidates, evidence };
+  }
+  if (!input.hunterKey) {
+    evidence.push({
+      label: "Email enrichment",
+      status: "needs_key",
+      detail: "Hunter domain contact enrichment is ready, but no Hunter API key is configured.",
+      url: "https://hunter.io/api-documentation/v2",
+    });
+    return { candidates, evidence };
+  }
+
+  const params = new URLSearchParams({
+    domain,
+    limit: "20",
+    api_key: input.hunterKey,
+  });
+  const res = await fetchJson<HunterDomainSearchResponse>(`https://api.hunter.io/v2/domain-search?${params.toString()}`, 9000);
+  if (!res.ok) {
+    evidence.push({
+      label: "Email enrichment",
+      status: "skipped",
+      detail: "Hunter contact enrichment did not return results during this lookup.",
+      url: "https://hunter.io/api-documentation/v2",
+    });
+    return { candidates, evidence };
+  }
+
+  const emails = res.data?.data?.emails ?? [];
+  for (const email of emails) {
+    const name = titleCaseName([safeText(email.first_name), safeText(email.last_name)].filter(Boolean).join(" "));
+    const role = safeText(email.position) || "Company contact";
+    if (!validPersonName(name) || !isDecisionRole(role)) continue;
+    const sourceUrl = email.sources?.find(source => source.uri)?.uri || `https://${domain}`;
+    candidates.push({
+      name,
+      role,
+      company: input.company,
+      country: input.country,
+      confidence: Math.min(92, Math.max(58, Math.round(email.confidence ?? 65)) + seniorityBoost(role)),
+      evidenceLevel: "medium",
+      sourceType: "Domain contact enrichment",
+      sourceUrl,
+      proof: `${name} is associated with ${domain} as ${role} in domain contact enrichment data.`,
+      email: safeText(email.value) || undefined,
+      phone: safeText(email.phone_number) || undefined,
+      outreachAngle: outreachAngle(role, input.company),
+    });
+  }
+
+  evidence.push({
+    label: "Email enrichment",
+    status: "checked",
+    detail: `Checked ${emails.length} contact record${emails.length === 1 ? "" : "s"} for ${domain}; senior decision roles are promoted when present.`,
+    url: "https://hunter.io/api-documentation/v2",
+  });
+
+  return { candidates, evidence };
+}
+
+interface WikidataSearchResponse {
+  search?: Array<{ id?: string; label?: string; description?: string; concepturi?: string }>;
+}
+
+interface WikidataEntityResponse {
+  entities?: Record<string, {
+    labels?: Record<string, { value?: string }>;
+    descriptions?: Record<string, { value?: string }>;
+    sitelinks?: Record<string, { url?: string }>;
+    claims?: Record<string, Array<{
+      mainsnak?: {
+        datavalue?: {
+          value?: {
+            id?: string;
+            "entity-type"?: string;
+          } | string | number;
+        };
+      };
+    }>>;
+  }>;
+}
+
+function getWikidataEntityIds(entity: NonNullable<WikidataEntityResponse["entities"]>[string], property: string) {
+  return (entity.claims?.[property] ?? [])
+    .map(claim => claim.mainsnak?.datavalue?.value)
+    .filter((value): value is { id?: string; "entity-type"?: string } => typeof value === "object" && value !== null)
+    .map(value => value.id)
+    .filter((id): id is string => Boolean(id?.startsWith("Q")));
+}
+
+async function getWikidataLabels(ids: string[]) {
+  if (ids.length === 0) return new Map<string, { label: string; description: string }>();
+  const params = new URLSearchParams({
+    action: "wbgetentities",
+    ids: ids.slice(0, 40).join("|"),
+    props: "labels|descriptions",
+    languages: "en",
+    format: "json",
+  });
+  const res = await fetchJson<WikidataEntityResponse>(`https://www.wikidata.org/w/api.php?${params.toString()}`, 8000);
+  const labels = new Map<string, { label: string; description: string }>();
+  if (!res.ok) return labels;
+  for (const [id, entity] of Object.entries(res.data?.entities ?? {})) {
+    labels.set(id, {
+      label: safeText(entity.labels?.en?.value),
+      description: safeText(entity.descriptions?.en?.value),
+    });
+  }
+  return labels;
+}
+
+async function searchWikidata(input: DecisionFinderInput) {
+  const candidates: CandidateDraft[] = [];
+  const evidence: DecisionFinderEvidence[] = [];
+  const params = new URLSearchParams({
+    action: "wbsearchentities",
+    search: input.company,
+    language: "en",
+    format: "json",
+    limit: "5",
+  });
+  const search = await fetchJson<WikidataSearchResponse>(`https://www.wikidata.org/w/api.php?${params.toString()}`, 8000);
+  if (!search.ok) {
+    evidence.push({
+      label: "Public knowledge graph",
+      status: "skipped",
+      detail: "Wikidata did not respond during this lookup.",
+      url: "https://www.wikidata.org/wiki/Wikidata:Data_access",
+    });
+    return { candidates, evidence };
+  }
+
+  const companyLower = input.company.toLowerCase();
+  const result = (search.data?.search ?? []).find(item => {
+    const label = safeText(item.label);
+    const description = safeText(item.description).toLowerCase();
+    return companyMatchScore(input.company, label) >= 0.72
+      || (label.toLowerCase().includes(companyLower) && /(company|business|organization|organisation|corporation|brand|restaurant|firm)/.test(description));
+  });
+  const qid = result?.id;
+  if (!qid) {
+    evidence.push({
+      label: "Public knowledge graph",
+      status: "checked",
+      detail: "No Wikidata entity matched this company name.",
+      url: "https://www.wikidata.org/wiki/Wikidata:Data_access",
+    });
+    return { candidates, evidence };
+  }
+
+  const entityRes = await fetchJson<WikidataEntityResponse>(`https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`, 8000);
+  const entity = entityRes.data?.entities?.[qid];
+  if (!entityRes.ok || !entity) {
+    evidence.push({
+      label: "Public knowledge graph",
+      status: "skipped",
+      detail: "The matched Wikidata entity could not be loaded.",
+      url: `https://www.wikidata.org/wiki/${qid}`,
+    });
+    return { candidates, evidence };
+  }
+
+  const rolePairs: Array<{ id: string; role: string }> = [];
+  for (const [property, role] of Object.entries(WIKIDATA_ROLE_PROPERTIES)) {
+    for (const id of getWikidataEntityIds(entity, property)) {
+      rolePairs.push({ id, role });
+    }
+  }
+  const labels = await getWikidataLabels(Array.from(new Set(rolePairs.map(pair => pair.id))));
+  const companyLabel = safeText(entity.labels?.en?.value) || input.company;
+  const entityUrl = `https://www.wikidata.org/wiki/${qid}`;
+
+  for (const pair of rolePairs) {
+    const label = labels.get(pair.id);
+    const name = titleCaseName(label?.label ?? "");
+    if (!validPersonName(name)) continue;
+    candidates.push({
+      name,
+      role: pair.role,
+      company: input.company,
+      country: input.country,
+      confidence: Math.min(88, 72 + seniorityBoost(pair.role)),
+      evidenceLevel: "medium",
+      sourceType: "Public knowledge graph",
+      sourceUrl: `https://www.wikidata.org/wiki/${pair.id}`,
+      proof: `${name} is listed on Wikidata as ${pair.role.toLowerCase()} for ${companyLabel}.`,
+      outreachAngle: outreachAngle(pair.role, input.company),
+    });
+  }
+
+  evidence.push({
+    label: "Public knowledge graph",
+    status: "checked",
+    detail: candidates.length
+      ? `Matched ${companyLabel} and found ${candidates.length} leadership relation${candidates.length === 1 ? "" : "s"}.`
+      : `Matched ${companyLabel}, but no founder, CEO, director, chair, or board member statement was available.`,
+    url: entityUrl,
+  });
+
+  return { candidates, evidence };
+}
+
+interface OCSearchResponse {
+  results?: {
+    companies?: Array<{
+      company?: {
+        name?: string;
+        company_number?: string;
+        jurisdiction_code?: string;
+        current_status?: string;
+        company_type?: string;
+        opencorporates_url?: string;
+        registry_url?: string;
+      };
+    }>;
+  };
+}
+
+interface OCCompanyResponse {
+  results?: {
+    company?: {
+      name?: string;
+      company_number?: string;
+      jurisdiction_code?: string;
+      current_status?: string;
+      opencorporates_url?: string;
+      registry_url?: string;
+      officers?: Array<{
+        officer?: {
+          name?: string;
+          position?: string;
+          role?: string;
+          occupation?: string;
+          opencorporates_url?: string;
+          start_date?: string;
+          end_date?: string;
+        };
+      }>;
+    };
+  };
+}
+
+function openCorporatesJurisdiction(input: DecisionFinderInput) {
+  if (input.country === "uk") return "gb";
+  const state = inferUsState(input.location);
+  if (state && US_STATE_TO_OC[state]) return US_STATE_TO_OC[state];
+  return null;
+}
+
+async function searchOpenCorporates(input: DecisionFinderInput) {
+  const candidates: CandidateDraft[] = [];
+  const evidence: DecisionFinderEvidence[] = [];
+  const params = new URLSearchParams({
+    q: input.company,
+    per_page: "5",
+    normalise_company_name: "true",
+  });
+  const jurisdiction = openCorporatesJurisdiction(input);
+  if (jurisdiction) params.set("jurisdiction_code", jurisdiction);
+  if (input.openCorporatesKey) params.set("api_token", input.openCorporatesKey);
+
+  const search = await fetchJson<OCSearchResponse>(`https://api.opencorporates.com/v0.4/companies/search?${params.toString()}`, 9000);
+  if (!search.ok) {
+    evidence.push({
+      label: "Business registry network",
+      status: search.status === 401 || search.status === 403 ? "needs_key" : "skipped",
+      detail: search.status === 401 || search.status === 403
+        ? "OpenCorporates registry lookup needs an API key for this environment."
+        : "OpenCorporates registry lookup did not return results during this lookup.",
+      url: "https://api.opencorporates.com/documentation/API-Reference",
+    });
+    return { candidates, evidence };
+  }
+
+  const companies = search.data?.results?.companies ?? [];
+  const closeMatches = companies.filter(item => companyMatchScore(input.company, safeText(item.company?.name)) >= 0.68);
+  const active = closeMatches.find(item => {
+    const status = safeText(item.company?.current_status).toLowerCase();
+    return !status || /active|registered|current|exist/i.test(status);
+  }) ?? closeMatches[0];
+  const company = active?.company;
+  if (!company?.jurisdiction_code || !company.company_number) {
+    evidence.push({
+      label: "Business registry network",
+      status: "checked",
+      detail: "No close OpenCorporates company record was found after name-quality matching.",
+      url: "https://opencorporates.com/",
+    });
+    return { candidates, evidence };
+  }
+
+  const detailParams = new URLSearchParams();
+  if (input.openCorporatesKey) detailParams.set("api_token", input.openCorporatesKey);
+  const detailUrl = `https://api.opencorporates.com/v0.4/companies/${company.jurisdiction_code}/${company.company_number}${detailParams.toString() ? `?${detailParams.toString()}` : ""}`;
+  const detail = await fetchJson<OCCompanyResponse>(detailUrl, 9000);
+  const detailCompany = detail.data?.results?.company;
+  const officers = detailCompany?.officers ?? [];
+  for (const row of officers) {
+    const officer = row.officer;
+    const name = titleCaseName(safeText(officer?.name));
+    const role = titleCaseName(safeText(officer?.position) || safeText(officer?.role) || safeText(officer?.occupation) || "Company officer");
+    if (!validPersonName(name)) continue;
+    candidates.push({
+      name,
+      role,
+      company: input.company,
+      country: input.country,
+      confidence: Math.min(90, 74 + seniorityBoost(role)),
+      evidenceLevel: "medium",
+      sourceType: "Business registry network",
+      sourceUrl: officer?.opencorporates_url || detailCompany?.opencorporates_url || company.opencorporates_url,
+      proof: `${name} is connected to the matched company record as ${role.toLowerCase()} in registry-network data.`,
+      outreachAngle: outreachAngle(role, input.company),
+    });
+  }
+
+  evidence.push({
+    label: "Business registry network",
+    status: "checked",
+    detail: officers.length
+      ? `Matched ${detailCompany?.name ?? company.name} and checked ${officers.length} officer record${officers.length === 1 ? "" : "s"}.`
+      : `Matched ${detailCompany?.name ?? company.name}; this registry record did not expose officer names through the API.`,
+    url: detailCompany?.opencorporates_url || company.opencorporates_url || "https://opencorporates.com/",
+  });
+
+  return { candidates, evidence };
+}
+
 function inferUsState(location?: string) {
   const text = (location ?? "").toLowerCase();
   const code = Object.keys(US_STATE_NAMES).find(state => {
@@ -603,13 +1026,28 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
   const domain = normalizeDomain(input.domain || input.website);
   const warnings: string[] = [];
 
-  const [website, companiesHouse] = await Promise.all([
+  const [website, hunter, wikidata, openCorporates, companiesHouse] = await Promise.all([
     searchWebsite({ ...input, company, domain }),
+    searchHunter({ ...input, company, domain }),
+    searchWikidata({ ...input, company, domain }),
+    searchOpenCorporates({ ...input, company, domain }),
     searchCompaniesHouse({ ...input, company, domain }),
   ]);
 
-  const candidates = dedupeCandidates([...website.candidates, ...companiesHouse.candidates]);
-  const evidence = [...website.evidence, ...companiesHouse.evidence];
+  const candidates = dedupeCandidates([
+    ...website.candidates,
+    ...hunter.candidates,
+    ...wikidata.candidates,
+    ...openCorporates.candidates,
+    ...companiesHouse.candidates,
+  ]);
+  const evidence = [
+    ...website.evidence,
+    ...hunter.evidence,
+    ...wikidata.evidence,
+    ...openCorporates.evidence,
+    ...companiesHouse.evidence,
+  ];
 
   if (input.country === "us") {
     evidence.push({

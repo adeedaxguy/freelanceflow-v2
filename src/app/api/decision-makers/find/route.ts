@@ -19,6 +19,7 @@ const schema = z.object({
   domain:   z.string().max(240).optional().nullable().transform(v => v?.trim() || undefined),
   website:  z.string().max(300).optional().nullable().transform(v => v?.trim() || undefined),
   location: z.string().max(160).optional().nullable().transform(v => v?.trim() || undefined),
+  hunterKey: z.string().max(240).optional().nullable().transform(v => v?.trim() || undefined),
 });
 
 async function resolvePlan(userId: string, sessionPlan?: string | null) {
@@ -35,18 +36,42 @@ async function resolvePlan(userId: string, sessionPlan?: string | null) {
   }
 }
 
-async function loadCompaniesHouseKey() {
-  let key = process.env.COMPANIES_HOUSE_API_KEY ?? process.env.COMPANIES_HOUSE_KEY ?? "";
+async function loadDecisionSourceKeys() {
+  const keys = {
+    companiesHouseKey: process.env.COMPANIES_HOUSE_API_KEY ?? process.env.COMPANIES_HOUSE_KEY ?? "",
+    hunterKey: process.env.HUNTER_API_KEY ?? "",
+    openCorporatesKey: process.env.OPENCORPORATES_API_KEY ?? process.env.OPENCORPORATES_API_TOKEN ?? "",
+  };
   try {
-    const setting = await prisma.platformSetting.findFirst({
-      where: { key: { in: ["companies_house_key", "companies_house_api_key"] } },
-      orderBy: { updatedAt: "desc" },
+    const settings = await prisma.platformSetting.findMany({
+      where: {
+        key: {
+          in: [
+            "companies_house_key",
+            "companies_house_api_key",
+            "hunter_api_key",
+            "opencorporates_api_key",
+            "opencorporates_api_token",
+          ],
+        },
+      },
     });
-    if (setting?.value && setting.value.length > 10) key = setting.value;
+    for (const setting of settings) {
+      if (!setting.value || setting.value.length <= 10) continue;
+      if (setting.key === "companies_house_key" || setting.key === "companies_house_api_key") {
+        keys.companiesHouseKey = setting.value;
+      }
+      if (setting.key === "hunter_api_key") {
+        keys.hunterKey = setting.value;
+      }
+      if (setting.key === "opencorporates_api_key" || setting.key === "opencorporates_api_token") {
+        keys.openCorporatesKey = setting.value;
+      }
+    }
   } catch {
-    // Non-fatal. The finder will still run website evidence checks.
+    // Non-fatal. The finder will still run no-key public checks.
   }
-  return key;
+  return keys;
 }
 
 export async function POST(req: NextRequest) {
@@ -72,10 +97,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const companiesHouseKey = await loadCompaniesHouseKey();
+    const sourceKeys = await loadDecisionSourceKeys();
     const result = await findDecisionMakers({
       ...parsed.data,
-      companiesHouseKey: companiesHouseKey || undefined,
+      companiesHouseKey: sourceKeys.companiesHouseKey || undefined,
+      hunterKey: parsed.data.hunterKey || sourceKeys.hunterKey || undefined,
+      openCorporatesKey: sourceKeys.openCorporatesKey || undefined,
     });
     return NextResponse.json({ result, plan });
   } catch (err) {
