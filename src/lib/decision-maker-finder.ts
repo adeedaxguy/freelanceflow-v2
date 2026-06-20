@@ -457,6 +457,22 @@ function genericBusinessContactCandidate(
   };
 }
 
+function businessProfileContactCandidate(input: DecisionFinderInput, sourceLink: DecisionSourceLink): CandidateDraft {
+  return {
+    name: "Owner / manager contact",
+    role: "Public business profile contact",
+    company: input.company,
+    country: input.country,
+    confidence: 46,
+    evidenceLevel: "low",
+    sourceType: "Provided business profile",
+    sourceUrl: sourceLink.url,
+    proof: `A ${sourceLink.platform} link was supplied for ${input.company}. Open the profile to verify the public phone, owner or manager details, hours, and contact route before outreach.`,
+    isGenericContact: true,
+    outreachAngle: `Use the business profile as the starting point: call or message the public contact route, then ask who handles growth, website, or marketing decisions for ${input.company}.`,
+  };
+}
+
 function socialProfilesFromValue(value: unknown, sourceType: string, baseUrl?: string) {
   return dedupeSocialProfiles(
     collectStrings(value)
@@ -1560,15 +1576,14 @@ async function searchPastedProfile(input: DecisionFinderInput, sourceLink: Decis
     }
   }
   if (contactCandidate) candidates.push(contactCandidate);
+  if (!contactCandidate) candidates.push(businessProfileContactCandidate(input, sourceLink));
 
   evidence.push({
     label: "Pasted business/profile link",
     status: "checked",
     detail: contactCandidate
       ? `Checked the pasted ${sourceLink.platform} and found public contact details.`
-      : sourceLink.platform === "Google Business Profile"
-        ? "Stored the pasted Google Business Profile link as the map/profile proof. Google profile content is dynamic, so use the open-profile link to verify phone and owner details in the browser."
-        : `Checked the pasted ${sourceLink.platform}; no public contact details were exposed in the quick scan.`,
+      : "Saved the supplied business profile as the main proof link. Open it to verify phone, owner, manager, and contact details in the browser.",
     url: sourceLink.url,
   });
 

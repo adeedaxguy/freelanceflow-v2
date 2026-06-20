@@ -232,6 +232,7 @@ function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: s
 function candidateSourceLabel(sourceType: string) {
   const normalized = sourceType.toLowerCase();
   if (normalized.includes("pasted") && normalized.includes("profile")) return "Provided profile";
+  if (normalized.includes("provided business profile")) return "Business profile";
   if (normalized.includes("official website contact")) return "Public contact";
   if (normalized.includes("official website")) return "Official website";
   if (normalized.includes("hunter")) return "Email verification";
