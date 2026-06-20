@@ -251,25 +251,29 @@ function profileSourceLabel(sourceType: string) {
 
 function userFacingEvidence(item: DecisionFinderEvidence) {
   const normalized = item.label.toLowerCase();
+  const isReferenceSafe =
+    normalized.includes("pasted") ||
+    normalized.includes("official website") ||
+    normalized.includes("business/profile");
   if (normalized.includes("pasted profile")) {
     return {
       label: "Provided profile checked",
       detail: item.detail.replace(/pasted LinkedIn profile|pasted Crunchbase profile/gi, "provided profile"),
-      url: item.url,
+      url: isReferenceSafe ? item.url : undefined,
     };
   }
   if (normalized.includes("pasted business") || normalized.includes("business/profile")) {
     return {
       label: "Provided business profile checked",
       detail: "The supplied profile was saved as the main proof link. Open it to verify owner, phone, hours, and public contact details.",
-      url: item.url,
+      url: isReferenceSafe ? item.url : undefined,
     };
   }
   if (normalized.includes("official website")) {
     return {
       label: "Business website checked",
       detail: item.detail.replace(/official website/gi, "business website"),
-      url: item.url,
+      url: isReferenceSafe ? item.url : undefined,
     };
   }
   if (normalized.includes("email enrichment")) {
@@ -338,7 +342,18 @@ function userFacingSearchLink(link: DecisionFinderSearchLink) {
 }
 
 function VerificationSummary({ result }: { result: DecisionFinderResult }) {
-  const checked = result.evidence.filter(item => item.status === "checked").map(userFacingEvidence);
+  const checked = result.evidence
+    .filter(item => {
+      if (item.status !== "checked") return false;
+      const detail = item.detail.toLowerCase();
+      const label = item.label.toLowerCase();
+      if (/^no\b/.test(detail)) return false;
+      if (detail.includes("no direct social profile") || detail.includes("no named decision maker")) return false;
+      if (detail.includes("did not expose officer names") || detail.includes("did not expose a reliable person name")) return false;
+      if (label.includes("knowledge graph") && !detail.includes("found")) return false;
+      return true;
+    })
+    .map(userFacingEvidence);
   const visibleChecks = checked.slice(0, 4);
   const hiddenCheckCount = Math.max(checked.length - visibleChecks.length, 0);
   const blockedCheckCount = result.evidence.filter(item => item.status !== "checked").length;
