@@ -219,10 +219,19 @@ function googleSearchUrl(query: string) {
 }
 
 function candidateProfileSearchUrl(candidate: DecisionMakerCandidate) {
+  if (candidate.isGenericContact) {
+    return googleSearchUrl(`"${candidate.company}" (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`);
+  }
   return googleSearchUrl(`"${candidate.name}" "${candidate.company}" (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`);
 }
 
 function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: string) {
+  if (candidate.isGenericContact) {
+    const query = domain
+      ? `site:${domain} ("${candidate.company}" OR owner OR founder OR manager OR contact) (email OR phone OR telephone OR contact)`
+      : `"${candidate.company}" (owner OR founder OR manager OR contact) (email OR phone OR telephone OR mobile OR WhatsApp)`;
+    return googleSearchUrl(query);
+  }
   const query = domain
     ? `site:${domain} "${candidate.name}" (email OR phone OR telephone OR contact)`
     : `"${candidate.name}" "${candidate.company}" (email OR phone OR telephone OR contact)`;
@@ -303,9 +312,7 @@ function userFacingEvidence(item: DecisionFinderEvidence) {
   if (normalized.includes("registry")) {
     return {
       label: "Business registry guidance ready",
-      detail: item.detail
-        .replace(/OpenCorporates registry lookup/gi, "Registry lookup")
-        .replace(/Companies House/gi, "the official registry"),
+      detail: "Official registry checks are available from the recommended links when a public owner profile is not published.",
       url: item.url,
     };
   }
@@ -394,7 +401,7 @@ function VerificationSummary({ result }: { result: DecisionFinderResult }) {
         {(hiddenCheckCount > 0 || blockedCheckCount > 0) && (
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
             {hiddenCheckCount > 0 ? `${hiddenCheckCount} more background check${hiddenCheckCount === 1 ? "" : "s"} completed. ` : ""}
-            {blockedCheckCount > 0 ? "Some deeper checks need a business website or connected enrichment key." : ""}
+            {blockedCheckCount > 0 ? "Add a business website when available to run deeper website checks." : ""}
           </p>
         )}
       </div>
