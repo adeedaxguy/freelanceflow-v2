@@ -31,8 +31,11 @@ export default function BlogCard({ post }: BlogCardProps) {
         <img
           src={coverImage}
           alt=""
+          width={768}
+          height={384}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/65 via-background/10 to-transparent" />
         <div className="absolute inset-0 bg-dot-pattern bg-dot-sm opacity-30" />

@@ -48,7 +48,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       fontSize: {
         hero: ["72px", { lineHeight: "1.1", letterSpacing: "-2px", fontWeight: "700" }],

@@ -334,7 +334,7 @@ export default async function BlogPostPage({ params }: Props) {
             {coverImage && (
               <div className="mb-10 rounded-2xl overflow-hidden border border-border">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={coverImage} alt={dbPost.title} className="w-full object-cover max-h-72" />
+                <img src={coverImage} alt={dbPost.title} width={1200} height={630} className="w-full object-cover max-h-72" decoding="async" />
               </div>
             )}
 
@@ -411,7 +411,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           <div className="mb-10 rounded-2xl overflow-hidden border border-border">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImage} alt={post.title} className="w-full object-cover max-h-72" />
+            <img src={coverImage} alt={post.title} width={1200} height={630} className="w-full object-cover max-h-72" decoding="async" />
           </div>
 
           <div className="prose-content">
