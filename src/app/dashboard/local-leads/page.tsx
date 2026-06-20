@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import type { LocalLead } from "@/app/api/local-leads/search/route";
-import { getPhoneTypeInfo, getPhoneTypeTone } from "@/lib/phone-type";
+import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/phone-type";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
@@ -41,20 +41,33 @@ type LocalLeadsCache = {
 type PhoneTypeFilter = "all" | "mobile" | "landline" | "toll_free_service" | "business_unknown";
 
 const PHONE_TYPE_FILTERS: Array<{ value: PhoneTypeFilter; label: string; title: string }> = [
-  { value: "all", label: "All numbers", title: "Show every lead with or without a phone type." },
+  { value: "all", label: "Any type", title: "Show all leads regardless of number type." },
   { value: "mobile", label: "Mobile / WhatsApp likely", title: "Shows numbers with mobile prefixes. WhatsApp availability still needs confirmation." },
   { value: "landline", label: "Landline", title: "Shows numbers that look like fixed business landlines." },
   { value: "toll_free_service", label: "Toll-free / Service", title: "Shows toll-free, freephone, or service-rate business numbers." },
   { value: "business_unknown", label: "Business / Unknown", title: "Shows business numbers where mobile vs landline cannot be verified from the digits alone." },
 ];
 
+const PHONE_TYPE_COUNT_ZERO: Record<PhoneTypeFilter, number> = {
+  all: 0,
+  mobile: 0,
+  landline: 0,
+  toll_free_service: 0,
+  business_unknown: 0,
+};
+
+function phoneLineTypeMatchesFilter(type: PhoneLineType, phoneTypeFilter: PhoneTypeFilter) {
+  if (phoneTypeFilter === "all") return true;
+  if (phoneTypeFilter === "toll_free_service") return type === "toll_free" || type === "service";
+  if (phoneTypeFilter === "business_unknown") return type === "business" || type === "unknown";
+  return type === phoneTypeFilter;
+}
+
 function matchesPhoneTypeFilter(lead: LocalLead, phoneTypeFilter: PhoneTypeFilter) {
   if (phoneTypeFilter === "all") return true;
   if (!lead.phone) return false;
   const info = getPhoneTypeInfo(lead.phone, lead.country);
-  if (phoneTypeFilter === "toll_free_service") return info.type === "toll_free" || info.type === "service";
-  if (phoneTypeFilter === "business_unknown") return info.type === "business" || info.type === "unknown";
-  return info.type === phoneTypeFilter;
+  return phoneLineTypeMatchesFilter(info.type, phoneTypeFilter);
 }
 
 // 150+ keyword suggestions grouped by category
@@ -739,7 +752,7 @@ export default function LocalLeadsPage() {
 
   const doSearch = useCallback(async () => {
     if (!keyword.trim() || !location.trim() || isOverLimit) return;
-    setLoading(true); setError(""); setLimitNotice(""); setPage(1); setShowSugg(null);
+    setLoading(true); setError(""); setLimitNotice(""); setPage(1); setShowSugg(null); setPhoneTypeFilter("all");
     try {
       const body: Record<string, unknown> = {
         keyword: keyword.trim(), location: location.trim(), filter,
@@ -780,7 +793,7 @@ export default function LocalLeadsPage() {
           location: location.trim(),
           filter,
           hasPhone,
-          phoneTypeFilter,
+          phoneTypeFilter: "all",
           minRating,
           page: 1,
           meta: { source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources },
@@ -801,7 +814,7 @@ export default function LocalLeadsPage() {
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, hasPhone, phoneTypeFilter, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
+  }, [keyword, location, filter, hasPhone, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -850,29 +863,57 @@ export default function LocalLeadsPage() {
     finally { setSavingId(null); }
   };
 
-  // Apply all client-side filters: website status + phone + rating
-  const filteredResults = results.filter(r => {
+  // Apply all client-side filters. Keep phone-type counts based on the visible
+  // search context before the user chooses a specific number type.
+  const primaryFilteredResults = useMemo(() => results.filter(r => {
     // Website status filter (the main Show: selector)
-    // "No Website" shows confirmed none + unverified businesses — both worth pitching.
+    // "No Website" shows confirmed none + unverified businesses - both worth pitching.
     if (filter === "no_website"       && r.websiteStatus !== "none" && r.websiteStatus !== "unknown") return false;
     if (filter === "outdated_website" && r.websiteStatus !== "outdated" && r.websiteStatus !== "unreachable") return false;
     if (filter === "has_website"      && (!r.website || r.websiteStatus === "none" || r.websiteStatus === "unknown")) return false;
-    // Extra filters
     if (hasPhone  && !r.phone)                    return false;
-    if (!matchesPhoneTypeFilter(r, phoneTypeFilter)) return false;
     if (minRating && (r.rating ?? 0) < minRating) return false;
     return true;
-  });
+  }), [results, filter, hasPhone, minRating]);
+  const phoneTypeCounts = useMemo(() => PHONE_TYPE_FILTERS.reduce<Record<PhoneTypeFilter, number>>((counts, option) => {
+    counts[option.value] = option.value === "all"
+      ? primaryFilteredResults.length
+      : primaryFilteredResults.filter(r => matchesPhoneTypeFilter(r, option.value)).length;
+    return counts;
+  }, { ...PHONE_TYPE_COUNT_ZERO }), [primaryFilteredResults]);
+  const filteredResults = useMemo(
+    () => primaryFilteredResults.filter(r => matchesPhoneTypeFilter(r, phoneTypeFilter)),
+    [primaryFilteredResults, phoneTypeFilter]
+  );
   const pagedResults  = filteredResults.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
   // Counts from ALL results so the badges always show the full breakdown
   const noWebsite     = results.filter(r => r.websiteStatus === "none" || r.websiteStatus === "unknown").length;
   const outdated      = results.filter(r => r.websiteStatus === "outdated" || r.websiteStatus === "unreachable").length;
   const hotLeads      = filteredResults.filter(r => r.urgency === "high").length;
-  const withPhone     = filteredResults.filter(r => !!r.phone).length;
-  const mobilePhoneLeads = filteredResults.filter(r => getPhoneTypeInfo(r.phone, r.country).type === "mobile").length;
-  const landlineLeads = filteredResults.filter(r => getPhoneTypeInfo(r.phone, r.country).type === "landline").length;
+  const withPhone     = primaryFilteredResults.filter(r => !!r.phone).length;
+  const mobilePhoneLeads = phoneTypeCounts.mobile;
+  const landlineLeads = phoneTypeCounts.landline;
+  const tollFreeServiceLeads = phoneTypeCounts.toll_free_service;
+  const businessUnknownLeads = phoneTypeCounts.business_unknown;
   const filtersActive = hasPhone || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all";
+  const selectedPhoneTypeOption = PHONE_TYPE_FILTERS.find(option => option.value === phoneTypeFilter);
+  const activeFilterLabels = [
+    filter === "no_website" ? "No/Unknown Website" : null,
+    filter === "outdated_website" ? "Outdated Site" : null,
+    filter === "has_website" ? "Has Website" : null,
+    hasPhone ? "Has Phone" : null,
+    phoneTypeFilter !== "all" ? selectedPhoneTypeOption?.label : null,
+    minRating > 0 ? `${minRating} star minimum rating` : null,
+  ].filter(Boolean) as string[];
+  const selectedPhoneTypeCount = phoneTypeCounts[phoneTypeFilter] ?? 0;
   const hasDemo       = meta?.sources?.includes("demo");
+
+  useEffect(() => {
+    if (phoneTypeFilter === "all" || loading || primaryFilteredResults.length === 0) return;
+    if (selectedPhoneTypeCount > 0) return;
+    setPhoneTypeFilter("all");
+    setPage(1);
+  }, [phoneTypeFilter, loading, primaryFilteredResults.length, selectedPhoneTypeCount]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
@@ -1097,21 +1138,42 @@ export default function LocalLeadsPage() {
               {/* Phone type */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs text-muted-foreground">Number type:</span>
-                {PHONE_TYPE_FILTERS.map(option => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    title={option.title}
-                    onClick={() => { setPhoneTypeFilter(option.value); setPage(1); }}
-                    className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
-                      phoneTypeFilter === option.value
-                        ? "bg-primary/15 border-primary/40 text-primary-light"
-                        : "border-border text-muted-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                {PHONE_TYPE_FILTERS.map(option => {
+                  const count = phoneTypeCounts[option.value] ?? 0;
+                  const unavailable = option.value !== "all" && primaryFilteredResults.length > 0 && count === 0;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      title={unavailable ? `No ${option.label.toLowerCase()} numbers found in the current results.` : option.title}
+                      disabled={unavailable}
+                      onClick={() => { setPhoneTypeFilter(option.value); setPage(1); }}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-all disabled:cursor-not-allowed ${
+                        phoneTypeFilter === option.value
+                          ? "bg-primary/15 border-primary/40 text-primary-light"
+                          : unavailable
+                            ? "border-border/70 bg-muted/20 text-muted-foreground/45"
+                            : "border-border text-muted-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      <span>{option.label}</span>
+                      {results.length > 0 && (
+                        <span className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${
+                          phoneTypeFilter === option.value
+                            ? "bg-primary/20 text-primary-light"
+                            : "bg-muted text-muted-foreground"
+                        }`}>
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+                {primaryFilteredResults.length > 0 && businessUnknownLeads > 0 && (mobilePhoneLeads === 0 || landlineLeads === 0) && (
+                  <p className="basis-full text-[11px] leading-relaxed text-muted-foreground/75">
+                    US and Canada directories usually do not reveal mobile vs landline from the digits. Those numbers stay under Business / Unknown until a carrier-verified source confirms them.
+                  </p>
+                )}
               </div>
 
               {/* Min rating */}
@@ -1213,7 +1275,7 @@ export default function LocalLeadsPage() {
               </div>
             )}
 
-            {/* Filters reduced results to zero — show clear message */}
+            {/* Filters reduced results to zero - show clear message */}
             {!loading && results.length > 0 && filteredResults.length === 0 && filtersActive && (
               <div className="text-center py-10 border border-dashed border-border rounded-2xl space-y-3">
                 <div className="w-12 h-12 rounded-full bg-yellow-500/10 flex items-center justify-center mx-auto border border-yellow-500/20">
@@ -1222,19 +1284,13 @@ export default function LocalLeadsPage() {
                 <div>
                   <p className="text-foreground font-semibold">No results match your filters</p>
                   <p className="text-muted-foreground text-sm mt-1">
-                    {results.length} businesses found, but none match
-                    {filter === "no_website" ? " the No Website filter — all businesses in this area have a website listed" : ""}
-                    {filter === "outdated_website" ? " the Outdated Site filter — no outdated/unreachable sites detected in this area" : ""}
-                    {filter === "has_website" ? " the Has Website filter — none of these businesses have a website on record" : ""}
-                    {hasPhone ? `${filter !== "all" ? " and" : ""} the Has Phone filter` : ""}
-                    {phoneTypeFilter !== "all" ? `${(filter !== "all" || hasPhone) ? " and" : ""} the ${PHONE_TYPE_FILTERS.find(option => option.value === phoneTypeFilter)?.label ?? "number type"} filter` : ""}
-                    {minRating > 0 ? `${(filter !== "all" || hasPhone || phoneTypeFilter !== "all") ? " and" : ""} the ${minRating}★ minimum rating` : ""}.
+                    {results.length} businesses found, but none match{activeFilterLabels.length ? `: ${activeFilterLabels.join(", ")}.` : "."}
                   </p>
                   <p className="text-muted-foreground text-xs mt-1">
-                    {filter === "no_website" || filter === "outdated_website"
-                      ? "Try a different area or keyword — website data varies by location."
-                      : phoneTypeFilter !== "all"
-                        ? "Try a country with clearer mobile/landline prefixes, or use Business / Unknown for numbers that cannot be classified."
+                    {phoneTypeFilter !== "all"
+                      ? "For US and Canadian listings, mobile-vs-landline is rarely exposed from the number pattern. Try Business / Unknown or Any type."
+                      : filter === "no_website" || filter === "outdated_website"
+                        ? "Try a different area or keyword - website data varies by location."
                         : "Broaden your filters to include leads without ratings or phone numbers."}
                   </p>
                 </div>
@@ -1340,6 +1396,8 @@ export default function LocalLeadsPage() {
                 { label: "With phone",     value: withPhone,                                                               color: "text-accent" },
                 { label: "Mobile/WhatsApp likely", value: mobilePhoneLeads,                                                color: "text-accent" },
                 { label: "Landline",       value: landlineLeads,                                                           color: "text-sky-300" },
+                { label: "Business/Unknown", value: businessUnknownLeads,                                                  color: "text-muted-foreground" },
+                { label: "Toll-free/Service", value: tollFreeServiceLeads,                                                 color: "text-emerald-300" },
                 { label: "Hot leads",      value: results.filter(r => r.urgency === "high").length,                        color: "text-orange-400" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="flex items-center justify-between text-sm">
