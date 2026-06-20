@@ -393,7 +393,7 @@ function validPersonName(name: string) {
   const clean = name.trim();
   if (clean.length < 5 || clean.length > 80) return false;
   if (!/\s/.test(clean)) return false;
-  if (/\b(?:company|limited|ltd|llc|inc|plc|group|holdings|services|solutions|customer|privacy|terms|website|copyright)\b/i.test(clean)) return false;
+  if (/\b(?:co|company|corp|corporation|incorporated|limited|ltd|llc|llp|lp|plc|pllc|group|holdings|services|solutions|customer|privacy|terms|website|copyright)\b/i.test(clean)) return false;
   return /^[A-Za-z][A-Za-z' .-]+[A-Za-z.]$/.test(clean);
 }
 
@@ -1041,8 +1041,20 @@ interface WikidataEntityResponse {
   }>;
 }
 
-function getWikidataEntityIds(entity: NonNullable<WikidataEntityResponse["entities"]>[string], property: string) {
+function wikidataClaimHasQualifier(
+  claim: NonNullable<NonNullable<WikidataEntityResponse["entities"]>[string]["claims"]>[string][number],
+  property: string,
+) {
+  return (claim.qualifiers?.[property]?.length ?? 0) > 0;
+}
+
+function getWikidataEntityIds(
+  entity: NonNullable<WikidataEntityResponse["entities"]>[string],
+  property: string,
+  options: { currentOnly?: boolean } = {},
+) {
   return (entity.claims?.[property] ?? [])
+    .filter(claim => !options.currentOnly || !wikidataClaimHasQualifier(claim, "P582"))
     .map(claim => claim.mainsnak?.datavalue?.value)
     .filter((value): value is { id?: string; "entity-type"?: string } => typeof value === "object" && value !== null)
     .map(value => value.id)
@@ -1160,10 +1172,17 @@ async function searchWikidata(input: DecisionFinderInput) {
     return { candidates, evidence };
   }
 
-  const rolePairs: Array<{ id: string; role: string }> = [];
+  const rolePairs: Array<{ id: string; role: string; property: string }> = [];
   for (const [property, role] of Object.entries(WIKIDATA_ROLE_PROPERTIES)) {
-    for (const id of getWikidataEntityIds(entity, property)) {
-      rolePairs.push({ id, role });
+    if (property === "P112") continue;
+    for (const id of getWikidataEntityIds(entity, property, { currentOnly: true })) {
+      rolePairs.push({ id, role, property });
+    }
+  }
+  if (rolePairs.length === 0) {
+    const founderRole = WIKIDATA_ROLE_PROPERTIES.P112 ?? "Founder";
+    for (const id of getWikidataEntityIds(entity, "P112")) {
+      rolePairs.push({ id, role: founderRole, property: "P112" });
     }
   }
   const personSnapshots = await getWikidataPersonSnapshots(Array.from(new Set(rolePairs.map(pair => pair.id))));
