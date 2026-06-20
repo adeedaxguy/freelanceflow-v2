@@ -227,7 +227,7 @@ function titleCaseName(name: string) {
     .replace(/^(.+),\s*(.+)$/u, "$2 $1")
     .trim();
   if (!clean) return "";
-  if (/[a-z]/.test(clean)) return clean;
+  if (/[a-z]/.test(clean) && !/\b[A-Z]{3,}\b/.test(clean)) return clean;
   return clean.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
 }
 
