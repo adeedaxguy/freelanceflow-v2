@@ -22,6 +22,7 @@ export interface DecisionMakerCandidate {
   email?: string;
   phone?: string;
   socialProfiles?: DecisionSocialProfile[];
+  isGenericContact?: boolean;
   outreachAngle: string;
 }
 
@@ -43,6 +44,7 @@ export interface DecisionFinderInput {
   country: DecisionCountry;
   domain?: string;
   website?: string;
+  profileUrl?: string;
   location?: string;
   companiesHouseKey?: string;
   hunterKey?: string;
@@ -233,6 +235,13 @@ const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
 const COMPANY_SUFFIX_RE = /\b(?:incorporated|inc|limited|ltd|llc|plc|corp|corporation|company|co|services|service|group|holdings|partners|the)\b/gi;
 const SOCIAL_BLOCKED_PATH_RE = /\/(?:share|shares|intent|sharer|search|login|signup|hashtag|jobs)(?:\/|\?|$)/i;
+const PROFILE_HOST_RE = /(?:^|\.)((google|maps\.app|g|goo)\.(com|gl)|linkedin\.com|facebook\.com|instagram\.com|x\.com|twitter\.com|yelp\.com|foursquare\.com|crunchbase\.com)$/i;
+
+interface DecisionSourceLink {
+  platform: string;
+  url: string;
+  kind: "business_profile" | "person_profile" | "website";
+}
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -319,6 +328,130 @@ function socialProfileFromUrl(raw: string, sourceType: string, baseUrl?: string)
   } catch {
     return null;
   }
+}
+
+function parseDecisionSourceLink(raw?: string): DecisionSourceLink | null {
+  const url = absoluteUrl(raw ?? "");
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    const path = parsed.pathname.replace(/\/+$/g, "");
+
+    if (
+      host === "maps.app.goo.gl" ||
+      host === "g.page" ||
+      host === "goo.gl" ||
+      (host.endsWith("google.com") && /\/maps|\/local|\/search/i.test(path))
+    ) {
+      return { platform: "Google Business Profile", url: parsed.toString(), kind: "business_profile" };
+    }
+    if (host === "yelp.com" && /^\/biz\//i.test(path)) {
+      return { platform: "Yelp business profile", url: parsed.toString(), kind: "business_profile" };
+    }
+    if (host === "foursquare.com" && /^\/v\//i.test(path)) {
+      return { platform: "Foursquare business profile", url: parsed.toString(), kind: "business_profile" };
+    }
+    if (host === "linkedin.com") {
+      if (/^\/(?:in|pub)\//i.test(path)) return { platform: "LinkedIn profile", url: parsed.toString(), kind: "person_profile" };
+      if (/^\/(?:company|school|showcase)\//i.test(path)) return { platform: "LinkedIn company page", url: parsed.toString(), kind: "business_profile" };
+    }
+    if (host === "crunchbase.com") {
+      if (/^\/person\//i.test(path)) return { platform: "Crunchbase profile", url: parsed.toString(), kind: "person_profile" };
+      if (/^\/organization\//i.test(path)) return { platform: "Crunchbase organization", url: parsed.toString(), kind: "business_profile" };
+    }
+    if (host === "facebook.com" || host === "instagram.com" || host === "x.com" || host === "twitter.com") {
+      return { platform: `${host.split(".")[0]!.replace(/^x$/i, "X")} profile`, url: parsed.toString(), kind: "business_profile" };
+    }
+    return { platform: "Website", url: parsed.toString(), kind: "website" };
+  } catch {
+    return null;
+  }
+}
+
+function isKnownProfileHost(raw?: string) {
+  const url = absoluteUrl(raw ?? "");
+  if (!url) return false;
+  try {
+    const host = new URL(url).hostname.replace(/^www\./i, "").toLowerCase();
+    return PROFILE_HOST_RE.test(host);
+  } catch {
+    return false;
+  }
+}
+
+function normalizeCompanyDomain(raw?: string) {
+  if (!raw || isKnownProfileHost(raw)) return "";
+  return normalizeDomain(raw);
+}
+
+function resolveDecisionSourceLink(input: DecisionFinderInput) {
+  const raw = input.profileUrl || input.website || input.domain || "";
+  return parseDecisionSourceLink(raw);
+}
+
+function nameFromPersonProfileUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    const pathParts = parsed.pathname.split("/").filter(Boolean);
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    let slug = "";
+    if (host === "linkedin.com" && /^(in|pub)$/i.test(pathParts[0] ?? "")) slug = pathParts[1] ?? "";
+    if (host === "crunchbase.com" && /^person$/i.test(pathParts[0] ?? "")) slug = pathParts[1] ?? "";
+    if (!slug) return "";
+    const words = slug
+      .replace(/[-_]+/g, " ")
+      .split(/\s+/)
+      .filter(part => part.length > 1 && !/^\d+$/.test(part) && !/^[a-f0-9]{6,}$/i.test(part))
+      .slice(0, 4);
+    return words.map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
+  } catch {
+    return "";
+  }
+}
+
+function cleanPhoneNumber(raw?: string) {
+  if (!raw) return "";
+  const compact = raw.replace(/[^\d+]/g, "");
+  const digits = compact.replace(/\D/g, "");
+  if (digits.length < 9 || digits.length > 15) return "";
+  if (/^(0{7,}|1{7,}|1234567)/.test(digits)) return "";
+  return raw.replace(/\s+/g, " ").trim();
+}
+
+function extractPublicContact(html: string) {
+  const text = stripTags(html);
+  const email = Array.from(new Set(text.match(EMAIL_RE) ?? []))[0] ?? "";
+  const phone = Array.from(new Set(text.match(PHONE_RE) ?? []))
+    .map(cleanPhoneNumber)
+    .find(Boolean) ?? "";
+  return { email, phone };
+}
+
+function genericBusinessContactCandidate(
+  input: DecisionFinderInput,
+  sourceUrl: string,
+  sourceType: string,
+  contact: { email?: string; phone?: string },
+): CandidateDraft | null {
+  const phone = cleanPhoneNumber(contact.phone);
+  const email = safeText(contact.email);
+  if (!phone && !email) return null;
+  return {
+    name: "Owner / manager contact",
+    role: "Public business contact",
+    company: input.company,
+    country: input.country,
+    confidence: phone && email ? 72 : 64,
+    evidenceLevel: "medium",
+    sourceType,
+    sourceUrl,
+    proof: `${sourceType} publishes ${[phone ? "a phone number" : "", email ? "an email address" : ""].filter(Boolean).join(" and ")} for ${input.company}. For small businesses this is often the owner, manager, or front-desk number; verify before outreach.`,
+    email: email || undefined,
+    phone: phone || undefined,
+    isGenericContact: true,
+    outreachAngle: `Call or email with a direct, local-business pitch and ask who handles growth, website, or marketing decisions for ${input.company}.`,
+  };
 }
 
 function socialProfilesFromValue(value: unknown, sourceType: string, baseUrl?: string) {
@@ -486,13 +619,16 @@ function outreachAngle(role: string, company: string) {
 }
 
 function candidateKey(candidate: CandidateDraft) {
+  if (candidate.isGenericContact) {
+    return `business-contact|${candidate.company.toLowerCase()}|${candidate.phone ?? candidate.email ?? candidate.sourceUrl ?? ""}`;
+  }
   return candidate.name.toLowerCase();
 }
 
 function dedupeCandidates(candidates: CandidateDraft[]) {
   const byKey = new Map<string, CandidateDraft>();
   for (const candidate of candidates) {
-    if (!validPersonName(candidate.name)) continue;
+    if (!candidate.isGenericContact && !validPersonName(candidate.name)) continue;
     const key = candidateKey(candidate);
     const current = byKey.get(key);
     if (!current) {
@@ -685,6 +821,13 @@ async function searchWebsite(input: DecisionFinderInput) {
     pagesChecked += 1;
     candidates.push(...extractJsonLdCandidates(html, url, input));
     candidates.push(...extractTextCandidates(html, url, input));
+    const publicContact = genericBusinessContactCandidate(
+      input,
+      url,
+      "Official website contact detail",
+      extractPublicContact(html),
+    );
+    if (publicContact) candidates.push(publicContact);
     if (candidates.length >= 8) break;
   }
 
@@ -1358,10 +1501,86 @@ function inferUsState(location?: string) {
   return code;
 }
 
+async function searchPastedProfile(input: DecisionFinderInput, sourceLink: DecisionSourceLink | null) {
+  const candidates: CandidateDraft[] = [];
+  const evidence: DecisionFinderEvidence[] = [];
+  if (!sourceLink || sourceLink.kind === "website") return { candidates, evidence };
+
+  if (sourceLink.kind === "person_profile") {
+    const name = nameFromPersonProfileUrl(sourceLink.url);
+    const profile = socialProfileFromUrl(sourceLink.url, "Pasted decision-maker profile");
+    if (validPersonName(name) && profile) {
+      candidates.push({
+        name,
+        role: "Possible decision maker",
+        company: input.company,
+        country: input.country,
+        confidence: 58,
+        evidenceLevel: "low",
+        sourceType: "Pasted decision-maker profile",
+        sourceUrl: sourceLink.url,
+        proof: `This ${sourceLink.platform} was supplied as a public profile source for ${input.company}. Verify the role before outreach.`,
+        socialProfiles: [profile],
+        outreachAngle: `Reference their public profile and ask whether they handle growth, website, or marketing decisions for ${input.company}.`,
+      });
+    }
+    evidence.push({
+      label: "Pasted profile link",
+      status: "checked",
+      detail: name
+        ? `Used the pasted ${sourceLink.platform} as a decision-maker profile seed.`
+        : `The pasted ${sourceLink.platform} was kept as proof, but its URL did not expose a reliable person name.`,
+      url: sourceLink.url,
+    });
+    return { candidates, evidence };
+  }
+
+  let contactCandidate: CandidateDraft | null = null;
+  if (sourceLink.platform !== "Google Business Profile") {
+    const html = await fetchHtml(sourceLink.url);
+    if (html) {
+      contactCandidate = genericBusinessContactCandidate(
+        input,
+        sourceLink.url,
+        sourceLink.platform,
+        extractPublicContact(html),
+      );
+    }
+  }
+  if (contactCandidate) candidates.push(contactCandidate);
+
+  evidence.push({
+    label: "Pasted business/profile link",
+    status: "checked",
+    detail: contactCandidate
+      ? `Checked the pasted ${sourceLink.platform} and found public contact details.`
+      : sourceLink.platform === "Google Business Profile"
+        ? "Stored the pasted Google Business Profile link as the map/profile proof. Google profile content is dynamic, so use the open-profile link to verify phone and owner details in the browser."
+        : `Checked the pasted ${sourceLink.platform}; no public contact details were exposed in the quick scan.`,
+    url: sourceLink.url,
+  });
+
+  return { candidates, evidence };
+}
+
 function buildSearchLinks(input: DecisionFinderInput, domain?: string): DecisionFinderSearchLink[] {
   const links: DecisionFinderSearchLink[] = [];
   const location = input.location ? ` ${input.location}` : "";
   const company = input.company;
+  const sourceLink = resolveDecisionSourceLink(input);
+
+  if (sourceLink && sourceLink.kind !== "website") {
+    links.push({
+      label: `Open ${sourceLink.platform}`,
+      detail: "Open the pasted business/profile page to verify owner, phone, hours, and public contact details.",
+      url: sourceLink.url,
+    });
+    links.push({
+      label: "Owner and phone verification search",
+      detail: "Search for the owner/manager name plus phone mentions around the pasted profile.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`"${company}"${location} ("owner" OR "founder" OR "manager") ("phone" OR "mobile" OR "WhatsApp" OR "contact")`)}`,
+    });
+  }
 
   links.push({
     label: "LinkedIn profile search",
@@ -1414,18 +1633,23 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
 
 export async function findDecisionMakers(input: DecisionFinderInput): Promise<DecisionFinderResult> {
   const company = input.company.trim();
-  const domain = normalizeDomain(input.domain || input.website);
+  const sourceLink = resolveDecisionSourceLink(input);
+  const domain = normalizeCompanyDomain(input.domain)
+    || normalizeCompanyDomain(input.website)
+    || (sourceLink?.kind === "website" ? normalizeDomain(sourceLink.url) : "");
   const warnings: string[] = [];
 
-  const [website, hunter, wikidata, openCorporates, companiesHouse] = await Promise.all([
+  const [website, hunter, wikidata, openCorporates, companiesHouse, pastedProfile] = await Promise.all([
     searchWebsite({ ...input, company, domain }),
     searchHunter({ ...input, company, domain }),
     searchWikidata({ ...input, company, domain }),
     searchOpenCorporates({ ...input, company, domain }),
     searchCompaniesHouse({ ...input, company, domain }),
+    searchPastedProfile({ ...input, company, domain }, sourceLink),
   ]);
 
   const candidates = dedupeCandidates([
+    ...pastedProfile.candidates,
     ...website.candidates,
     ...hunter.candidates,
     ...wikidata.candidates,
@@ -1433,6 +1657,7 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
     ...companiesHouse.candidates,
   ]);
   const evidence = [
+    ...pastedProfile.evidence,
     ...website.evidence,
     ...hunter.evidence,
     ...wikidata.evidence,

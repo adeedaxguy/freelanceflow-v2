@@ -18,6 +18,7 @@ const schema = z.object({
   country:  z.enum(["us", "uk", "ca", "au", "nz", "ie"]).default("us"),
   domain:   z.string().max(240).optional().nullable().transform(v => v?.trim() || undefined),
   website:  z.string().max(300).optional().nullable().transform(v => v?.trim() || undefined),
+  profileUrl: z.string().max(900).optional().nullable().transform(v => v?.trim() || undefined),
   location: z.string().max(160).optional().nullable().transform(v => v?.trim() || undefined),
   hunterKey: z.string().max(240).optional().nullable().transform(v => v?.trim() || undefined),
 });

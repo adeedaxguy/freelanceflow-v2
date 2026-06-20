@@ -10,6 +10,7 @@ import {
   Copy,
   ExternalLink,
   Globe,
+  Link2,
   Loader2,
   Lock,
   Mail,
@@ -41,6 +42,7 @@ interface FinderResponse {
 interface PersistedDecisionFinderState {
   company: string;
   domain: string;
+  profileUrl: string;
   location: string;
   country: DecisionCountry;
   result: DecisionFinderResult;
@@ -61,6 +63,22 @@ function normalizeDomain(value: string) {
   }
 }
 
+function isKnownProfileInput(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  try {
+    const url = new URL(/^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+    const host = url.hostname.replace(/^www\./i, "").toLowerCase();
+    return /(google\.com|maps\.app\.goo\.gl|g\.page|goo\.gl|linkedin\.com|facebook\.com|instagram\.com|x\.com|twitter\.com|yelp\.com|foursquare\.com|crunchbase\.com)$/.test(host);
+  } catch {
+    return false;
+  }
+}
+
+function normalizeCompanyDomain(value: string) {
+  return isKnownProfileInput(value) ? "" : normalizeDomain(value);
+}
+
 function isDecisionCountry(value: unknown): value is DecisionCountry {
   return typeof value === "string" && DECISION_COUNTRIES.includes(value as DecisionCountry);
 }
@@ -77,7 +95,8 @@ function readPersistedDecisionFinderState() {
     if (!parsed.result || !parsed.company || !isDecisionCountry(parsed.country)) return null;
     return {
       company: parsed.company,
-      domain: normalizeDomain(parsed.domain ?? ""),
+      domain: normalizeCompanyDomain(parsed.domain ?? ""),
+      profileUrl: parsed.profileUrl ?? "",
       location: parsed.location ?? "",
       country: parsed.country,
       result: parsed.result,
@@ -99,11 +118,12 @@ function writePersistedDecisionFinderState(state: PersistedDecisionFinderState) 
 
 function persistedStateMatchesInput(
   state: PersistedDecisionFinderState,
-  input: { company: string; domain: string; location: string; country: DecisionCountry },
+  input: { company: string; domain: string; profileUrl: string; location: string; country: DecisionCountry },
 ) {
   return (
     normalizeComparable(state.company) === normalizeComparable(input.company) &&
-    normalizeDomain(state.domain) === normalizeDomain(input.domain) &&
+    normalizeCompanyDomain(state.domain) === normalizeCompanyDomain(input.domain) &&
+    normalizeComparable(state.profileUrl) === normalizeComparable(input.profileUrl) &&
     normalizeComparable(state.location) === normalizeComparable(input.location) &&
     state.country === input.country
   );
@@ -169,6 +189,29 @@ function ConfidenceBadge({ candidate }: { candidate: DecisionMakerCandidate }) {
   );
 }
 
+function ContactSignalBadges({ candidate }: { candidate: DecisionMakerCandidate }) {
+  const signals = [
+    candidate.phone ? { label: "Phone", tone: "border-accent/30 bg-accent/10 text-accent" } : null,
+    candidate.email ? { label: "Email", tone: "border-accent/30 bg-accent/10 text-accent" } : null,
+    candidate.socialProfiles?.length ? { label: "Profile", tone: "border-primary/30 bg-primary/10 text-primary-light" } : null,
+    candidate.isGenericContact ? { label: "Business contact", tone: "border-yellow-500/30 bg-yellow-500/10 text-yellow-300" } : null,
+  ].filter((signal): signal is { label: string; tone: string } => Boolean(signal));
+
+  if (signals.length === 0) {
+    signals.push({ label: "Needs verification", tone: "border-border bg-surface text-muted-foreground" });
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {signals.map(signal => (
+        <span key={signal.label} className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${signal.tone}`}>
+          {signal.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function googleSearchUrl(query: string) {
   return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 }
@@ -213,6 +256,7 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{candidate.proof}</p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/85">{candidate.outreachAngle}</p>
+          <ContactSignalBadges candidate={candidate} />
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {candidate.email && (
@@ -306,12 +350,14 @@ function DecisionMakerFinderInner() {
   const params = useSearchParams();
   const initialCompany = params.get("company") ?? "";
   const initialDomain = params.get("domain") || params.get("website") || "";
+  const initialProfileUrl = params.get("profileUrl") || params.get("profile") || "";
   const initialLocation = params.get("location") ?? "";
   const initialCountry = inferCountryFromParams(params.get("country"), initialLocation);
-  const hasPrefillParams = Boolean(initialCompany || initialDomain || initialLocation || params.get("country"));
+  const hasPrefillParams = Boolean(initialCompany || initialDomain || initialProfileUrl || initialLocation || params.get("country"));
 
   const [company, setCompany] = useState(initialCompany);
-  const [domain, setDomain] = useState(normalizeDomain(initialDomain));
+  const [domain, setDomain] = useState(normalizeCompanyDomain(initialDomain));
+  const [profileUrl, setProfileUrl] = useState(initialProfileUrl);
   const [location, setLocation] = useState(initialLocation);
   const [country, setCountry] = useState<DecisionCountry>(initialCountry);
   const [usage, setUsage] = useState<UsageStats | null>(null);
@@ -327,12 +373,14 @@ function DecisionMakerFinderInner() {
     if (hasPrefillParams) {
       const prefilledInput = {
         company: initialCompany,
-        domain: normalizeDomain(initialDomain),
+        domain: normalizeCompanyDomain(initialDomain),
+        profileUrl: initialProfileUrl,
         location: initialLocation,
         country: initialCountry,
       };
       setCompany(prefilledInput.company);
       setDomain(prefilledInput.domain);
+      setProfileUrl(prefilledInput.profileUrl);
       setLocation(prefilledInput.location);
       setCountry(prefilledInput.country);
       if (persistedStateMatchesInput(stored, prefilledInput)) {
@@ -345,10 +393,11 @@ function DecisionMakerFinderInner() {
 
     setCompany(stored.company);
     setDomain(stored.domain);
+    setProfileUrl(stored.profileUrl);
     setLocation(stored.location);
     setCountry(stored.country);
     setResult(stored.result);
-  }, [hasPrefillParams, initialCompany, initialCountry, initialDomain, initialLocation]);
+  }, [hasPrefillParams, initialCompany, initialCountry, initialDomain, initialLocation, initialProfileUrl]);
 
   useEffect(() => {
     let active = true;
@@ -366,7 +415,7 @@ function DecisionMakerFinderInner() {
 
   const plan = (usage?.plan ?? "free").toLowerCase();
   const canUseFinder = plan === "agency" || plan === "pro" || usage?.unlimited === true;
-  const cleanDomain = useMemo(() => normalizeDomain(domain), [domain]);
+  const cleanDomain = useMemo(() => normalizeCompanyDomain(domain), [domain]);
 
   async function runLookup() {
     if (!company.trim()) {
@@ -382,10 +431,13 @@ function DecisionMakerFinderInner() {
     setError("");
     try {
       const hunterKey = window.localStorage.getItem("ff_hunter_api_key") ?? "";
+      const detectedProfileUrl = profileUrl.trim() || (isKnownProfileInput(domain) ? domain.trim() : "");
+      const lookupDomain = isKnownProfileInput(domain) ? "" : cleanDomain;
       const lookupInput = {
         company: company.trim(),
         country,
-        domain: cleanDomain,
+        domain: lookupDomain,
+        profileUrl: detectedProfileUrl,
         location: location.trim(),
       };
       const response = await fetch("/api/decision-makers/find", {
@@ -395,6 +447,7 @@ function DecisionMakerFinderInner() {
           company: lookupInput.company,
           country: lookupInput.country,
           domain: lookupInput.domain || undefined,
+          profileUrl: lookupInput.profileUrl || undefined,
           location: lookupInput.location || undefined,
           hunterKey: hunterKey.length > 10 ? hunterKey : undefined,
         }),
@@ -510,6 +563,22 @@ function DecisionMakerFinderInner() {
           </div>
 
           <label className="space-y-2 lg:col-span-2">
+            <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Google Business or social profile URL</span>
+            <div className="relative">
+              <Link2 className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+              <input
+                value={profileUrl}
+                onChange={event => setProfileUrl(event.target.value)}
+                placeholder="Paste Google Maps, LinkedIn, Facebook, Instagram, Yelp, Foursquare..."
+                className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary/50"
+              />
+            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Use this when the business has no website or when you already found a public profile with phone/social proof.
+            </p>
+          </label>
+
+          <label className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">City, state, or postcode area</span>
             <div className="relative">
               <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
