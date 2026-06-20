@@ -2,6 +2,12 @@ export type DecisionCountry = "us" | "uk" | "ca" | "au" | "nz" | "ie";
 
 export type DecisionEvidenceLevel = "high" | "medium" | "low";
 
+export interface DecisionSocialProfile {
+  platform: string;
+  url: string;
+  sourceType: string;
+}
+
 export interface DecisionMakerCandidate {
   id: string;
   name: string;
@@ -15,6 +21,7 @@ export interface DecisionMakerCandidate {
   proof: string;
   email?: string;
   phone?: string;
+  socialProfiles?: DecisionSocialProfile[];
   outreachAngle: string;
 }
 
@@ -225,6 +232,7 @@ const COUNTRY_REGISTRY_LINKS: Partial<Record<DecisionCountry, DecisionFinderSear
 const EMAIL_RE = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
 const PHONE_RE = /(?:\+?\d[\d\s().-]{7,}\d)/g;
 const COMPANY_SUFFIX_RE = /\b(?:incorporated|inc|limited|ltd|llc|plc|corp|corporation|company|co|services|service|group|holdings|partners|the)\b/gi;
+const SOCIAL_BLOCKED_PATH_RE = /\/(?:share|shares|intent|sharer|search|login|signup|hashtag|jobs)(?:\/|\?|$)/i;
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -268,6 +276,107 @@ function websiteFromDomain(domain?: string, website?: string) {
 
 function safeText(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function collectStrings(value: unknown): string[] {
+  if (!value) return [];
+  if (typeof value === "string") return [value.trim()].filter(Boolean);
+  if (Array.isArray(value)) return value.flatMap(item => collectStrings(item));
+  return [];
+}
+
+function absoluteUrl(raw: string, baseUrl?: string) {
+  const clean = raw.trim();
+  if (!clean || clean.startsWith("mailto:") || clean.startsWith("tel:")) return "";
+  try {
+    return new URL(clean, baseUrl).toString();
+  } catch {
+    return "";
+  }
+}
+
+function socialProfileFromUrl(raw: string, sourceType: string, baseUrl?: string): DecisionSocialProfile | null {
+  const url = absoluteUrl(raw, baseUrl);
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    const path = parsed.pathname.replace(/\/+$/g, "");
+    if (SOCIAL_BLOCKED_PATH_RE.test(path)) return null;
+
+    let platform = "";
+    if (host === "linkedin.com" && /^\/(?:in|pub)\//i.test(path)) platform = "LinkedIn";
+    else if ((host === "x.com" || host === "twitter.com") && /^\/[A-Za-z0-9_]{2,30}$/i.test(path)) platform = "X";
+    else if (host === "facebook.com" && /^\/[A-Za-z0-9.]{3,80}$/i.test(path)) platform = "Facebook";
+    else if (host === "instagram.com" && /^\/[A-Za-z0-9_.]{2,60}$/i.test(path)) platform = "Instagram";
+    else if (host === "crunchbase.com" && /^\/person\//i.test(path)) platform = "Crunchbase";
+    else if (host === "about.me" && /^\/[A-Za-z0-9_.-]{2,80}$/i.test(path)) platform = "About.me";
+    if (!platform) return null;
+
+    parsed.hash = "";
+    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(param => parsed.searchParams.delete(param));
+    return { platform, url: parsed.toString(), sourceType };
+  } catch {
+    return null;
+  }
+}
+
+function socialProfilesFromValue(value: unknown, sourceType: string, baseUrl?: string) {
+  return dedupeSocialProfiles(
+    collectStrings(value)
+      .map(item => socialProfileFromUrl(item, sourceType, baseUrl))
+      .filter((profile): profile is DecisionSocialProfile => Boolean(profile)),
+  );
+}
+
+function dedupeSocialProfiles(profiles: DecisionSocialProfile[]) {
+  const byUrl = new Map<string, DecisionSocialProfile>();
+  for (const profile of profiles) {
+    const key = profile.url.toLowerCase();
+    if (!byUrl.has(key)) byUrl.set(key, profile);
+  }
+  return Array.from(byUrl.values()).slice(0, 6);
+}
+
+function extractSocialAnchorProfiles(html: string, pageUrl: string) {
+  const profiles: Array<DecisionSocialProfile & { anchorText: string }> = [];
+  const anchors = html.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi);
+  for (const anchor of anchors) {
+    const profile = socialProfileFromUrl(anchor[1] ?? "", "Official website profile link", pageUrl);
+    if (!profile) continue;
+    profiles.push({
+      ...profile,
+      anchorText: stripTags(anchor[2] ?? ""),
+    });
+  }
+  return profiles;
+}
+
+function compactName(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+function socialUrlLooksLikePerson(url: string, name: string) {
+  try {
+    const parsed = new URL(url);
+    const path = compactName(parsed.pathname);
+    const parts = name.toLowerCase().split(/\s+/).map(part => part.replace(/[^a-z0-9]/g, "")).filter(Boolean);
+    if (parts.length < 2) return false;
+    const first = parts[0]!;
+    const last = parts[parts.length - 1]!;
+    return path.includes(`${first}${last}`) || path.includes(`${last}${first}`) || (path.includes(first) && path.includes(last));
+  } catch {
+    return false;
+  }
+}
+
+function findProfileLinksForName(html: string, pageUrl: string, name: string) {
+  const wanted = compactName(name);
+  const links = extractSocialAnchorProfiles(html, pageUrl).filter(profile => {
+    const anchor = compactName(profile.anchorText);
+    return anchor === wanted || anchor.includes(wanted) || socialUrlLooksLikePerson(profile.url, name);
+  });
+  return dedupeSocialProfiles(links);
 }
 
 function titleCaseName(name: string) {
@@ -386,9 +495,24 @@ function dedupeCandidates(candidates: CandidateDraft[]) {
     if (!validPersonName(candidate.name)) continue;
     const key = candidateKey(candidate);
     const current = byKey.get(key);
-    if (!current || candidate.confidence > current.confidence) {
+    if (!current) {
       byKey.set(key, candidate);
+      continue;
     }
+
+    const mergedProfiles = dedupeSocialProfiles([
+      ...(current.socialProfiles ?? []),
+      ...(candidate.socialProfiles ?? []),
+    ]);
+    const mergedContact = {
+      email: current.email || candidate.email,
+      phone: current.phone || candidate.phone,
+      socialProfiles: mergedProfiles.length ? mergedProfiles : undefined,
+    };
+
+    byKey.set(key, candidate.confidence > current.confidence
+      ? { ...candidate, ...mergedContact }
+      : { ...current, ...mergedContact });
   }
   return Array.from(byKey.values())
     .sort((a, b) => b.confidence - a.confidence)
@@ -432,6 +556,10 @@ function extractJsonLdCandidates(html: string, pageUrl: string, input: DecisionF
     const name = titleCaseName(safeText(raw.name));
     const role = safeText(raw.jobTitle) || fallbackRole || "Decision maker";
     if (!validPersonName(name)) return;
+    const socialProfiles = dedupeSocialProfiles([
+      ...socialProfilesFromValue(raw.sameAs, "Official website structured data", pageUrl),
+      ...socialProfilesFromValue(raw.url, "Official website structured data", pageUrl),
+    ]);
     candidates.push({
       name,
       role,
@@ -444,6 +572,7 @@ function extractJsonLdCandidates(html: string, pageUrl: string, input: DecisionF
       proof: `${name} is listed as ${role} in structured data on the official website.`,
       email: safeText(raw.email) || undefined,
       phone: safeText(raw.telephone) || undefined,
+      socialProfiles: socialProfiles.length ? socialProfiles : undefined,
       outreachAngle: outreachAngle(role, input.company),
     });
   }
@@ -510,6 +639,7 @@ function extractTextCandidates(html: string, pageUrl: string, input: DecisionFin
       const role = firstIsRole ? first : second;
       if (!validWebsitePersonName(name, input)) continue;
       const email = findNearbyEmail(name, emails);
+      const socialProfiles = findProfileLinksForName(html, pageUrl, name);
       candidates.push({
         name,
         role,
@@ -522,6 +652,7 @@ function extractTextCandidates(html: string, pageUrl: string, input: DecisionFin
         proof: `${name} appears near the role "${role}" on ${new URL(pageUrl).pathname || "the homepage"}.`,
         email,
         phone: phones[0],
+        socialProfiles: socialProfiles.length ? socialProfiles : undefined,
         outreachAngle: outreachAngle(role, input.company),
       });
     }
@@ -910,25 +1041,59 @@ function getWikidataEntityIds(entity: NonNullable<WikidataEntityResponse["entiti
     .filter((id): id is string => Boolean(id?.startsWith("Q")));
 }
 
-async function getWikidataLabels(ids: string[]) {
-  if (ids.length === 0) return new Map<string, { label: string; description: string }>();
+function getWikidataStringClaims(entity: NonNullable<WikidataEntityResponse["entities"]>[string], property: string) {
+  return (entity.claims?.[property] ?? [])
+    .map(claim => claim.mainsnak?.datavalue?.value)
+    .filter((value): value is string => typeof value === "string")
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+function wikidataPersonProfiles(entity: NonNullable<WikidataEntityResponse["entities"]>[string]) {
+  const profiles: DecisionSocialProfile[] = [];
+  for (const url of getWikidataStringClaims(entity, "P856")) {
+    const profile = socialProfileFromUrl(url, "Public knowledge graph");
+    if (profile) profiles.push(profile);
+  }
+  for (const id of getWikidataStringClaims(entity, "P6634")) {
+    const profile = socialProfileFromUrl(/^https?:\/\//i.test(id) ? id : `https://www.linkedin.com/in/${id}`, "Public knowledge graph");
+    if (profile) profiles.push(profile);
+  }
+  for (const id of getWikidataStringClaims(entity, "P2002")) {
+    const profile = socialProfileFromUrl(`https://x.com/${id.replace(/^@/, "")}`, "Public knowledge graph");
+    if (profile) profiles.push(profile);
+  }
+  for (const id of getWikidataStringClaims(entity, "P2003")) {
+    const profile = socialProfileFromUrl(`https://www.instagram.com/${id.replace(/^@/, "")}/`, "Public knowledge graph");
+    if (profile) profiles.push(profile);
+  }
+  for (const id of getWikidataStringClaims(entity, "P2013")) {
+    const profile = socialProfileFromUrl(`https://www.facebook.com/${id}`, "Public knowledge graph");
+    if (profile) profiles.push(profile);
+  }
+  return dedupeSocialProfiles(profiles);
+}
+
+async function getWikidataPersonSnapshots(ids: string[]) {
+  if (ids.length === 0) return new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[] }>();
   const params = new URLSearchParams({
     action: "wbgetentities",
     ids: ids.slice(0, 40).join("|"),
-    props: "labels|descriptions",
+    props: "labels|descriptions|claims",
     languages: "en",
     format: "json",
   });
   const res = await fetchJson<WikidataEntityResponse>(`https://www.wikidata.org/w/api.php?${params.toString()}`, 8000);
-  const labels = new Map<string, { label: string; description: string }>();
-  if (!res.ok) return labels;
+  const snapshots = new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[] }>();
+  if (!res.ok) return snapshots;
   for (const [id, entity] of Object.entries(res.data?.entities ?? {})) {
-    labels.set(id, {
+    snapshots.set(id, {
       label: safeText(entity.labels?.en?.value),
       description: safeText(entity.descriptions?.en?.value),
+      socialProfiles: wikidataPersonProfiles(entity),
     });
   }
-  return labels;
+  return snapshots;
 }
 
 async function searchWikidata(input: DecisionFinderInput) {
@@ -988,13 +1153,13 @@ async function searchWikidata(input: DecisionFinderInput) {
       rolePairs.push({ id, role });
     }
   }
-  const labels = await getWikidataLabels(Array.from(new Set(rolePairs.map(pair => pair.id))));
+  const personSnapshots = await getWikidataPersonSnapshots(Array.from(new Set(rolePairs.map(pair => pair.id))));
   const companyLabel = safeText(entity.labels?.en?.value) || input.company;
   const entityUrl = `https://www.wikidata.org/wiki/${qid}`;
 
   for (const pair of rolePairs) {
-    const label = labels.get(pair.id);
-    const name = titleCaseName(label?.label ?? "");
+    const snapshot = personSnapshots.get(pair.id);
+    const name = titleCaseName(snapshot?.label ?? "");
     if (!validPersonName(name)) continue;
     candidates.push({
       name,
@@ -1006,6 +1171,7 @@ async function searchWikidata(input: DecisionFinderInput) {
       sourceType: "Public knowledge graph",
       sourceUrl: `https://www.wikidata.org/wiki/${pair.id}`,
       proof: `${name} is listed on Wikidata as ${pair.role.toLowerCase()} for ${companyLabel}.`,
+      socialProfiles: snapshot?.socialProfiles.length ? snapshot.socialProfiles : undefined,
       outreachAngle: outreachAngle(pair.role, input.company),
     });
   }
@@ -1170,11 +1336,22 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
     url: `https://www.google.com/search?q=${encodeURIComponent(`site:linkedin.com/in "${company}"${location} owner OR founder OR director OR CEO`)}`,
   });
 
+  links.push({
+    label: "Public social profile search",
+    detail: "Search public profile pages for named decision makers connected to this business.",
+    url: `https://www.google.com/search?q=${encodeURIComponent(`"${company}"${location} ("founder" OR "owner" OR "CEO" OR "director") (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`)}`,
+  });
+
   if (domain) {
     links.push({
       label: "Official site decision-maker search",
       detail: "Search the business website for leadership, about, team, and contact mentions.",
       url: `https://www.google.com/search?q=${encodeURIComponent(`site:${domain} owner OR founder OR director OR "managing director" OR "contact"`)}`,
+    });
+    links.push({
+      label: "Official contact detail search",
+      detail: "Search the company's own domain for public email, phone, and contact-page mentions before outreach.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(`site:${domain} ("${company}" OR team OR leadership OR contact) (email OR phone OR telephone OR "contact us")`)}`,
     });
   }
 
@@ -1229,6 +1406,15 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
     ...openCorporates.evidence,
     ...companiesHouse.evidence,
   ];
+  const socialProfileCount = candidates.reduce((count, candidate) => count + (candidate.socialProfiles?.length ?? 0), 0);
+
+  evidence.push({
+    label: "Professional profile links",
+    status: "checked",
+    detail: socialProfileCount
+      ? `Found ${socialProfileCount} public professional/social profile link${socialProfileCount === 1 ? "" : "s"} attached to verified candidate${candidates.length === 1 ? "" : "s"}.`
+      : "Checked official-site structured data, official-site profile links, and the public knowledge graph; no direct social profile links were published for the verified candidates.",
+  });
 
   if (input.country === "us") {
     evidence.push({

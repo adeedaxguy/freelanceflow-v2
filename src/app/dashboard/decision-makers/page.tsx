@@ -169,6 +169,21 @@ function ConfidenceBadge({ candidate }: { candidate: DecisionMakerCandidate }) {
   );
 }
 
+function googleSearchUrl(query: string) {
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
+
+function candidateProfileSearchUrl(candidate: DecisionMakerCandidate) {
+  return googleSearchUrl(`"${candidate.name}" "${candidate.company}" (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`);
+}
+
+function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: string) {
+  const query = domain
+    ? `site:${domain} "${candidate.name}" (email OR phone OR telephone OR contact)`
+    : `"${candidate.name}" "${candidate.company}" (email OR phone OR telephone OR contact)`;
+  return googleSearchUrl(query);
+}
+
 function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidate; domain?: string }) {
   const proposalParams = new URLSearchParams({
     company: candidate.company,
@@ -230,6 +245,48 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               </a>
             )}
             <CopyButton value={`${candidate.name} - ${candidate.role}`} />
+          </div>
+
+          {candidate.socialProfiles?.length ? (
+            <div className="mt-4 rounded-xl border border-border/70 bg-background/50 p-3">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">Profile links from sources</p>
+              <div className="flex flex-wrap gap-2">
+                {candidate.socialProfiles.map(profile => (
+                  <a
+                    key={profile.url}
+                    href={profile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`Found via ${profile.sourceType}`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-primary/25 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary-light transition-colors hover:border-primary/45 hover:text-foreground"
+                  >
+                    {profile.platform}
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href={candidateProfileSearchUrl(candidate)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              Verify profiles
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+            <a
+              href={candidateContactSearchUrl(candidate, domain)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              Verify email/phone
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
           </div>
         </div>
 
