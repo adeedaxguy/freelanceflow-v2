@@ -38,6 +38,18 @@ interface FinderResponse {
   requiresAgency?: boolean;
 }
 
+interface PersistedDecisionFinderState {
+  company: string;
+  domain: string;
+  location: string;
+  country: DecisionCountry;
+  result: DecisionFinderResult;
+  savedAt: number;
+}
+
+const DECISION_FINDER_STORAGE_KEY = "ff_decision_maker_last_lookup_v1";
+const DECISION_COUNTRIES: DecisionCountry[] = ["us", "uk", "ca", "au", "nz", "ie"];
+
 function normalizeDomain(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return "";
@@ -47,6 +59,54 @@ function normalizeDomain(value: string) {
   } catch {
     return trimmed.replace(/^https?:\/\//i, "").replace(/^www\./i, "").split("/")[0] ?? "";
   }
+}
+
+function isDecisionCountry(value: unknown): value is DecisionCountry {
+  return typeof value === "string" && DECISION_COUNTRIES.includes(value as DecisionCountry);
+}
+
+function normalizeComparable(value: string) {
+  return value.trim().toLowerCase();
+}
+
+function readPersistedDecisionFinderState() {
+  try {
+    const raw = window.localStorage.getItem(DECISION_FINDER_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PersistedDecisionFinderState>;
+    if (!parsed.result || !parsed.company || !isDecisionCountry(parsed.country)) return null;
+    return {
+      company: parsed.company,
+      domain: normalizeDomain(parsed.domain ?? ""),
+      location: parsed.location ?? "",
+      country: parsed.country,
+      result: parsed.result,
+      savedAt: typeof parsed.savedAt === "number" ? parsed.savedAt : Date.now(),
+    } satisfies PersistedDecisionFinderState;
+  } catch {
+    window.localStorage.removeItem(DECISION_FINDER_STORAGE_KEY);
+    return null;
+  }
+}
+
+function writePersistedDecisionFinderState(state: PersistedDecisionFinderState) {
+  try {
+    window.localStorage.setItem(DECISION_FINDER_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // localStorage can be unavailable in private or locked-down browsers.
+  }
+}
+
+function persistedStateMatchesInput(
+  state: PersistedDecisionFinderState,
+  input: { company: string; domain: string; location: string; country: DecisionCountry },
+) {
+  return (
+    normalizeComparable(state.company) === normalizeComparable(input.company) &&
+    normalizeDomain(state.domain) === normalizeDomain(input.domain) &&
+    normalizeComparable(state.location) === normalizeComparable(input.location) &&
+    state.country === input.country
+  );
 }
 
 const COUNTRY_OPTIONS: Array<{ code: DecisionCountry; label: string; longLabel: string; placeholder: string }> = [
@@ -191,6 +251,7 @@ function DecisionMakerFinderInner() {
   const initialDomain = params.get("domain") || params.get("website") || "";
   const initialLocation = params.get("location") ?? "";
   const initialCountry = inferCountryFromParams(params.get("country"), initialLocation);
+  const hasPrefillParams = Boolean(initialCompany || initialDomain || initialLocation || params.get("country"));
 
   const [company, setCompany] = useState(initialCompany);
   const [domain, setDomain] = useState(normalizeDomain(initialDomain));
@@ -201,6 +262,36 @@ function DecisionMakerFinderInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<DecisionFinderResult | null>(null);
+
+  useEffect(() => {
+    const stored = readPersistedDecisionFinderState();
+    if (!stored) return;
+
+    if (hasPrefillParams) {
+      const prefilledInput = {
+        company: initialCompany,
+        domain: normalizeDomain(initialDomain),
+        location: initialLocation,
+        country: initialCountry,
+      };
+      setCompany(prefilledInput.company);
+      setDomain(prefilledInput.domain);
+      setLocation(prefilledInput.location);
+      setCountry(prefilledInput.country);
+      if (persistedStateMatchesInput(stored, prefilledInput)) {
+        setResult(stored.result);
+      } else {
+        setResult(null);
+      }
+      return;
+    }
+
+    setCompany(stored.company);
+    setDomain(stored.domain);
+    setLocation(stored.location);
+    setCountry(stored.country);
+    setResult(stored.result);
+  }, [hasPrefillParams, initialCompany, initialCountry, initialDomain, initialLocation]);
 
   useEffect(() => {
     let active = true;
@@ -232,23 +323,33 @@ function DecisionMakerFinderInner() {
 
     setLoading(true);
     setError("");
-    setResult(null);
     try {
       const hunterKey = window.localStorage.getItem("ff_hunter_api_key") ?? "";
+      const lookupInput = {
+        company: company.trim(),
+        country,
+        domain: cleanDomain,
+        location: location.trim(),
+      };
       const response = await fetch("/api/decision-makers/find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          company,
-          country,
-          domain: cleanDomain || undefined,
-          location: location || undefined,
+          company: lookupInput.company,
+          country: lookupInput.country,
+          domain: lookupInput.domain || undefined,
+          location: lookupInput.location || undefined,
           hunterKey: hunterKey.length > 10 ? hunterKey : undefined,
         }),
       });
       const data = await response.json() as FinderResponse;
       if (!response.ok || !data.result) throw new Error(data.error ?? "Lookup failed");
       setResult(data.result);
+      writePersistedDecisionFinderState({
+        ...lookupInput,
+        result: data.result,
+        savedAt: Date.now(),
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Lookup failed. Please try again.");
     } finally {
