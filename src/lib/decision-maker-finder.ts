@@ -1029,6 +1029,14 @@ interface WikidataEntityResponse {
           } | string | number;
         };
       };
+      qualifiers?: Record<string, Array<{
+        datavalue?: {
+          value?: {
+            id?: string;
+            "entity-type"?: string;
+          } | string | number;
+        };
+      }>>;
     }>>;
   }>;
 }
@@ -1047,6 +1055,10 @@ function getWikidataStringClaims(entity: NonNullable<WikidataEntityResponse["ent
     .filter((value): value is string => typeof value === "string")
     .map(value => value.trim())
     .filter(Boolean);
+}
+
+function hasWikidataClaim(entity: NonNullable<WikidataEntityResponse["entities"]>[string], property: string) {
+  return (entity.claims?.[property]?.length ?? 0) > 0;
 }
 
 function wikidataPersonProfiles(entity: NonNullable<WikidataEntityResponse["entities"]>[string]) {
@@ -1075,7 +1087,7 @@ function wikidataPersonProfiles(entity: NonNullable<WikidataEntityResponse["enti
 }
 
 async function getWikidataPersonSnapshots(ids: string[]) {
-  if (ids.length === 0) return new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[] }>();
+  if (ids.length === 0) return new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[]; deceased: boolean }>();
   const params = new URLSearchParams({
     action: "wbgetentities",
     ids: ids.slice(0, 40).join("|"),
@@ -1084,13 +1096,14 @@ async function getWikidataPersonSnapshots(ids: string[]) {
     format: "json",
   });
   const res = await fetchJson<WikidataEntityResponse>(`https://www.wikidata.org/w/api.php?${params.toString()}`, 8000);
-  const snapshots = new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[] }>();
+  const snapshots = new Map<string, { label: string; description: string; socialProfiles: DecisionSocialProfile[]; deceased: boolean }>();
   if (!res.ok) return snapshots;
   for (const [id, entity] of Object.entries(res.data?.entities ?? {})) {
     snapshots.set(id, {
       label: safeText(entity.labels?.en?.value),
       description: safeText(entity.descriptions?.en?.value),
       socialProfiles: wikidataPersonProfiles(entity),
+      deceased: hasWikidataClaim(entity, "P570"),
     });
   }
   return snapshots;
@@ -1160,6 +1173,7 @@ async function searchWikidata(input: DecisionFinderInput) {
   for (const pair of rolePairs) {
     const snapshot = personSnapshots.get(pair.id);
     const name = titleCaseName(snapshot?.label ?? "");
+    if (snapshot?.deceased) continue;
     if (!validPersonName(name)) continue;
     candidates.push({
       name,
