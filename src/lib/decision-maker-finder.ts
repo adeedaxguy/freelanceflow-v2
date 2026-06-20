@@ -523,8 +523,8 @@ function extractCompaniesHousePublicOfficers(html: string, input: DecisionFinder
     if (!new RegExp(`officer-status-tag-${id}[\\s\\S]*?>\\s*Active\\s*<`, "i").test(block)) continue;
     if (new RegExp(`officer-resigned-on-${id}`, "i").test(block)) continue;
 
-    const rawName = stripTags(block.match(new RegExp(`<span id="officer-name-${id}"[\\s\\S]*?</span>`, "i"))?.[0] ?? "");
-    const role = titleCaseName(stripTags(block.match(new RegExp(`id="officer-role-${id}"[^>]*>[\\s\\S]*?</dd>`, "i"))?.[0] ?? "")) || "Company officer";
+    const rawName = stripTags(block.match(/<a\b[^>]*>([\s\S]*?)<\/a>/i)?.[0] ?? "");
+    const role = titleCaseName(stripTags(block.match(new RegExp(`<dd[^>]*id="officer-role-${id}"[^>]*>[\\s\\S]*?</dd>`, "i"))?.[0] ?? "")) || "Company officer";
     const name = titleCaseName(rawName);
     if (!validPersonName(name)) continue;
     candidates.push({
