@@ -434,6 +434,9 @@ function genericBusinessContactCandidate(
   sourceType: string,
   contact: { email?: string; phone?: string },
 ): CandidateDraft | null {
+  if (sourceType === "Official website contact detail" && !domainLooksRelatedToCompany(sourceUrl, input.company)) {
+    return null;
+  }
   const phone = cleanPhoneNumber(contact.phone);
   const email = safeText(contact.email);
   if (!phone && !email) return null;
@@ -596,6 +599,15 @@ function companyMatchScore(query: string, candidate: string) {
   return overlap / Math.max(qTokens.size, cTokens.size);
 }
 
+function domainLooksRelatedToCompany(sourceUrl: string, company: string) {
+  const domain = normalizeDomain(sourceUrl);
+  const root = domain.split(".")[0] ?? "";
+  if (!root) return false;
+  const domainText = root.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+  const companyTokens = normalizeCompanyName(company).split(" ").filter(token => token.length >= 4);
+  return companyMatchScore(company, root) >= 0.45 || companyTokens.some(token => domainText.includes(token));
+}
+
 function seniorityBoost(role: string) {
   const r = role.toLowerCase();
   if (/\b(owner|founder|ceo|chief executive|managing director|president|principal|partner)\b/.test(r)) return 10;
@@ -620,7 +632,7 @@ function outreachAngle(role: string, company: string) {
 
 function candidateKey(candidate: CandidateDraft) {
   if (candidate.isGenericContact) {
-    return `business-contact|${candidate.company.toLowerCase()}|${candidate.phone ?? candidate.email ?? candidate.sourceUrl ?? ""}`;
+    return `business-contact|${candidate.company.toLowerCase()}`;
   }
   return candidate.name.toLowerCase();
 }
