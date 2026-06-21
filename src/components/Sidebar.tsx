@@ -435,9 +435,12 @@ export default function Sidebar() {
       )}
 
       {/* Mobile drawer */}
-      <aside className={`lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-surface border-r border-border flex flex-col transition-transform duration-300 ease-in-out ${
-        mobileOpen ? "translate-x-0" : "-translate-x-full"
-      }`}>
+      <aside
+        aria-hidden={!mobileOpen}
+        className={`lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-surface border-r border-border flex flex-col transition-[transform,opacity,visibility] duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0 opacity-100 visible pointer-events-auto" : "-translate-x-full opacity-0 invisible pointer-events-none"
+        }`}
+      >
         <div className="flex items-center justify-between p-4 border-b border-border">
           <SidebarLogo />
           <button

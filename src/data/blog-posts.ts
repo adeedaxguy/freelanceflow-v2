@@ -1,7 +1,9 @@
 import type { BlogPost } from "@/types";
+import { SEO_LONGFORM_POSTS } from "@/data/seo-longform-posts";
 import { SEO_CONTENT_CLUSTER } from "@/data/seo-content-cluster";
 
 export const STATIC_POSTS: BlogPost[] = [
+  ...SEO_LONGFORM_POSTS,
   ...SEO_CONTENT_CLUSTER,
   {
     id: "ai-lead-generation-freelancers-2026",
