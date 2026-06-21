@@ -1043,15 +1043,15 @@ export default function HomepageClient() {
       <section className="py-24 px-4" id="testimonials">
         <div className="max-w-6xl mx-auto">
           <SectionHeading
-            badge="Real Results"
+            badge="Early Feedback"
             badgeColor="gold"
-            title={<>What freelancers are<br />saying after 30 days</>}
+            title={<>What freelancers notice<br />after 30 days</>}
             sub="The pattern is simple: better lead timing, more relevant outreach, and a cleaner follow-up system."
           />
 
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mt-16 grid auto-rows-[300px] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
-              <Reveal key={i} delay={i * 0.1}>
+              <Reveal key={i} delay={i * 0.08} className="h-full">
                 <motion.div whileHover={{ y: -4, borderColor: "rgba(159,103,255,0.35)" }}
                   transition={{ type: "spring", stiffness: 280, damping: 22 }}
                   className="h-full">
