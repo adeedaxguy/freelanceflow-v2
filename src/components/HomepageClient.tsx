@@ -447,7 +447,7 @@ function LeadEngineShowcase() {
           badge="Lead Engines"
           badgeColor="gold"
           title={<>Three ways to find your<br />next serious client</>}
-          sub="Remote jobs first, local business leads second, live jobs third. Each path has a different buying signal, pitch angle, and search workflow."
+          sub="Remote jobs first, local business leads second, live jobs third — with Decision Maker Finder built into the local business path so you can move from company name to owner or manager verification."
         />
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-[0.82fr_1.18fr] gap-6 items-stretch">
@@ -472,6 +472,14 @@ function LeadEngineShowcase() {
                       <span className={`block mt-1 font-bold ${isActive ? "text-foreground" : "text-foreground/85"}`}>{i + 1}. {engine.label}</span>
                       <span className="block mt-1 text-sm font-semibold text-foreground/80 leading-snug">{engine.title}</span>
                       <span className="block mt-1.5 text-sm text-muted-foreground leading-relaxed">{engine.promise}</span>
+                      {engine.id === "local-business-leads" && (
+                        <span className="mt-4 flex flex-wrap items-center gap-2 border-t border-accent/15 pt-3 text-xs">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/25 bg-accent/10 px-2.5 py-1 font-bold text-accent">
+                            <Users className="h-3.5 w-3.5" /> Decision Maker Finder included
+                          </span>
+                          <span className="text-muted-foreground">Owner, manager, phone route, social proof</span>
+                        </span>
+                      )}
                     </span>
                   </div>
                 </button>
@@ -515,6 +523,29 @@ function LeadEngineShowcase() {
                     </div>
                   ))}
                 </div>
+                {active.id === "local-business-leads" && (
+                  <div className="mt-5 border-y border-accent/15 py-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-accent/10 text-accent">
+                          <Users className="h-5 w-5" />
+                        </span>
+                        <div>
+                          <p className="text-sm font-bold text-foreground">Decision Maker Finder is part of this path</p>
+                          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                            After you find a local business worth pitching, check for owner names, managers, public phone routes, social profiles, registry guidance, and proof links.
+                          </p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/features/lead-discovery#capabilities"
+                        className="inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent hover:bg-accent/15 transition-all"
+                      >
+                        See owner finder <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="p-5 sm:p-6">
