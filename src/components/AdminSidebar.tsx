@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, Settings, BarChart2, Shield, LogOut, Zap,
   MessageSquare, DollarSign, Megaphone, UserCheck, FileText, BookOpen,
-  Mail, ChevronRight, Menu, X,
+  Mail, ChevronRight, Menu, X, MessageCircle,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import ThemeToggle from "./ThemeToggle";
@@ -45,6 +45,7 @@ const NAV_GROUPS = [
     label: "Content",
     items: [
       { label: "Blog Posts",       href: "/admin/blog",      icon: BookOpen      },
+      { label: "Blog Comments",    href: "/admin/comments",  icon: MessageCircle },
     ],
   },
   {

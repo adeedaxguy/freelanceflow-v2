@@ -37,7 +37,7 @@ function Avatar({ name }: { name: string }) {
 interface CommentFormProps {
   slug: string;
   parentId?: string;
-  onSuccess: (comment: CommentData) => void;
+  onSuccess: (comment: CommentData, pending: boolean) => void;
   onCancel?: () => void;
   compact?: boolean;
 }
@@ -49,6 +49,7 @@ function CommentForm({ slug, parentId, onSuccess, onCancel, compact }: CommentFo
   const [honeypot, setHoneypot] = useState(""); // spam trap
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const startedAtRef = useRef(Date.now());
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,16 +66,25 @@ function CommentForm({ slug, parentId, onSuccess, onCancel, compact }: CommentFo
       const res = await fetch("/api/blog/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, parentId, authorName: name, authorEmail: email, content, honeypot }),
+        body: JSON.stringify({
+          slug,
+          parentId,
+          authorName: name,
+          authorEmail: email,
+          content,
+          honeypot,
+          startedAt: startedAtRef.current,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Failed to post comment");
       } else {
-        onSuccess(data.comment);
+        onSuccess(data.comment, data.status === "pending");
         setName("");
         setEmail("");
         setContent("");
+        startedAtRef.current = Date.now();
       }
     } catch {
       setError("Network error — please try again");
@@ -163,7 +173,7 @@ function CommentForm({ slug, parentId, onSuccess, onCancel, compact }: CommentFo
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             <Send className="w-3.5 h-3.5" />
-            {submitting ? "Posting…" : compact ? "Reply" : "Post Comment"}
+            {submitting ? "Submitting…" : compact ? "Submit reply" : "Submit for review"}
           </button>
           {onCancel && (
             <button
@@ -183,7 +193,7 @@ function CommentForm({ slug, parentId, onSuccess, onCancel, compact }: CommentFo
 
         {!compact && (
           <p className="text-xs text-muted-foreground/50">
-            Your email is never published. Comments are reviewed for spam automatically.
+            Your email is never published. Comments are spam-checked and reviewed before appearing.
           </p>
         )}
       </form>
@@ -216,7 +226,7 @@ function ReplyItem({ reply }: ReplyProps) {
 interface CommentItemProps {
   comment: CommentData;
   slug: string;
-  onReplyAdded: (commentId: string, reply: CommentData) => void;
+  onReplyAdded: (commentId: string, reply: CommentData, pending: boolean) => void;
 }
 
 function CommentItem({ comment, slug, onReplyAdded }: CommentItemProps) {
@@ -250,8 +260,8 @@ function CommentItem({ comment, slug, onReplyAdded }: CommentItemProps) {
                 slug={slug}
                 parentId={comment.id}
                 compact
-                onSuccess={(reply) => {
-                  onReplyAdded(comment.id, reply);
+                onSuccess={(reply, pending) => {
+                  onReplyAdded(comment.id, reply, pending);
                   setShowReplyForm(false);
                 }}
                 onCancel={() => setShowReplyForm(false)}
@@ -290,6 +300,7 @@ export default function BlogComments({ slug, initialComments = [] }: BlogComment
   const [comments, setComments] = useState<CommentData[]>(initialComments);
   const [loading, setLoading] = useState(initialComments.length === 0);
   const [showForm, setShowForm] = useState(false);
+  const [moderationNotice, setModerationNotice] = useState("");
 
   useEffect(() => {
     if (initialComments.length === 0) {
@@ -301,12 +312,21 @@ export default function BlogComments({ slug, initialComments = [] }: BlogComment
     }
   }, [slug, initialComments.length]);
 
-  function handleNewComment(comment: CommentData) {
+  function handleNewComment(comment: CommentData, pending: boolean) {
+    if (pending) {
+      setModerationNotice("Thanks. Your comment is queued for review and will appear after approval.");
+      setShowForm(false);
+      return;
+    }
     setComments((prev) => [{ ...comment, replies: [] }, ...prev]);
     setShowForm(false);
   }
 
-  function handleReplyAdded(commentId: string, reply: CommentData) {
+  function handleReplyAdded(commentId: string, reply: CommentData, pending: boolean) {
+    if (pending) {
+      setModerationNotice("Thanks. Your reply is queued for review and will appear after approval.");
+      return;
+    }
     setComments((prev) =>
       prev.map((c) =>
         c.id === commentId
@@ -334,9 +354,16 @@ export default function BlogComments({ slug, initialComments = [] }: BlogComment
         )}
       </div>
 
+      {moderationNotice && (
+        <div className="mb-6 rounded-2xl border border-accent/20 bg-accent/10 px-4 py-3 text-sm text-accent">
+          {moderationNotice}
+        </div>
+      )}
+
       {showForm && (
         <div className="mb-8 p-5 bg-white/[0.03] border border-primary/20 rounded-2xl">
-          <h3 className="text-sm font-semibold text-foreground mb-4">Add a comment</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-1">Add a comment</h3>
+          <p className="text-xs text-muted-foreground mb-4">Thoughtful replies are welcome. Comments appear after moderation.</p>
           <CommentForm
             slug={slug}
             onSuccess={handleNewComment}
@@ -363,7 +390,7 @@ export default function BlogComments({ slug, initialComments = [] }: BlogComment
       ) : comments.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground/60">
           <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">No comments yet. Be the first to share your thoughts!</p>
+          <p className="text-sm">No approved comments yet. Be the first to share a thoughtful note.</p>
           {!showForm && (
             <button
               onClick={() => setShowForm(true)}

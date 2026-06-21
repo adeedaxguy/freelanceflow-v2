@@ -212,7 +212,7 @@ model BlogComment {
   authorName  String
   authorEmail String
   content     String
-  approved    Boolean  @default(true)
+  approved    Boolean  @default(false)
   ip          String?
   createdAt   DateTime @default(now())
 

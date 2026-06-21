@@ -6,6 +6,7 @@ import { Calendar, Clock, ArrowLeft, ArrowRight, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
+import BlogComments from "@/components/BlogComments";
 import { formatDate } from "@/lib/utils";
 import { getBlogCoverImage, getBlogCoverImageUrl, isHiddenBlogSlug } from "@/lib/blog-images";
 import { STATIC_POSTS } from "@/data/blog-posts";
@@ -358,6 +359,8 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="text-muted-foreground text-sm mt-1">Helping freelancers build sustainable client pipelines through direct outreach and AI-powered tools.</p>
               </div>
             </div>
+
+            <BlogComments slug={dbPost.slug} />
           </article>
         </main>
         <Footer />
@@ -425,6 +428,8 @@ export default async function BlogPostPage({ params }: Props) {
               <p className="text-muted-foreground text-sm mt-1">We study what works in freelance client acquisition so you don&apos;t have to. Subscribe for weekly insights.</p>
             </div>
           </div>
+
+          <BlogComments slug={post.slug} />
         </article>
 
         {relatedPosts.length > 0 && (
