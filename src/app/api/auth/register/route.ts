@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { notifyNewUserSignup } from "@/lib/admin-notifications";
 
 export const dynamic = 'force-dynamic';
 
@@ -56,8 +57,21 @@ export async function POST(req: NextRequest) {
         referralSource: referralSource || null,
         suspended:      false,
       },
-      select: { id: true, email: true, name: true },
+      select: { id: true, email: true, name: true, plan: true },
     });
+
+    try {
+      await notifyNewUserSignup({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        plan: user.plan,
+        expertise,
+        referralSource,
+      });
+    } catch (error) {
+      console.error("[register] Admin signup notification failed", error);
+    }
 
     return NextResponse.json({ user }, { status: 201 });
 
