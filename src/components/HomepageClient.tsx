@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import {
   ArrowRight, Search, Sparkles, BarChart2, Check, Zap,
-  ChevronDown, Star, Shield, Globe, TrendingUp,
+  ChevronDown, ChevronLeft, ChevronRight, Star, Shield, Globe, TrendingUp,
   Target, Layers, Bot, Send, Play, ExternalLink,
   CheckCircle2, X,
   Briefcase, Building2, Radio, MapPin, SlidersHorizontal, Users,
@@ -24,7 +24,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import TestimonialCard from "@/components/TestimonialCard";
-import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
+import { PRICING_TIERS, TESTIMONIALS, type Testimonial } from "@/data/marketing";
 
 type MotionExtras = {
   initial?: unknown;
@@ -120,6 +120,131 @@ function Reveal({ children, delay = 0, y = 28, className = "" }: {
       className={className}>
       {children}
     </motion.div>
+  );
+}
+
+function TestimonialsCarousel({ testimonials }: { testimonials: Testimonial[] }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const updateActiveIndex = useCallback(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const slides = Array.from(scroller.children) as HTMLElement[];
+    if (!slides.length) return;
+
+    const viewportStart = scroller.scrollLeft + 16;
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+
+    slides.forEach((slide, index) => {
+      const distance = Math.abs(slide.offsetLeft - viewportStart);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+
+    setActiveIndex(nearestIndex);
+  }, []);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return undefined;
+
+    updateActiveIndex();
+    scroller.addEventListener("scroll", updateActiveIndex, { passive: true });
+    window.addEventListener("resize", updateActiveIndex);
+
+    return () => {
+      scroller.removeEventListener("scroll", updateActiveIndex);
+      window.removeEventListener("resize", updateActiveIndex);
+    };
+  }, [testimonials.length, updateActiveIndex]);
+
+  const scrollToIndex = useCallback((index: number) => {
+    const scroller = scrollerRef.current;
+    const target = scroller?.children[index] as HTMLElement | undefined;
+    if (!scroller || !target) return;
+
+    scroller.scrollTo({
+      left: target.offsetLeft - 16,
+      behavior: "smooth",
+    });
+  }, []);
+
+  const scrollByPage = useCallback((direction: -1 | 1) => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    scroller.scrollBy({
+      left: direction * Math.max(scroller.clientWidth * 0.84, 320),
+      behavior: "smooth",
+    });
+  }, []);
+
+  return (
+    <div className="mt-16">
+      <div className="mb-5 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => scrollByPage(-1)}
+          aria-label="Previous review"
+          title="Previous review"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface/80 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollByPage(1)}
+          aria-label="Next review"
+          title="Next review"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface/80 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+
+      <div
+        ref={scrollerRef}
+        className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-2"
+        aria-label="Customer feedback"
+      >
+        {testimonials.map((testimonial, index) => (
+          <div
+            key={`${testimonial.name}-${testimonial.niche ?? index}`}
+            className="h-[300px] min-w-0 shrink-0 basis-[86%] snap-start sm:basis-[420px] md:basis-[47%] lg:basis-[31.5%]"
+          >
+            <motion.div
+              whileHover={{ y: -4, borderColor: "rgba(159,103,255,0.35)" }}
+              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+              className="h-full"
+            >
+              <TestimonialCard testimonial={testimonial} index={index} />
+            </motion.div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 flex justify-center gap-2" aria-label="Review carousel pagination">
+        {testimonials.map((testimonial, index) => (
+          <button
+            key={`${testimonial.avatar}-${index}`}
+            type="button"
+            onClick={() => scrollToIndex(index)}
+            aria-label={`Show review ${index + 1}`}
+            title={`Show review ${index + 1}`}
+            className={`h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+              activeIndex === index
+                ? "w-8 bg-primary"
+                : "w-2.5 bg-border hover:bg-primary/50"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -1049,17 +1174,9 @@ export default function HomepageClient() {
             sub="The pattern is simple: better lead timing, more relevant outreach, and a cleaner follow-up system."
           />
 
-          <div className="mt-16 grid auto-rows-[300px] grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {TESTIMONIALS.map((t, i) => (
-              <Reveal key={i} delay={i * 0.08} className="h-full">
-                <motion.div whileHover={{ y: -4, borderColor: "rgba(159,103,255,0.35)" }}
-                  transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                  className="h-full">
-                  <TestimonialCard testimonial={t} index={i} />
-                </motion.div>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal delay={0.1}>
+            <TestimonialsCarousel testimonials={TESTIMONIALS} />
+          </Reveal>
 
           {/* Bottom number strip */}
           <Reveal delay={0.3} className="mt-14 grid grid-cols-3 gap-4">
