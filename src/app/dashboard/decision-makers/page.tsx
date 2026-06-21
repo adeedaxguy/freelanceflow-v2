@@ -521,11 +521,8 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
   if (candidate.sourceUrl) proposalParams.set("url", candidate.sourceUrl);
   if (candidate.email) proposalParams.set("email", candidate.email);
   const summaryLine = candidate.isGenericContact
-    ? "Profile supplied. Verify the owner, phone, and social links before outreach."
+    ? "Open profile to verify owner, phone, or social proof before outreach."
     : compactCandidateText(candidate.proof);
-  const nextStep = candidate.isGenericContact
-    ? "Next: open profile, confirm owner or contact, then draft outreach."
-    : compactCandidateText(candidate.outreachAngle);
   const sourceButtonLabel = candidate.isGenericContact ? "Open profile" : "Proof";
 
   return (
@@ -544,10 +541,9 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
             {candidate.role}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{summaryLine}</p>
-          <div className="mt-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-primary-light">Next step</p>
-            <p className="mt-1 text-sm leading-relaxed text-foreground/85">{nextStep}</p>
-          </div>
+          {!candidate.isGenericContact && (
+            <p className="mt-2 text-sm leading-relaxed text-foreground/85">{compactCandidateText(candidate.outreachAngle)}</p>
+          )}
           <ContactSignalBadges candidate={candidate} />
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
