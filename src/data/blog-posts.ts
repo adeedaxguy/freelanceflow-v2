@@ -611,5 +611,101 @@ You do not need a complex agency sales funnel to close your first few local busi
     readTime: 8,
     createdAt: new Date("2026-06-17T15:07:00Z"),
     updatedAt: new Date("2026-06-17T15:07:00Z"),
+  }  ,
+  {
+    id: "freelance-lead-scoring-complete-guide",
+    title: "The Complete Guide to Freelance Lead Scoring",
+    slug: "freelance-lead-scoring-complete-guide",
+    excerpt: "Not all leads are worth your time. Learn how to score freelance leads so you spend your outreach energy on prospects most likely to hire you.",
+    content: `Most freelancers treat every lead the same. They find a list of potential clients, send the same message to everyone, and wonder why their reply rates are low. The problem is not the outreach — it is the targeting.
+
+Lead scoring fixes that. It is a simple system for ranking your prospects so you spend time on the ones most likely to convert, and skip the ones that would waste your week.
+
+## What Lead Scoring Actually Means for Freelancers
+
+Lead scoring is not a complex algorithm. For freelancers, it is a structured way of asking: how good of a fit is this prospect, right now?
+
+A high-scoring lead has a visible, urgent problem you can solve, a budget to hire someone, and a way for you to reach them. A low-scoring lead might be in the right industry but have no obvious need, or they might be easy to reach but have no money to spend.
+
+When you score leads before you pitch them, you stop wasting time on people who were never going to hire you. You also write better outreach, because you understand exactly why each prospect is a good fit.
+
+## The Five Factors That Make a Lead Worth Pursuing
+
+Not every signal matters equally. These five factors predict whether a freelance lead is likely to convert.
+
+### 1. Problem Visibility
+
+Can you see a specific, obvious problem from the outside? A business with no website, a broken booking flow, terrible SEO, or an outdated design is showing you a visible problem. That is easier to pitch than a company that "could probably benefit from better copy."
+
+Score higher when the problem is specific and observable without a sales call.
+
+### 2. Business Activity
+
+Active businesses pay invoices. Look for signals that a company is operational: recent Google reviews, active social profiles, job postings, recent press, or consistent website updates. A dormant business may have the problem but not the urgency or budget to fix it.
+
+### 3. Budget Signals
+
+Freelancers often pitch companies that cannot afford them. Look for signals that a prospect invests in their business: paid ads running, recent hires, a LinkedIn team page with multiple employees, or a pricing page that shows they sell real products or services at real prices.
+
+### 4. Reachability
+
+Can you get in front of a decision-maker without going through a gatekeeper? Small and mid-size businesses often have a direct email on their website or a LinkedIn profile for the owner. Larger companies may require a longer chase. Score lower if there is no clear contact path.
+
+### 5. Niche Match
+
+Do you have relevant experience or a portfolio example for this type of client? If you have built three SaaS landing pages, a SaaS startup is a stronger lead than a restaurant even if both need work. A credible pitch is easier to write and easier for the client to trust.
+
+## A Simple Scoring System You Can Use Today
+
+Assign 1–3 points to each factor. Add them up. Score out of 15.
+
+- **12–15:** Priority lead. Reach out this week with a personalized message.
+- **8–11:** Warm lead. Add to your sequence, personalize the opening line.
+- **4–7:** Weak lead. Send only if you have spare outreach capacity.
+- **1–3:** Skip. The time cost is not worth it.
+
+This takes less than two minutes per lead once you know what to look for. You are not doing deep research — you are making a fast, informed judgment about whether the lead deserves your full attention.
+
+## How to Apply Lead Scoring Without a Spreadsheet
+
+You do not need a CRM or a spreadsheet to start scoring leads. Most freelancers can run this system mentally for the first 20 or 30 leads until the criteria become instinctive.
+
+Once you are processing more volume, a simple spreadsheet with five columns — one per scoring factor — is enough to sort and prioritize your list before each outreach session.
+
+<a href="https://icloseleads.com">iCloseLeads</a> applies lead scoring automatically when you pull prospects from its 23 sources. Each lead comes with a relevance score based on your niche, so you can see at a glance which prospects to prioritize without scoring them manually.
+
+## Common Scoring Mistakes Freelancers Make
+
+**Scoring on industry alone.** "They are a tech startup so they must have budget" is not a score — it is a stereotype. Score each lead individually based on observable signals.
+
+**Ignoring reachability.** A perfect lead you cannot reach is worth nothing. Always check whether you have a credible path to the decision-maker before adding a lead to your priority list.
+
+**Rescoring after rejection.** If a high-scoring lead does not reply, that does not mean your scoring system is broken. Outreach has natural non-response rates even from great-fit prospects. Score before outreach, not after.
+
+**Treating all sources equally.** A lead from a job board is different from a local business you found via Google Maps. Job board leads are actively looking; local business leads need to be convinced they have a problem. Factor in intent when scoring.
+
+## Turning Scores Into a Weekly Outreach Routine
+
+A scoring system only works if you use it consistently. Here is a simple weekly routine:
+
+Pull 30–50 new leads from your sources — job boards, social platforms, local databases, or a tool like <a href="https://icloseleads.com">iCloseLeads</a>. Score each one in under two minutes. Send personalized outreach to every 12–15 point lead. Send templated outreach to your 8–11 point leads. Archive the rest.
+
+That routine, done weekly, produces a qualified pipeline without the scattered energy that kills most freelancers' client acquisition efforts.
+
+## The Real Benefit of Lead Scoring
+
+The goal is not to find the perfect lead. It is to stop sending mediocre outreach to the wrong people and start sending strong outreach to the right ones.
+
+Freelancers who score their leads close more deals, spend less time on dead-end conversations, and write better proposals because they understand each prospect's specific situation before they pitch.
+
+<a href="https://icloseleads.com/auth?mode=signup">Start building a scored, prioritized lead list with iCloseLeads — free during Early Access.</a>`,
+    category: "Lead Generation",
+    published: true,
+    coverImage: null,
+    readTime: 8,
+    createdAt: new Date("2026-06-21T15:02:00Z"),
+    updatedAt: new Date("2026-06-21T15:02:00Z"),
   }
+
 ];
+
