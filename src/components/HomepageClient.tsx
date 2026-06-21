@@ -752,11 +752,11 @@ export default function HomepageClient() {
         {/* Animated glows */}
         <motion.div animate={{ scale: [1, 1.08, 1], opacity: [0.18, 0.28, 0.18] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/4 w-[700px] h-[700px] rounded-full"
+          className="absolute top-1/4 left-1/4 hidden md:block w-[700px] h-[700px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)", filter: "blur(60px)" }} />
         <motion.div animate={{ scale: [1.05, 1, 1.05], opacity: [0.12, 0.2, 0.12] }}
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] rounded-full"
+          className="absolute bottom-1/3 right-1/4 hidden md:block w-[500px] h-[500px] rounded-full"
           style={{ background: "radial-gradient(circle, rgba(0,229,160,0.2) 0%, transparent 70%)", filter: "blur(50px)" }} />
 
         {/* Floating particles */}

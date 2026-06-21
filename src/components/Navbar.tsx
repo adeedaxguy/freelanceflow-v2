@@ -225,7 +225,12 @@ export default function Navbar() {
           {/* Mobile: theme + hamburger */}
           <div className="md:hidden flex items-center gap-2">
             <ThemeToggle size="sm" />
-            <button onClick={() => setIsOpen(v => !v)} className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              onClick={() => setIsOpen(v => !v)}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isOpen}
+            >
               {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>

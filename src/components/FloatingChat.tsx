@@ -26,8 +26,8 @@ function shouldShowSignupCta(message: Message): boolean {
   ].some(phrase => content.includes(phrase));
 }
 
-export default function FloatingChat() {
-  const [open,       setOpen]      = useState(false);
+export default function FloatingChat({ initialOpen = false }: { initialOpen?: boolean }) {
+  const [open,       setOpen]      = useState(initialOpen);
   const [messages,   setMessages]  = useState<Message[]>([
     { role: "assistant", content: "Hi, I'm iCloseLeads AI. Tell me what kind of clients you want, and I'll point you to the best lead engine, explain the workflow, or draft a pitch. Free early access is open while Pro and Agency plans are being prepared." },
   ]);
