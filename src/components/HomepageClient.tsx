@@ -1001,13 +1001,13 @@ export default function HomepageClient() {
             sub="Every tool you need to find leads, write proposals, send emails, and track deals — in one focused platform."
           />
 
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="mt-16 grid auto-rows-[340px] grid-cols-1 gap-5 sm:auto-rows-[320px] md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.07}>
+              <Reveal key={f.title} delay={i * 0.07} className="h-full">
                 <motion.div
                   whileHover={{ y: -6, borderColor: `${f.tagColor}40` }}
                   transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                  className="group relative bg-gradient-card border border-border rounded-2xl p-6 h-full cursor-default overflow-hidden shimmer-line">
+                  className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-gradient-card p-6 cursor-default shimmer-line">
                   {/* Hover glow */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
                     style={{ background: `radial-gradient(ellipse at top left, ${f.tagColor}12 0%, transparent 60%)` }} />
@@ -1017,16 +1017,16 @@ export default function HomepageClient() {
                       style={{ background: `${f.tagColor}15`, border: `1px solid ${f.tagColor}25` }}>
                       {f.icon}
                     </div>
-                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                    <span className="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full"
                       style={{ background: `${f.tagColor}12`, color: f.tagColor, border: `1px solid ${f.tagColor}20` }}>
                       {f.tag}
                     </span>
                   </div>
 
-                  <h3 className="text-foreground font-bold text-base mb-2.5 relative group-hover:text-white transition-colors">{f.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed relative">{f.desc}</p>
+                  <h3 className="relative mb-2.5 line-clamp-2 text-base font-bold text-foreground transition-colors group-hover:text-white">{f.title}</h3>
+                  <p className="relative line-clamp-5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
 
-                  <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-between relative">
+                  <div className="relative mt-auto flex items-center justify-between border-t border-border/60 pt-4">
                     <span className="text-xs font-semibold" style={{ color: f.tagColor }}>{f.stat}</span>
                     <ExternalLink className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors" />
                   </div>
