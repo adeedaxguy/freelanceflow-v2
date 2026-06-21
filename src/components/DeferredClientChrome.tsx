@@ -16,11 +16,11 @@ function runWhenIdle(callback: () => void) {
   };
 
   if (idleWindow.requestIdleCallback) {
-    const id = idleWindow.requestIdleCallback(callback, { timeout: 8000 });
+    const id = idleWindow.requestIdleCallback(callback, { timeout: 2500 });
     return () => idleWindow.cancelIdleCallback?.(id);
   }
 
-  const timeout = globalThis.setTimeout(callback, 6000);
+  const timeout = globalThis.setTimeout(callback, 1800);
   return () => globalThis.clearTimeout(timeout);
 }
 
@@ -28,7 +28,17 @@ export default function DeferredClientChrome() {
   const [showCookieConsent, setShowCookieConsent] = useState(false);
   const [chatRequested, setChatRequested] = useState(false);
 
-  useEffect(() => runWhenIdle(() => setShowCookieConsent(true)), []);
+  useEffect(() => {
+    let cleanupIdle = () => {};
+    const timeout = globalThis.setTimeout(() => {
+      cleanupIdle = runWhenIdle(() => setShowCookieConsent(true));
+    }, 12000);
+
+    return () => {
+      globalThis.clearTimeout(timeout);
+      cleanupIdle();
+    };
+  }, []);
 
   if (chatRequested) {
     return (
