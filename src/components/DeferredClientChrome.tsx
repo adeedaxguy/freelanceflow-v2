@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 
 const FloatingChat = dynamic(() => import("@/components/FloatingChat"), { ssr: false });
@@ -25,8 +26,16 @@ function runWhenIdle(callback: () => void) {
 }
 
 export default function DeferredClientChrome() {
+  const pathname = usePathname();
   const [showCookieConsent, setShowCookieConsent] = useState(false);
   const [chatRequested, setChatRequested] = useState(false);
+  const [showMobileLauncher, setShowMobileLauncher] = useState(false);
+  const isDashboard = pathname?.startsWith("/dashboard");
+  const isAuth = pathname?.startsWith("/auth");
+  const launcherOffsetClass = isDashboard ? "bottom-[88px] md:bottom-6" : "bottom-6";
+  const launcherVisibilityClass = isDashboard || showMobileLauncher
+    ? "flex"
+    : "hidden sm:flex";
 
   useEffect(() => {
     let cleanupIdle = () => {};
@@ -39,6 +48,30 @@ export default function DeferredClientChrome() {
       cleanupIdle();
     };
   }, []);
+
+  useEffect(() => {
+    setChatRequested(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (isDashboard) {
+      setShowMobileLauncher(true);
+      return undefined;
+    }
+
+    if (isAuth) {
+      setShowMobileLauncher(false);
+      return undefined;
+    }
+
+    const updateMobileLauncher = () => {
+      setShowMobileLauncher(window.scrollY > 520);
+    };
+
+    updateMobileLauncher();
+    window.addEventListener("scroll", updateMobileLauncher, { passive: true });
+    return () => window.removeEventListener("scroll", updateMobileLauncher);
+  }, [isAuth, isDashboard, pathname]);
 
   if (chatRequested) {
     return (
@@ -54,7 +87,7 @@ export default function DeferredClientChrome() {
       {showCookieConsent && <CookieConsent />}
       <button
         onClick={() => setChatRequested(true)}
-        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-hero shadow-glow-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        className={`fixed ${launcherOffsetClass} right-4 sm:right-6 z-50 h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95 ${launcherVisibilityClass}`}
         aria-label="Open support chat"
       >
         <MessageCircle className="w-6 h-6 text-white" />

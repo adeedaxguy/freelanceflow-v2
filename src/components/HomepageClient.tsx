@@ -905,7 +905,7 @@ export default function HomepageClient() {
       ════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className={`relative min-h-screen flex items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-20"}`}
+        className={`relative min-h-[calc(100svh-96px)] sm:min-h-screen flex items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-20"} pb-10 sm:pb-0`}
       >
 
         {/* Layered mesh gradient background */}
@@ -948,27 +948,27 @@ export default function HomepageClient() {
 
           {/* Social proof chip */}
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2.5 mb-8">
+            className="inline-flex items-center gap-2.5 mb-5 sm:mb-8">
             <div className="flex -space-x-2">
               {["#7C3AED","#00E5A0","#FFD166","#F472B6","#60A5FA"].map((c, i) => (
-                <div key={i} className="w-7 h-7 rounded-full border-2 border-background flex items-center justify-center text-[10px] font-bold text-white"
+                <div key={i} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-background flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-white"
                   style={{ background: c }}>
                   {["M","S","J","A","R"][i]}
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card text-sm">
+            <div className="flex max-w-[220px] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs glass-card sm:max-w-none sm:text-sm">
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
               </div>
               <span className="text-foreground font-semibold">Remote, local, and live leads</span>
-              <span className="text-muted-foreground">in one focused workflow</span>
+              <span className="hidden text-muted-foreground sm:inline">in one focused workflow</span>
             </div>
           </motion.div>
 
           {/* Headline */}
           <motion.h1 initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75, delay: 0.1 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.05] tracking-tight mb-6">
+            className="text-[2.65rem] sm:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.04] tracking-tight mb-4 sm:mb-6">
             Your next{" "}
             <span className="relative inline-block">
               <span className="gradient-text">$10k client</span>
@@ -984,25 +984,25 @@ export default function HomepageClient() {
               </motion.svg>
             </span>
             <br />is already out there.
-            <br /><span className="text-muted-foreground font-normal text-4xl sm:text-5xl lg:text-6xl">Let AI find them for you.</span>
+            <br /><span className="text-muted-foreground font-normal text-[2rem] sm:text-5xl lg:text-6xl">Let AI find them for you.</span>
           </motion.h1>
 
           {/* Sub */}
           <motion.p initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+            className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed">
             iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live job opportunities, then turns each signal into a sharper pitch, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link href="/auth?mode=signup" prefetch={false} className="group relative flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-primary text-white text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-7 sm:mb-12">
+            <Link href="/auth?mode=signup" prefetch={false} className="group relative flex w-full sm:w-auto items-center justify-center gap-2.5 px-7 sm:px-9 py-3.5 sm:py-4 rounded-2xl bg-primary text-white text-sm sm:text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
               <Zap className="w-5 h-5 relative z-10" />
               <span className="relative z-10">Start Free — No Card Needed</span>
               <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="#how-it-works" className="flex items-center gap-2 px-7 py-4 rounded-2xl border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground text-base font-medium transition-all hover:bg-surface/60 hover:-translate-y-0.5">
+            <a href="#how-it-works" className="hidden sm:flex items-center gap-2 px-7 py-4 rounded-2xl border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground text-base font-medium transition-all hover:bg-surface/60 hover:-translate-y-0.5">
               <Play className="w-4 h-4" />
               See how it works
             </a>
@@ -1010,7 +1010,7 @@ export default function HomepageClient() {
 
           {/* Trust bar */}
           <motion.div initial={false} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
+            className="hidden sm:flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
               { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Remote jobs first" },
@@ -1023,7 +1023,7 @@ export default function HomepageClient() {
 
           {/* Source pills */}
           <motion.div initial={false} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-2 mt-8">
+            className="hidden sm:flex flex-wrap items-center justify-center gap-2 mt-8">
             <span className="text-xs text-muted-foreground mr-1">Lead engines and high-intent signals:</span>
             {SOURCES.map((s, i) => (
               <motion.span key={s} initial={false} animate={{ opacity: 1, scale: 1 }}

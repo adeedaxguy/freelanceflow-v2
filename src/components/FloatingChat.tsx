@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Send, Bot, User, Loader2, ChevronDown, ArrowRight } from "lucide-react";
 
 interface Message { role: "user" | "assistant"; content: string; }
@@ -27,6 +28,7 @@ function shouldShowSignupCta(message: Message): boolean {
 }
 
 export default function FloatingChat({ initialOpen = false }: { initialOpen?: boolean }) {
+  const pathname = usePathname();
   const [open,       setOpen]      = useState(initialOpen);
   const [messages,   setMessages]  = useState<Message[]>([
     { role: "assistant", content: "Hi, I'm iCloseLeads AI. Tell me what kind of clients you want, and I'll point you to the best lead engine, explain the workflow, or draft a pitch. Free early access is open while Pro and Agency plans are being prepared." },
@@ -37,6 +39,9 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
   const [unread,     setUnread]    = useState(0);
   const bottomRef  = useRef<HTMLDivElement>(null);
   const inputRef   = useRef<HTMLInputElement>(null);
+  const isDashboard = pathname?.startsWith("/dashboard");
+  const panelOffsetClass = isDashboard ? "bottom-[152px] md:bottom-[84px]" : "bottom-[84px]";
+  const buttonOffsetClass = isDashboard ? "bottom-[88px] md:bottom-6" : "bottom-6";
 
   useEffect(() => {
     if (open) {
@@ -84,7 +89,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
       {open && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)} />}
 
       {/* Chat panel */}
-      <div className={`fixed bottom-[84px] right-4 sm:right-6 z-50 transition-all duration-300 ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4 pointer-events-none"}`}>
+      <div className={`fixed ${panelOffsetClass} right-4 sm:right-6 z-50 transition-all duration-300 ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4 pointer-events-none"}`}>
         <div className="w-[calc(100vw-32px)] sm:w-[380px] bg-surface border border-border rounded-2xl shadow-card-hover overflow-hidden flex flex-col"
           style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}>
 
@@ -190,7 +195,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
 
       {/* FAB button */}
       <button onClick={() => setOpen(o => !o)}
-        className="fixed bottom-6 right-4 sm:right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-hero shadow-glow-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        className={`fixed ${buttonOffsetClass} right-4 sm:right-6 z-50 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95`}
         aria-label="Open support chat">
         {open
           ? <X className="w-6 h-6 text-white" />

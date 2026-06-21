@@ -65,7 +65,8 @@ function AuthForm() {
   const [loading,   setLoading]   = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [githubLoading, setGithubLoading] = useState(false);
-  const [oauthProviders, setOauthProviders] = useState({ google: true, github: true });
+  const [providersLoaded, setProvidersLoaded] = useState(false);
+  const [oauthProviders, setOauthProviders] = useState({ google: false, github: false });
   const [error,     setError]     = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [referral,  setReferral]  = useState("");
@@ -93,10 +94,12 @@ function AuthForm() {
           google: Boolean(providers?.google),
           github: Boolean(providers?.github),
         });
+        setProvidersLoaded(true);
       })
       .catch(() => {
         if (!active) return;
-        setOauthProviders({ google: true, github: true });
+        setOauthProviders({ google: false, github: false });
+        setProvidersLoaded(true);
       });
     return () => { active = false; };
   }, []);
@@ -106,6 +109,7 @@ function AuthForm() {
   }, [status, router]);
 
   const strength = strengthLabel(password);
+  const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
 
   const handleGoogleSignIn = async () => {
     if (!oauthProviders.google) {
@@ -259,9 +263,11 @@ function AuthForm() {
                 </h1>
 
                 {/* OAuth Buttons */}
+                {providersLoaded && oauthProviderCount > 0 && (
                 <div className="mb-5 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className={`grid gap-3 ${oauthProviderCount > 1 ? "grid-cols-2" : "grid-cols-1"}`}>
                     {/* Google */}
+                    {oauthProviders.google && (
                     <button
                       type="button"
                       onClick={() => void handleGoogleSignIn()}
@@ -271,7 +277,9 @@ function AuthForm() {
                       {googleLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
                       Google
                     </button>
+                    )}
                     {/* GitHub */}
+                    {oauthProviders.github && (
                     <button
                       type="button"
                       onClick={() => void handleGitHubSignIn()}
@@ -281,6 +289,7 @@ function AuthForm() {
                       {githubLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <GitHubIcon />}
                       GitHub
                     </button>
+                    )}
                   </div>
 
                   <div className="relative my-1">
@@ -292,6 +301,7 @@ function AuthForm() {
                     </div>
                   </div>
                 </div>
+                )}
 
                 <form onSubmit={e => void handleCredentials(e)} className="space-y-4">
                   {mode === "signup" && (
