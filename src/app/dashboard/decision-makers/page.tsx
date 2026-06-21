@@ -148,6 +148,16 @@ function locationPlaceholder(country: DecisionCountry) {
   return COUNTRY_OPTIONS.find(option => option.code === country)?.placeholder ?? "City or region";
 }
 
+function locationHelpText(country: DecisionCountry) {
+  if (country === "us") return "For US businesses, include the state abbreviation, e.g. Austin, TX. Registry ownership checks are state-based.";
+  if (country === "uk") return "For UK businesses, city or postcode area is enough, e.g. Manchester or M1.";
+  if (country === "ca") return "For Canada, include province when possible, e.g. Toronto, ON.";
+  if (country === "au") return "For Australia, include state or territory when possible, e.g. Sydney, NSW.";
+  if (country === "nz") return "For New Zealand, city or region is usually enough.";
+  if (country === "ie") return "For Ireland, city or county is usually enough.";
+  return "Add the city and region when available to improve registry and profile matching.";
+}
+
 function inferCountryFromParams(country: string | null, location: string | null): DecisionCountry {
   const blob = `${country ?? ""} ${location ?? ""}`.toLowerCase();
   if (/\b(uk|gb|united kingdom|england|scotland|wales|northern ireland)\b/.test(blob)) return "uk";
@@ -894,6 +904,7 @@ function DecisionMakerFinderInner() {
                 className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-3 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-primary/50"
               />
             </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">{locationHelpText(country)}</p>
           </label>
 
           <button
