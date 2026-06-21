@@ -7,10 +7,23 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
 import BlogComments from "@/components/BlogComments";
+import {
+  BlogArticleRoadmap,
+  BlogConversionPanel,
+  BlogTrustedReferences,
+} from "@/components/BlogArticleEnhancements";
 import { formatDate } from "@/lib/utils";
 import { getBlogCoverImage, getBlogCoverImageUrl, isHiddenBlogSlug } from "@/lib/blog-images";
+import {
+  type BlogArticleSource,
+  estimateWordCount,
+  extractArticleHeadings,
+  getRelatedStaticPosts,
+  headingId,
+} from "@/lib/blog-seo";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { prisma } from "@/lib/prisma";
+import type { BlogPost } from "@/types";
 
 export const dynamic = 'force-dynamic';
 
@@ -210,7 +223,15 @@ Would it make sense to chat for 15 minutes?
 function renderMarkdown(content: string): ReactNode {
   const lines = content.split("\n");
   const nodes: ReactNode[] = [];
+  const headingCounts = new Map<string, number>();
   let i = 0;
+
+  const getHeadingAnchor = (text: string) => {
+    const baseId = headingId(text);
+    const count = headingCounts.get(baseId) ?? 0;
+    headingCounts.set(baseId, count + 1);
+    return count ? `${baseId}-${count + 1}` : baseId;
+  };
 
   while (i < lines.length) {
     const line = lines[i] ?? "";
@@ -218,9 +239,11 @@ function renderMarkdown(content: string): ReactNode {
     if (line.startsWith("# ")) {
       // Stored static content sometimes includes a duplicate H1; the page title already covers it.
     } else if (line.startsWith("## ")) {
-      nodes.push(<h2 key={i} className="text-2xl font-bold text-foreground mt-10 mb-4">{line.slice(3)}</h2>);
+      const text = line.slice(3);
+      nodes.push(<h2 key={i} id={getHeadingAnchor(text)} className="scroll-mt-28 text-2xl font-bold text-foreground mt-10 mb-4">{text}</h2>);
     } else if (line.startsWith("### ")) {
-      nodes.push(<h3 key={i} className="text-xl font-semibold text-foreground mt-8 mb-3">{line.slice(4)}</h3>);
+      const text = line.slice(4);
+      nodes.push(<h3 key={i} id={getHeadingAnchor(text)} className="scroll-mt-28 text-xl font-semibold text-foreground mt-8 mb-3">{text}</h3>);
     } else if (line.startsWith("---")) {
       nodes.push(<hr key={i} className="border-border my-8" />);
     } else if (line.startsWith("- ") || line.startsWith("* ")) {
@@ -266,6 +289,74 @@ function renderMarkdown(content: string): ReactNode {
   return <>{nodes}</>;
 }
 
+function dbPostToBlogPost(post: DbPost): BlogPost {
+  return {
+    id: post.id,
+    title: post.title,
+    slug: post.slug,
+    excerpt: post.excerpt ?? "",
+    content: post.content,
+    category: post.category,
+    published: post.published,
+    coverImage: getBlogCoverImage(post.slug, post.ogImage, post.coverImage),
+    readTime: post.readTime ?? Math.max(4, Math.round(estimateWordCount(post.content) / 225)),
+    createdAt: post.createdAt instanceof Date ? post.createdAt : new Date(String(post.createdAt)),
+    updatedAt: post.updatedAt instanceof Date ? post.updatedAt : new Date(String(post.updatedAt)),
+  };
+}
+
+async function getRelatedDbPosts(post: DbPost): Promise<BlogPost[]> {
+  try {
+    const related = await prisma.blogPost.findMany({
+      where: {
+        published: true,
+        slug: { not: post.slug },
+        category: post.category,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+
+    return (related as DbPost[])
+      .filter(item => !isHiddenBlogSlug(item.slug) && item.excerpt?.trim().toLowerCase() !== "test excerpt")
+      .map(dbPostToBlogPost);
+  } catch {
+    return [];
+  }
+}
+
+function mergeRelatedPosts(posts: BlogPost[], limit = 3) {
+  const seen = new Set<string>();
+  return posts.filter(post => {
+    if (seen.has(post.slug)) return false;
+    seen.add(post.slug);
+    return true;
+  }).slice(0, limit);
+}
+
+function RelatedArticlesSection({ posts }: { posts: BlogPost[] }) {
+  if (!posts.length) return null;
+
+  return (
+    <section className="py-16 bg-surface border-t border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Keep reading</p>
+            <h2 className="mt-2 text-2xl font-bold text-foreground">Related Articles</h2>
+          </div>
+          <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
+            View All Articles <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {posts.map(p => <BlogCard key={p.id ?? p.slug} post={p} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
   // 1. Try DB (admin-published posts with SEO fields)
@@ -277,12 +368,34 @@ export default async function BlogPostPage({ params }: Props) {
     // JSON-LD schema — use custom if set, else build Article schema
     const coverImage = getBlogCoverImage(dbPost.slug, dbPost.ogImage, dbPost.coverImage);
     const coverImageUrl = getBlogCoverImageUrl(BASE_URL, dbPost.slug, dbPost.ogImage, dbPost.coverImage);
+    const tagList = dbPost.tags?.split(",").map(t => t.trim()).filter(Boolean) ?? [];
+    const articleSource: BlogArticleSource = {
+      slug: dbPost.slug,
+      title: dbPost.title,
+      excerpt: dbPost.excerpt,
+      content: dbPost.content,
+      category: dbPost.category,
+      readTime: dbPost.readTime,
+      author: dbPost.author,
+      createdAt: postDate,
+      updatedAt: updDate,
+      tags: tagList,
+      focusKeyword: dbPost.focusKeyword,
+    };
+    const articleHeadings = extractArticleHeadings(dbPost.content);
+    const relatedDbPosts = await getRelatedDbPosts(dbPost);
+    const relatedStaticPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
+    const relatedPosts = mergeRelatedPosts([...relatedDbPosts, ...relatedStaticPosts], 3);
     let jsonLd: object;
     try { jsonLd = JSON.parse(dbPost.schema ?? "{}") as object; } catch { jsonLd = {}; }
     if (!Object.keys(jsonLd).length) {
       jsonLd = {
         "@context": "https://schema.org",
-        "@type": "Article",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": `${BASE_URL}/blog/${dbPost.slug}`,
+        },
         "headline": dbPost.metaTitle || dbPost.title,
         "description": dbPost.metaDesc || dbPost.excerpt || "",
         "datePublished": postDate.toISOString(),
@@ -290,12 +403,13 @@ export default async function BlogPostPage({ params }: Props) {
         "author": { "@type": "Person", "name": dbPost.author || "iCloseLeads Team" },
         "publisher": { "@type": "Organization", "name": "iCloseLeads", "url": BASE_URL },
         "image": coverImageUrl,
-        "keywords": dbPost.focusKeyword || "",
+        "articleSection": dbPost.category,
+        "keywords": [dbPost.focusKeyword, ...tagList].filter(Boolean),
+        "wordCount": estimateWordCount(dbPost.content),
+        "isAccessibleForFree": true,
         "url": `${BASE_URL}/blog/${dbPost.slug}`,
       };
     }
-
-    const tagList = dbPost.tags?.split(",").map(t => t.trim()).filter(Boolean) ?? [];
 
     return (
       <>
@@ -339,15 +453,15 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             )}
 
+            <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
+
             {/* Body */}
             <div className="prose-content">
               {renderMarkdown(dbPost.content)}
             </div>
 
-            {/* Focus keyword hint (invisible to users, useful for indexing) */}
-            {dbPost.focusKeyword && (
-              <meta itemProp="keywords" content={dbPost.focusKeyword} />
-            )}
+            <BlogConversionPanel post={articleSource} />
+            <BlogTrustedReferences post={articleSource} />
 
             {/* Author card */}
             <div className="mt-14 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
@@ -362,6 +476,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             <BlogComments slug={dbPost.slug} />
           </article>
+          <RelatedArticlesSection posts={relatedPosts} />
         </main>
         <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -374,20 +489,41 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const content = post.content || FULL_POSTS[params.slug] || "Full article coming soon. Subscribe to be notified.";
-  const relatedPosts = STATIC_POSTS.filter(p => p.slug !== params.slug).slice(0, 3);
   const postDate = post.createdAt instanceof Date ? post.createdAt : new Date(String(post.createdAt));
+  const updatedDate = post.updatedAt instanceof Date ? post.updatedAt : new Date(String(post.updatedAt ?? post.createdAt));
   const coverImage = getBlogCoverImage(post.slug, post.coverImage);
   const coverImageUrl = getBlogCoverImageUrl(BASE_URL, post.slug, post.coverImage);
+  const articleSource: BlogArticleSource = {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content,
+    category: post.category,
+    readTime: post.readTime,
+    author: "iCloseLeads Team",
+    createdAt: postDate,
+    updatedAt: updatedDate,
+  };
+  const articleHeadings = extractArticleHeadings(content);
+  const relatedPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `${BASE_URL}/blog/${post.slug}`,
+    },
     "headline": post.title,
     "description": post.excerpt ?? "",
     "datePublished": postDate.toISOString(),
+    "dateModified": updatedDate.toISOString(),
     "author": { "@type": "Organization", "name": "iCloseLeads" },
     "publisher": { "@type": "Organization", "name": "iCloseLeads", "url": BASE_URL },
     "image": coverImageUrl,
+    "articleSection": post.category,
+    "wordCount": estimateWordCount(content),
+    "isAccessibleForFree": true,
     "url": `${BASE_URL}/blog/${post.slug}`,
   };
 
@@ -417,9 +553,14 @@ export default async function BlogPostPage({ params }: Props) {
             <img src={coverImage} alt={post.title} width={1200} height={630} className="w-full object-cover max-h-72" decoding="async" />
           </div>
 
+          <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
+
           <div className="prose-content">
             {renderMarkdown(content)}
           </div>
+
+          <BlogConversionPanel post={articleSource} />
+          <BlogTrustedReferences post={articleSource} />
 
           <div className="mt-14 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
             <div className="w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center text-white font-bold flex-shrink-0">FF</div>
@@ -432,21 +573,7 @@ export default async function BlogPostPage({ params }: Props) {
           <BlogComments slug={post.slug} />
         </article>
 
-        {relatedPosts.length > 0 && (
-          <section className="py-16 bg-surface border-t border-border">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-bold text-foreground mb-8">Related Articles</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedPosts.map(p => <BlogCard key={p.id} post={p} />)}
-              </div>
-              <div className="text-center mt-8">
-                <Link href="/blog" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all text-sm">
-                  View All Articles <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
+        <RelatedArticlesSection posts={relatedPosts} />
       </main>
       <Footer />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
