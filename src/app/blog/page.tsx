@@ -6,7 +6,7 @@ import { STATIC_POSTS } from "@/data/blog-posts";
 import { getBlogCoverImage, isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 import type { BlogPost } from "@/types";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -119,6 +119,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const firstVisiblePost = posts.length === 0 ? 0 : startIndex + 1;
   const lastVisiblePost = Math.min(startIndex + POSTS_PER_PAGE, posts.length);
   const paginationItems = getPaginationItems(currentPage, totalPages);
+  const categoryCounts = new Map<string, number>();
+  for (const post of publishedPosts) {
+    categoryCounts.set(post.category, (categoryCounts.get(post.category) ?? 0) + 1);
+  }
+  const activeCategoryName = activeCategoryLabel ?? "All";
 
   return (
     <>
@@ -139,20 +144,49 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             </div>
 
             {/* Category Filter */}
-            <div className="flex items-center justify-center gap-2 flex-wrap mb-12">
-              {categories.map((cat) => (
-                <a
-                  key={cat}
-                  href={cat.toLowerCase() === "all" ? "/blog" : `/blog?category=${encodeURIComponent(cat)}`}
-                  className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors capitalize ${
-                    activeCategory === cat.toLowerCase()
-                      ? "bg-primary/15 border-primary/40 text-primary-light"
-                      : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary-light"
-                  }`}
-                >
-                  {cat}
-                </a>
-              ))}
+            <div className="relative z-20 mb-12 flex justify-center">
+              <details className="group relative">
+                <summary className="flex cursor-pointer list-none items-center gap-3 rounded-2xl border border-border bg-surface/80 px-4 py-3 text-sm font-semibold text-foreground shadow-card transition-colors hover:border-primary/40 [&::-webkit-details-marker]:hidden">
+                  <SlidersHorizontal className="h-4 w-4 text-primary-light" />
+                  <span className="text-muted-foreground">Topic</span>
+                  <span className="max-w-[180px] truncate capitalize text-foreground sm:max-w-none">
+                    {activeCategoryName}
+                  </span>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary-light">
+                    {posts.length}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                </summary>
+
+                <div className="absolute left-1/2 top-full mt-3 w-[min(92vw,720px)] -translate-x-1/2 rounded-2xl border border-border bg-surface/95 p-2 shadow-2xl backdrop-blur-xl">
+                  <div className="grid max-h-[360px] grid-cols-1 gap-1 overflow-y-auto sm:grid-cols-2 lg:grid-cols-3">
+                    {categories.map((cat) => {
+                      const isAll = cat.toLowerCase() === "all";
+                      const count = isAll ? publishedPosts.length : categoryCounts.get(cat) ?? 0;
+                      const selected = activeCategory === cat.toLowerCase();
+
+                      return (
+                        <a
+                          key={cat}
+                          href={isAll ? "/blog" : `/blog?category=${encodeURIComponent(cat)}`}
+                          className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                            selected
+                              ? "bg-primary/15 text-primary-light"
+                              : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                          }`}
+                        >
+                          <span className="truncate capitalize">{cat}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-xs ${
+                            selected ? "bg-primary/15 text-primary-light" : "bg-muted/60 text-muted-foreground"
+                          }`}>
+                            {count}
+                          </span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </details>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
