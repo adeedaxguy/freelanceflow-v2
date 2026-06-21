@@ -55,6 +55,7 @@ export interface DecisionFinderResult {
   company: string;
   country: DecisionCountry;
   domain?: string;
+  location?: string;
   candidates: DecisionMakerCandidate[];
   evidence: DecisionFinderEvidence[];
   searchLinks: DecisionFinderSearchLink[];
@@ -1760,6 +1761,7 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
     company,
     country: input.country,
     domain,
+    location: input.location?.trim() || undefined,
     candidates,
     evidence,
     searchLinks: buildSearchLinks({ ...input, company }, domain),

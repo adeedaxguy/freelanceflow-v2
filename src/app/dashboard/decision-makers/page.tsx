@@ -205,23 +205,34 @@ function googleSearchUrl(query: string) {
   return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 }
 
-function candidateProfileSearchUrl(candidate: DecisionMakerCandidate) {
-  if (candidate.isGenericContact) {
-    return googleSearchUrl(`"${candidate.company}" (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`);
-  }
-  return googleSearchUrl(`"${candidate.name}" "${candidate.company}" (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`);
+function quotedSearchPart(value?: string) {
+  const clean = value?.replace(/\s+/g, " ").trim();
+  return clean ? ` "${clean}"` : "";
 }
 
-function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: string) {
+function ownerRoleQuery() {
+  return `(owner OR founder OR "co-owner" OR proprietor OR "managing partner" OR "general manager" OR director OR president)`;
+}
+
+function candidateProfileSearchUrl(candidate: DecisionMakerCandidate, location?: string) {
+  const context = quotedSearchPart(location);
+  if (candidate.isGenericContact) {
+    return googleSearchUrl(`"${candidate.company}"${context} ${ownerRoleQuery()} -jobs -hiring -careers`);
+  }
+  return googleSearchUrl(`"${candidate.name}" "${candidate.company}"${context} ${ownerRoleQuery()} (profile OR LinkedIn OR bio OR contact)`);
+}
+
+function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: string, location?: string) {
+  const context = quotedSearchPart(location);
   if (candidate.isGenericContact) {
     const query = domain
       ? `site:${domain} ("${candidate.company}" OR owner OR founder OR manager OR contact) (email OR phone OR telephone OR contact)`
-      : `"${candidate.company}" (owner OR founder OR manager OR contact) (email OR phone OR telephone OR mobile OR WhatsApp)`;
+      : `"${candidate.company}"${context} (owner OR founder OR manager OR contact) (email OR phone OR telephone OR mobile OR WhatsApp)`;
     return googleSearchUrl(query);
   }
   const query = domain
     ? `site:${domain} "${candidate.name}" (email OR phone OR telephone OR contact)`
-    : `"${candidate.name}" "${candidate.company}" (email OR phone OR telephone OR contact)`;
+    : `"${candidate.name}" "${candidate.company}"${context} (email OR phone OR telephone OR contact)`;
   return googleSearchUrl(query);
 }
 
@@ -241,27 +252,28 @@ function compactCandidateText(value: string, maxLength = 150) {
   return `${trimmed.slice(0, lastSpace > 80 ? lastSpace : maxLength).trim()}...`;
 }
 
-function socialDiscoveryLinks(company: string) {
+function socialDiscoveryLinks(company: string, location?: string) {
+  const context = quotedSearchPart(location);
   return [
     {
       label: "LinkedIn",
       icon: Users,
-      url: googleSearchUrl(`"${company}" (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:linkedin.com/company)`),
+      url: googleSearchUrl(`"${company}"${context} (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:linkedin.com/company)`),
     },
     {
       label: "Facebook",
       icon: Globe,
-      url: googleSearchUrl(`"${company}" (owner OR manager OR contact OR phone) site:facebook.com`),
+      url: googleSearchUrl(`"${company}"${context} (owner OR manager OR contact OR phone) site:facebook.com`),
     },
     {
       label: "Instagram",
       icon: Sparkles,
-      url: googleSearchUrl(`"${company}" (owner OR manager OR contact OR phone) site:instagram.com`),
+      url: googleSearchUrl(`"${company}"${context} (owner OR manager OR contact OR phone) site:instagram.com`),
     },
     {
       label: "X",
       icon: Link2,
-      url: googleSearchUrl(`"${company}" (owner OR founder OR manager OR contact) (site:x.com OR site:twitter.com)`),
+      url: googleSearchUrl(`"${company}"${context} (owner OR founder OR manager OR contact) (site:x.com OR site:twitter.com)`),
     },
   ];
 }
@@ -303,7 +315,7 @@ function userFacingWarning(warning: string) {
   );
 }
 
-function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidate; domain?: string }) {
+function CandidateCard({ candidate, domain, location }: { candidate: DecisionMakerCandidate; domain?: string; location?: string }) {
   const proposalParams = new URLSearchParams({
     company: candidate.company,
     domain: domain ?? "",
@@ -342,7 +354,7 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <a
-              href={candidateProfileSearchUrl(candidate)}
+              href={candidateProfileSearchUrl(candidate, location)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/10 px-3 py-2 text-xs font-bold text-primary-light transition-colors hover:border-primary/55 hover:text-foreground"
@@ -381,7 +393,7 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               </a>
             )}
             <a
-              href={candidateContactSearchUrl(candidate, domain)}
+              href={candidateContactSearchUrl(candidate, domain, location)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
@@ -405,7 +417,7 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               </a>
             ))}
             {candidate.isGenericContact && !candidate.socialProfiles?.length
-              ? socialDiscoveryLinks(candidate.company).map(link => {
+              ? socialDiscoveryLinks(candidate.company, location).map(link => {
                   const Icon = link.icon;
                   return (
                     <a
@@ -732,7 +744,7 @@ function DecisionMakerFinderInner() {
           {result.candidates.length > 0 ? (
             <div className="space-y-3">
               {result.candidates.map(candidate => (
-                <CandidateCard key={candidate.id} candidate={candidate} domain={result.domain} />
+                <CandidateCard key={candidate.id} candidate={candidate} domain={result.domain} location={result.location ?? location} />
               ))}
             </div>
           ) : (
