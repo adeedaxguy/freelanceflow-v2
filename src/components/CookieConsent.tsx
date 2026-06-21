@@ -39,11 +39,11 @@ export default function CookieConsent() {
             <p className="text-foreground font-semibold text-sm mb-0.5">We use cookies</p>
             <p className="text-muted-foreground text-xs leading-relaxed">
               We use cookies to improve your experience and analyse site usage. By clicking &quot;Accept All&quot; you consent to our use of cookies.{" "}
-              <Link href="/cookie-policy" className="text-primary-light hover:underline">
+              <Link href="/cookie-policy" className="text-primary-light underline underline-offset-2 hover:no-underline">
                 Cookie Policy
               </Link>
               {" · "}
-              <Link href="/privacy" className="text-primary-light hover:underline">
+              <Link href="/privacy" className="text-primary-light underline underline-offset-2 hover:no-underline">
                 Privacy Policy
               </Link>
             </p>

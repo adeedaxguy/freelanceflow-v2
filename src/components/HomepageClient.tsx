@@ -728,7 +728,7 @@ export default function HomepageClient() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#090915] overflow-x-hidden">
+    <main className="min-h-screen bg-[#090915] overflow-x-hidden">
       <Navbar />
 
       {/* ── Early Access Banner ── */}
@@ -1146,6 +1146,6 @@ export default function HomepageClient() {
       </section>
 
       <Footer />
-    </div>
+    </main>
   );
 }

@@ -73,7 +73,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Toast stack - bottom right */}
       <div
         aria-live="polite"
-        aria-label="Notifications"
+        aria-atomic="false"
         className="fixed bottom-5 right-5 z-[10000] flex flex-col gap-2.5 pointer-events-none"
       >
         {toasts.map(t => {
