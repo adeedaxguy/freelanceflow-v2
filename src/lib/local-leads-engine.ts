@@ -56,6 +56,7 @@ export interface LocalBizLead {
   pitchPoints:     string[];
   pitchSubject:    string;
   pitchOpener:     string;
+  callScript:      string;
   opportunityType: "no_website" | "outdated_website" | "modernise" | "seo";
   score:           number;
   urgency:         "high" | "medium" | "low";
@@ -1438,15 +1439,40 @@ function guessEmails(domain: string | undefined): string[] {
 }
 
 // ── Pitch generator ────────────────────────────────────────────────────────────
+function buildCallScript(
+  name: string,
+  category: string,
+  wsStatus: LocalBizLead["websiteStatus"],
+  opportunityType: LocalBizLead["opportunityType"],
+): string {
+  const businessName = name || "your business";
+  const businessType = category || "local business";
+
+  if (wsStatus === "none" || wsStatus === "unknown" || opportunityType === "no_website") {
+    return `Hi, this is [Your name]. Is this the right person for ${businessName}'s website or marketing? I found you while checking local ${businessType} options and could not find a clear website on the business profile. That can make it harder for mobile searchers to see services, photos, and request a quote. I help fix that quickly. Can I send a short example?`;
+  }
+
+  if (wsStatus === "outdated" || wsStatus === "unreachable" || opportunityType === "outdated_website") {
+    return `Hi, this is [Your name]. Who handles the website for ${businessName}? I noticed the site may be dated or hard to reach on mobile. I help local ${businessType} businesses make quick fixes that turn visitors into calls, bookings, or quote requests. Would you be open to a short screen recording with the three fixes I would prioritize?`;
+  }
+
+  if (opportunityType === "seo") {
+    return `Hi, this is [Your name]. Is this the owner or manager for ${businessName}? I was checking local ${businessType} searches and saw a few ways you could show up stronger in Google and Maps, mainly clearer service pages, reviews, and conversion buttons. Can I send a quick local visibility checklist?`;
+  }
+
+  return `Hi, this is [Your name]. Who handles website enquiries for ${businessName}? I saw you already have an online presence, so this is not a basic website call. I noticed a few conversion improvements that could make it easier for visitors to call or request a quote. Can I send a quick mini-audit?`;
+}
+
 function buildPitch(
   name: string, category: string, wsStatus: LocalBizLead["websiteStatus"],
-  webInfo: WebInfo | null, revenueEst: string,
-): Pick<LocalBizLead,"pitchPoints"|"pitchSubject"|"pitchOpener"> {
+  webInfo: WebInfo | null, revenueEst: string, opportunityType: LocalBizLead["opportunityType"],
+): Pick<LocalBizLead,"pitchPoints"|"pitchSubject"|"pitchOpener"|"callScript"> {
 
   if (wsStatus === "none") {
     return {
       pitchSubject: `Getting more customers for ${name} — quick question`,
       pitchOpener:  `Hi, I noticed ${name} doesn't have a website yet. In today's market, 97% of people search online before choosing a local ${category} — without a site, those searches go straight to competitors. I specialise in affordable websites for ${category} businesses and can have you live within a week.`,
+      callScript: buildCallScript(name, category, wsStatus, opportunityType),
       pitchPoints: [
         `97% of consumers search online before contacting a local ${category}`,
         `${name} is invisible to anyone Googling "${category} near me" right now`,
@@ -1463,6 +1489,7 @@ function buildPitch(
     return {
       pitchSubject: `Quick idea to bring more customers to ${name}`,
       pitchOpener:  `Hi, I had a look at ${name}'s website ${detail} and spotted a few quick fixes that could bring in noticeably more customers from Google — especially mobile searches, which now account for over 60% of local queries.`,
+      callScript: buildCallScript(name, category, wsStatus, opportunityType),
       pitchPoints: [
         `Outdated sites rank lower in Google's mobile-first index — costing you visibility`,
         `62% of local searches happen on phones — old sites lose these visitors immediately`,
@@ -1477,6 +1504,7 @@ function buildPitch(
   return {
     pitchSubject: `Boosting ${name}'s Google visibility — quick idea`,
     pitchOpener:  `Hi, I came across ${name} online and spotted a few improvements that could bring in noticeably more customers — especially from local "near me" searches where most of your competitors aren't fully optimised yet.`,
+    callScript: buildCallScript(name, category, wsStatus, opportunityType),
     pitchPoints: [
       `Local SEO to rank on page 1 for "${category} near me" in your area`,
       `Core Web Vitals optimisation — Google's speed ranking signals`,
@@ -1621,9 +1649,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
     db,
   } = opts;
   const limit    = Math.min(opts.limit ?? 60, 80);
-  // v5 — tighter website trust checks for outdated/down results.
+  // v6 - add per-opportunity call scripts to cached local lead payloads.
   const sourceScope = cacheScope ?? "default";
-  const cacheKey = `v5-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
+  const cacheKey = `v6-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
 
   // 1. Cache check — instant return
   const cached = await cacheGet(cacheKey, db);
@@ -1732,8 +1760,8 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           wsStatus === "unreachable"|| wsStatus === "outdated" ? "outdated_website" :
           wsStatus === "alive"      ? "seo" : "modernise";
 
-        const { pitchPoints, pitchSubject, pitchOpener } = buildPitch(
-          raw.name ?? "this business", cat, wsStatus, webInfo, revEst
+        const { pitchPoints, pitchSubject, pitchOpener, callScript } = buildPitch(
+          raw.name ?? "this business", cat, wsStatus, webInfo, revEst, opType
         );
 
         // Use phone from OSM data; fall back to number scraped from the website
@@ -1768,6 +1796,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           pitchPoints,
           pitchSubject,
           pitchOpener,
+          callScript,
           opportunityType: opType,
           score:           0,
           urgency:         "medium",

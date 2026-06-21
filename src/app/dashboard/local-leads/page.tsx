@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import {
-  MapPin, Search, Globe, Phone, Star, ExternalLink, Bookmark,
+  MapPin, Search, Globe, Phone, PhoneCall, Star, ExternalLink, Bookmark,
   CheckCircle, Sparkles, ChevronDown, ChevronUp, AlertCircle,
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
@@ -104,6 +104,28 @@ function decisionMakerLocation(lead: LocalLead, searchLocation?: string) {
 function googleMapsBusinessProfileUrl(lead: LocalLead) {
   const query = [lead.name, lead.address, lead.city, lead.country].filter(Boolean).join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query || lead.name)}`;
+}
+
+function getLocalLeadCallScript(lead: LocalLead) {
+  const existing = typeof lead.callScript === "string" ? lead.callScript.trim() : "";
+  if (existing) return existing;
+
+  const businessName = lead.name || "this business";
+  const businessType = (lead.categoryLabel ?? lead.category ?? "local business").toLowerCase();
+
+  if (lead.websiteStatus === "none" || lead.websiteStatus === "unknown" || lead.opportunityType === "no_website") {
+    return `Hi, this is [Your name]. Is this the right person for ${businessName}'s website or marketing? I found you while checking local ${businessType} options and could not find a clear website on the business profile. That can make it harder for mobile searchers to see services, photos, and request a quote. I help fix that quickly. Can I send a short example?`;
+  }
+
+  if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable" || lead.opportunityType === "outdated_website") {
+    return `Hi, this is [Your name]. Who handles the website for ${businessName}? I noticed the site may be dated or hard to reach on mobile. I help local ${businessType} businesses make quick fixes that turn visitors into calls, bookings, or quote requests. Would you be open to a short screen recording with the three fixes I would prioritize?`;
+  }
+
+  if (lead.opportunityType === "seo") {
+    return `Hi, this is [Your name]. Is this the owner or manager for ${businessName}? I was checking local ${businessType} searches and saw a few ways you could show up stronger in Google and Maps, mainly clearer service pages, reviews, and conversion buttons. Can I send a quick local visibility checklist?`;
+  }
+
+  return `Hi, this is [Your name]. Who handles website enquiries for ${businessName}? I saw you already have an online presence, so this is not a basic website call. I noticed a few conversion improvements that could make it easier for visitors to call or request a quote. Can I send a quick mini-audit?`;
 }
 
 // 150+ keyword suggestions grouped by category
@@ -414,6 +436,8 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
   const [expanded,    setExpanded]    = useState(false);
   const [showPitch,   setShowPitch]   = useState(false);
   const [copiedPitch, setCopiedPitch] = useState(false);
+  const [copiedCallScript, setCopiedCallScript] = useState(false);
+  const callScript = getLocalLeadCallScript(lead);
 
   const fullPitch = [
     `Subject: ${lead.pitchSubject}`,
@@ -427,6 +451,9 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
     "",
     "Best,",
     "[Your name]",
+    "",
+    "30-second call script:",
+    callScript,
   ].join("\n");
 
   const borderCls =
@@ -678,6 +705,22 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
               Best,<br/><span className="italic opacity-60">[Your name]</span>
             </p>
           </div>
+          <div className="mt-3 rounded-xl border border-accent/20 bg-accent/5 p-4 text-sm">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <h5 className="flex items-center gap-2 font-bold text-foreground">
+                <PhoneCall className="h-4 w-4 text-accent"/> 30-Second Call Script
+              </h5>
+              <button
+                onClick={() => { void navigator.clipboard.writeText(callScript).then(() => { setCopiedCallScript(true); setTimeout(() => setCopiedCallScript(false), 2000); }); }}
+                className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${copiedCallScript ? "border-accent/30 bg-accent/10 text-accent" : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
+                {copiedCallScript ? <><CheckCircle className="h-3 w-3"/> Copied!</> : <><Copy className="h-3 w-3"/> Copy Script</>}
+              </button>
+            </div>
+            <p className="leading-relaxed text-muted-foreground">{callScript}</p>
+            <p className="mt-2 border-t border-accent/15 pt-2 text-xs text-muted-foreground/80">
+              Keep it permission-based: identify yourself, be brief, and honour do-not-call or opt-out requests.
+            </p>
+          </div>
         </div>
       )}
     </div>
@@ -725,11 +768,11 @@ export default function LocalLeadsPage() {
     if (sessionStatus === "loading") return;
     // Clear stale lead caches on schema changes
     try {
-      if (sessionStorage.getItem("icl_cache_v") !== "5") {
+      if (sessionStorage.getItem("icl_cache_v") !== "6") {
         sessionStorage.removeItem("ff_ss_live_results");
         sessionStorage.removeItem("ff_ss_remote_results");
         sessionStorage.removeItem("ff_ss_local_results");
-        sessionStorage.setItem("icl_cache_v", "5");
+        sessionStorage.setItem("icl_cache_v", "6");
       }
     } catch {}
     const resetTs  = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
@@ -880,6 +923,7 @@ export default function LocalLeadsPage() {
         ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
         : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".local";
       const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
+      const callScript = getLocalLeadCallScript(lead);
       const res = await fetch("/api/leads/save", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -907,6 +951,9 @@ export default function LocalLeadsPage() {
             "",
             "Pitch Points:",
             ...lead.pitchPoints.map(p => `• ${p}`),
+            "",
+            "30-Second Call Script:",
+            callScript,
           ].filter(Boolean).join("\n"),
         }),
       });
