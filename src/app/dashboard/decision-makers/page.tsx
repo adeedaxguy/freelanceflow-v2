@@ -21,8 +21,6 @@ import {
 } from "lucide-react";
 import type {
   DecisionCountry,
-  DecisionFinderEvidence,
-  DecisionFinderSearchLink,
   DecisionFinderResult,
   DecisionMakerCandidate,
 } from "@/lib/decision-maker-finder";
@@ -298,193 +296,10 @@ function profileSourceLabel(sourceType: string) {
   return "verification scan";
 }
 
-function userFacingEvidence(item: DecisionFinderEvidence) {
-  const normalized = item.label.toLowerCase();
-  const isReferenceSafe =
-    normalized.includes("pasted") ||
-    normalized.includes("official website") ||
-    normalized.includes("business/profile");
-  if (normalized.includes("pasted profile")) {
-    return {
-      label: "Provided profile checked",
-      detail: item.detail.replace(/pasted LinkedIn profile|pasted Crunchbase profile/gi, "provided profile"),
-      url: isReferenceSafe ? item.url : undefined,
-    };
-  }
-  if (normalized.includes("pasted business") || normalized.includes("business/profile")) {
-    return {
-      label: "Provided business profile checked",
-      detail: "The supplied profile was saved as the main proof link. Open it to verify owner, phone, hours, and public contact details.",
-      url: isReferenceSafe ? item.url : undefined,
-    };
-  }
-  if (normalized.includes("official website")) {
-    return {
-      label: "Business website checked",
-      detail: item.detail.replace(/official website/gi, "business website"),
-      url: isReferenceSafe ? item.url : undefined,
-    };
-  }
-  if (normalized.includes("email enrichment")) {
-    return {
-      label: "Contact enrichment checked",
-      detail: item.detail.replace(/Hunter(?:\.io)?/gi, "contact enrichment"),
-      url: item.url,
-    };
-  }
-  if (normalized.includes("professional profile")) {
-    return {
-      label: "Professional profiles checked",
-      detail: item.detail
-        .replace(/official-site structured data, official-site profile links, and the public knowledge graph/gi, "public profile signals")
-        .replace(/professional\/social/gi, "professional"),
-      url: item.url,
-    };
-  }
-  if (normalized.includes("knowledge graph")) {
-    return {
-      label: "Public profile scan checked",
-      detail: item.detail.replace(/Wikidata entity/gi, "public profile record"),
-      url: item.url,
-    };
-  }
-  if (normalized.includes("registry")) {
-    return {
-      label: "Business registry guidance ready",
-      detail: "Official registry checks are available from the recommended links when a public owner profile is not published.",
-      url: item.url,
-    };
-  }
-  return {
-    label: "Verification check completed",
-    detail: item.detail,
-    url: item.url,
-  };
-}
-
-function userFacingSearchLink(link: DecisionFinderSearchLink) {
-  const normalized = link.label.toLowerCase();
-  if (normalized.startsWith("open ")) {
-    return { ...link, label: "Open provided profile" };
-  }
-  if (normalized.includes("owner and phone")) {
-    return { ...link, label: "Search owner and phone mentions" };
-  }
-  if (normalized.includes("linkedin")) {
-    return { ...link, label: "Search professional profiles" };
-  }
-  if (normalized.includes("social")) {
-    return { ...link, label: "Search public social profiles" };
-  }
-  if (normalized.includes("official site")) {
-    return { ...link, label: "Search the business website" };
-  }
-  if (normalized.includes("contact detail")) {
-    return { ...link, label: "Search official contact details" };
-  }
-  if (normalized.includes("registry") || normalized.includes("companies house")) {
-    return { ...link, label: "Check official business registry" };
-  }
-  return link;
-}
-
-function searchLinkIcon(label: string) {
-  const normalized = label.toLowerCase();
-  if (normalized.includes("profile")) return Users;
-  if (normalized.includes("phone") || normalized.includes("contact")) return Phone;
-  if (normalized.includes("social")) return Link2;
-  if (normalized.includes("website")) return Globe;
-  if (normalized.includes("registry")) return Building2;
-  return Search;
-}
-
-function VerificationSummary({ result }: { result: DecisionFinderResult }) {
-  const checked = result.evidence
-    .filter(item => {
-      if (item.status !== "checked") return false;
-      const detail = item.detail.toLowerCase();
-      const label = item.label.toLowerCase();
-      if (/^no\b/.test(detail)) return false;
-      if (detail.includes("no direct social profile") || detail.includes("no named decision maker")) return false;
-      if (detail.includes("did not expose officer names") || detail.includes("did not expose a reliable person name")) return false;
-      if (label.includes("knowledge graph") && !detail.includes("found")) return false;
-      return true;
-    })
-    .map(userFacingEvidence);
-  const visibleChecks = checked.slice(0, 4);
-  const hiddenCheckCount = Math.max(checked.length - visibleChecks.length, 0);
-  const blockedCheckCount = result.evidence.filter(item => item.status !== "checked").length;
-  const nextLinks = result.searchLinks.map(userFacingSearchLink).slice(0, 5);
-
-  return (
-    <div className="grid gap-4 xl:grid-cols-2">
-      <div className="rounded-2xl border border-border bg-surface p-5">
-        <h3 className="mb-3 flex items-center gap-2 font-bold text-foreground">
-          <Shield className="h-4 w-4 text-accent" />
-          Verification summary
-        </h3>
-        <div className="space-y-2">
-          {visibleChecks.length ? (
-            visibleChecks.map(item => (
-              <div key={`${item.label}-${item.detail}`} className="rounded-xl border border-border/70 bg-background/55 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold text-foreground">{item.label}</span>
-                  <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-accent">
-                    Checked
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.detail}</p>
-                {item.url && (
-                  <a href={item.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-primary-light hover:underline">
-                    Open reference <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="rounded-xl border border-border/70 bg-background/55 p-3 text-sm text-muted-foreground">
-              Run a lookup with a website or profile URL to see verified public signals here.
-            </div>
-          )}
-        </div>
-        {(hiddenCheckCount > 0 || blockedCheckCount > 0) && (
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            {hiddenCheckCount > 0 ? `${hiddenCheckCount} more background check${hiddenCheckCount === 1 ? "" : "s"} completed. ` : ""}
-            {blockedCheckCount > 0 ? "Add a business website when available to run deeper website checks." : ""}
-          </p>
-        )}
-      </div>
-
-      <div className="rounded-2xl border border-border bg-surface p-5">
-        <h3 className="mb-3 flex items-center gap-2 font-bold text-foreground">
-          <Search className="h-4 w-4 text-primary-light" />
-          Recommended checks
-        </h3>
-        <div className="space-y-2">
-          {nextLinks.map(link => {
-            const Icon = searchLinkIcon(link.label);
-            return (
-              <a
-                key={`${link.label}-${link.url}`}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-xl border border-border/70 bg-background/55 p-3 transition-colors hover:border-primary/35"
-              >
-                <span className="flex items-center justify-between gap-3 font-semibold text-foreground">
-                  <span className="flex items-center gap-2">
-                    <Icon className="h-4 w-4 text-primary-light" />
-                    {link.label}
-                  </span>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                </span>
-                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{link.detail}</span>
-              </a>
-            );
-          })}
-        </div>
-      </div>
-    </div>
+function userFacingWarning(warning: string) {
+  return warning.replace(
+    "Use the next-step links to check public profiles and official registries.",
+    "Start with Find possible owner, then verify phone/email or social proof before outreach.",
   );
 }
 
@@ -530,7 +345,7 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               href={candidateProfileSearchUrl(candidate)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/10 px-3 py-2 text-xs font-bold text-primary-light transition-colors hover:border-primary/55 hover:text-foreground"
             >
               <Users className="h-3.5 w-3.5" />
               {ownerSearchLabel(candidate)}
@@ -910,7 +725,7 @@ function DecisionMakerFinderInner() {
 
           {result.warnings.map(warning => (
             <div key={warning} className="rounded-xl border border-yellow-500/25 bg-yellow-500/10 p-3 text-sm text-yellow-200">
-              {warning}
+              {userFacingWarning(warning)}
             </div>
           ))}
 
@@ -925,12 +740,10 @@ function DecisionMakerFinderInner() {
               <Users className="mx-auto mb-3 h-9 w-9 text-muted-foreground" />
               <h3 className="font-bold text-foreground">No verified person found in the quick scan</h3>
               <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                That usually means the site does not publish leadership details or the official registry needs manual review. Use the next-step links below.
+                That usually means the site does not publish leadership details or the public profile needs manual review. Add a profile URL or business website and run the lookup again.
               </p>
             </div>
           )}
-
-          <VerificationSummary result={result} />
         </section>
       )}
     </div>
