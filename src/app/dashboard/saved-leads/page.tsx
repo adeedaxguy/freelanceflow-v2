@@ -202,10 +202,11 @@ function decisionMakerHref(lead: LeadExt) {
   const domain = contact.website ? normalizeUrl(contact.website).replace(/^https?:\/\/(www\.)?/, "").split("/")[0] : lead.domain;
   const params = new URLSearchParams({
     company: lead.company,
-    domain: domain ?? "",
     location: contact.address,
   });
+  if (domain) params.set("domain", domain);
   if (contact.website) params.set("website", normalizeUrl(contact.website));
+  if (lead.sourceUrl) params.set("profileUrl", lead.sourceUrl);
   if (country) params.set("country", country === "usa" ? "us" : "uk");
   return `/dashboard/decision-makers?${params.toString()}`;
 }
@@ -604,7 +605,7 @@ export default function SavedLeadsPage() {
                       </button>
                       <button onClick={() => router.push(decisionMakerHref(lead))}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/10 text-accent border border-accent/25 hover:bg-accent/15 text-xs font-medium transition-all">
-                        <Users className="w-3.5 h-3.5" /> Decision
+                        <Users className="w-3.5 h-3.5" /> Find Owner
                       </button>
                       <button onClick={() => setDeleteId(lead.id)}
                         className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors">

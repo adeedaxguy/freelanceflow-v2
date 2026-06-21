@@ -81,6 +81,26 @@ function decisionMakerCountryParam(country?: string) {
   return "";
 }
 
+function decisionMakerLocation(lead: LocalLead, searchLocation?: string) {
+  const address = lead.address && !/address not listed/i.test(lead.address) ? lead.address.trim() : "";
+  const primary = address || lead.city?.trim() || "";
+  const search = searchLocation?.trim() ?? "";
+  if (!primary) return search;
+  if (!search) return primary;
+
+  const normalizedPrimary = primary.toLowerCase();
+  const normalizedSearch = search.toLowerCase();
+  if (normalizedPrimary.includes(normalizedSearch)) return primary;
+
+  const [searchCity, ...regionParts] = search.split(",").map(part => part.trim()).filter(Boolean);
+  const region = regionParts.join(", ");
+  if (!region) return primary;
+  if (normalizedPrimary.includes(region.toLowerCase())) return primary;
+  if (searchCity && normalizedPrimary.includes(searchCity.toLowerCase())) return `${primary}, ${region}`;
+
+  return `${primary}, ${search}`;
+}
+
 // 150+ keyword suggestions grouped by category
 const KEYWORD_CATEGORIES: Record<string, string[]> = {
   "🔧 Trades & Construction": [
@@ -383,8 +403,8 @@ function Pagination({ page, total, perPage, onChange }: { page: number; total: n
 }
 
 // ─── Lead Card ────────────────────────────────────────────────────────────────
-function LeadCard({ lead, onSave, isSaved, isSaving }: {
-  lead: LocalLead; onSave: (l: LocalLead) => void; isSaved: boolean; isSaving: boolean;
+function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
+  lead: LocalLead; onSave: (l: LocalLead) => void; isSaved: boolean; isSaving: boolean; searchLocation?: string;
 }) {
   const [expanded,    setExpanded]    = useState(false);
   const [showPitch,   setShowPitch]   = useState(false);
@@ -442,10 +462,11 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
   const proposalHref = `/dashboard/proposal/new?${proposalParams.toString()}`;
   const decisionParams = new URLSearchParams({
     company: lead.name,
-    location: lead.address || lead.city || "",
+    location: decisionMakerLocation(lead, searchLocation),
   });
   if (proposalDomain) decisionParams.set("domain", proposalDomain);
   if (lead.website) decisionParams.set("website", lead.website);
+  if (lead.mapsUrl) decisionParams.set("profileUrl", lead.mapsUrl);
   const decisionCountry = decisionMakerCountryParam(lead.country);
   if (decisionCountry) decisionParams.set("country", decisionCountry);
   const decisionHref = `/dashboard/decision-makers?${decisionParams.toString()}`;
@@ -582,7 +603,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
         </div>
 
         {/* Action column */}
-        <div className="flex flex-col gap-2 flex-shrink-0 w-[120px]">
+        <div className="flex flex-col gap-2 flex-shrink-0 w-[132px]">
           <a href={lead.mapsUrl} target="_blank" rel="noopener noreferrer"
             title="Search this business on Google Maps to see phone, hours &amp; reviews"
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
@@ -601,8 +622,9 @@ function LeadCard({ lead, onSave, isSaved, isSaving }: {
           </button>
           <Link
             href={decisionHref}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-primary/30 bg-primary/10 text-primary-light text-xs font-medium hover:bg-primary/20 transition-all">
-            <Users className="w-3.5 h-3.5"/> Decision
+            title="Find the owner, manager, or best public contact for this business"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-accent/25 bg-accent/10 text-accent text-xs font-medium hover:bg-accent/15 transition-all">
+            <Users className="w-3.5 h-3.5"/> Find Owner
           </Link>
           <Link
             href={proposalHref}
@@ -1331,7 +1353,8 @@ export default function LocalLeadsPage() {
               <div className="space-y-4">
                 {pagedResults.map(lead => (
                   <LeadCard key={lead.id} lead={lead} onSave={handleSave}
-                    isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}/>
+                    isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}
+                    searchLocation={location}/>
                 ))}
               </div>
             )}
