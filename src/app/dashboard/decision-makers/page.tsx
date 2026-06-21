@@ -526,6 +526,16 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
           <ContactSignalBadges candidate={candidate} />
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
+            <a
+              href={candidateProfileSearchUrl(candidate)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <Users className="h-3.5 w-3.5" />
+              {ownerSearchLabel(candidate)}
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
             {candidate.email && (
               <a
                 href={`mailto:${candidate.email}`}
@@ -555,16 +565,6 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
                 {sourceButtonLabel}
               </a>
             )}
-            <a
-              href={candidateProfileSearchUrl(candidate)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              <Users className="h-3.5 w-3.5" />
-              {ownerSearchLabel(candidate)}
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
             <a
               href={candidateContactSearchUrl(candidate, domain)}
               target="_blank"
