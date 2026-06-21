@@ -6,8 +6,6 @@ import Link from "next/link";
 import {
   AlertCircle,
   Building2,
-  CheckCircle,
-  Copy,
   ExternalLink,
   Globe,
   Link2,
@@ -166,25 +164,6 @@ function inferCountryFromParams(country: string | null, location: string | null)
   if (/\b(nz|new zealand|auckland|wellington|christchurch)\b/.test(blob)) return "nz";
   if (/\b(ie|ireland|dublin|cork|galway|limerick)\b/.test(blob)) return "ie";
   return "us";
-}
-
-function CopyButton({ value, label = "Copy" }: { value: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        void navigator.clipboard.writeText(value).then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        });
-      }}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-    >
-      {copied ? <CheckCircle className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
-      {copied ? "Copied" : label}
-    </button>
-  );
 }
 
 function ConfidenceBadge({ candidate }: { candidate: DecisionMakerCandidate }) {
@@ -521,9 +500,9 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
   if (candidate.sourceUrl) proposalParams.set("url", candidate.sourceUrl);
   if (candidate.email) proposalParams.set("email", candidate.email);
   const summaryLine = candidate.isGenericContact
-    ? "Open profile to verify owner, phone, or social proof before outreach."
+    ? "Confirm owner, phone, or social proof from the supplied business profile."
     : compactCandidateText(candidate.proof);
-  const sourceButtonLabel = candidate.isGenericContact ? "Open profile" : "Proof";
+  const sourceButtonLabel = candidate.isGenericContact ? "Verify business profile" : "Proof";
 
   return (
     <article className="rounded-2xl border border-border bg-gradient-card p-5 transition-all hover:border-primary/35 hover:shadow-card-hover">
@@ -628,7 +607,6 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
                   );
                 })
               : null}
-            <CopyButton value={`${candidate.name} - ${candidate.role}`} />
           </div>
         </div>
 
