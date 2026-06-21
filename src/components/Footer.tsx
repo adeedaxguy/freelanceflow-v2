@@ -9,6 +9,7 @@ const footerLinks = {
     { label: "Use Cases",  href: "/use-cases"  },
     { label: "Remote Job Leads", href: "/use-cases/remote-job-leads" },
     { label: "Local Business Leads", href: "/use-cases/local-business-leads" },
+    { label: "Decision Maker Finder", href: "/features/lead-discovery#capabilities" },
     { label: "Live Job Leads", href: "/use-cases/live-job-leads" },
     { label: "Pricing",    href: "/pricing"     },
     { label: "Blog",       href: "/blog"        },

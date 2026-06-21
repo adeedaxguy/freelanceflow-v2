@@ -97,6 +97,7 @@ function OverviewJsonLd() {
 const comparisonRows = [
   ["Find fresh remote job leads", true, false, false, false],
   ["Find local business leads", true, false, false, true],
+  ["Check owner or manager contact paths", true, false, false, false],
   ["Generate lead-specific proposals", true, false, false, false],
   ["Prepare Gmail drafts safely", true, false, false, true],
   ["Track saved leads in CRM", true, true, false, false],
@@ -126,7 +127,7 @@ export default function FeatureOverviewPage() {
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                iCloseLeads brings lead discovery, AI proposals, Gmail-ready outreach, CRM tracking, analytics, and free freelancer tools into one focused workflow. It is built for people who want clients without depending on crowded marketplaces.
+                iCloseLeads brings lead discovery, decision maker checks, AI proposals, Gmail-ready outreach, CRM tracking, analytics, and free freelancer tools into one focused workflow. It is built for people who want clients without depending on crowded marketplaces.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -151,7 +152,7 @@ export default function FeatureOverviewPage() {
         <section className="border-b border-border bg-surface/35 px-4 py-8 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              ["2", "Lead discovery modes"],
+              ["3", "Discovery paths"],
               ["6", "Core feature areas"],
               ["1", "CRM-backed workflow"],
               ["0", "Credit card required"],

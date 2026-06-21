@@ -147,9 +147,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads for Web Designers and SEO Consultants",
+    metaTitle: "Local Business Leads and Decision Maker Finder for Web Designers",
     metaDescription:
-      "Find local business leads with no website, outdated websites, phone numbers, and map profiles. Built for freelancers selling websites, SEO, ads, and marketing services.",
+      "Find local business leads with no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths. Built for freelancers selling websites, SEO, ads, and marketing services.",
     keywords: [
       "local business leads",
       "local business leads for web designers",
@@ -157,11 +157,13 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "outdated website leads",
       "find web design clients",
       "local SEO client leads",
+      "business owner name finder",
+      "decision maker finder for local business",
       "small business leads",
       "website redesign leads",
     ],
     heroSummary:
-      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, strong reviews, or a service category that depends on trust and bookings.",
+      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings.",
     primaryCta: "Find Local Leads Free",
     secondaryCta: "Read Lead Discovery",
     dashboardPath: "/dashboard/local-leads",
@@ -170,15 +172,16 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     audience:
       "Built for web designers, SEO consultants, local ads specialists, automation freelancers, copywriters, and agencies selling to small businesses.",
     outcome:
-      "A practical local prospecting workflow where each lead includes the business profile, website signal, contact details when available, pitch angle, notes, and CRM status.",
+      "A practical local prospecting workflow where each lead includes the business profile, website signal, contact details when available, owner/manager research path, pitch angle, notes, and CRM status.",
     intro: [
       "Local prospecting works best when it starts with a visible business problem. A cleaning company with no website, a dental clinic with an outdated site, or a trades business with a weak mobile experience is not just a name in a spreadsheet. It is a business likely losing trust, calls, bookings, or quote requests.",
-      "iCloseLeads helps freelancers search by business type and city, then filter by website status and contact readiness. The goal is not to pretend every business needs the same service. The goal is to find the gap, verify it, and write a useful first message.",
+      "iCloseLeads helps freelancers search by business type and city, then filter by website status and contact readiness. When a lead looks worth pursuing, Decision Maker Finder helps you look for public owner or manager signals, social profiles, phone routes, registry guidance, and proof links. The goal is not to pretend every business needs the same service. The goal is to find the gap, verify the contact route, and write a useful first message.",
     ],
     signals: [
       { label: "No or unknown website", detail: "Useful for web design, landing page, booking flow, and starter website offers." },
       { label: "Outdated or unreachable site", detail: "Useful for redesign, speed, mobile, conversion, SEO, and maintenance packages." },
       { label: "Has phone", detail: "Prioritize businesses with direct contact paths when email is not visible." },
+      { label: "Owner or manager path", detail: "Use decision maker checks to look for public owner names, manager roles, social profiles, and verification links before pitching." },
       { label: "Local trust signals", detail: "Ratings, reviews, category, and address help you judge whether the business is active enough to pitch." },
     ],
     workflow: [
@@ -198,6 +201,11 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
           "Open the map link and confirm the business details before adding it to outreach.",
       },
       {
+        title: "Check the owner or manager route",
+        description:
+          "Use Decision Maker Finder for public owner names, manager signals, social profiles, phone/email verification searches, and registry guidance.",
+      },
+      {
         title: "Save the lead and pitch the business reason",
         description:
           "Keep the contact info, address, notes, pitch points, and proposal workflow together.",
@@ -206,13 +214,14 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     keywordsCluster: [
       { group: "Core", terms: ["local business leads", "small business leads", "local client leads"] },
       { group: "Web design", terms: ["businesses without websites", "outdated website leads", "find web design clients"] },
+      { group: "Decision makers", terms: ["business owner name finder", "find business owner contact", "decision maker finder for local business"] },
       { group: "Marketing", terms: ["local SEO client leads", "lead generation for local marketing agencies", "website redesign leads"] },
     ],
     examples: [
       {
         title: "Cleaning company with no verified website",
-        context: "Service business, phone visible, address active, website gap.",
-        pitchAngle: "Offer a simple lead-capture site focused on calls and quote requests.",
+        context: "Service business, phone visible, address active, website gap, owner route worth checking.",
+        pitchAngle: "Verify the public contact route, then offer a simple lead-capture site focused on calls and quote requests.",
       },
       {
         title: "Dental clinic with an old mobile experience",
@@ -227,7 +236,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     comparison: [
       { oldWay: "Manually browse maps and copy names into a spreadsheet.", icloseWay: "Search by city, category, website signal, and contact readiness." },
-      { oldWay: "Pitch every business the same website package.", icloseWay: "Use the actual website status and business type to shape the pitch." },
+      { oldWay: "Pitch every business the same website package.", icloseWay: "Use the actual website status, business type, and owner/contact route to shape the pitch." },
       { oldWay: "Lose the map link and notes after saving.", icloseWay: "Keep contact info, Google Maps, notes, and proposal action on the saved lead." },
     ],
     faqs: [
@@ -238,6 +247,10 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       {
         q: "Are local business leads good for web designers?",
         a: "Yes. Web designers can use no-website, outdated-site, and unreachable-site signals to build a more relevant pitch around trust, bookings, mobile experience, and lead capture.",
+      },
+      {
+        q: "Can I find the owner or decision maker for a local business?",
+        a: "Decision Maker Finder helps you check public owner and manager signals, business profile links, social profile searches, phone/email verification routes, and registry guidance where available. It should be used as a verification workflow because not every small business publishes a named owner.",
       },
       {
         q: "Can SEO consultants use local business leads?",

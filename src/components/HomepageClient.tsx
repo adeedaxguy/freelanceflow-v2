@@ -18,7 +18,7 @@ import {
   ChevronDown, Star, Shield, Globe, TrendingUp,
   Target, Layers, Bot, Send, Play, ExternalLink,
   CheckCircle2, X,
-  Briefcase, Building2, Radio, MapPin, SlidersHorizontal,
+  Briefcase, Building2, Radio, MapPin, SlidersHorizontal, Users,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -301,30 +301,30 @@ const LEAD_ENGINES: LeadEngine[] = [
     icon: <Building2 className="w-5 h-5" />,
     label: "Local Business Leads",
     eyebrow: "Second priority",
-    title: "Local businesses with visible buying signals",
-    promise: "Find local business leads that need websites, SEO, booking flows, ads, content, or modernization without manually digging through maps for hours.",
-    seoLine: "Designed around high-intent searches like local business leads, businesses without websites, outdated website leads, and web design clients.",
-    pitch: "A local business with a weak website is not a random prospect. It is a business already losing trust, bookings, or calls. That makes your outreach feel useful instead of cold.",
+    title: "Local businesses plus the owner/contact path",
+    promise: "Find local business leads that need websites, SEO, booking flows, ads, content, or modernization, then move into owner and manager verification when the lead looks worth pitching.",
+    seoLine: "Designed around high-intent searches like local business leads, businesses without websites, outdated website leads, business owner name finder, and web design clients.",
+    pitch: "A local business with a weak website is not a random prospect. It is a business already losing trust, bookings, or calls. The Decision Maker layer helps you move from company name to owner, manager, public phone, social proof, and the best next verification step.",
     route: "/dashboard/local-leads",
     publicRoute: "/use-cases/local-business-leads",
     color: "#00E5A0",
     metrics: [
       { label: "Best for", value: "Web, SEO, ads, content" },
       { label: "Buying clue", value: "No site or outdated site" },
-      { label: "Pitch style", value: "Revenue gap" },
+      { label: "Contact path", value: "Owner or manager check" },
     ],
-    filters: ["No website", "Outdated site", "Has phone", "High rating", "City search"],
+    filters: ["No website", "Outdated site", "Has phone", "Find owner", "City search"],
     leads: [
-      { name: "Family dental clinic", detail: "Outdated site - strong local reviews", score: 89, signal: "Modernization angle", cta: "Pitch booking improvements" },
-      { name: "Cleaning company in Houston", detail: "No verified website - phone present", score: 82, signal: "Direct contact path", cta: "Pitch lead capture page" },
-      { name: "Local fitness studio", detail: "Mobile site issues - active business", score: 78, signal: "Service demand", cta: "Pitch conversion audit" },
+      { name: "Family dental clinic", detail: "Outdated site - strong local reviews", score: 89, signal: "Owner check next", cta: "Pitch booking improvements" },
+      { name: "Cleaning company in Houston", detail: "No verified website - phone present", score: 82, signal: "Public contact path", cta: "Find owner then pitch" },
+      { name: "Local fitness studio", detail: "Mobile site issues - active business", score: 78, signal: "Manager/social check", cta: "Pitch conversion audit" },
     ],
     playbook: [
       "Start with a helpful observation from the business profile.",
+      "Use Decision Maker Finder to look for the owner, manager, social profile, phone route, or proof link before outreach.",
       "Tie the website or marketing gap to calls, bookings, or local trust.",
-      "Keep the ask small: a quick audit, simple mockup, or 15-minute review.",
     ],
-    keywords: ["local business leads", "businesses without websites", "outdated website leads", "web design clients"],
+    keywords: ["local business leads", "business owner name finder", "businesses without websites", "outdated website leads"],
   },
   {
     id: "live-jobs",
@@ -368,6 +368,14 @@ const FEATURES = [
     stat: "Cleaner search",
   },
   {
+    icon: <Users className="w-5 h-5 text-accent" />,
+    tag: "Decision Makers",
+    tagColor: "#00E5A0",
+    title: "Move from business name to owner path",
+    desc: "For local leads, open owner and manager checks, social profile searches, public phone routes, registry guidance, and proof links before outreach.",
+    stat: "Owner checks",
+  },
+  {
     icon: <Bot className="w-5 h-5 text-accent" />,
     tag: "AI Proposal",
     tagColor: "#00E5A0",
@@ -409,20 +417,20 @@ const FEATURES = [
   },
 ];
 
-const SOURCES = ["Remote job leads", "Local business leads", "Live job signals", "Startup hiring", "Urgent projects", "Website gaps", "Marketing leads", "Design leads", "SEO leads", "Public demand"];
+const SOURCES = ["Remote job leads", "Local business leads", "Owner checks", "Live job signals", "Startup hiring", "Urgent projects", "Website gaps", "Marketing leads", "Design leads", "SEO leads"];
 
 const STATS = [
-  { to: 3, suffix: "", prefix: "", label: "Core lead engines", sub: "remote, local, and live jobs", color: "text-primary-light" },
+  { to: 3, suffix: "", prefix: "", label: "Core lead engines", sub: "remote, local + owners, and live jobs", color: "text-primary-light" },
   { to: 16, suffix: "+", prefix: "", label: "Signal paths monitored", sub: "fresh demand in one workflow", color: "text-accent" },
   { to: 100, suffix: "", prefix: "", label: "Free daily lead allowance", sub: "during early access", color: "text-gold" },
   { to: 6, suffix: "", prefix: "", label: "Pipeline stages", sub: "from saved lead to won deal", color: "text-blue-400" },
 ];
 
 const FAQS = [
-  { q: "What are the top three iCloseLeads features?", a: "The homepage now focuses on the three lead engines freelancers use most: Remote Jobs for contract and freelance roles, Local Business Leads for web design, SEO, ads, and marketing clients, and Live Jobs for urgent public hiring signals." },
+  { q: "What are the top three iCloseLeads features?", a: "The homepage focuses on the three lead engines freelancers use most: Remote Jobs for contract and freelance roles, Local Business Leads with Decision Maker checks for owner and manager paths, and Live Jobs for urgent public hiring signals." },
   { q: "Is it really free to start?", a: "Yes. The Free plan gives you fresh lead discovery, AI-assisted proposals, local business search, live job signals, the CRM pipeline, and useful freelancer tools during early access. No credit card is required." },
   { q: "Can I use it to find remote freelance jobs?", a: "Yes. Remote Jobs is built for niche searches like WordPress, Meta ads, SEO, React, design, copywriting, and other freelance skills. It helps you find relevant remote job leads and draft a better first message." },
-  { q: "Can I use it for local business lead generation?", a: "Yes. Local Business Leads helps freelancers find businesses with useful outreach angles such as no website, outdated website, phone available, active local profile, or high review potential." },
+  { q: "Can I use it for local business lead generation?", a: "Yes. Local Business Leads helps freelancers find businesses with useful outreach angles such as no website, outdated website, phone available, active local profile, or high review potential. Decision Maker Finder then helps you look for the owner, manager, public phone route, social profile, and proof links before pitching." },
   { q: "How does the AI proposal writing work without sounding generic?", a: "The proposal workflow starts from the actual lead context: the job title, business type, visible pain, niche, and your service angle. You still review and edit the message before sending, which keeps the outreach human." },
   { q: "Can I cancel at any time?", a: "Yes — cancel anytime from your profile with zero friction. You keep access until the end of your billing period. No cancellation fees." },
 ];
@@ -919,12 +927,12 @@ export default function HomepageClient() {
                 <Reveal delay={0.1}>
                   <StepCard n="1" icon={<Search className="w-5 h-5" />}
                     title="Pick the lead engine"
-                    desc="Start with Remote Jobs for contract work, Local Business Leads for service businesses, or Live Jobs for fresh public demand. The search language changes with the opportunity type." />
+                    desc="Start with Remote Jobs for contract work, Local Business Leads for service businesses and owner/contact discovery, or Live Jobs for fresh public demand. The search language changes with the opportunity type." />
                 </Reveal>
                 <Reveal delay={0.2}>
                   <StepCard n="2" icon={<Target className="w-5 h-5" />}
                     title="Qualify by signal, not volume"
-                    desc="Use relevance, freshness, urgency, contact readiness, and website status to separate real opportunities from noisy listings." />
+                    desc="Use relevance, freshness, urgency, contact readiness, website status, and owner/manager verification paths to separate real opportunities from noisy listings." />
                 </Reveal>
                 <Reveal delay={0.3}>
                   <StepCard n="3" icon={<Sparkles className="w-5 h-5" />}

@@ -83,18 +83,20 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     title: "Freelance Lead Generation Software",
     accentTitle: "for Finding Buyers Before the Crowd",
     description:
-      "Search remote job posts, local business opportunities, community requests, and public hiring signals from one focused workspace. iCloseLeads helps freelancers spot real buying intent, filter out noise, and move the best leads straight into proposals and pipeline.",
+      "Search remote job posts, local business opportunities, owner and manager contact paths, community requests, and public hiring signals from one focused workspace. iCloseLeads helps freelancers spot real buying intent, filter out noise, and move the best leads straight into proposals and pipeline.",
     shortDescription:
-      "Find remote jobs, local businesses, and high-intent freelance opportunities without opening a dozen tabs.",
+      "Find remote jobs, local businesses, decision makers, and high-intent freelance opportunities without opening a dozen tabs.",
     titleTag:
-      "Freelance Lead Generation Software for Remote Jobs and Local Business Leads",
+      "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
     metaDescription:
-      "Find freelance clients with live remote job leads, local business opportunities, niche filters, lead scoring, and a built-in proposal workflow.",
+      "Find freelance clients with live remote job leads, local business opportunities, decision maker checks, niche filters, lead scoring, and a built-in proposal workflow.",
     keywords: [
       "freelance lead generation software",
       "find freelance clients",
       "remote job leads for freelancers",
       "local business leads for web designers",
+      "decision maker finder for small business",
+      "business owner name finder",
       "freelance client acquisition tool",
       "lead generation for independent contractors",
       "AI lead scoring for freelancers",
@@ -113,12 +115,13 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     promise:
       "Replace manual lead hunting with a repeatable discovery workflow: choose a niche, search fresh signals, filter by intent, save the best prospects, and write the first pitch while the context is still fresh.",
     proof: [
-      "Remote job leads and local business leads live in separate focused dashboards.",
+      "Remote job leads, local business leads, and Decision Maker Finder live in focused dashboards.",
       "Saved leads flow into the same CRM, proposal, and outreach workflow.",
+      "Local lead workflows can continue into owner, manager, social profile, phone route, and proof-link checks.",
       "Source coverage is abstracted in the product UI so users focus on lead quality, not raw data plumbing.",
     ],
     stats: [
-      { value: "2 modes", label: "Remote and local lead discovery" },
+      { value: "3 paths", label: "Remote, local, and decision maker discovery" },
       { value: "12h-7d", label: "Freshness filters for live jobs" },
       { value: "0-100", label: "Lead quality scoring" },
       { value: "1 flow", label: "Find, save, pitch, track" },
@@ -133,13 +136,13 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       {
         title: "Search buyer-intent signals",
         description:
-          "Run remote job discovery for active project demand or local business discovery for companies with visible website and contact gaps.",
+          "Run remote job discovery for active project demand or local business discovery for companies with visible website, contact, and owner-verification gaps.",
         icon: "Search",
       },
       {
         title: "Filter by urgency and contactability",
         description:
-          "Prioritize fresh posts, contact-ready leads, local businesses with phone numbers, and prospects that match your delivery model.",
+          "Prioritize fresh posts, contact-ready leads, local businesses with phone numbers, and prospects where an owner, manager, or public contact path can be checked.",
         icon: "Shield",
       },
       {
@@ -159,8 +162,14 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       {
         title: "Local business lead search",
         description:
-          "Search by business type and city to identify companies that may need a better website, stronger local SEO, or improved outreach.",
+          "Search by business type and city to identify companies that may need a better website, stronger local SEO, improved outreach, or a clearer contact route.",
         icon: "Target",
+      },
+      {
+        title: "Decision Maker Finder",
+        description:
+          "Move from a local business profile to owner and manager checks, social profile searches, public phone routes, registry guidance, and proof links.",
+        icon: "Users",
       },
       {
         title: "Quality scoring",
@@ -179,7 +188,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       {
         title: "Web designers selling local sites",
         description:
-          "Find local businesses by city and category, then pitch a modern website, booking flow, or local SEO package.",
+          "Find local businesses by city and category, check the owner or manager path, then pitch a modern website, booking flow, or local SEO package.",
         icon: "Users",
       },
       {
@@ -197,7 +206,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     ],
     differentiators: [
       "Built around freelancers instead of generic B2B sales teams.",
-      "Combines remote opportunities and local business prospects in one product.",
+      "Combines remote opportunities, local business prospects, and decision maker checks in one product.",
       "Moves directly from discovery to proposal and CRM instead of stopping at a list.",
       "Keeps the source labels out of the user-facing pitch flow so the experience feels proprietary and focused.",
     ],
@@ -212,7 +221,11 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       },
       {
         q: "Can I find local businesses that may need a website?",
-        a: "Yes. Local business search lets you enter a business type and city, filter by website status, and open the map profile for verification before you pitch.",
+        a: "Yes. Local business search lets you enter a business type and city, filter by website status, and open the map profile for verification before you pitch. When a lead looks promising, Decision Maker Finder helps you look for the owner, manager, phone route, social profile, registry reference, and proof links.",
+      },
+      {
+        q: "Can iCloseLeads help find the business owner or decision maker?",
+        a: "Yes. Decision Maker Finder is built to support local lead outreach by checking public owner and manager signals, social profile searches, business profile links, phone/email verification searches, and registry guidance where available. It is designed as a verification workflow, not a promise that every business will publish a named owner.",
       },
       {
         q: "How should I use lead scoring?",

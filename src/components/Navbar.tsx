@@ -21,6 +21,7 @@ const MEGA_FEATURES = [
     items: [
       { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/use-cases/remote-job-leads" },
       { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/use-cases/local-business-leads" },
+      { label: "Decision Maker Finder", desc: "Find owner and manager contact paths",       href: "/features/lead-discovery#capabilities" },
       { label: "Live Job Leads",        desc: "Move first on fresh freelance demand",       href: "/use-cases/live-job-leads" },
       { label: "Lead Scoring",          desc: "Prioritise fit, urgency, and contactability", href: "/features/lead-discovery#capabilities" },
     ],

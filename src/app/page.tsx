@@ -3,12 +3,14 @@ import HomepageClient from "@/components/HomepageClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
-  title: "Freelance Lead Generation Software for Remote Jobs and Local Business Leads",
-  description: "Find remote job leads, local business leads, and live job opportunities. Generate AI proposals, prepare Gmail outreach, and track every freelance client in one CRM.",
+  title: "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
+  description: "Find remote job leads, local business leads, owner and manager contact paths, and live job opportunities. Generate AI proposals, prepare Gmail outreach, and track every freelance client in one CRM.",
   keywords: [
     "freelance lead generation",
     "remote job leads",
     "local business leads",
+    "decision maker finder",
+    "business owner name finder",
     "live job leads",
     "find freelance clients",
     "AI proposal generator",
@@ -25,14 +27,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://icloseleads.com",
     siteName: "iCloseLeads",
-    title: "Freelance Lead Generation Software for Remote Jobs and Local Business Leads",
-    description: "Find remote job leads, local business leads, and live job opportunities, then turn each signal into AI-assisted outreach and a tracked freelance pipeline.",
+    title: "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
+    description: "Find remote job leads, local business leads, owner and manager contact paths, and live job opportunities, then turn each signal into AI-assisted outreach and a tracked freelance pipeline.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Remote Jobs, Local Business Leads, and AI Proposals",
-    description: "Find better freelance leads, draft sharper outreach, and track every client opportunity in one workflow.",
+    title: "Remote Jobs, Local Business Leads, Decision Makers, and AI Proposals",
+    description: "Find better freelance leads, identify owner/contact paths, draft sharper outreach, and track every client opportunity in one workflow.",
     creator: "@icloseleads",
   },
   robots: {
@@ -61,7 +63,7 @@ const websiteJsonLd = {
   "@type": "WebSite",
   "name": "iCloseLeads",
   "url": "https://icloseleads.com",
-  "description": "Freelance lead generation software for remote job leads, local business leads, live job opportunities, AI proposals, and CRM follow-up.",
+  "description": "Freelance lead generation software for remote job leads, local business leads, decision maker discovery, live job opportunities, AI proposals, and CRM follow-up.",
 };
 
 const softwareJsonLd = {
@@ -71,10 +73,11 @@ const softwareJsonLd = {
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "url": "https://icloseleads.com",
-  "description": "Freelance lead generation software for finding remote job leads, local business leads, live job opportunities, AI proposals, Gmail-ready outreach, and CRM pipeline tracking.",
+  "description": "Freelance lead generation software for finding remote job leads, local business leads, owner and manager contact paths, live job opportunities, AI proposals, Gmail-ready outreach, and CRM pipeline tracking.",
   "featureList": [
     "Remote job lead discovery",
     "Local business lead generation",
+    "Decision maker and owner contact path discovery",
     "Live job opportunity feed",
     "AI proposal generator",
     "Gmail-ready outreach preparation",
@@ -106,7 +109,7 @@ const useCaseItemListJsonLd = {
       "position": 2,
       "name": "Local Business Leads",
       "url": "https://icloseleads.com/use-cases/local-business-leads",
-      "description": "Find local businesses with no website, outdated websites, or visible marketing gaps.",
+      "description": "Find local businesses with no website, outdated websites, visible marketing gaps, and owner or manager verification paths.",
     },
     {
       "@type": "ListItem",

@@ -139,17 +139,23 @@ function OverviewDemo() {
 }
 
 function LeadDiscoveryDemo() {
-  const [mode, setMode] = useState<"remote" | "local">("remote");
+  const [mode, setMode] = useState<"remote" | "local" | "decision">("remote");
   const rows = mode === "remote"
     ? [
         ["Meta Ads Landing Page Audit", "Score 91", "Budget signal", "3h"],
         ["WordPress Speed Fix", "Score 84", "Contact found", "7h"],
         ["SEO Content Refresh", "Score 78", "Urgent", "12h"],
       ]
-    : [
+    : mode === "local"
+      ? [
         ["Mary Cleaning Service", "Score 82", "No website", "Houston"],
         ["Peak Dental Studio", "Score 76", "Outdated site", "Austin"],
         ["Cedar Plumbing", "Score 71", "Phone found", "Dallas"],
+      ]
+      : [
+        ["Bouldin Creek Cafe", "Score 88", "Owner path", "Austin"],
+        ["Mitchell Maids", "Score 81", "Phone route", "TX"],
+        ["Peak Dental Studio", "Score 76", "Social proof", "Austin"],
       ];
 
   return (
@@ -160,21 +166,21 @@ function LeadDiscoveryDemo() {
           <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2">
             <Search className="h-4 w-4 text-primary-light" />
             <span className="text-sm text-foreground">
-              {mode === "remote" ? "meta ads OR landing page" : "cleaning service"}
+              {mode === "remote" ? "meta ads OR landing page" : mode === "local" ? "cleaning service" : "business owner OR manager"}
             </span>
           </div>
           <button className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white">
-            Find Leads
+            {mode === "decision" ? "Check Path" : "Find Leads"}
           </button>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          {(["remote", "local"] as const).map(option => (
+          {(["remote", "local", "decision"] as const).map(option => (
             <button
               key={option}
               onClick={() => setMode(option)}
               className={cn(chip, mode === option && activeChip)}
             >
-              {option === "remote" ? "Remote jobs" : "Local businesses"}
+              {option === "remote" ? "Remote jobs" : option === "local" ? "Local businesses" : "Decision makers"}
             </button>
           ))}
           <span className={chip}>High intent</span>
