@@ -433,6 +433,7 @@ function genericBusinessContactCandidate(
   sourceUrl: string,
   sourceType: string,
   contact: { email?: string; phone?: string },
+  socialProfiles: DecisionSocialProfile[] = [],
 ): CandidateDraft | null {
   if (sourceType === "Official website contact detail" && !domainLooksRelatedToCompany(sourceUrl, input.company)) {
     return null;
@@ -452,12 +453,17 @@ function genericBusinessContactCandidate(
     proof: `${sourceType} publishes ${[phone ? "a phone number" : "", email ? "an email address" : ""].filter(Boolean).join(" and ")} for ${input.company}. For small businesses this is often the owner, manager, or front-desk number; verify before outreach.`,
     email: email || undefined,
     phone: phone || undefined,
+    socialProfiles: socialProfiles.length ? socialProfiles : undefined,
     isGenericContact: true,
     outreachAngle: `Call or email with a direct, local-business pitch and ask who handles growth, website, or marketing decisions for ${input.company}.`,
   };
 }
 
-function businessProfileContactCandidate(input: DecisionFinderInput, sourceLink: DecisionSourceLink): CandidateDraft {
+function businessProfileContactCandidate(
+  input: DecisionFinderInput,
+  sourceLink: DecisionSourceLink,
+  socialProfiles: DecisionSocialProfile[] = [],
+): CandidateDraft {
   return {
     name: "Owner / manager contact",
     role: "Public business profile contact",
@@ -468,6 +474,7 @@ function businessProfileContactCandidate(input: DecisionFinderInput, sourceLink:
     sourceType: "Provided business profile",
     sourceUrl: sourceLink.url,
     proof: `A ${sourceLink.platform} link was supplied for ${input.company}. Open the profile to verify the public phone, owner or manager details, hours, and contact route before outreach.`,
+    socialProfiles: socialProfiles.length ? socialProfiles : undefined,
     isGenericContact: true,
     outreachAngle: `Use the business profile as the starting point: call or message the public contact route, then ask who handles growth, website, or marketing decisions for ${input.company}.`,
   };
@@ -854,6 +861,7 @@ async function searchWebsite(input: DecisionFinderInput) {
       url,
       "Official website contact detail",
       extractPublicContact(html),
+      dedupeSocialProfiles(extractSocialAnchorProfiles(html, url)),
     );
     if (publicContact) candidates.push(publicContact);
     if (candidates.length >= 8) break;
@@ -1564,19 +1572,22 @@ async function searchPastedProfile(input: DecisionFinderInput, sourceLink: Decis
   }
 
   let contactCandidate: CandidateDraft | null = null;
+  let profileLinks: DecisionSocialProfile[] = [];
   if (sourceLink.platform !== "Google Business Profile") {
     const html = await fetchHtml(sourceLink.url);
     if (html) {
+      profileLinks = dedupeSocialProfiles(extractSocialAnchorProfiles(html, sourceLink.url));
       contactCandidate = genericBusinessContactCandidate(
         input,
         sourceLink.url,
         sourceLink.platform,
         extractPublicContact(html),
+        profileLinks,
       );
     }
   }
   if (contactCandidate) candidates.push(contactCandidate);
-  if (!contactCandidate) candidates.push(businessProfileContactCandidate(input, sourceLink));
+  if (!contactCandidate) candidates.push(businessProfileContactCandidate(input, sourceLink, profileLinks));
 
   evidence.push({
     label: "Pasted business/profile link",

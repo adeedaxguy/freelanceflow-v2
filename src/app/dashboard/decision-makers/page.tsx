@@ -238,6 +238,48 @@ function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: s
   return googleSearchUrl(query);
 }
 
+function ownerSearchLabel(candidate: DecisionMakerCandidate) {
+  return candidate.isGenericContact ? "Find possible owner" : "Verify profile";
+}
+
+function contactSearchLabel(candidate: DecisionMakerCandidate) {
+  return candidate.isGenericContact ? "Verify phone/email" : "Verify email/phone";
+}
+
+function socialDiscoveryLinks(company: string) {
+  return [
+    {
+      label: "LinkedIn",
+      icon: Users,
+      url: googleSearchUrl(`"${company}" (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:linkedin.com/company)`),
+    },
+    {
+      label: "Facebook",
+      icon: Globe,
+      url: googleSearchUrl(`"${company}" (owner OR manager OR contact OR phone) site:facebook.com`),
+    },
+    {
+      label: "Instagram",
+      icon: Sparkles,
+      url: googleSearchUrl(`"${company}" (owner OR manager OR contact OR phone) site:instagram.com`),
+    },
+    {
+      label: "X",
+      icon: Link2,
+      url: googleSearchUrl(`"${company}" (owner OR founder OR manager OR contact) (site:x.com OR site:twitter.com)`),
+    },
+  ];
+}
+
+function SocialProfileIcon({ platform }: { platform: string }) {
+  const name = platform.toLowerCase();
+  if (name.includes("linkedin")) return <Users className="h-3.5 w-3.5" />;
+  if (name.includes("facebook")) return <Globe className="h-3.5 w-3.5" />;
+  if (name.includes("instagram")) return <Sparkles className="h-3.5 w-3.5" />;
+  if (name === "x" || name.includes("twitter")) return <Link2 className="h-3.5 w-3.5" />;
+  return <ExternalLink className="h-3.5 w-3.5" />;
+}
+
 function candidateSourceLabel(sourceType: string) {
   const normalized = sourceType.toLowerCase();
   if (normalized.includes("pasted") && normalized.includes("profile")) return "Provided profile";
@@ -349,6 +391,16 @@ function userFacingSearchLink(link: DecisionFinderSearchLink) {
   return link;
 }
 
+function searchLinkIcon(label: string) {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("profile")) return Users;
+  if (normalized.includes("phone") || normalized.includes("contact")) return Phone;
+  if (normalized.includes("social")) return Link2;
+  if (normalized.includes("website")) return Globe;
+  if (normalized.includes("registry")) return Building2;
+  return Search;
+}
+
 function VerificationSummary({ result }: { result: DecisionFinderResult }) {
   const checked = result.evidence
     .filter(item => {
@@ -412,21 +464,27 @@ function VerificationSummary({ result }: { result: DecisionFinderResult }) {
           Recommended checks
         </h3>
         <div className="space-y-2">
-          {nextLinks.map(link => (
-            <a
-              key={`${link.label}-${link.url}`}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-xl border border-border/70 bg-background/55 p-3 transition-colors hover:border-primary/35"
-            >
-              <span className="flex items-center justify-between gap-3 font-semibold text-foreground">
-                {link.label}
-                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-              </span>
-              <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{link.detail}</span>
-            </a>
-          ))}
+          {nextLinks.map(link => {
+            const Icon = searchLinkIcon(link.label);
+            return (
+              <a
+                key={`${link.label}-${link.url}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-xl border border-border/70 bg-background/55 p-3 transition-colors hover:border-primary/35"
+              >
+                <span className="flex items-center justify-between gap-3 font-semibold text-foreground">
+                  <span className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-primary-light" />
+                    {link.label}
+                  </span>
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                </span>
+                <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">{link.detail}</span>
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -463,6 +521,20 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{candidate.proof}</p>
           <p className="mt-2 text-sm leading-relaxed text-foreground/85">{candidate.outreachAngle}</p>
           <ContactSignalBadges candidate={candidate} />
+
+          {candidate.isGenericContact && (
+            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-primary-light">
+                <Search className="h-3.5 w-3.5" />
+                Suggested verification flow
+              </p>
+              <div className="mt-2 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                <span className="rounded-lg border border-border/70 bg-background/55 px-3 py-2">1. Find possible owner name</span>
+                <span className="rounded-lg border border-border/70 bg-background/55 px-3 py-2">2. Match phone or email</span>
+                <span className="rounded-lg border border-border/70 bg-background/55 px-3 py-2">3. Confirm on profile/socials</span>
+              </div>
+            </div>
+          )}
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {candidate.email && (
@@ -510,10 +582,35 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
                     title={`Found via ${profileSourceLabel(profile.sourceType)}`}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-primary/25 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary-light transition-colors hover:border-primary/45 hover:text-foreground"
                   >
+                    <SocialProfileIcon platform={profile.platform} />
                     {profile.platform}
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 ))}
+              </div>
+            </div>
+          ) : null}
+
+          {candidate.isGenericContact && !candidate.socialProfiles?.length ? (
+            <div className="mt-4 rounded-xl border border-border/70 bg-background/50 p-3">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">Find social profiles</p>
+              <div className="flex flex-wrap gap-2">
+                {socialDiscoveryLinks(candidate.company).map(link => {
+                  const Icon = link.icon;
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {link.label}
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  );
+                })}
               </div>
             </div>
           ) : null}
@@ -525,7 +622,8 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
-              Verify profiles
+              <Users className="h-3.5 w-3.5" />
+              {ownerSearchLabel(candidate)}
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
             <a
@@ -534,7 +632,8 @@ function CandidateCard({ candidate, domain }: { candidate: DecisionMakerCandidat
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
-              Verify email/phone
+              <Mail className="h-3.5 w-3.5" />
+              {contactSearchLabel(candidate)}
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>
