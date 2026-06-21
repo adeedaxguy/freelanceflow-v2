@@ -672,7 +672,7 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
   if (!visible) return null;
   return (
     <motion.div
-      initial={{ opacity: 0, height: 0 }}
+      initial={false}
       animate={{ opacity: 1, height: "auto" }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.4 }}
@@ -773,17 +773,17 @@ export default function HomepageClient() {
           { x: 5,  y: 50, s: 3,  c: "rgba(0,229,160,0.4)",   d: 1.5  },
         ].map((p, i) => (
           <motion.div key={i}
-            className="absolute rounded-full pointer-events-none"
+            className="absolute hidden sm:block rounded-full pointer-events-none"
             style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.s, height: p.s, background: p.c, boxShadow: `0 0 ${p.s * 3}px ${p.c}` }}
             animate={{ y: [0, -20, 0], opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
             transition={{ duration: 4 + p.d, repeat: Infinity, delay: p.d, ease: "easeInOut" }}
           />
         ))}
 
-        <motion.div style={{ transform: `translateY(${heroY}px)`, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
 
           {/* Social proof chip */}
-          <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2.5 mb-8">
             <div className="flex -space-x-2">
               {["#7C3AED","#00E5A0","#FFD166","#F472B6","#60A5FA"].map((c, i) => (
@@ -803,13 +803,13 @@ export default function HomepageClient() {
           </motion.div>
 
           {/* Headline */}
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75, delay: 0.1 }}
+          <motion.h1 initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75, delay: 0.1 }}
             className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.05] tracking-tight mb-6">
             Your next{" "}
             <span className="relative inline-block">
               <span className="gradient-text">$10k client</span>
               <motion.svg className="absolute -bottom-2 left-0 w-full" height="8" viewBox="0 0 300 8" fill="none" preserveAspectRatio="none"
-                initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }} transition={{ delay: 0.8, duration: 0.7 }}>
+                initial={false} animate={{ pathLength: 1, opacity: 1 }} transition={{ delay: 0.8, duration: 0.7 }}>
                 <motion.path d="M0 6 Q75 1 150 5 Q225 9 300 4" stroke="url(#ug)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                 <defs>
                   <linearGradient id="ug" x1="0" y1="0" x2="300" y2="0" gradientUnits="userSpaceOnUse">
@@ -824,13 +824,13 @@ export default function HomepageClient() {
           </motion.h1>
 
           {/* Sub */}
-          <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
+          <motion.p initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
             iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live job opportunities, then turns each signal into a sharper pitch, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
+          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link href="/auth?mode=signup" prefetch={false} className="group relative flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-primary text-white text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -845,7 +845,7 @@ export default function HomepageClient() {
           </motion.div>
 
           {/* Trust bar */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
+          <motion.div initial={false} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
@@ -858,11 +858,11 @@ export default function HomepageClient() {
           </motion.div>
 
           {/* Source pills */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
+          <motion.div initial={false} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-2 mt-8">
             <span className="text-xs text-muted-foreground mr-1">Lead engines and high-intent signals:</span>
             {SOURCES.map((s, i) => (
-              <motion.span key={s} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+              <motion.span key={s} initial={false} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 1 + i * 0.06 }}
                 className="px-2.5 py-1 rounded-full bg-surface border border-border text-xs text-muted-foreground font-medium">
                 {s}
