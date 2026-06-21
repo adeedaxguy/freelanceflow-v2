@@ -101,6 +101,11 @@ function decisionMakerLocation(lead: LocalLead, searchLocation?: string) {
   return `${primary}, ${search}`;
 }
 
+function googleMapsBusinessProfileUrl(lead: LocalLead) {
+  const query = [lead.name, lead.address, lead.city, lead.country].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query || lead.name)}`;
+}
+
 // 150+ keyword suggestions grouped by category
 const KEYWORD_CATEGORIES: Record<string, string[]> = {
   "🔧 Trades & Construction": [
@@ -458,15 +463,18 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
     leadType: "local-business",
   });
   if (proposalDomain) proposalParams.set("domain", proposalDomain);
-  if (lead.mapsUrl) proposalParams.set("url", lead.mapsUrl);
+  const mapsHref = lead.mapsUrl || googleMapsBusinessProfileUrl(lead);
+  if (mapsHref) proposalParams.set("url", mapsHref);
   const proposalHref = `/dashboard/proposal/new?${proposalParams.toString()}`;
   const decisionParams = new URLSearchParams({
     company: lead.name,
     location: decisionMakerLocation(lead, searchLocation),
+    source: "local-leads",
+    autoRun: "1",
   });
   if (proposalDomain) decisionParams.set("domain", proposalDomain);
   if (lead.website) decisionParams.set("website", lead.website);
-  if (lead.mapsUrl) decisionParams.set("profileUrl", lead.mapsUrl);
+  if (mapsHref) decisionParams.set("profileUrl", mapsHref);
   const decisionCountry = decisionMakerCountryParam(lead.country);
   if (decisionCountry) decisionParams.set("country", decisionCountry);
   const decisionHref = `/dashboard/decision-makers?${decisionParams.toString()}`;
@@ -604,8 +612,8 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
 
         {/* Action column */}
         <div className="flex flex-col gap-2 flex-shrink-0 w-[132px]">
-          <a href={lead.mapsUrl} target="_blank" rel="noopener noreferrer"
-            title="Search this business on Google Maps to see phone, hours &amp; reviews"
+          <a href={mapsHref} target="_blank" rel="noopener noreferrer"
+            title="Search this business on Google Maps to see phone, hours, and reviews"
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
             <MapPin className="w-3.5 h-3.5"/> Google Maps
           </a>
@@ -867,6 +875,7 @@ export default function LocalLeadsPage() {
     if (savedIds.has(lead.id)) return;
     setSavingId(lead.id); setSaveError(null);
     try {
+      const mapsHref = lead.mapsUrl || googleMapsBusinessProfileUrl(lead);
       const domain = lead.website
         ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
         : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".local";
@@ -881,7 +890,7 @@ export default function LocalLeadsPage() {
           niche:       lead.categoryLabel ?? lead.category ?? "local business",
           title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${websiteStatusLabel(lead.websiteStatus)})`,
           description: lead.pitchOpener,
-          sourceUrl:   lead.mapsUrl ?? null,
+          sourceUrl:   mapsHref,
           source:      "local_business",
           isManual:    true,
           notes: [

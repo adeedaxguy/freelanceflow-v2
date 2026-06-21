@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -457,6 +457,7 @@ function DecisionMakerFinderInner() {
   const initialLocation = params.get("location") ?? "";
   const initialCountry = inferCountryFromParams(params.get("country"), initialLocation);
   const hasPrefillParams = Boolean(initialCompany || initialDomain || initialProfileUrl || initialLocation || params.get("country"));
+  const shouldAutoRunFromLocalLeads = params.get("source") === "local-leads" && params.get("autoRun") === "1";
 
   const [company, setCompany] = useState(initialCompany);
   const [domain, setDomain] = useState(normalizeCompanyDomain(initialDomain));
@@ -468,6 +469,7 @@ function DecisionMakerFinderInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<DecisionFinderResult | null>(null);
+  const autoLookupStartedRef = useRef(false);
 
   useEffect(() => {
     const stored = readPersistedDecisionFinderState();
@@ -520,7 +522,7 @@ function DecisionMakerFinderInner() {
   const canUseFinder = plan === "agency" || plan === "pro" || usage?.unlimited === true;
   const cleanDomain = useMemo(() => normalizeCompanyDomain(domain), [domain]);
 
-  async function runLookup() {
+  const runLookup = useCallback(async () => {
     if (!company.trim()) {
       setError("Enter a business name first.");
       return;
@@ -568,7 +570,14 @@ function DecisionMakerFinderInner() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [canUseFinder, cleanDomain, company, country, domain, location, profileUrl]);
+
+  useEffect(() => {
+    if (!shouldAutoRunFromLocalLeads || autoLookupStartedRef.current || !usageLoaded || !canUseFinder || loading) return;
+    if (!company.trim()) return;
+    autoLookupStartedRef.current = true;
+    void runLookup();
+  }, [canUseFinder, company, loading, runLookup, shouldAutoRunFromLocalLeads, usageLoaded]);
 
   return (
     <div className="space-y-6 p-4 pb-24 sm:p-6 lg:p-8">

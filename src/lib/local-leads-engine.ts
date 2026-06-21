@@ -61,6 +61,11 @@ export interface LocalBizLead {
   urgency:         "high" | "medium" | "low";
 }
 
+function googleMapsSearchUrl(...parts: Array<string | undefined | null>) {
+  const query = parts.map(part => part?.trim()).filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
 // ── OSM Keyword → Tag mapping (100+ business types) ───────────────────────────
 type OsmTag = { key: string; value: string };
 const OSM_MAP: Record<string, OsmTag[]> = {
@@ -442,7 +447,6 @@ async function fetchFromPhoton(keyword: string, bbox: BBox): Promise<Partial<Loc
       // Build a Google Maps business-name search URL so users land on the
       // actual business listing (with phone, hours, website, reviews) instead of
       // a bare OSM data page.
-      const searchQuery = [name, address || city, p.country].filter(Boolean).join(", ");
       results.push({
         id:      `photon-${osmType}-${p.osm_id ?? Math.random()}`,
         name,
@@ -453,7 +457,7 @@ async function fetchFromPhoton(keyword: string, bbox: BBox): Promise<Partial<Loc
         phone,
         email,
         website,
-        mapsUrl: `https://www.google.com/maps/search/${encodeURIComponent(searchQuery)}`,
+        mapsUrl: googleMapsSearchUrl(name, address || city, p.country),
         osmId:   p.osm_id ? `${osmType}/${p.osm_id}` : undefined,
         source:  "osm" as const,
         category: p.osm_value ?? keyword,
@@ -513,7 +517,6 @@ async function fetchFromNominatim(keyword: string, location: string, bbox: BBox)
       const email   = ex["email"]   ?? ex["contact:email"]   ?? undefined;
       const osmType = b.osm_type ?? "node";
 
-      const nomSearchQuery = [name, address || city, a.country].filter(Boolean).join(", ");
       results.push({
         id:      `nom-${osmType}-${b.osm_id ?? b.place_id}`,
         name,
@@ -524,7 +527,7 @@ async function fetchFromNominatim(keyword: string, location: string, bbox: BBox)
         phone:   phone?.trim() || undefined,
         email:   email?.trim() || undefined,
         website: website?.trim() || undefined,
-        mapsUrl: `https://www.google.com/maps/search/${encodeURIComponent(nomSearchQuery)}`,
+        mapsUrl: googleMapsSearchUrl(name, address || city, a.country),
         osmId:   b.osm_id ? `${osmType}/${b.osm_id}` : undefined,
         source:  "osm" as const,
       });
@@ -570,7 +573,6 @@ async function fetchFromOSM(keyword: string, bbox: BBox): Promise<Partial<LocalB
     const address = [street, city, t["addr:postcode"]].filter(Boolean).join(", ");
     const website = (t["website"] ?? t["contact:website"] ?? t["url"] ?? "").trim() || undefined;
     const phone   = (t["phone"] ?? t["contact:phone"] ?? t["contact:mobile"] ?? t["mobile"] ?? t["tel"] ?? "").trim() || undefined;
-    const osmSearchQuery = [name, address || city, t["addr:country"]].filter(Boolean).join(", ");
     results.push({
       id:       `osm-${el.type}-${el.id}`,
       name, address: address || city || "Address not listed", city,
@@ -579,7 +581,7 @@ async function fetchFromOSM(keyword: string, bbox: BBox): Promise<Partial<LocalB
       phone,
       email:    (t["email"] ?? t["contact:email"] ?? "").trim() || undefined,
       website,
-      mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(osmSearchQuery)}`,
+      mapsUrl:  googleMapsSearchUrl(name, address || city, t["addr:country"]),
       osmId:    `${el.type}/${el.id}`,
       source:   "osm" as const,
     });
@@ -640,7 +642,6 @@ async function fetchFromFoursquare(keyword: string, bbox: BBox, apiKey: string):
       const city    = loc.locality ?? loc.region ?? "";
       const address = loc.formatted_address ?? [loc.address, city, loc.postcode].filter(Boolean).join(", ");
       const cat     = b.categories?.[0]?.name?.toLowerCase() ?? keyword;
-      const mapsQ   = encodeURIComponent([b.name, address].filter(Boolean).join(", "));
       return {
         id:          `fsq-${b.fsq_id}`,
         name:         b.name,
@@ -654,7 +655,7 @@ async function fetchFromFoursquare(keyword: string, bbox: BBox, apiKey: string):
         rating:       b.rating ? Math.round((b.rating / 10) * 5 * 10) / 10 : undefined, // FSQ uses 0–10
         reviewCount:  b.stats?.total_ratings,
         category:     cat,
-        mapsUrl:      `https://www.google.com/maps/search/${mapsQ}`,
+        mapsUrl:      googleMapsSearchUrl(b.name, address),
         isOpen:       b.hours?.open_now,
         source:       "foursquare" as const,
       } satisfies Partial<LocalBizLead>;
@@ -703,7 +704,7 @@ async function fetchFromTomTom(keyword: string, bbox: BBox, apiKey: string): Pro
         lat:      r.position?.lat,
         lon:      r.position?.lon,
         category: r.poi?.categories?.[0]?.name?.toLowerCase() ?? keyword,
-        mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + ", " + address)}`,
+        mapsUrl:  googleMapsSearchUrl(name, address),
         isOpen:   r.openingHours?.open,
         source:   "osm" as const,
       } satisfies Partial<LocalBizLead>;
@@ -759,7 +760,7 @@ async function fetchFromGeoapify(keyword: string, bbox: BBox, apiKey: string): P
         lat:      p.lat ?? f.geometry?.coordinates?.[1],
         lon:      p.lon ?? f.geometry?.coordinates?.[0],
         category: keyword,
-        mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + ", " + (p.formatted ?? city))}`,
+        mapsUrl:  googleMapsSearchUrl(name, p.formatted ?? city),
         source:   "osm" as const,
       } satisfies Partial<LocalBizLead>;
     });
@@ -801,7 +802,7 @@ async function fetchFromRadar(keyword: string, bbox: BBox, apiKey: string): Prom
         country:  p.address?.country ?? "",
         lat, lon,
         category: p.categories?.[0]?.toLowerCase() ?? keyword,
-        mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + ", " + address)}`,
+        mapsUrl:  googleMapsSearchUrl(name, address),
         source:   "osm" as const,
       } satisfies Partial<LocalBizLead>;
     });
@@ -850,7 +851,7 @@ async function fetchFromBing(keyword: string, bbox: BBox, apiKey: string): Promi
         rating:      b.aggregateRating?.ratingValue,
         reviewCount: b.aggregateRating?.reviewCount,
         category:    keyword,
-        mapsUrl:     `https://www.google.com/maps/search/${encodeURIComponent(name + ", " + address)}`,
+        mapsUrl:     googleMapsSearchUrl(name, address),
         source:      "osm" as const,
       } satisfies Partial<LocalBizLead>;
     });
@@ -907,7 +908,7 @@ async function fetchFromCompaniesHouse(keyword: string, location: string, apiKey
           city,
           country: addr.country ?? "United Kingdom",
           category: keyword,
-          mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + " " + city)}`,
+          mapsUrl:  googleMapsSearchUrl(name, city),
           // Companies House doesn't return phone/website — but gives us real registered businesses
           source:   "osm" as const,
         } satisfies Partial<LocalBizLead>;
@@ -967,7 +968,7 @@ async function fetchFromSirene(keyword: string, location: string): Promise<Parti
           lat:     siege.latitude  ?? undefined,
           lon:     siege.longitude ?? undefined,
           category: e.activite_principale?.toLowerCase() ?? keyword,
-          mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + " " + city2 + " France")}`,
+          mapsUrl:  googleMapsSearchUrl(name, city2, "France"),
           source:   "osm" as const,
         } satisfies Partial<LocalBizLead>;
       });
@@ -1012,7 +1013,7 @@ async function fetchFromABN(keyword: string, location: string, guid: string): Pr
         city,
         country:  "Australia",
         category: keyword,
-        mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + " " + city + " Australia")}`,
+        mapsUrl:  googleMapsSearchUrl(name, city, "Australia"),
         source:   "osm" as const,
       } satisfies Partial<LocalBizLead>;
     });
@@ -1083,7 +1084,7 @@ async function fetchFromOpenCorporates(keyword: string, location: string): Promi
           city:    bizCity,
           country,
           category: keyword,
-          mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(name + " " + bizCity)}`,
+          mapsUrl:  googleMapsSearchUrl(name, bizCity),
           source:   "osm" as const,
         } satisfies Partial<LocalBizLead>;
       });
@@ -1121,7 +1122,7 @@ async function fetchFromYelp(keyword: string, location: string, apiKey: string):
       lon:          b.coordinates?.longitude,
       website:      undefined,           // Yelp search doesn't return website URL
       yelpUrl:      b.url,
-      mapsUrl:      b.url ?? `https://www.yelp.com/biz/${b.id}`,
+      mapsUrl:      googleMapsSearchUrl(b.name, b.location?.display_address?.join(", "), b.location?.city, b.location?.country),
       rating:       b.rating,
       reviewCount:  b.review_count,
       category:     b.categories?.[0]?.title?.toLowerCase() ?? keyword,
@@ -1176,8 +1177,8 @@ async function fetchFromHERE(keyword: string, bbox: BBox, apiKey: string): Promi
         email,
         website,
         mapsUrl:   b.title && b.address?.city
-          ? `https://www.google.com/maps/search/${encodeURIComponent([b.title, b.address.label ?? b.address.city].filter(Boolean).join(", "))}`
-          : `https://www.google.com/maps/search/${encodeURIComponent(b.title ?? "")}`,
+          ? googleMapsSearchUrl(b.title, b.address.label ?? b.address.city)
+          : googleMapsSearchUrl(b.title),
         category:  b.categories?.[0]?.name?.toLowerCase() ?? keyword,
         isOpen:    b.openingHours?.[0]?.isOpen,
         source:    "here" as const,
@@ -1274,7 +1275,7 @@ function generateDemoLeads(keyword: string, location: string, count = 18): Parti
       country:  location.split(",").slice(-1)[0]?.trim() ?? "",
       phone:    `${prefix} ${String(randS).slice(0,3)}-${String(randS).slice(3)}`,
       website:  sc.website,
-      mapsUrl:  `https://www.google.com/maps/search/${encodeURIComponent(keyword+"+"+city)}`,
+      mapsUrl:  googleMapsSearchUrl(keyword, city),
       rating:   sc.rating,
       reviewCount: sc.reviews,
       category: keyword,
@@ -1753,7 +1754,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           websiteStatus:   wsStatus,
           websiteAge:      webInfo?.age,
           websiteTech:     webInfo?.tech,
-          mapsUrl:         raw.mapsUrl ?? "",
+          mapsUrl:         raw.mapsUrl ?? googleMapsSearchUrl(raw.name, raw.address, raw.city, raw.country),
           yelpUrl:         raw.yelpUrl,
           rating:          raw.rating,
           reviewCount:     raw.reviewCount,
