@@ -485,6 +485,7 @@ function LeadEngineShowcase() {
                   <div className="flex flex-col gap-2 sm:items-end">
                     <Link
                       href={active.route}
+                      prefetch={false}
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-all flex-shrink-0"
                     >
                       Try this engine <ArrowRight className="w-4 h-4" />
@@ -649,7 +650,7 @@ function OpportunityCommandCenter() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {active.leads[0]?.cta}. Open with the exact signal, show one relevant proof point, and ask for a small next step.
               </p>
-              <Link href={active.route} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-light transition-colors">
+              <Link href={active.route} prefetch={false} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-light transition-colors">
                 Explore {active.label} <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
@@ -689,6 +690,7 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
           <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
           <Link
             href="/auth?mode=signup"
+            prefetch={false}
             className="ml-1 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/20 hover:bg-primary/30 text-primary-light text-xs font-semibold border border-primary/25 transition-all"
           >
             Get free access <ArrowRight className="w-3 h-3" />
@@ -830,7 +832,7 @@ export default function HomepageClient() {
           {/* CTAs */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link href="/auth?mode=signup" className="group relative flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-primary text-white text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
+            <Link href="/auth?mode=signup" prefetch={false} className="group relative flex items-center gap-2.5 px-9 py-4 rounded-2xl bg-primary text-white text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
               <Zap className="w-5 h-5 relative z-10" />
               <span className="relative z-10">Start Free — No Card Needed</span>
@@ -1119,14 +1121,14 @@ export default function HomepageClient() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link href="/auth?mode=signup"
+                  <Link href="/auth?mode=signup" prefetch={false}
                     className="group relative flex items-center gap-3 px-10 py-4 rounded-2xl bg-primary text-white text-lg font-bold transition-all shadow-glow-primary hover:shadow-xl hover:bg-primary-light hover:-translate-y-1 overflow-hidden">
                     <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Zap className="w-5 h-5 relative z-10" />
                     <span className="relative z-10">Find My First Lead — Free</span>
                     <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/auth?mode=signup&plan=pro"
+                  <Link href="/auth?mode=signup&plan=pro" prefetch={false}
                     className="flex items-center gap-2 px-8 py-4 rounded-2xl border border-gold/30 hover:border-gold/60 text-gold font-semibold text-base transition-all hover:-translate-y-0.5 hover:bg-gold/5">
                     <Star className="w-4 h-4 fill-gold" />
                     See Early Access
