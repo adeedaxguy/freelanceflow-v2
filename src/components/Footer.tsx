@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import Logo from "./Logo";
 
 const footerLinks = {
@@ -52,7 +52,6 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: Github, href: "https://github.com/adeedaxguy/freelanceflow-v2", label: "GitHub" },
                 { icon: Mail, href: "mailto:hello@icloseleads.com", label: "Email" },
               ].map(({ icon: Icon, href, label }) => (
                 <a
