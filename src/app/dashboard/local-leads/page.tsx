@@ -7,7 +7,7 @@ import {
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
   Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  ArrowRight, Filter, Users,
+  ArrowRight, Filter, Users, Store,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -31,6 +31,7 @@ type LocalLeadsCache = {
   location?: string;
   filter?: "all"|"no_website"|"outdated_website"|"has_website";
   hasPhone?: boolean;
+  smallOperatorOnly?: boolean;
   phoneTypeFilter?: PhoneTypeFilter;
   minRating?: number;
   page?: number;
@@ -68,6 +69,70 @@ function matchesPhoneTypeFilter(lead: LocalLead, phoneTypeFilter: PhoneTypeFilte
   if (!lead.phone) return false;
   const info = getPhoneTypeInfo(lead.phone, lead.country);
   return phoneLineTypeMatchesFilter(info.type, phoneTypeFilter);
+}
+
+const SMALL_OPERATOR_CATEGORY_RE =
+  /\b(clean(?:ing|er)?|handyman|plumb(?:er|ing)?|electric(?:ian|al)?|roofer|roofing|painter|decorator|landscap(?:er|ing)?|lawn|gardener|barber|salon|nail|massage|spa|photograph(?:er|y)?|florist|bakery|cafe|coffee|catering|food truck|takeaway|restaurant|repair|detailing|car wash|locksmith|tutor|pet groom(?:er|ing)?|tailor|alteration|kiosk|stall|cart|market|pos)\b/i;
+const SMALL_OPERATOR_NAME_RE =
+  /\b(mobile|truck|cart|stall|kiosk|booth|pop[- ]?up|market|family|owner|independent|studio|local|artisan|handmade|street|home|van|caravan|trailer|solo)\b/i;
+const SMALL_OPERATOR_ADDRESS_RE =
+  /\b(stall|booth|kiosk|unit|suite|market|mall|plaza|van|trailer|caravan)\b/i;
+const LARGE_BUSINESS_NAME_RE =
+  /\b(walmart|mcdonald'?s|starbucks|subway|burger king|kfc|domino'?s|target|costco|tesco|sainsbury'?s|asda|aldi|lidl|cvs|walgreens|home depot|lowe'?s|best buy|dunkin'?|wendy'?s|chipotle|popeyes|taco bell|panda express|pizza hut|7-eleven|holdings|group|corporation|enterprise|international|global|national|franchise)\b/i;
+
+function getSmallOperatorSignal(lead: LocalLead) {
+  const serverScale = lead.businessScale;
+  if (serverScale && typeof lead.businessScaleScore === "number") {
+    return {
+      matches: serverScale === "micro" || serverScale === "small",
+      label: serverScale === "micro" ? "Micro operator" : "Small operator",
+      score: lead.businessScaleScore,
+      reasons: lead.businessScaleReasons?.length ? lead.businessScaleReasons : ["public profile looks smaller than a chain"],
+    };
+  }
+
+  const name = lead.name ?? "";
+  const category = `${lead.category ?? ""} ${lead.categoryLabel ?? ""}`;
+  const address = lead.address ?? "";
+  const combined = `${name} ${category} ${address}`;
+  let score = 22;
+  const reasons: string[] = [];
+  const add = (points: number, reason: string) => {
+    score += points;
+    if (points > 0 && !reasons.includes(reason)) reasons.push(reason);
+  };
+
+  if (SMALL_OPERATOR_CATEGORY_RE.test(category)) add(18, "local service or storefront category");
+  if (SMALL_OPERATOR_NAME_RE.test(name)) add(16, "owner-run or mobile naming signal");
+  if (SMALL_OPERATOR_ADDRESS_RE.test(address)) add(10, "small premises, stall, or mobile address clue");
+  if (lead.websiteStatus === "none" || lead.websiteStatus === "unknown") add(12, "weak or missing website signal");
+  if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable") add(8, "website needs attention");
+  if (lead.phone) add(4, "direct public phone route found");
+
+  if (typeof lead.reviewCount === "number") {
+    if (lead.reviewCount <= 25) add(20, "low public review footprint");
+    else if (lead.reviewCount <= 75) add(14, "modest public review footprint");
+    else if (lead.reviewCount <= 150) add(7, "single-location sized review footprint");
+    else if (lead.reviewCount >= 1000) score -= 35;
+    else if (lead.reviewCount >= 500) score -= 22;
+  } else {
+    add(6, "limited public profile data");
+  }
+
+  if (LARGE_BUSINESS_NAME_RE.test(combined)) score -= 40;
+  score = Math.max(0, Math.min(100, score));
+
+  return {
+    matches: score >= 40,
+    label: score >= 58 ? "Micro operator" : "Small operator",
+    score,
+    reasons: reasons.length ? reasons.slice(0, 4) : ["public profile looks smaller than a chain"],
+  };
+}
+
+function smallOperatorTitle(lead: LocalLead) {
+  const signal = getSmallOperatorSignal(lead);
+  return `${signal.label} signal (${signal.score}/100): ${signal.reasons.join(" · ")}. Use as a prospecting clue, then verify before pitching.`;
 }
 
 function decisionMakerCountryParam(country?: string) {
@@ -478,6 +543,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
     ...(lead.guessedEmails ?? []).filter(e => e !== lead.email).map(e => ({ addr: e, type: "guessed" as const })),
   ];
   const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
+  const smallOperatorSignal = getSmallOperatorSignal(lead);
 
   const proposalDomain = lead.website
     ? lead.website.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]!
@@ -533,6 +599,14 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
             {lead.revenueEst && (
               <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-medium">
                 <DollarSign className="w-3 h-3"/> {lead.revenueEst}/mo potential
+              </span>
+            )}
+            {smallOperatorSignal.matches && (
+              <span
+                title={smallOperatorTitle(lead)}
+                className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium"
+              >
+                <Store className="w-3 h-3"/> {smallOperatorSignal.label}
               </span>
             )}
             <span className={`text-xs ml-auto ${scoreCls}`} title="Priority score (0–100)">
@@ -754,6 +828,7 @@ export default function LocalLeadsPage() {
   const [cacheReady,     setCacheReady]     = useState(false);
   // Extra filters
   const [hasPhone,       setHasPhone]       = useState(false);
+  const [smallOperatorOnly, setSmallOperatorOnly] = useState(false);
   const [phoneTypeFilter, setPhoneTypeFilter] = useState<PhoneTypeFilter>("all");
   const [minRating,      setMinRating]      = useState(0);
   const [showFilters,    setShowFilters]    = useState(false);
@@ -768,11 +843,11 @@ export default function LocalLeadsPage() {
     if (sessionStatus === "loading") return;
     // Clear stale lead caches on schema changes
     try {
-      if (sessionStorage.getItem("icl_cache_v") !== "6") {
+      if (sessionStorage.getItem("icl_cache_v") !== "7") {
         sessionStorage.removeItem("ff_ss_live_results");
         sessionStorage.removeItem("ff_ss_remote_results");
         sessionStorage.removeItem("ff_ss_local_results");
-        sessionStorage.setItem("icl_cache_v", "6");
+        sessionStorage.setItem("icl_cache_v", "7");
       }
     } catch {}
     const resetTs  = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
@@ -803,6 +878,7 @@ export default function LocalLeadsPage() {
         if (typeof parsed.location === "string") setLocation(parsed.location);
         if (parsed.filter && ["all", "no_website", "outdated_website", "has_website"].includes(parsed.filter)) setFilter(parsed.filter);
         setHasPhone(Boolean(parsed.hasPhone));
+        setSmallOperatorOnly(Boolean(parsed.smallOperatorOnly));
         if (parsed.phoneTypeFilter && PHONE_TYPE_FILTERS.some(option => option.value === parsed.phoneTypeFilter)) {
           setPhoneTypeFilter(parsed.phoneTypeFilter);
         }
@@ -828,6 +904,7 @@ export default function LocalLeadsPage() {
         location,
         filter,
         hasPhone,
+        smallOperatorOnly,
         phoneTypeFilter,
         minRating,
         page,
@@ -836,7 +913,7 @@ export default function LocalLeadsPage() {
       };
       sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify(payload));
     } catch {}
-  }, [cacheReady, results, keyword, location, filter, hasPhone, phoneTypeFilter, minRating, page, meta, savedIds]);
+  }, [cacheReady, results, keyword, location, filter, hasPhone, smallOperatorOnly, phoneTypeFilter, minRating, page, meta, savedIds]);
 
   // Reset time for display
   const resetAt = (() => {
@@ -891,6 +968,7 @@ export default function LocalLeadsPage() {
           location: location.trim(),
           filter,
           hasPhone,
+          smallOperatorOnly,
           phoneTypeFilter: "all",
           minRating,
           page: 1,
@@ -912,7 +990,7 @@ export default function LocalLeadsPage() {
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, hasPhone, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
+  }, [keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -924,6 +1002,7 @@ export default function LocalLeadsPage() {
         : lead.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".local";
       const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
       const callScript = getLocalLeadCallScript(lead);
+      const smallSignal = getSmallOperatorSignal(lead);
       const res = await fetch("/api/leads/save", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -945,6 +1024,7 @@ export default function LocalLeadsPage() {
             `Website: ${lead.website ?? "None"} (${lead.websiteStatus}${lead.websiteTech ? ` — ${lead.websiteTech}` : ""}${lead.websiteAge ? ` — ${lead.websiteAge}` : ""})`,
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
             lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
+            smallSignal.matches ? `Small Operator Signal: ${smallSignal.score}/100 (${smallSignal.reasons.join("; ")})` : null,
             lead.guessedEmails?.length ? `Guessed Emails: ${lead.guessedEmails.join(", ")}` : null,
             "Lead Coverage: Live local search",
             `Priority Score: ${lead.score}/100 (${lead.urgency} urgency)`,
@@ -968,7 +1048,7 @@ export default function LocalLeadsPage() {
 
   // Apply all client-side filters. Keep phone-type counts based on the visible
   // search context before the user chooses a specific number type.
-  const primaryFilteredResults = useMemo(() => results.filter(r => {
+  const baseFilteredResults = useMemo(() => results.filter(r => {
     // Website status filter (the main Show: selector)
     // "No Website" shows confirmed none + unverified businesses - both worth pitching.
     if (filter === "no_website"       && r.websiteStatus !== "none" && r.websiteStatus !== "unknown") return false;
@@ -978,6 +1058,14 @@ export default function LocalLeadsPage() {
     if (minRating && (r.rating ?? 0) < minRating) return false;
     return true;
   }), [results, filter, hasPhone, minRating]);
+  const smallOperatorCount = useMemo(
+    () => baseFilteredResults.filter(r => getSmallOperatorSignal(r).matches).length,
+    [baseFilteredResults]
+  );
+  const primaryFilteredResults = useMemo(
+    () => smallOperatorOnly ? baseFilteredResults.filter(r => getSmallOperatorSignal(r).matches) : baseFilteredResults,
+    [baseFilteredResults, smallOperatorOnly]
+  );
   const phoneTypeCounts = useMemo(() => PHONE_TYPE_FILTERS.reduce<Record<PhoneTypeFilter, number>>((counts, option) => {
     counts[option.value] = option.value === "all"
       ? primaryFilteredResults.length
@@ -998,13 +1086,14 @@ export default function LocalLeadsPage() {
   const landlineLeads = phoneTypeCounts.landline;
   const tollFreeServiceLeads = phoneTypeCounts.toll_free_service;
   const businessUnknownLeads = phoneTypeCounts.business_unknown;
-  const filtersActive = hasPhone || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all";
+  const filtersActive = hasPhone || smallOperatorOnly || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all";
   const selectedPhoneTypeOption = PHONE_TYPE_FILTERS.find(option => option.value === phoneTypeFilter);
   const activeFilterLabels = [
     filter === "no_website" ? "No/Unknown Website" : null,
     filter === "outdated_website" ? "Outdated Site" : null,
     filter === "has_website" ? "Has Website" : null,
     hasPhone ? "Has Phone" : null,
+    smallOperatorOnly ? "Small Operator" : null,
     phoneTypeFilter !== "all" ? selectedPhoneTypeOption?.label : null,
     minRating > 0 ? `${minRating} star minimum rating` : null,
   ].filter(Boolean) as string[];
@@ -1238,6 +1327,19 @@ export default function LocalLeadsPage() {
                 <Phone className="w-3.5 h-3.5"/> Has Phone
               </button>
 
+              <button
+                type="button"
+                title="Prioritises businesses that look owner-run, single-location, mobile/stall-based, or lower-resource from public profile signals. Verify before pitching."
+                onClick={() => { setSmallOperatorOnly(v => !v); setPage(1); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${smallOperatorOnly ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-300" : "border-border text-muted-foreground hover:border-cyan-500/30"}`}>
+                <Store className="w-3.5 h-3.5"/> Small operator
+                {baseFilteredResults.length > 0 && (
+                  <span className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${smallOperatorOnly ? "bg-cyan-500/20 text-cyan-200" : "bg-muted text-muted-foreground"}`}>
+                    {smallOperatorCount}
+                  </span>
+                )}
+              </button>
+
               {/* Phone type */}
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs text-muted-foreground">Number type:</span>
@@ -1291,8 +1393,8 @@ export default function LocalLeadsPage() {
               </div>
 
               {/* Clear extra filters */}
-              {(hasPhone || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all") && (
-                <button onClick={() => { setHasPhone(false); setPhoneTypeFilter("all"); setMinRating(0); setFilter("all"); setPage(1); }}
+              {(hasPhone || smallOperatorOnly || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all") && (
+                <button onClick={() => { setHasPhone(false); setSmallOperatorOnly(false); setPhoneTypeFilter("all"); setMinRating(0); setFilter("all"); setPage(1); }}
                   className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-3 h-3"/> Clear filters
                 </button>
@@ -1334,7 +1436,7 @@ export default function LocalLeadsPage() {
                 <Info className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   <span className="text-foreground font-semibold">Live coverage</span>
-                  {" "}— {filteredResults.length} businesses found. Ratings, reviews, phone numbers, and website signals appear when available.
+                  {" "}— {filteredResults.length} businesses found. Ratings, reviews, phone numbers, website signals, and small-operator clues appear when available.
                 </p>
               </div>
             )}
@@ -1351,6 +1453,7 @@ export default function LocalLeadsPage() {
                 )}
                 {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no website</span>}
                 {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated/down</span>}
+                {smallOperatorCount > 0 && <span className="text-cyan-300 font-medium">{smallOperatorCount} small operators</span>}
                 {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
                 <div className="ml-auto flex items-center gap-2 flex-wrap">
                   {meta?.cached && (
@@ -1392,12 +1495,14 @@ export default function LocalLeadsPage() {
                   <p className="text-muted-foreground text-xs mt-1">
                     {phoneTypeFilter !== "all"
                       ? "For US and Canadian listings, mobile-vs-landline is rarely exposed from the number pattern. Try Business / Unknown or Any type."
+                      : smallOperatorOnly
+                        ? "Small-operator matching uses public clues like review volume, category, naming, and website status. Try clearing it if this niche has sparse data."
                       : filter === "no_website" || filter === "outdated_website"
                         ? "Try a different area or keyword - website data varies by location."
                         : "Broaden your filters to include leads without ratings or phone numbers."}
                   </p>
                 </div>
-                <button onClick={() => { setHasPhone(false); setPhoneTypeFilter("all"); setMinRating(0); setFilter("all"); setPage(1); }}
+                <button onClick={() => { setHasPhone(false); setSmallOperatorOnly(false); setPhoneTypeFilter("all"); setMinRating(0); setFilter("all"); setPage(1); }}
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all">
                   <X className="w-3.5 h-3.5"/> Clear filters to see {results.length} results
                 </button>

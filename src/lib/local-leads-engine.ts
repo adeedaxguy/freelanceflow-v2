@@ -60,11 +60,80 @@ export interface LocalBizLead {
   opportunityType: "no_website" | "outdated_website" | "modernise" | "seo";
   score:           number;
   urgency:         "high" | "medium" | "low";
+  businessScale?:  "micro" | "small" | "standard" | "chain_or_large" | "unknown";
+  businessScaleScore?: number;
+  businessScaleReasons?: string[];
 }
 
 function googleMapsSearchUrl(...parts: Array<string | undefined | null>) {
   const query = parts.map(part => part?.trim()).filter(Boolean).join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+const MICRO_BUSINESS_CATEGORY_RE =
+  /\b(clean(?:ing|er)?|handyman|plumb(?:er|ing)?|electric(?:ian|al)?|roofer|roofing|painter|decorator|landscap(?:er|ing)?|lawn|gardener|barber|salon|nail|massage|spa|photograph(?:er|y)?|florist|bakery|cafe|coffee|catering|food truck|takeaway|restaurant|repair|detailing|car wash|locksmith|tutor|pet groom(?:er|ing)?|tailor|alteration|kiosk|stall|cart|market|pos)\b/i;
+const MICRO_BUSINESS_NAME_RE =
+  /\b(mobile|truck|cart|stall|kiosk|booth|pop[- ]?up|market|family|owner|independent|studio|local|artisan|handmade|street|home|van|caravan|trailer|solo)\b/i;
+const MICRO_BUSINESS_ADDRESS_RE =
+  /\b(stall|booth|kiosk|unit|suite|market|mall|plaza|van|trailer|caravan)\b/i;
+const CHAIN_OR_LARGE_NAME_RE =
+  /\b(walmart|mcdonald'?s|starbucks|subway|burger king|kfc|domino'?s|target|costco|tesco|sainsbury'?s|asda|aldi|lidl|cvs|walgreens|home depot|lowe'?s|best buy|dunkin'?|wendy'?s|chipotle|popeyes|taco bell|panda express|pizza hut|7-eleven)\b/i;
+const LARGE_ORG_NAME_RE =
+  /\b(holdings|group|corporation|enterprise|international|global|national|franchise)\b/i;
+
+function businessScaleSignal(lead: Pick<LocalBizLead,
+  "name" | "address" | "category" | "categoryLabel" | "websiteStatus" | "phone" | "reviewCount"
+>): Pick<LocalBizLead, "businessScale" | "businessScaleScore" | "businessScaleReasons"> {
+  const name = lead.name ?? "";
+  const category = `${lead.category ?? ""} ${lead.categoryLabel ?? ""}`;
+  const address = lead.address ?? "";
+  const combined = `${name} ${category} ${address}`;
+  let score = 22;
+  const reasons: string[] = [];
+
+  const add = (points: number, reason: string) => {
+    score += points;
+    if (points > 0 && !reasons.includes(reason)) reasons.push(reason);
+  };
+
+  if (MICRO_BUSINESS_CATEGORY_RE.test(category)) add(18, "local service or storefront category");
+  if (MICRO_BUSINESS_NAME_RE.test(name)) add(16, "owner-run or mobile naming signal");
+  if (MICRO_BUSINESS_ADDRESS_RE.test(address)) add(10, "small premises, stall, or mobile address clue");
+
+  if (lead.websiteStatus === "none" || lead.websiteStatus === "unknown") {
+    add(12, "weak or missing website signal");
+  } else if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable") {
+    add(8, "website needs attention");
+  }
+
+  if (lead.phone) add(4, "direct public phone route found");
+
+  if (typeof lead.reviewCount === "number") {
+    if (lead.reviewCount <= 25) add(20, "low public review footprint");
+    else if (lead.reviewCount <= 75) add(14, "modest public review footprint");
+    else if (lead.reviewCount <= 150) add(7, "single-location sized review footprint");
+    else if (lead.reviewCount >= 1000) score -= 35;
+    else if (lead.reviewCount >= 500) score -= 22;
+  } else {
+    add(6, "limited public profile data");
+  }
+
+  if (CHAIN_OR_LARGE_NAME_RE.test(combined)) score -= 52;
+  if (LARGE_ORG_NAME_RE.test(name)) score -= 18;
+
+  score = Math.max(0, Math.min(100, score));
+
+  const businessScale: LocalBizLead["businessScale"] =
+    score >= 58 ? "micro" :
+    score >= 40 ? "small" :
+    score <= 12 ? "chain_or_large" :
+    "standard";
+
+  return {
+    businessScale,
+    businessScaleScore: score,
+    businessScaleReasons: reasons.slice(0, 4),
+  };
 }
 
 // ── OSM Keyword → Tag mapping (100+ business types) ───────────────────────────
@@ -1649,9 +1718,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
     db,
   } = opts;
   const limit    = Math.min(opts.limit ?? 60, 80);
-  // v6 - add per-opportunity call scripts to cached local lead payloads.
+  // v7 - add small-operator business scale signals to cached local lead payloads.
   const sourceScope = cacheScope ?? "default";
-  const cacheKey = `v6-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
+  const cacheKey = `v7-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
 
   // 1. Cache check — instant return
   const cached = await cacheGet(cacheKey, db);
@@ -1801,6 +1870,10 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           score:           0,
           urgency:         "medium",
         };
+        const scaleSignal = businessScaleSignal(lead);
+        lead.businessScale = scaleSignal.businessScale;
+        lead.businessScaleScore = scaleSignal.businessScaleScore;
+        lead.businessScaleReasons = scaleSignal.businessScaleReasons;
         lead.score   = scoreLead(lead);
         lead.urgency = lead.score >= 85 ? "high" : lead.score >= 65 ? "medium" : "low";
         return lead;
