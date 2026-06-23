@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 export type UseCaseSlug =
   | "remote-job-leads"
+  | "freelance-cold-outreach"
   | "local-business-leads"
   | "live-job-leads";
 
@@ -138,6 +139,132 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       {
         q: "Which niches work best for remote job lead search?",
         a: "High-signal niches include WordPress, Webflow, React, SEO, Meta ads, copywriting, design, automation, data, and virtual assistance because buyers often describe the problem clearly in public posts.",
+      },
+    ],
+  },
+  {
+    slug: "freelance-cold-outreach",
+    path: "/use-cases/freelance-cold-outreach",
+    eyebrow: "Freelance Cold Outreach",
+    title: "Freelance cold outreach",
+    accentTitle: "that starts from real buying signals",
+    metaTitle: "Freelance Cold Outreach Software | Find Leads and Write Better Pitches",
+    metaDescription:
+      "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, AI proposal drafts, Gmail-ready emails, notes, and CRM follow-up.",
+    keywords: [
+      "freelance cold outreach",
+      "cold outreach for freelancers",
+      "freelance cold email",
+      "cold email outreach for freelancers",
+      "find freelance clients",
+      "freelance lead generation",
+      "freelance outreach tool",
+      "AI cold email generator for freelancers",
+      "personalized freelance proposals",
+      "Gmail outreach for freelancers",
+    ],
+    heroSummary:
+      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied.",
+    primaryCta: "Start Outreach Free",
+    secondaryCta: "See AI Proposals",
+    dashboardPath: "/dashboard/leads",
+    searchIntent:
+      "People searching for freelance cold outreach usually want a repeatable way to find clients, write better cold emails, and avoid generic spam. This page targets that practical commercial intent.",
+    audience:
+      "Built for freelancers, consultants, and small agencies selling websites, SEO, paid ads, design, copywriting, automation, development, and marketing support.",
+    outcome:
+      "A signal-led outreach workflow where every saved lead has context, a pitch angle, a contact route, notes, and follow-up status.",
+    intro: [
+      "Most freelance cold outreach fails because it starts with a list, not a reason. A stranger does not need another generic message about your services. They need to see that you noticed a real problem, timing cue, job post, website gap, or business signal that makes your offer relevant now.",
+      "iCloseLeads is built for that style of outreach. You can find remote job leads, local business opportunities, live hiring signals, and decision-maker paths, then turn the context into a sharp first message. The result is not more noise. It is a smaller list of better prospects with a stronger reason to reply.",
+    ],
+    signals: [
+      {
+        label: "Fresh lead signal",
+        detail: "Use recent remote posts, live job signals, and local business gaps so the outreach starts from something current.",
+      },
+      {
+        label: "Specific business reason",
+        detail: "Pitch the website issue, hiring need, launch pressure, booking gap, or marketing problem instead of opening with a generic intro.",
+      },
+      {
+        label: "Decision-maker path",
+        detail: "For local businesses, check public owner, manager, social profile, phone route, and registry guidance before deciding how to reach out.",
+      },
+      {
+        label: "Human proposal draft",
+        detail: "Generate a first draft from the lead context, then edit the opener, proof point, and next step before sending.",
+      },
+      {
+        label: "Follow-up memory",
+        detail: "Save notes, outreach status, and next actions so good leads do not disappear after the first message.",
+      },
+    ],
+    workflow: [
+      {
+        title: "Choose one offer",
+        description:
+          "Pick one service to sell this week, such as Webflow, WordPress, SEO, Meta ads, landing pages, or automation.",
+      },
+      {
+        title: "Find leads with a visible reason",
+        description:
+          "Search remote jobs, local businesses, or live signals where the business problem is clear enough to reference.",
+      },
+      {
+        title: "Write from the signal",
+        description:
+          "Use the job post, business profile, website status, or contact route as the first sentence of the pitch.",
+      },
+      {
+        title: "Track replies and follow-ups",
+        description:
+          "Move each lead through saved, contacted, replied, follow-up, won, or lost instead of relying on memory.",
+      },
+    ],
+    keywordsCluster: [
+      { group: "Core", terms: ["freelance cold outreach", "cold outreach for freelancers", "freelance cold email"] },
+      { group: "Lead sourcing", terms: ["find freelance clients", "freelance lead generation", "remote job leads"] },
+      { group: "Pitch workflow", terms: ["AI proposal generator", "cold email outreach for freelancers", "freelance CRM"] },
+    ],
+    examples: [
+      {
+        title: "B2B SaaS team needs Webflow help",
+        context: "Fresh remote post, marketing-site pain, and a clear delivery window.",
+        pitchAngle: "Open with the launch timing, mention one similar Webflow outcome, and offer a short cleanup sprint.",
+      },
+      {
+        title: "Local business has no verified website",
+        context: "Active map profile, public phone route, and a service category that depends on trust.",
+        pitchAngle: "Reference the missing website, tie it to missed calls or quote requests, and suggest a simple starter site.",
+      },
+      {
+        title: "Agency hiring overflow support",
+        context: "Urgent delivery language and likely recurring work if the first project goes well.",
+        pitchAngle: "Lead with availability, the exact skill match, and a low-friction first task.",
+      },
+    ],
+    comparison: [
+      { oldWay: "Buy a generic list and send the same message.", icloseWay: "Start from remote, local, and live signals that give each pitch a real reason." },
+      { oldWay: "Write cold emails from scratch every time.", icloseWay: "Generate a draft from the opportunity context, then personalize the proof and next step." },
+      { oldWay: "Forget who you contacted.", icloseWay: "Save leads, notes, proposal drafts, and follow-up stages in one CRM workflow." },
+    ],
+    faqs: [
+      {
+        q: "What is freelance cold outreach?",
+        a: "Freelance cold outreach is the process of contacting potential clients who have not asked for a proposal yet, but show a public signal that your service may help them. Good outreach references a specific reason, not just a generic service pitch.",
+      },
+      {
+        q: "How do I make freelance cold outreach less spammy?",
+        a: "Use a smaller list, verify the business or job signal, mention a real observation, keep the message short, and give the recipient a simple next step. The goal is relevance, not volume.",
+      },
+      {
+        q: "What should I write in a freelance cold email?",
+        a: "Start with the reason you are reaching out, connect it to one outcome you can help with, add a short proof point, and ask for a low-pressure next step. Avoid long introductions and vague claims.",
+      },
+      {
+        q: "How does iCloseLeads help with cold outreach for freelancers?",
+        a: "iCloseLeads helps you find lead signals, save the best prospects, check decision-maker paths, generate proposal drafts, prepare Gmail outreach, and track follow-up so cold outreach becomes a repeatable workflow.",
       },
     ],
   },

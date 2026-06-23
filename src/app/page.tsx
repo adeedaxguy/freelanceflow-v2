@@ -3,10 +3,14 @@ import HomepageClient from "@/components/HomepageClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
-  title: "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
-  description: "Find remote job leads, local business leads, owner and manager contact paths, and live job opportunities. Generate AI proposals, prepare Gmail outreach, and track every freelance client in one CRM.",
+  title: "iCloseLeads: Freelance Lead Generation Software for Cold Outreach",
+  description: "iCloseLeads helps freelancers find remote job leads, local business leads, decision-maker paths, and live job opportunities, then write better cold outreach and track follow-up.",
   keywords: [
+    "iCloseLeads",
+    "icloseleads.com",
     "freelance lead generation",
+    "freelance cold outreach",
+    "cold outreach for freelancers",
     "remote job leads",
     "local business leads",
     "decision maker finder",
@@ -27,14 +31,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://icloseleads.com",
     siteName: "iCloseLeads",
-    title: "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
-    description: "Find remote job leads, local business leads, owner and manager contact paths, and live job opportunities, then turn each signal into AI-assisted outreach and a tracked freelance pipeline.",
+    title: "iCloseLeads: Freelance Lead Generation Software for Cold Outreach",
+    description: "Find remote jobs, local business leads, owner and manager contact paths, and live job signals, then turn each opportunity into AI-assisted outreach and CRM follow-up.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Remote Jobs, Local Business Leads, Decision Makers, and AI Proposals",
-    description: "Find better freelance leads, identify owner/contact paths, draft sharper outreach, and track every client opportunity in one workflow.",
+    title: "iCloseLeads: Freelance Leads, Cold Outreach, and CRM",
+    description: "Find better freelance leads, identify owner/contact paths, draft sharper outreach, and track every client opportunity.",
     creator: "@icloseleads",
   },
   robots: {
@@ -47,9 +51,19 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "iCloseLeads",
+  "alternateName": ["iCloseLeads"],
   "url": "https://icloseleads.com",
   "logo": "https://icloseleads.com/og-image.png",
-  "description": "AI-powered client acquisition platform for freelancers",
+  "description": "Freelance lead generation and cold outreach software for remote job leads, local business leads, decision-maker research, AI proposals, and CRM follow-up.",
+  "disambiguatingDescription": "iCloseLeads is an independent freelance lead generation platform. It is not iClose or iCloser.",
+  "knowsAbout": [
+    "freelance cold outreach",
+    "remote job leads",
+    "local business leads",
+    "decision maker finder",
+    "AI proposals",
+    "freelance CRM"
+  ],
   "contactPoint": {
     "@type": "ContactPoint",
     "email": "hello@icloseleads.com",
@@ -62,8 +76,9 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "iCloseLeads",
+  "alternateName": "iCloseLeads.com",
   "url": "https://icloseleads.com",
-  "description": "Freelance lead generation software for remote job leads, local business leads, decision maker discovery, live job opportunities, AI proposals, and CRM follow-up.",
+  "description": "Freelance lead generation software for cold outreach, remote job leads, local business leads, decision maker discovery, live job opportunities, AI proposals, and CRM follow-up.",
 };
 
 const softwareJsonLd = {
@@ -75,6 +90,7 @@ const softwareJsonLd = {
   "url": "https://icloseleads.com",
   "description": "Freelance lead generation software for finding remote job leads, local business leads, owner and manager contact paths, live job opportunities, AI proposals, Gmail-ready outreach, and CRM pipeline tracking.",
   "featureList": [
+    "Freelance cold outreach workflow",
     "Remote job lead discovery",
     "Local business lead generation",
     "Decision maker and owner contact path discovery",
@@ -107,13 +123,20 @@ const useCaseItemListJsonLd = {
     {
       "@type": "ListItem",
       "position": 2,
+      "name": "Freelance Cold Outreach",
+      "url": "https://icloseleads.com/use-cases/freelance-cold-outreach",
+      "description": "Find lead signals, write researched cold outreach, prepare Gmail drafts, and track follow-up.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
       "name": "Local Business Leads",
       "url": "https://icloseleads.com/use-cases/local-business-leads",
       "description": "Find local businesses with no website, outdated websites, visible marketing gaps, and owner or manager verification paths.",
     },
     {
       "@type": "ListItem",
-      "position": 3,
+      "position": 4,
       "name": "Live Job Leads",
       "url": "https://icloseleads.com/use-cases/live-job-leads",
       "description": "Monitor live freelance opportunities and turn fresh demand into saved leads and outreach.",

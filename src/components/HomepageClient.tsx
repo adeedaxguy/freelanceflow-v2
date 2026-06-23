@@ -552,7 +552,9 @@ const STATS = [
 ];
 
 const FAQS = [
+  { q: "Is iCloseLeads the same as iClose or iCloser?", a: "No. iCloseLeads is an independent freelance lead generation and cold outreach platform for remote job leads, local business leads, decision-maker research, AI proposals, and CRM follow-up." },
   { q: "What are the top three iCloseLeads features?", a: "The homepage focuses on the three lead engines freelancers use most: Remote Jobs for contract and freelance roles, Local Business Leads with Decision Maker checks for owner and manager paths, and Live Jobs for urgent public hiring signals." },
+  { q: "Can iCloseLeads help with freelance cold outreach?", a: "Yes. iCloseLeads helps you find fresh lead signals, save the best prospects, check the contact path, draft a personalized proposal, prepare Gmail outreach, and track follow-up in one workflow." },
   { q: "Is it really free to start?", a: "Yes. The Free plan gives you fresh lead discovery, AI-assisted proposals, local business search, live job signals, the CRM pipeline, and useful freelancer tools during early access. No credit card is required." },
   { q: "Can I use it to find remote freelance jobs?", a: "Yes. Remote Jobs is built for niche searches like WordPress, Meta ads, SEO, React, design, copywriting, and other freelance skills. It helps you find relevant remote job leads and draft a better first message." },
   { q: "Can I use it for local business lead generation?", a: "Yes. Local Business Leads helps freelancers find businesses with useful outreach angles such as no website, outdated website, phone available, active local profile, or high review potential. Decision Maker Finder then helps you look for the owner, manager, public phone route, social profile, and proof links before pitching." },

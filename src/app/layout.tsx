@@ -7,11 +7,11 @@ import DeferredClientChrome from "@/components/DeferredClientChrome";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
   title: {
-    default: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
+    default: "iCloseLeads - Freelance Lead Generation and Cold Outreach Software",
     template: "%s | iCloseLeads",
   },
-  description: "Find high-quality clients with AI-powered lead discovery, personalized proposals, and automated outreach. The #1 client acquisition platform for freelancers.",
-  keywords: ["freelance", "client acquisition", "lead generation", "cold email", "AI proposals", "freelancer tools"],
+  description: "iCloseLeads helps freelancers find remote job leads, local business leads, decision-maker paths, and live job signals, then write better cold outreach and track follow-up.",
+  keywords: ["iCloseLeads", "freelance cold outreach", "freelance lead generation", "remote job leads", "local business leads", "decision maker finder", "AI proposals", "freelancer tools"],
   authors: [{ name: "iCloseLeads" }],
   creator: "iCloseLeads",
   openGraph: {
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://icloseleads.com",
     siteName: "iCloseLeads",
-    title: "iCloseLeads — AI-Powered Client Acquisition for Freelancers",
-    description: "Stop chasing clients. Let iCloseLeads find them with AI-powered lead discovery and proposal generation.",
+    title: "iCloseLeads - Freelance Lead Generation and Cold Outreach Software",
+    description: "Find remote job leads, local business leads, decision-maker paths, live job signals, AI proposals, and CRM follow-up in one workflow.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "iCloseLeads — AI-Powered Client Acquisition",
-    description: "Find high-quality clients with AI. 10,000+ leads found monthly.",
+    title: "iCloseLeads - Freelance Lead Generation",
+    description: "Find better freelance leads, write stronger outreach, and track every follow-up.",
     creator: "@icloseleads",
   },
   robots: {

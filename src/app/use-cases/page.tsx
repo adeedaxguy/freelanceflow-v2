@@ -9,11 +9,12 @@ const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Freelance Lead Generation Use Cases: Remote, Local, and Live Leads",
+  title: "Freelance Lead Generation Use Cases: Remote, Cold Outreach, Local, and Live Leads",
   description:
-    "Explore iCloseLeads use cases for remote job leads, local business leads, and live job leads. Find better prospects, generate AI proposals, and track every follow-up.",
+    "Explore iCloseLeads use cases for remote job leads, freelance cold outreach, local business leads, and live job leads. Find better prospects, generate AI proposals, and track every follow-up.",
   keywords: [
     "freelance lead generation use cases",
+    "freelance cold outreach",
     "remote job leads",
     "local business leads",
     "live job leads",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Freelance Lead Generation Use Cases | iCloseLeads",
     description:
-      "Remote job leads, local business leads, and live job leads in one client acquisition workflow.",
+      "Remote job leads, freelance cold outreach, local business leads, and live job leads in one client acquisition workflow.",
     url: `${BASE_URL}/use-cases`,
     type: "website",
     siteName: "iCloseLeads",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Freelance Lead Generation Use Cases",
     description:
-      "Find remote, local, and live opportunities, then turn each lead into outreach and pipeline.",
+      "Find remote, cold outreach, local, and live opportunities, then turn each lead into outreach and pipeline.",
   },
 };
 
@@ -44,7 +45,7 @@ function UseCasesJsonLd() {
       "@type": "CollectionPage",
       name: "Freelance Lead Generation Use Cases",
       description:
-        "A collection of iCloseLeads use cases for freelancers searching for remote job leads, local business leads, and live job leads.",
+        "A collection of iCloseLeads use cases for freelancers searching for remote job leads, freelance cold outreach, local business leads, and live job leads.",
       url: `${BASE_URL}/use-cases`,
       isPartOf: {
         "@type": "WebSite",
@@ -91,10 +92,10 @@ export default function UseCasesPage() {
               Use Cases
             </div>
             <h1 className="mx-auto max-w-4xl break-words text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Three focused ways to find freelance clients
+              Four focused ways to find freelance clients
             </h1>
             <p className="mx-auto mt-6 max-w-2xl break-words text-lg leading-8 text-muted-foreground">
-              iCloseLeads is built around the three prospecting motions freelancers search for most: remote job leads, local business leads, and live job leads. Pick the path that matches how you sell.
+              iCloseLeads is built around the prospecting motions freelancers search for most: remote job leads, cold outreach, local business leads, and live job leads. Pick the path that matches how you sell.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light">
@@ -109,7 +110,7 @@ export default function UseCasesPage() {
         </section>
 
         <section className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 xl:grid-cols-4">
             {USE_CASE_PAGES.map((page, index) => {
               const Icon = index === 0 ? Target : index === 1 ? Search : Sparkles;
               return (
