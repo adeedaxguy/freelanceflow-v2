@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
+  Award,
   CheckCircle,
   Copy,
   ExternalLink,
@@ -17,6 +18,10 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import {
+  businessInitials,
+  getSiteDraftIdentity,
+} from "@/lib/site-draft";
 
 type DraftData = {
   company: string;
@@ -60,53 +65,6 @@ function buildPreviewSearch(data: DraftData) {
   return params.toString();
 }
 
-function servicePlan(category: string, status: string) {
-  const text = `${category} ${status}`.toLowerCase();
-
-  if (text.includes("auto") || text.includes("car") || text.includes("body")) {
-    return [
-      "Repair estimate requests",
-      "Before and after gallery",
-      "Insurance claim calls",
-      "Reviews and local SEO",
-    ];
-  }
-
-  if (text.includes("clean")) {
-    return [
-      "Instant quote requests",
-      "Service area pages",
-      "Recurring booking flow",
-      "Review-led trust section",
-    ];
-  }
-
-  if (text.includes("restaurant") || text.includes("cafe") || text.includes("food")) {
-    return [
-      "Menu and ordering CTA",
-      "Maps and opening hours",
-      "Private event enquiries",
-      "Photo-led local search pages",
-    ];
-  }
-
-  if (text.includes("salon") || text.includes("spa") || text.includes("barber")) {
-    return [
-      "Online appointment CTA",
-      "Service menu pages",
-      "Stylist or team profiles",
-      "Review and social proof blocks",
-    ];
-  }
-
-  return [
-    "Mobile-first landing page",
-    "Quote and contact forms",
-    "Google Business profile CTA",
-    "Local SEO service pages",
-  ];
-}
-
 function SiteBuilderContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
@@ -124,7 +82,9 @@ function SiteBuilderContent() {
   }), [searchParams]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data)}`;
-  const services = servicePlan(data.category, data.status);
+  const identity = useMemo(() => getSiteDraftIdentity(data), [data]);
+  const initials = businessInitials(data.company);
+  const services = identity.services;
 
   async function copyPreviewLink() {
     const absoluteUrl = `${window.location.origin}${previewHref}`;
@@ -170,14 +130,24 @@ function SiteBuilderContent() {
             <div className="p-6 sm:p-8 lg:p-10">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-200">
                 <Palette className="h-3.5 w-3.5" />
-                Website draft
+                {identity.logoLabel} website draft
               </div>
-              <h1 className="max-w-3xl text-3xl font-black leading-tight text-foreground sm:text-5xl">
-                Shareable website concept for {data.company}
-              </h1>
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
-                Built from the local lead record so you can show the prospect a practical, modern direction before pitching a full site.
-              </p>
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+                <div
+                  className="grid h-20 w-20 flex-shrink-0 place-items-center rounded-3xl text-2xl font-black text-slate-950 shadow-glow"
+                  style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
+                >
+                  {initials}
+                </div>
+                <div>
+                  <h1 className="max-w-3xl text-3xl font-black leading-tight text-foreground sm:text-5xl">
+                    Shareable website concept for {data.company}
+                  </h1>
+                  <p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
+                    {identity.pitchHook}
+                  </p>
+                </div>
+              </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-border bg-background/60 p-4">
@@ -202,7 +172,7 @@ function SiteBuilderContent() {
                   <Sparkles className="h-5 w-5 text-primary-light" />
                   <h2 className="text-lg font-extrabold text-foreground">Draft angle</h2>
                 </div>
-                <p className="text-muted-foreground">{data.pitch}</p>
+                <p className="text-muted-foreground">{data.pitch || identity.subheadline}</p>
               </div>
             </div>
 
@@ -210,9 +180,9 @@ function SiteBuilderContent() {
               <h2 className="text-xl font-black text-foreground">What this draft includes</h2>
               <div className="mt-5 space-y-3">
                 {services.map((service) => (
-                  <div key={service} className="flex items-center gap-3 rounded-2xl border border-border bg-surface/70 p-3">
+                  <div key={service.title} className="flex items-center gap-3 rounded-2xl border border-border bg-surface/70 p-3">
                     <CheckCircle className="h-5 w-5 flex-shrink-0 text-accent" />
-                    <span className="font-semibold text-foreground">{service}</span>
+                    <span className="font-semibold text-foreground">{service.title}</span>
                   </div>
                 ))}
               </div>
@@ -261,10 +231,10 @@ function SiteBuilderContent() {
                   <div>
                     <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">{data.category}</p>
                     <h3 className="mt-3 max-w-2xl text-3xl font-black leading-tight text-white sm:text-5xl">
-                      {data.company} can turn more local searches into booked work.
+                      {identity.headline}
                     </h3>
                     <p className="mt-4 max-w-2xl text-lg leading-8 text-white/70">
-                      A fast, modern site built around calls, quote requests, reviews, and the services customers are already searching for.
+                      {identity.subheadline}
                     </p>
                     <div className="mt-6 flex flex-wrap gap-3">
                       {data.phone && (
@@ -284,8 +254,9 @@ function SiteBuilderContent() {
                 </div>
                 <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {services.map((service) => (
-                    <div key={service} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                      <p className="font-bold text-white">{service}</p>
+                    <div key={service.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                      <Award className="mb-3 h-5 w-5" style={{ color: identity.accent }} />
+                      <p className="font-bold text-white">{service.title}</p>
                     </div>
                   ))}
                 </div>

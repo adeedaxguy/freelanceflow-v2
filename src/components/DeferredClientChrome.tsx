@@ -32,6 +32,7 @@ export default function DeferredClientChrome() {
   const [showMobileLauncher, setShowMobileLauncher] = useState(false);
   const isDashboard = pathname?.startsWith("/dashboard");
   const isAuth = pathname?.startsWith("/auth");
+  const isSitePreview = pathname?.startsWith("/site-preview");
   const launcherOffsetClass = isDashboard ? "bottom-[88px] md:bottom-6" : "bottom-6";
   const launcherVisibilityClass = isDashboard || showMobileLauncher
     ? "flex"
@@ -72,6 +73,10 @@ export default function DeferredClientChrome() {
     window.addEventListener("scroll", updateMobileLauncher, { passive: true });
     return () => window.removeEventListener("scroll", updateMobileLauncher);
   }, [isAuth, isDashboard, pathname]);
+
+  if (isSitePreview) {
+    return null;
+  }
 
   if (chatRequested) {
     return (
