@@ -7,7 +7,7 @@ import {
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
   Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  ArrowRight, Filter, Users, Store,
+  ArrowRight, Filter, Users, Store, Palette,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -571,6 +571,19 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
   const decisionCountry = decisionMakerCountryParam(lead.country);
   if (decisionCountry) decisionParams.set("country", decisionCountry);
   const decisionHref = `/dashboard/decision-makers?${decisionParams.toString()}`;
+  const siteBuilderParams = new URLSearchParams({
+    company: lead.name,
+    category: lead.categoryLabel ?? lead.category ?? "Local business",
+    location: decisionMakerLocation(lead, searchLocation),
+    address: lead.address ?? "",
+    phone: lead.phone ?? "",
+    pitch: lead.pitchOpener.slice(0, 360),
+    status: lead.websiteStatus,
+  });
+  if (lead.website) siteBuilderParams.set("website", lead.website);
+  if (mapsHref) siteBuilderParams.set("maps", mapsHref);
+  if (proposalDomain) siteBuilderParams.set("domain", proposalDomain);
+  const siteBuilderHref = `/dashboard/site-builder/new?${siteBuilderParams.toString()}`;
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
@@ -734,6 +747,12 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
             title="Find the owner, manager, or best public contact for this business"
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-accent/25 bg-accent/10 text-accent text-xs font-medium hover:bg-accent/15 transition-all">
             <Users className="w-3.5 h-3.5"/> Find Owner
+          </Link>
+          <Link
+            href={siteBuilderHref}
+            title="Create a shareable website draft for this business"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-cyan-400/25 bg-cyan-400/10 text-cyan-200 text-xs font-semibold hover:bg-cyan-400/15 transition-all">
+            <Palette className="w-3.5 h-3.5"/> Design Site
           </Link>
           <Link
             href={proposalHref}
