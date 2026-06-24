@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* Prevent flash of wrong theme — runs synchronously before first paint */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('ff_theme');var d=t==='light'?'light':t==='dark'?'dark':(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.classList.add(d);}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('ff_theme');var d=t==='light'?'light':'dark';var r=document.documentElement;r.classList.remove(d==='light'?'dark':'light');r.classList.add(d);r.style.colorScheme=d;}catch(e){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}})();`,
           }}
         />
       </head>

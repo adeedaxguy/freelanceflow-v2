@@ -17,28 +17,32 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof document === "undefined") return "dark";
+    return document.documentElement.classList.contains("light") ? "light" : "dark";
+  });
 
-  // Read saved preference on mount
+  // Dark is the product default. Light only applies after the user explicitly chooses it.
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("ff_theme") as Theme | null;
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const initial: Theme = saved ?? (prefersDark ? "dark" : "light");
+      const saved = localStorage.getItem("ff_theme");
+      const initial: Theme = saved === "light" ? "light" : "dark";
       setThemeState(initial);
       applyTheme(initial);
-    } catch {}
+    } catch {
+      applyTheme("dark");
+    }
   }, []);
 
   function applyTheme(t: Theme) {
     const root = document.documentElement;
+    root.classList.remove("dark", "light");
     if (t === "light") {
       root.classList.add("light");
-      root.classList.remove("dark");
     } else {
       root.classList.add("dark");
-      root.classList.remove("light");
     }
+    root.style.colorScheme = t;
   }
 
   function setTheme(t: Theme) {

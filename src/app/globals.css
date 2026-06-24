@@ -26,39 +26,6 @@
     --radius: 0.75rem;
   }
 
-  /* ── Light mode overrides ─────────────────────────────────────────── */
-  html.light body, html.light #__next, html.light main {
-    background-color: #F5F5FA !important; color: #1A1A2E !important;
-  }
-  html.light .bg-background  { background-color: #F5F5FA !important; }
-  html.light .bg-surface     { background-color: #FFFFFF !important; }
-  html.light .bg-muted       { background-color: #EBEBF5 !important; }
-  html.light .bg-gradient-card { background: linear-gradient(145deg,#FFFFFF,#F0F0FA) !important; }
-  html.light .text-foreground       { color: #1A1A2E !important; }
-  html.light .text-muted-foreground { color: #5A5A8A !important; }
-  html.light h1,html.light h2,html.light h3,html.light h4,html.light h5,html.light h6 { color: #1A1A2E; }
-  html.light p { color: #3A3A5A; }
-  html.light .border-border, html.light .border { border-color: #D8D8EE !important; }
-  html.light nav { background: rgba(255,255,255,0.92) !important; border-bottom-color: #D8D8EE !important; }
-  html.light nav a, html.light nav button, html.light nav span { color: #1A1A2E !important; }
-  html.light aside, html.light [class*="sidebar"] { background-color: #FFFFFF !important; border-color: #D8D8EE !important; }
-  html.light input, html.light textarea, html.light select { background-color: #FFFFFF !important; border-color: #C8C8E0 !important; color: #1A1A2E !important; }
-  html.light input::placeholder, html.light textarea::placeholder { color: #9090B0 !important; }
-  html.light table  { background-color: #FFFFFF !important; }
-  html.light thead  { background-color: #F0F0FA !important; }
-  html.light tr:hover { background-color: #F5F5FF !important; }
-  html.light td, html.light th { border-color: #E0E0EE !important; color: #1A1A2E !important; }
-  html.light .glass-card { background: rgba(255,255,255,0.85) !important; border-color: rgba(100,100,180,0.2) !important; }
-  html.light [role="dialog"], html.light [class*="modal"] { background-color: #FFFFFF !important; border-color: #D8D8EE !important; color: #1A1A2E !important; }
-  html.light .text-primary-light { color: #7C3AED !important; }
-  html.light .text-accent         { color: #00A870 !important; }
-  html.light .text-gold           { color: #C8960C !important; }
-  html.light .shadow-glow-primary { box-shadow: 0 4px 20px rgba(124,58,237,0.15) !important; }
-  html.light ::-webkit-scrollbar-track { background: #F0F0FA; }
-  html.light ::-webkit-scrollbar-thumb { background: #C0C0E0; }
-  html.light ::-webkit-scrollbar-thumb:hover { background: #7C3AED; }
-  html.light .mesh-gradient { background: radial-gradient(ellipse 80% 60% at 20% 30%,rgba(124,58,237,0.08) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 70%,rgba(0,229,160,0.06) 0%,transparent 60%),#F5F5FA !important; }
-
   * {
     @apply border-border;
   }
@@ -67,6 +34,10 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -525,30 +496,27 @@ html.light .min-h-screen.bg-background { background-color: #F3F4FA !important; }
 html.light section { background-color: transparent; }
 html.light .bg-gradient-to-b { filter: none; }
 
-/* ── Homepage dark-mode override (homepage always stays dark) ── */
-/* The .dark class is applied directly on the homepage wrapper div */
-/* so these rules restore dark-mode CSS variables within that scope */
-.dark {
-  --background:       #090915;
-  --foreground:       #F0F0FF;
-  --surface:          #0F0F1E;
-  --muted-foreground: #8888AA;
-  --border:           #1E1E35;
+/* ── Explicit dark-mode root ─────────────────────────────────── */
+html.dark {
+  --background: 240 20% 6%;
+  --foreground: 240 50% 97%;
+  --muted-foreground: 240 18% 62%;
+  --border: 234 30% 18%;
   color-scheme: dark;
 }
-.dark .bg-background  { background-color: #090915 !important; }
-.dark .bg-surface     { background-color: #0F0F1E !important; }
-.dark .text-foreground { color: #F0F0FF !important; }
-.dark .text-muted-foreground { color: #8888AA !important; }
-.dark .border-border  { border-color: #1E1E35 !important; }
-.dark .mesh-gradient {
+html.dark .bg-background  { background-color: #090915 !important; }
+html.dark .bg-surface     { background-color: #0F0F1E !important; }
+html.dark .text-foreground { color: #F0F0FF !important; }
+html.dark .text-muted-foreground { color: #8888AA !important; }
+html.dark .border-border  { border-color: #1E1E35 !important; }
+html.dark .mesh-gradient {
   background:
     radial-gradient(ellipse 80% 60% at 20% 30%, rgba(124,58,237,0.18) 0%, transparent 60%),
     radial-gradient(ellipse 60% 50% at 80% 70%, rgba(0,229,160,0.10) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 50% 10%, rgba(159,103,255,0.12) 0%, transparent 60%),
     #090915 !important;
 }
-.dark nav {
+html.dark nav {
   background-color: rgba(9,9,21,0.85) !important;
   border-color: rgba(30,30,53,0.8) !important;
 }
@@ -572,10 +540,12 @@ html.light span.text-foreground { color: #14142B !important; }
 /* Fix invisible white text on light backgrounds */
 html.light .text-white { color: #14142B !important; }
 /* Exception: keep white text on coloured buttons/badges */
-html.light button.bg-primary .text-white,
-html.light a.bg-primary .text-white,
+html.light .bg-primary,
+html.light .bg-primary *,
 html.light [class*="bg-gradient-hero"] .text-white,
 html.light [class*="bg-gradient-hero"],
+html.light [class*="from-primary"][class*="to-accent"],
+html.light [class*="from-primary"][class*="to-accent"] *,
 html.light button.bg-primary,
 html.light a.bg-primary { color: #ffffff !important; }
 
@@ -643,9 +613,7 @@ html.light nav.fixed.bottom-0 {
 }
 
 /* ── Dropdowns / popovers ────────────────────────────────────── */
-html.light [class*="bg-surface"][class*="shadow"],
-html.light [class*="rounded-xl"][class*="shadow-xl"],
-html.light [class*="rounded-2xl"][class*="shadow"] {
+html.light [class*="bg-surface"][class*="shadow"] {
   background-color: #FFFFFF !important;
   border-color: #E0E1EE !important;
 }
@@ -708,11 +676,6 @@ html.light [role="dialog"] {
   border-color: #E0E1EE !important;
 }
 html.light [role="dialog"] * { color: #14142B; }
-
-/* Upgrade modal */
-html.light [class*="bg-gradient-to-r"][class*="from-primary"] {
-  background: linear-gradient(to right, rgba(124,58,237,0.08), rgba(0,135,90,0.05)) !important;
-}
 
 /* ── Sidebar user panel — light mode fix ─────────────────────── */
 html.light aside .bg-surface { background-color: #FFFFFF !important; }
