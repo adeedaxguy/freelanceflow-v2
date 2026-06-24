@@ -907,7 +907,7 @@ export default function HomepageClient() {
       ════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className={`relative min-h-[calc(100svh-96px)] sm:min-h-screen flex items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-20"} pb-10 sm:pb-0`}
+        className={`relative min-h-[calc(100svh-210px)] sm:min-h-screen flex items-start sm:items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-10 sm:pt-20"} pb-10 sm:pb-0`}
       >
 
         {/* Layered mesh gradient background */}
@@ -1038,7 +1038,7 @@ export default function HomepageClient() {
         </motion.div>
 
         {/* Scroll cue */}
-        <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        <motion.div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
           animate={{ y: [0, 8, 0] }} transition={{ duration: 2.2, repeat: Infinity }}>
           <div className="w-5 h-8 rounded-full border border-border/60 flex justify-center pt-1.5">
             <motion.div className="w-1 h-2 rounded-full bg-primary-light/60" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.2, repeat: Infinity }} />
