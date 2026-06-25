@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   CheckCircle,
   Copy,
+  Download,
   ExternalLink,
   Image as ImageIcon,
   LayoutTemplate,
@@ -232,6 +233,7 @@ function WebDesignBuilderContent() {
   }), [contentDepth, conversionGoal, images, layout, sections, style, theme]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data, options)}`;
+  const pdfHref = `${previewHref}&print=1`;
   const identity = useMemo(() => getSiteDraftIdentity(data), [data]);
   const initials = businessInitials(data.company);
 
@@ -278,6 +280,15 @@ function WebDesignBuilderContent() {
             >
               <ExternalLink className="h-4 w-4" />
               Open beta preview
+            </a>
+            <a
+              href={pdfHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/15"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF
             </a>
             <button
               type="button"
@@ -445,6 +456,15 @@ function WebDesignBuilderContent() {
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:text-foreground"
             >
               Full page <ExternalLink className="h-4 w-4" />
+            </a>
+            <a
+              href={pdfHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/15"
+            >
+              <Download className="h-4 w-4" />
+              PDF
             </a>
           </div>
           <div className="overflow-hidden rounded-2xl border border-border bg-[#071014]">

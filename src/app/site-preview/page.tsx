@@ -21,6 +21,7 @@ import {
   getSiteDraftIdentity,
   marketFromLocation,
 } from "@/lib/site-draft";
+import SitePreviewPdfActions from "@/components/SitePreviewPdfActions";
 
 export const metadata: Metadata = {
   title: "Website Preview",
@@ -48,6 +49,7 @@ type SearchParams = {
   contentDepth?: string | string[];
   conversionGoal?: string | string[];
   layout?: string | string[];
+  print?: string | string[];
 };
 
 type PreviewData = {
@@ -164,6 +166,46 @@ function panelClass(isLight: boolean) {
 
 function mutedClass(isLight: boolean) {
   return isLight ? "text-slate-600" : "text-white/64";
+}
+
+function printStyles(isLight: boolean) {
+  return `
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    @media print {
+      html {
+        background: ${isLight ? "#f8fafc" : "#070b12"} !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        background: ${isLight ? "#f8fafc" : "#070b12"} !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      main {
+        min-height: auto !important;
+      }
+
+      section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      a {
+        text-decoration: none !important;
+      }
+    }
+  `;
 }
 
 function HeadingBlock({
@@ -360,6 +402,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   const isLight = options.theme === "light";
   const styleCopy = STYLE_COPY[options.style];
   const goalCopy = GOAL_COPY[options.conversionGoal];
+  const autoPrint = clean(searchParams?.print).toLowerCase() === "1";
   const heroGrid = options.layout === "editorial"
     ? "lg:grid-cols-[0.88fr_1.12fr]"
     : options.layout === "showcase"
@@ -506,6 +549,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   ];
 
   return (
+    <>
+    <style dangerouslySetInnerHTML={{ __html: printStyles(isLight) }} />
+    <SitePreviewPdfActions autoPrint={autoPrint} />
     <main className={`min-h-screen ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
       <section className="relative overflow-hidden">
         <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
@@ -677,5 +723,6 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         </div>
       </section>
     </main>
+    </>
   );
 }
