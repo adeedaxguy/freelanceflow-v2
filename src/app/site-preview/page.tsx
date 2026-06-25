@@ -124,6 +124,39 @@ const GOAL_COPY: Record<PreviewOptions["conversionGoal"], { primary: string; sec
   },
 };
 
+const STYLE_MOOD: Record<PreviewOptions["style"], { rhythm: string; detail: string; shape: string }> = {
+  professional: {
+    rhythm: "Trust-first",
+    detail: "Clear offer, proof, and service categories for serious buyers.",
+    shape: "rounded-[1.5rem]",
+  },
+  premium: {
+    rhythm: "High-value",
+    detail: "More editorial space, stronger confidence cues, and a calmer buying path.",
+    shape: "rounded-[2.25rem]",
+  },
+  bold: {
+    rhythm: "Action-led",
+    detail: "Sharper contrast, faster CTA rhythm, and stronger offer blocks.",
+    shape: "rounded-[1.25rem]",
+  },
+  friendly: {
+    rhythm: "Neighbourhood",
+    detail: "Warm language, approachable proof, and a human local-service tone.",
+    shape: "rounded-[2rem]",
+  },
+  minimal: {
+    rhythm: "Clean and fast",
+    detail: "Low-friction scanning with only the details needed to enquire.",
+    shape: "rounded-2xl",
+  },
+  creative: {
+    rhythm: "Memorable",
+    detail: "More personality and visual motion while keeping the service path obvious.",
+    shape: "rounded-[2.5rem]",
+  },
+};
+
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -401,6 +434,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   const heroPitch = pitch || identity.subheadline;
   const isLight = options.theme === "light";
   const styleCopy = STYLE_COPY[options.style];
+  const styleMood = STYLE_MOOD[options.style];
   const goalCopy = GOAL_COPY[options.conversionGoal];
   const autoPrint = clean(searchParams?.print).toLowerCase() === "1";
   const heroGrid = options.layout === "editorial"
@@ -552,7 +586,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     <>
     <style dangerouslySetInnerHTML={{ __html: printStyles(isLight) }} />
     <SitePreviewPdfActions autoPrint={autoPrint} />
-    <main className={`min-h-screen ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
+    <main className={`min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
       <section className="relative overflow-hidden">
         <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
         <div
@@ -579,6 +613,17 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
                 </p>
               </div>
             </div>
+            <nav className={`hidden items-center gap-1 rounded-full border p-1 md:flex ${isLight ? "border-slate-200 bg-white/75" : "border-white/10 bg-white/5"}`}>
+              {identity.pages.slice(0, 3).map(page => (
+                <a
+                  key={page}
+                  href="#services"
+                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${isLight ? "text-slate-600 hover:bg-slate-100 hover:text-slate-950" : "text-white/62 hover:bg-white/10 hover:text-white"}`}
+                >
+                  {page}
+                </a>
+              ))}
+            </nav>
             <div className={`hidden items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold sm:flex ${isLight ? "border-slate-200 bg-white text-slate-600" : "border-white/10 bg-white/5 text-white/70"}`}>
               <ShieldCheck className="h-4 w-4" style={{ color: identity.accent }} />
               Private preview
@@ -589,7 +634,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
             <div>
               <div className={`mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
                 <Sparkles className="h-4 w-4" style={{ color: identity.accent }} />
-                {identity.eyebrow}
+                {styleMood.rhythm} concept for {identity.eyebrow}
               </div>
               <h1 className="max-w-4xl break-words text-4xl font-black leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
                 {identity.headline}
@@ -668,22 +713,41 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
                         </div>
                       ))}
                     </div>
-                    <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.045] p-4">
-                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">Contact</p>
-                      <div className="mt-3 space-y-2 text-white/72">
-                        {address && <p>{address}</p>}
-                        {phone && <p>{phone}</p>}
-                        {website && (
-                          <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:underline" style={{ color: identity.accent }}>
-                            Current website <ExternalLink className="h-3.5 w-3.5" />
-                          </a>
-                        )}
+                    <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_0.82fr]">
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">Contact</p>
+                        <div className="mt-3 space-y-2 text-white/72">
+                          {address && <p>{address}</p>}
+                          {phone && <p>{phone}</p>}
+                          {website && (
+                            <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:underline" style={{ color: identity.accent }}>
+                              Current website <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">Design logic</p>
+                        <p className="mt-3 text-sm leading-6 text-white/70">{styleMood.detail}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className={`mb-10 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/80" : "border-white/10 bg-white/[0.055]"}`}>
+            {[
+              { label: "Lead signal", value: data.status === "has-website" ? "Modernise current site" : "Website gap visible" },
+              { label: "Offer angle", value: identity.pitchHook },
+              { label: "Primary action", value: goalCopy.primary },
+            ].map(item => (
+              <div key={item.label} className={`${styleMood.shape} border p-4 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-black/15"}`}>
+                <p className={`text-xs font-black uppercase tracking-[0.18em] ${isLight ? "text-slate-500" : "text-white/42"}`}>{item.label}</p>
+                <p className="mt-2 text-base font-black leading-6">{item.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

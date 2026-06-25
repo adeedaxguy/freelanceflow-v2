@@ -21,7 +21,7 @@ export default function SitePreviewPdfActions({ autoPrint = false }: { autoPrint
   }, [autoPrint, downloadPdf]);
 
   return (
-    <div className="no-print fixed bottom-5 right-5 z-50 flex flex-col gap-2 sm:bottom-6 sm:right-6 sm:flex-row">
+    <div className="no-print fixed inset-x-4 bottom-4 z-50 flex flex-col gap-2 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:flex-row">
       <button
         type="button"
         onClick={downloadPdf}
