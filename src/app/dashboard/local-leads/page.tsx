@@ -583,7 +583,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
   if (lead.website) siteBuilderParams.set("website", lead.website);
   if (mapsHref) siteBuilderParams.set("maps", mapsHref);
   if (proposalDomain) siteBuilderParams.set("domain", proposalDomain);
-  const siteBuilderHref = `/dashboard/site-builder/new?${siteBuilderParams.toString()}`;
+  const siteBuilderHref = `/dashboard/web-design?${siteBuilderParams.toString()}`;
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>

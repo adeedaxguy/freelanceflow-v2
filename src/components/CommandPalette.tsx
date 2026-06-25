@@ -6,7 +6,7 @@ import {
   Search, LayoutDashboard, Radio, Bookmark,
   Send, BarChart2, Settings, FileText, Megaphone, User,
   Wrench, MessageCircle, Zap, CalendarDays, GitMerge,
-  Mail, MapPin, ArrowRight, Crown, Users,
+  Mail, MapPin, ArrowRight, Crown, Users, Palette,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ const COMMANDS = [
   { id: "saved-leads",    label: "Saved Leads",            desc: "Your saved leads",       href: "/dashboard/saved-leads",      icon: Bookmark,        group: "Navigate" },
   { id: "pipeline",       label: "CRM Pipeline",           desc: "Manage your deals",      href: "/dashboard/pipeline",         icon: GitMerge,        group: "Navigate" },
   { id: "deal-closer",    label: "AI Deal Closer",         desc: "Close more deals",       href: "/dashboard/deal-closer",      icon: Zap,             group: "AI Tools" },
+  { id: "web-design",     label: "Web Design",             desc: "Create client website concepts", href: "/dashboard/web-design", icon: Palette,     group: "AI Tools", badge: "NEW" },
   { id: "followups",      label: "Follow-Ups",             desc: "Plan Gmail follow-ups",  href: "/dashboard/followups",        icon: CalendarDays,    group: "AI Tools" },
   { id: "campaigns",      label: "Campaigns",              desc: "Organize outreach",      href: "/dashboard/campaigns",        icon: Megaphone,       group: "Outreach" },
   { id: "templates",      label: "Templates",              desc: "Email templates",        href: "/dashboard/templates",        icon: FileText,        group: "Outreach" },
@@ -196,9 +197,13 @@ export default function CommandPalette() {
                               </p>
                               <p className="text-xs text-muted-foreground truncate">{cmd.desc}</p>
                             </div>
-                            {"badge" in cmd && cmd.badge === "LIVE" && (
-                              <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/30 flex-shrink-0">
-                                LIVE
+                            {"badge" in cmd && cmd.badge && (
+                              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full border flex-shrink-0 ${
+                                cmd.badge === "LIVE"
+                                  ? "bg-accent/20 text-accent border-accent/30"
+                                  : "bg-primary/20 text-primary-light border-primary/30"
+                              }`}>
+                                {cmd.badge}
                               </span>
                             )}
                             <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 transition-opacity ${

@@ -9,7 +9,7 @@ import {
   FileText, Megaphone, User, Wrench, MessageCircle, Zap,
   CalendarDays, GitMerge, Mail, Menu, X, Radio, ChevronRight,
   LogOut, Crown, Shield, Sparkles, MapPin, ChevronLeft,
-  Command, Users,
+  Command, Users, Palette,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
@@ -32,6 +32,7 @@ const NAV_GROUPS = [
     label: "AI Tools",
     items: [
       { href: "/dashboard/deal-closer", label: "AI Deal Closer", icon: Zap },
+      { href: "/dashboard/web-design",  label: "Web Design",     icon: Palette, badge: "NEW" },
       { href: "/dashboard/followups",   label: "Follow-Ups",     icon: CalendarDays },
     ],
   },
