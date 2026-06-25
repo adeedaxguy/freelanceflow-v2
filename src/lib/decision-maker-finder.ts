@@ -1538,6 +1538,27 @@ function inferUsState(location?: string) {
   return code;
 }
 
+function googleSearchUrl(query: string) {
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+}
+
+function compactLocationForSearch(value?: string) {
+  const clean = value?.replace(/\s+/g, " ").trim();
+  if (!clean) return "";
+  const parts = clean.split(",").map(part => part.trim()).filter(Boolean);
+  const likelyArea = parts.length >= 2 ? parts.slice(-2).join(" ") : clean;
+  return likelyArea
+    .replace(/\b\d{4,6}(?:-\d{4})?\b/g, "")
+    .replace(/\b(?:USA|United States(?: of America)?|United Kingdom)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function searchLocationPart(value?: string) {
+  const compact = compactLocationForSearch(value);
+  return compact ? ` ${compact}` : "";
+}
+
 async function searchPastedProfile(input: DecisionFinderInput, sourceLink: DecisionSourceLink | null) {
   const candidates: CandidateDraft[] = [];
   const evidence: DecisionFinderEvidence[] = [];
@@ -1604,45 +1625,57 @@ async function searchPastedProfile(input: DecisionFinderInput, sourceLink: Decis
 
 function buildSearchLinks(input: DecisionFinderInput, domain?: string): DecisionFinderSearchLink[] {
   const links: DecisionFinderSearchLink[] = [];
-  const location = input.location ? ` ${input.location}` : "";
+  const location = searchLocationPart(input.location);
   const company = input.company;
   const sourceLink = resolveDecisionSourceLink(input);
 
+  links.push({
+    label: "Find possible owner name",
+    detail: "Start broad: search the business name with the city/state and owner keyword.",
+    url: googleSearchUrl(`"${company}"${location} owner`),
+  });
+
+  links.push({
+    label: "Search owner and founder mentions",
+    detail: "Use a wider public search for founder, manager, proprietor, or director mentions.",
+    url: googleSearchUrl(`"${company}"${location} founder OR owner OR manager`),
+  });
+
   if (sourceLink && sourceLink.kind !== "website") {
     links.push({
-      label: `Open ${sourceLink.platform}`,
+      label: `Verify ${sourceLink.platform}`,
       detail: "Open the pasted business/profile page to verify owner, phone, hours, and public contact details.",
       url: sourceLink.url,
     });
     links.push({
-      label: "Owner and phone verification search",
-      detail: "Search for the owner/manager name plus phone mentions around the pasted profile.",
-      url: `https://www.google.com/search?q=${encodeURIComponent(`"${company}"${location} ("owner" OR "founder" OR "manager") ("phone" OR "mobile" OR "WhatsApp" OR "contact")`)}`,
+      label: "Verify phone and email route",
+      detail: "Search public pages for contact details after you have a likely owner or manager path.",
+      url: googleSearchUrl(`"${company}"${location} contact OR phone OR email`),
     });
   }
 
   links.push({
     label: "LinkedIn profile search",
     detail: "Open a filtered public search for owners, founders, directors, and managers.",
-    url: `https://www.google.com/search?q=${encodeURIComponent(`site:linkedin.com/in "${company}"${location} owner OR founder OR director OR CEO`)}`,
+    url: googleSearchUrl(`site:linkedin.com/in "${company}"${location} owner OR founder OR director`),
   });
 
   links.push({
     label: "Public social profile search",
     detail: "Search public profile pages for named decision makers connected to this business.",
-    url: `https://www.google.com/search?q=${encodeURIComponent(`"${company}"${location} ("founder" OR "owner" OR "CEO" OR "director") (site:linkedin.com/in OR site:x.com OR site:facebook.com OR site:instagram.com)`)}`,
+    url: googleSearchUrl(`"${company}"${location} (owner OR founder OR manager) (facebook OR instagram OR linkedin)`),
   });
 
   if (domain) {
     links.push({
       label: "Official site decision-maker search",
       detail: "Search the business website for leadership, about, team, and contact mentions.",
-      url: `https://www.google.com/search?q=${encodeURIComponent(`site:${domain} owner OR founder OR director OR "managing director" OR "contact"`)}`,
+      url: googleSearchUrl(`site:${domain} owner OR founder OR director OR team OR about`),
     });
     links.push({
       label: "Official contact detail search",
       detail: "Search the company's own domain for public email, phone, and contact-page mentions before outreach.",
-      url: `https://www.google.com/search?q=${encodeURIComponent(`site:${domain} ("${company}" OR team OR leadership OR contact) (email OR phone OR telephone OR "contact us")`)}`,
+      url: googleSearchUrl(`site:${domain} contact OR email OR phone OR telephone`),
     });
   }
 
@@ -1661,7 +1694,7 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
         : "US records are state-based. Use the business location to open the right registry.",
       url: state && US_STATE_REGISTRY_URLS[state]
         ? US_STATE_REGISTRY_URLS[state]
-        : `https://www.google.com/search?q=${encodeURIComponent(`${company}${location} secretary of state business registry`)}`,
+        : googleSearchUrl(`${company}${location} secretary of state business registry`),
     });
   } else {
     links.push(...(COUNTRY_REGISTRY_LINKS[input.country] ?? []));

@@ -205,34 +205,42 @@ function googleSearchUrl(query: string) {
   return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 }
 
-function quotedSearchPart(value?: string) {
+function compactLocationForSearch(value?: string) {
   const clean = value?.replace(/\s+/g, " ").trim();
-  return clean ? ` "${clean}"` : "";
+  if (!clean) return "";
+  const parts = clean.split(",").map(part => part.trim()).filter(Boolean);
+  const likelyArea = parts.length >= 2 ? parts.slice(-2).join(" ") : clean;
+  return likelyArea
+    .replace(/\b\d{4,6}(?:-\d{4})?\b/g, "")
+    .replace(/\b(?:USA|United States(?: of America)?|United Kingdom)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function ownerRoleQuery() {
-  return `(owner OR founder OR "co-owner" OR proprietor OR "managing partner" OR "general manager" OR director OR president)`;
+function searchLocationPart(value?: string) {
+  const compact = compactLocationForSearch(value);
+  return compact ? ` ${compact}` : "";
 }
 
 function candidateProfileSearchUrl(candidate: DecisionMakerCandidate, location?: string) {
-  const context = quotedSearchPart(location);
+  const context = searchLocationPart(location);
   if (candidate.isGenericContact) {
-    return googleSearchUrl(`"${candidate.company}"${context} ${ownerRoleQuery()} -jobs -hiring -careers`);
+    return googleSearchUrl(`"${candidate.company}"${context} owner`);
   }
-  return googleSearchUrl(`"${candidate.name}" "${candidate.company}"${context} ${ownerRoleQuery()} (profile OR LinkedIn OR bio OR contact)`);
+  return googleSearchUrl(`"${candidate.name}" "${candidate.company}"${context}`);
 }
 
 function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: string, location?: string) {
-  const context = quotedSearchPart(location);
+  const context = searchLocationPart(location);
   if (candidate.isGenericContact) {
     const query = domain
-      ? `site:${domain} ("${candidate.company}" OR owner OR founder OR manager OR contact) (email OR phone OR telephone OR contact)`
-      : `"${candidate.company}"${context} (owner OR founder OR manager OR contact) (email OR phone OR telephone OR mobile OR WhatsApp)`;
+      ? `site:${domain} ${candidate.company} (contact OR phone OR email)`
+      : `"${candidate.company}"${context} (contact OR phone OR email)`;
     return googleSearchUrl(query);
   }
   const query = domain
-    ? `site:${domain} "${candidate.name}" (email OR phone OR telephone OR contact)`
-    : `"${candidate.name}" "${candidate.company}"${context} (email OR phone OR telephone OR contact)`;
+    ? `site:${domain} "${candidate.name}" (contact OR phone OR email)`
+    : `"${candidate.name}" "${candidate.company}"${context} (contact OR phone OR email)`;
   return googleSearchUrl(query);
 }
 
@@ -253,27 +261,27 @@ function compactCandidateText(value: string, maxLength = 150) {
 }
 
 function socialDiscoveryLinks(company: string, location?: string) {
-  const context = quotedSearchPart(location);
+  const context = searchLocationPart(location);
   return [
     {
       label: "LinkedIn",
       icon: Users,
-      url: googleSearchUrl(`"${company}"${context} (owner OR founder OR manager OR director) (site:linkedin.com/in OR site:linkedin.com/company)`),
+      url: googleSearchUrl(`site:linkedin.com/in "${company}"${context} owner`),
     },
     {
       label: "Facebook",
       icon: Globe,
-      url: googleSearchUrl(`"${company}"${context} (owner OR manager OR contact OR phone) site:facebook.com`),
+      url: googleSearchUrl(`site:facebook.com "${company}"${context}`),
     },
     {
       label: "Instagram",
       icon: Sparkles,
-      url: googleSearchUrl(`"${company}"${context} (owner OR manager OR contact OR phone) site:instagram.com`),
+      url: googleSearchUrl(`site:instagram.com "${company}"${context}`),
     },
     {
       label: "X",
       icon: Link2,
-      url: googleSearchUrl(`"${company}"${context} (owner OR founder OR manager OR contact) (site:x.com OR site:twitter.com)`),
+      url: googleSearchUrl(`"${company}"${context} owner OR founder OR manager`),
     },
   ];
 }
