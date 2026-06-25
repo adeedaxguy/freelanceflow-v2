@@ -205,7 +205,7 @@ function printStyles(isLight: boolean) {
   return `
     @page {
       size: A4;
-      margin: 12mm;
+      margin: 10mm;
     }
 
     @media print {
@@ -217,6 +217,8 @@ function printStyles(isLight: boolean) {
 
       body {
         background: ${isLight ? "#f8fafc" : "#070b12"} !important;
+        margin: 0 !important;
+        overflow: visible !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -225,17 +227,113 @@ function printStyles(isLight: boolean) {
         display: none !important;
       }
 
-      main {
+      .site-preview-root {
+        display: block !important;
         min-height: auto !important;
+        width: 100% !important;
+        overflow: visible !important;
+        padding-bottom: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
 
-      section {
+      .site-preview-root * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .site-preview-root section {
+        position: relative !important;
+        overflow: visible !important;
+      }
+
+      .site-preview-print-nav {
+        display: flex !important;
+      }
+
+      .site-preview-root .mx-auto {
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+
+      .site-preview-root .max-w-7xl {
+        max-width: 1080px !important;
+      }
+
+      .site-preview-hero {
+        display: block !important;
+        min-height: auto !important;
+        padding-top: 18px !important;
+        padding-bottom: 22px !important;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+
+      .site-preview-hero-grid {
+        display: grid !important;
+        flex: none !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        align-items: start !important;
+        gap: 18px !important;
+        padding-top: 28px !important;
+        padding-bottom: 24px !important;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+
+      .site-preview-hero-grid h1 {
+        font-size: 46px !important;
+        line-height: 1.04 !important;
+        letter-spacing: 0 !important;
+      }
+
+      .site-preview-hero-grid p {
+        font-size: 16px !important;
+        line-height: 1.55 !important;
+      }
+
+      .site-preview-hero-visual {
+        display: none !important;
+      }
+
+      .site-preview-signal-grid {
+        margin-bottom: 0 !important;
+      }
+
+      .site-preview-root section > .mx-auto:not(.site-preview-hero) {
+        padding-top: 30px !important;
+        padding-bottom: 30px !important;
+      }
+
+      .site-preview-root h2 {
+        font-size: 34px !important;
+        line-height: 1.08 !important;
+      }
+
+      .site-preview-root h3 {
+        line-height: 1.16 !important;
+      }
+
+      .site-preview-root [class*="shadow-"] {
+        box-shadow: none !important;
+      }
+
+      .site-preview-root article,
+      .site-preview-root blockquote,
+      .site-preview-root .rounded-\\[2rem\\],
+      .site-preview-root .rounded-3xl {
         break-inside: avoid;
         page-break-inside: avoid;
       }
 
       a {
         text-decoration: none !important;
+      }
+
+      img,
+      svg {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
     }
   `;
@@ -585,8 +683,8 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   return (
     <>
     <style dangerouslySetInnerHTML={{ __html: printStyles(isLight) }} />
-    <SitePreviewPdfActions autoPrint={autoPrint} />
-    <main className={`min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
+    <SitePreviewPdfActions autoPrint={autoPrint} pdfTitle={`${company} homepage website concept`} />
+    <main className={`site-preview-root min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
       <section className="relative overflow-hidden">
         <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
         <div
@@ -597,7 +695,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         />
         <div className="absolute bottom-0 left-1/2 h-80 w-[80vw] -translate-x-1/2 rounded-full blur-3xl" style={{ background: identity.accentSoft }} />
 
-        <div className="relative mx-auto flex max-w-7xl flex-col px-5 py-6 sm:px-8 lg:min-h-[760px] lg:px-10">
+        <div className="site-preview-hero relative mx-auto flex max-w-7xl flex-col px-5 py-6 sm:px-8 lg:min-h-[760px] lg:px-10">
           <header className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
@@ -613,7 +711,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
                 </p>
               </div>
             </div>
-            <nav className={`hidden items-center gap-1 rounded-full border p-1 md:flex ${isLight ? "border-slate-200 bg-white/75" : "border-white/10 bg-white/5"}`}>
+            <nav className={`site-preview-print-nav hidden items-center gap-1 rounded-full border p-1 md:flex ${isLight ? "border-slate-200 bg-white/75" : "border-white/10 bg-white/5"}`}>
               {identity.pages.slice(0, 3).map(page => (
                 <a
                   key={page}
@@ -630,7 +728,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
             </div>
           </header>
 
-          <div className={`grid flex-1 items-center gap-10 py-10 lg:gap-12 lg:py-14 ${heroGrid}`}>
+          <div className={`site-preview-hero-grid grid flex-1 items-center gap-10 py-10 lg:gap-12 lg:py-14 ${heroGrid}`}>
             <div>
               <div className={`mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
                 <Sparkles className="h-4 w-4" style={{ color: identity.accent }} />
@@ -677,7 +775,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
               </div>
             </div>
 
-            <div className="relative hidden sm:block">
+            <div className="site-preview-hero-visual relative hidden sm:block">
               <div
                 className="absolute -inset-5 rounded-[2.5rem] opacity-60 blur-2xl"
                 style={{ background: `linear-gradient(135deg, ${identity.accentSoft}, ${identity.accent2}22)` }}
@@ -737,7 +835,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
             </div>
           </div>
 
-          <div className={`mb-10 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/80" : "border-white/10 bg-white/[0.055]"}`}>
+          <div className={`site-preview-signal-grid mb-10 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/80" : "border-white/10 bg-white/[0.055]"}`}>
             {[
               { label: "Lead signal", value: data.status === "has-website" ? "Modernise current site" : "Website gap visible" },
               { label: "Offer angle", value: identity.pitchHook },

@@ -348,7 +348,7 @@ function WebDesignBuilderContent() {
               className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/15"
             >
               <Download className="h-4 w-4" />
-              Download PDF
+              Full homepage PDF
             </a>
             <button
               type="button"
@@ -605,8 +605,8 @@ function WebDesignBuilderContent() {
                     className: "border-accent/30 bg-accent/10 text-accent",
                   },
                   {
-                    title: "Download PDF",
-                    copy: "Open the preview with the save-as-PDF flow ready for sending.",
+                    title: "Full homepage PDF",
+                    copy: "Export the complete homepage concept into one client-ready PDF file.",
                     href: pdfHref,
                     icon: Download,
                     className: "border-cyan-400/30 bg-cyan-400/10 text-cyan-200",
@@ -752,7 +752,7 @@ function WebDesignBuilderContent() {
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15"
                     >
                       <Download className="h-4 w-4" />
-                      PDF
+                      Full PDF
                     </a>
                   </div>
                 </div>
