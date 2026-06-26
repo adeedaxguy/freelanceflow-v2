@@ -308,11 +308,27 @@ function Badge({ children, color = "primary" }: { children: ReactNode; color?: "
 function SectionHeading({ badge, badgeColor, title, sub, center = true }: {
   badge?: string; badgeColor?: "primary"|"accent"|"gold"; title: ReactNode; sub?: ReactNode; center?: boolean;
 }) {
+  const badgeTone = badgeColor === "accent"
+    ? "text-accent"
+    : badgeColor === "gold"
+      ? "text-gold"
+      : "text-primary-light";
+
   return (
-    <Reveal className={center ? "text-center" : ""}>
-      {badge && <div className={`mb-5 ${center ? "flex justify-center" : ""}`}><Badge color={badgeColor}>{badge}</Badge></div>}
-      <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-foreground leading-tight mb-4 tracking-tight">{title}</h2>
-      {sub && <p className={`text-muted-foreground text-lg leading-relaxed ${center ? "max-w-2xl mx-auto" : ""}`}>{sub}</p>}
+    <Reveal className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
+      {badge && (
+        <p className={`text-xs font-bold uppercase tracking-[0.22em] ${badgeTone}`}>
+          {badge}
+        </p>
+      )}
+      <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem]">
+        {title}
+      </h2>
+      {sub && (
+        <p className={`mt-4 text-base leading-7 text-muted-foreground ${center ? "max-w-2xl mx-auto" : ""}`}>
+          {sub}
+        </p>
+      )}
     </Reveal>
   );
 }
@@ -542,7 +558,20 @@ const FEATURES = [
   },
 ];
 
-const SOURCES = ["Remote job leads", "Local business leads", "Owner checks", "Live job signals", "Startup hiring", "Urgent projects", "Website gaps", "Marketing leads", "Design leads", "SEO leads"];
+const HERO_PANELS = [
+  {
+    title: "Remote, local, and live demand",
+    detail: "Start with the lead engine that matches the kind of client you want.",
+  },
+  {
+    title: "Owner path when a lead looks real",
+    detail: "Move from company name to owner or manager verification before outreach.",
+  },
+  {
+    title: "Review-first proposal workflow",
+    detail: "Turn the signal into a cleaner opener, Gmail draft, and tracked next step.",
+  },
+];
 
 const STATS = [
   { to: 3, suffix: "", prefix: "", label: "Core lead engines", sub: "remote, local + owners, and live jobs", color: "text-primary-light" },
@@ -896,7 +925,7 @@ export default function HomepageClient() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#090915] overflow-x-hidden">
+    <main className="min-h-screen overflow-x-hidden bg-background">
       <Navbar />
 
       {/* ── Early Access Banner ── */}
@@ -907,7 +936,7 @@ export default function HomepageClient() {
       ════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className={`relative min-h-[calc(100svh-210px)] sm:min-h-screen flex items-start sm:items-center justify-center overflow-hidden ${showEarlyAccess ? "pt-8 sm:pt-10" : "pt-10 sm:pt-20"} pb-10 sm:pb-0`}
+        className={`relative flex min-h-[calc(100svh-150px)] items-start justify-center overflow-hidden ${showEarlyAccess ? "pt-4 sm:pt-10" : "pt-8 sm:pt-16"} pb-12 sm:min-h-[calc(100svh-88px)] sm:pb-8 lg:items-center`}
       >
 
         {/* Layered mesh gradient background */}
@@ -946,58 +975,38 @@ export default function HomepageClient() {
           />
         ))}
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-
-          {/* Social proof chip */}
-          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2.5 mb-5 sm:mb-8">
-            <div className="flex -space-x-2">
-              {["#7C3AED","#00E5A0","#FFD166","#F472B6","#60A5FA"].map((c, i) => (
-                <div key={i} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-background flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-white"
-                  style={{ background: c }}>
-                  {["M","S","J","A","R"][i]}
-                </div>
-              ))}
-            </div>
-            <div className="flex max-w-[220px] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs glass-card sm:max-w-none sm:text-sm">
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-gold text-gold" />)}
-              </div>
-              <span className="text-foreground font-semibold">Remote, local, and live leads</span>
-              <span className="hidden text-muted-foreground sm:inline">in one focused workflow</span>
-            </div>
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 mx-auto max-w-5xl px-4 text-center">
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+            className="mb-5 inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light"
+          >
+            <Zap className="h-4 w-4" />
+            Freelance Lead Generation Platform
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1 initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.75, delay: 0.1 }}
-            className="text-[2.65rem] sm:text-6xl lg:text-7xl font-extrabold text-foreground leading-[1.04] tracking-tight mb-4 sm:mb-6">
-            Your next{" "}
-            <span className="relative inline-block">
-              <span className="gradient-text">$10k client</span>
-              <motion.svg className="absolute -bottom-2 left-0 w-full" height="8" viewBox="0 0 300 8" fill="none" preserveAspectRatio="none"
-                initial={false} animate={{ pathLength: 1, opacity: 1 }} transition={{ delay: 0.8, duration: 0.7 }}>
-                <motion.path d="M0 6 Q75 1 150 5 Q225 9 300 4" stroke="url(#ug)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-                <defs>
-                  <linearGradient id="ug" x1="0" y1="0" x2="300" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#9F67FF" />
-                    <stop offset="100%" stopColor="#00E5A0" />
-                  </linearGradient>
-                </defs>
-              </motion.svg>
-            </span>
-            <br />is already out there.
-            <br /><span className="text-muted-foreground font-normal text-[2rem] sm:text-5xl lg:text-6xl">Let AI find them for you.</span>
+          <motion.h1
+            initial={false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.72, delay: 0.08 }}
+            className="mx-auto max-w-4xl text-4xl font-extrabold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-[5.5rem]"
+          >
+            Your next <span className="gradient-text">$10k client</span> is already out there.
           </motion.h1>
 
-          {/* Sub */}
-          <motion.p initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-10 leading-relaxed">
-            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live job opportunities, then turns each signal into a sharper pitch, Gmail-ready outreach, and a tracked pipeline.
+          <motion.p
+            initial={false}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.68, delay: 0.2 }}
+            className="mx-auto mt-6 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8"
+          >
+            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live client demand, then turns each signal into owner-path research, sharper proposals, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-7 sm:mb-12">
+            className="mb-8 mt-8 flex flex-col items-center justify-center gap-3 sm:mb-10 sm:flex-row sm:gap-4">
             <Link href="/auth?mode=signup" prefetch={false} className="group relative flex w-full sm:w-auto items-center justify-center gap-2.5 px-7 sm:px-9 py-3.5 sm:py-4 rounded-2xl bg-primary text-white text-sm sm:text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
               <Zap className="w-5 h-5 relative z-10" />
@@ -1010,29 +1019,36 @@ export default function HomepageClient() {
             </a>
           </motion.div>
 
-          {/* Trust bar */}
-          <motion.div initial={false} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
-            className="hidden sm:flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
-            {[
-              { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free forever plan" },
-              { icon: <Zap className="w-4 h-4 text-gold" />,      t: "Remote jobs first" },
-              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Local business discovery" },
-              { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "Review-first Gmail outreach" },
-            ].map(({ icon, t }) => (
-              <div key={t} className="flex items-center gap-1.5">{icon}<span>{t}</span></div>
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.56 }}
+            className="mx-auto grid max-w-4xl gap-3 text-left sm:grid-cols-3"
+          >
+            {HERO_PANELS.map(panel => (
+              <div key={panel.title} className="rounded-2xl border border-border bg-surface/70 p-4">
+                <p className="text-sm font-semibold text-foreground">{panel.title}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{panel.detail}</p>
+              </div>
             ))}
           </motion.div>
 
-          {/* Source pills */}
-          <motion.div initial={false} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.6 }}
-            className="hidden sm:flex flex-wrap items-center justify-center gap-2 mt-8">
-            <span className="text-xs text-muted-foreground mr-1">Lead engines and high-intent signals:</span>
-            {SOURCES.map((s, i) => (
-              <motion.span key={s} initial={false} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1 + i * 0.06 }}
-                className="px-2.5 py-1 rounded-full bg-surface border border-border text-xs text-muted-foreground font-medium">
-                {s}
-              </motion.span>
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.68 }}
+            className="mt-6 hidden flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground sm:flex"
+          >
+            {[
+              { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free early access" },
+              { icon: <Zap className="w-4 h-4 text-gold" />, t: "Remote jobs first" },
+              { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Local business plus owner path" },
+              { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "Review-first Gmail outreach" },
+            ].map(({ icon, t }) => (
+              <div key={t} className="flex items-center gap-1.5">
+                {icon}
+                <span>{t}</span>
+              </div>
             ))}
           </motion.div>
         </motion.div>
