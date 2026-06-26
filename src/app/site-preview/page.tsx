@@ -5,7 +5,6 @@ import {
   Award,
   CheckCircle,
   Clock,
-  ExternalLink,
   Image as ImageIcon,
   Layers,
   MapPin,
@@ -13,7 +12,6 @@ import {
   MousePointerClick,
   Phone,
   ShieldCheck,
-  Sparkles,
   Star,
 } from "lucide-react";
 import {
@@ -25,7 +23,7 @@ import SitePreviewPdfActions from "@/components/SitePreviewPdfActions";
 
 export const metadata: Metadata = {
   title: "Website Preview",
-  description: "A private website concept preview.",
+  description: "A client-facing local business homepage preview.",
   robots: {
     index: false,
     follow: false,
@@ -72,33 +70,6 @@ type PreviewOptions = {
   contentDepth: "short" | "balanced" | "detailed";
   conversionGoal: "calls" | "quotes" | "bookings" | "visits";
   layout: "conversion" | "editorial" | "showcase";
-};
-
-const STYLE_COPY: Record<PreviewOptions["style"], { label: string; tone: string }> = {
-  professional: {
-    label: "Trusted local service website",
-    tone: "Clear services, visible proof, and a practical path from search to enquiry.",
-  },
-  premium: {
-    label: "Premium brand-forward website",
-    tone: "More whitespace, stronger trust cues, and a higher-value buying experience.",
-  },
-  bold: {
-    label: "Bold conversion website",
-    tone: "Sharper sections, punchier CTAs, and a page built to make action feel obvious.",
-  },
-  friendly: {
-    label: "Friendly neighbourhood website",
-    tone: "Warm local language, approachable proof, and a simple contact path.",
-  },
-  minimal: {
-    label: "Clean direct-response website",
-    tone: "Less clutter, faster scanning, and only the information customers need.",
-  },
-  creative: {
-    label: "Creative standout website",
-    tone: "More personality and movement while keeping the offer easy to understand.",
-  },
 };
 
 const GOAL_COPY: Record<PreviewOptions["conversionGoal"], { primary: string; secondary: string; section: string }> = {
@@ -199,6 +170,58 @@ function panelClass(isLight: boolean) {
 
 function mutedClass(isLight: boolean) {
   return isLight ? "text-slate-600" : "text-white/64";
+}
+
+const SEGMENT_IMAGES: Record<string, string[]> = {
+  auto: [
+    "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1632823471565-1ecdf5c298bb?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?auto=format&fit=crop&w=1000&q=80",
+  ],
+  cleaning: [
+    "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=1000&q=80",
+  ],
+  food: [
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1000&q=80",
+  ],
+  beauty: [
+    "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1000&q=80",
+  ],
+  trade: [
+    "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80",
+  ],
+  local: [
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=80",
+  ],
+};
+
+const FALLBACK_SEGMENT_IMAGES = SEGMENT_IMAGES.local ?? [
+  "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80",
+];
+
+function segmentImage(segment: string, index = 0) {
+  const images = SEGMENT_IMAGES[segment] ?? FALLBACK_SEGMENT_IMAGES;
+  return images[index % images.length]!;
+}
+
+function imageBackground(segment: string, index: number, overlay: string) {
+  return `${overlay}, url("${segmentImage(segment, index)}")`;
 }
 
 function printStyles(isLight: boolean) {
@@ -379,9 +402,9 @@ function VisualStory({
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <div className={`rounded-[2rem] border p-7 sm:p-9 ${panelClass(isLight)}`}>
           <ImageIcon className="mb-4 h-8 w-8" style={{ color: identity.accent }} />
-          <h2 className="text-3xl font-black">A clean page without stock-image distractions</h2>
+          <h2 className="text-3xl font-black">A clean page focused on the next call</h2>
           <p className={`mt-3 max-w-3xl text-lg leading-8 ${mutedClass(isLight)}`}>
-            This version keeps attention on the offer, trust proof, location, and action path instead of using generic imagery.
+            This version keeps attention on the services, trust proof, location, and contact path so customers can act quickly.
           </p>
         </div>
       </section>
@@ -392,15 +415,15 @@ function VisualStory({
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
-          eyebrow="Before and after concept"
-          title="Show the upgrade before asking for the sale"
-          copy={`The mockup gives ${data.company} a simple way to see how a clearer site can improve trust and action.`}
+          eyebrow="Before and after"
+          title="Make the choice feel obvious before customers call"
+          copy={`${data.company} should make services, proof, location, and the next step clear before a customer compares another business.`}
           isLight={isLight}
         />
         <div className="grid gap-4 lg:grid-cols-2">
           {[
-            { label: "Current impression", items: ["Harder to compare services", "Contact details can get missed", "Little proof before the call"] },
-            { label: "Proposed experience", items: ["Services are clear in seconds", "Phone and quote path stay visible", "Proof and local trust are structured"] },
+            { label: "Harder to choose", items: ["Services are harder to compare", "Contact details can get missed", "Little proof appears before the call"] },
+            { label: "Easier to call", items: ["Services are clear in seconds", "Phone and quote path stay visible", "Proof and local trust are structured"] },
           ].map((column, index) => (
             <article key={column.label} className={`rounded-[2rem] border p-6 ${panelClass(isLight)}`}>
               <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: index === 0 ? identity.accent2 : identity.accent }}>
@@ -424,18 +447,22 @@ function VisualStory({
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
-          eyebrow="Visual selling blocks"
-          title="A gallery that feels specific to the work"
-          copy="Instead of stock photos, this concept uses branded visual slots that can later be replaced with real work samples."
+          eyebrow="Service gallery"
+          title="Show the work customers are already trying to understand"
+          copy={`${data.company} can use service photos, repair examples, and proof blocks to help local customers feel safer before they call.`}
           isLight={isLight}
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {identity.services.map((service, index) => (
             <article key={service.title} className={`min-h-[240px] overflow-hidden rounded-[2rem] border ${panelClass(isLight)}`}>
               <div
-                className="h-32"
+                className="h-36 bg-cover bg-center"
                 style={{
-                  background: `radial-gradient(circle at ${25 + index * 12}% 25%, ${identity.accent}, transparent 28%), linear-gradient(135deg, ${identity.accentSoft}, ${identity.accent2}33)`,
+                  backgroundImage: imageBackground(
+                    identity.segment,
+                    index + 1,
+                    `linear-gradient(180deg, rgba(2,6,23,0.10), rgba(2,6,23,0.62))`,
+                  ),
                 }}
               />
               <div className="p-5">
@@ -454,7 +481,7 @@ function VisualStory({
       <div className={`grid gap-6 overflow-hidden rounded-[2rem] border p-5 sm:p-7 lg:grid-cols-[0.95fr_1.05fr] ${panelClass(isLight)}`}>
         <div className="p-2 sm:p-4">
           <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: identity.accent }}>
-            Brand preview
+            Customer view
           </p>
           <h2 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">{identity.visualTitle}</h2>
           <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{identity.visualSubtitle}</p>
@@ -519,7 +546,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     style: option(searchParams?.style, ["professional", "premium", "bold", "friendly", "minimal", "creative"] as const, "professional"),
     theme: option(searchParams?.theme, ["dark", "light"] as const, "dark"),
     sections: sectionCount(searchParams?.sections),
-    images: option(searchParams?.images, ["abstract", "gallery", "before-after", "none"] as const, "abstract"),
+    images: option(searchParams?.images, ["abstract", "gallery", "before-after", "none"] as const, "gallery"),
     contentDepth: option(searchParams?.contentDepth, ["short", "balanced", "detailed"] as const, "balanced"),
     conversionGoal: option(searchParams?.conversionGoal, ["calls", "quotes", "bookings", "visits"] as const, "quotes"),
     layout: option(searchParams?.layout, ["conversion", "editorial", "showcase"] as const, "conversion"),
@@ -529,9 +556,8 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   const initials = businessInitials(company);
   const market = marketFromLocation(location);
   const callLink = telHref(phone);
-  const heroPitch = pitch || identity.subheadline;
+  const heroPitch = identity.subheadline;
   const isLight = options.theme === "light";
-  const styleCopy = STYLE_COPY[options.style];
   const styleMood = STYLE_MOOD[options.style];
   const goalCopy = GOAL_COPY[options.conversionGoal];
   const autoPrint = clean(searchParams?.print).toLowerCase() === "1";
@@ -554,9 +580,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     <section key="services" id="services" className={isLight ? "border-y border-slate-200 bg-white" : "border-y border-white/10 bg-white/[0.035]"}>
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
-          eyebrow="Website built around real buying intent"
-          title="What the new site should make obvious"
-          copy={goalCopy.section}
+          eyebrow="Services made clear"
+          title="What customers should understand in seconds"
+          copy={`${company} should make the right service, phone number, location, and reason to trust the business obvious before customers keep searching.`}
           isLight={isLight}
         />
         <div className="grid gap-4 lg:grid-cols-4">
@@ -595,10 +621,10 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       </div>
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: identity.accent }}>
-          {styleCopy.label}
+          {identity.visualTitle}
         </p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">The pitch feels easier to believe</h2>
-        <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{styleCopy.tone}</p>
+        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Confidence before the first call</h2>
+        <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{identity.visualSubtitle}</p>
         <div className="mt-8 flex flex-wrap gap-2">
           {[...identity.trustBadges, goalCopy.secondary].map(badge => (
             <span key={badge} className={`rounded-full border px-3 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-slate-50 text-slate-700" : "border-white/10 bg-white/[0.05] text-white/70"}`}>
@@ -612,7 +638,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     <section key="process" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
       <HeadingBlock
         eyebrow="Simple conversion path"
-        title="How visitors become enquiries"
+        title="How customers move from search to call"
         copy={`A cleaner path helps ${company} turn local attention into action without making customers hunt for the next step.`}
         isLight={isLight}
       />
@@ -631,9 +657,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <Layers className="mb-5 h-8 w-8" style={{ color: identity.accent }} />
         <p className={`text-sm font-black uppercase tracking-[0.18em] ${isLight ? "text-slate-500" : "text-white/45"}`}>
-          Suggested site map
+          Service shortcuts
         </p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Pages worth building first</h2>
+        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Find the right service faster</h2>
         <div className="mt-6 flex flex-wrap gap-2">
           {identity.pages.map(page => (
             <span key={page} className="rounded-full px-4 py-2 text-sm font-black text-slate-950" style={{ background: identity.accent }}>
@@ -672,9 +698,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     <section key="expanded-copy" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <MousePointerClick className="mb-5 h-8 w-8" style={{ color: identity.accent }} />
-        <h2 className="text-3xl font-black sm:text-5xl">Why this would be easier to sell</h2>
+        <h2 className="text-3xl font-black sm:text-5xl">Why customers should choose {company}</h2>
         <p className={`mt-4 max-w-4xl text-lg leading-8 ${mutedClass(isLight)}`}>
-          The concept is specific to {data.category.toLowerCase()} buyers in {market}. It gives the prospect a concrete beta link, a clearer service path, and a practical reason to discuss the website instead of hearing a generic pitch.
+          Customers comparing {data.category.toLowerCase()} options in {market} need quick proof, plain service descriptions, a visible phone path, and enough local confidence to stop searching and call.
         </p>
       </div>
     </section>,
@@ -683,7 +709,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   return (
     <>
     <style dangerouslySetInnerHTML={{ __html: printStyles(isLight) }} />
-    <SitePreviewPdfActions autoPrint={autoPrint} pdfTitle={`${company} homepage website concept`} />
+    <SitePreviewPdfActions autoPrint={autoPrint} pdfTitle={`${company} homepage`} />
     <main className={`site-preview-root min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
       <section className="relative overflow-hidden">
         <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
@@ -695,7 +721,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         />
         <div className="absolute bottom-0 left-1/2 h-80 w-[80vw] -translate-x-1/2 rounded-full blur-3xl" style={{ background: identity.accentSoft }} />
 
-        <div className="site-preview-hero relative mx-auto flex max-w-7xl flex-col px-5 py-6 sm:px-8 lg:min-h-[760px] lg:px-10">
+        <div className="site-preview-hero relative mx-auto flex max-w-7xl flex-col px-5 py-6 sm:px-8 lg:min-h-[690px] lg:px-10">
           <header className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div
@@ -707,32 +733,32 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
               <div>
                 <p className="text-lg font-black leading-none">{company}</p>
                 <p className={`mt-1 text-xs font-bold uppercase tracking-[0.2em] ${isLight ? "text-slate-500" : "text-white/45"}`}>
-                  {STYLE_COPY[options.style].label}
+                  {category}
                 </p>
               </div>
             </div>
-            <nav className={`site-preview-print-nav hidden items-center gap-1 rounded-full border p-1 md:flex ${isLight ? "border-slate-200 bg-white/75" : "border-white/10 bg-white/5"}`}>
+            <nav className={`site-preview-print-nav hidden items-center gap-1 rounded-full border p-1 md:flex ${isLight ? "border-slate-950 bg-slate-950 shadow-lg" : "border-white/10 bg-white/5"}`}>
               {identity.pages.slice(0, 3).map(page => (
                 <a
                   key={page}
                   href="#services"
-                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${isLight ? "text-slate-600 hover:bg-slate-100 hover:text-slate-950" : "text-white/62 hover:bg-white/10 hover:text-white"}`}
+                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${isLight ? "text-white hover:bg-white/10" : "text-white/70 hover:bg-white/10 hover:text-white"}`}
                 >
                   {page}
                 </a>
               ))}
             </nav>
-            <div className={`hidden items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold sm:flex ${isLight ? "border-slate-200 bg-white text-slate-600" : "border-white/10 bg-white/5 text-white/70"}`}>
-              <ShieldCheck className="h-4 w-4" style={{ color: identity.accent }} />
-              Private preview
+            <div className={`hidden items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-bold sm:flex ${isLight ? "border-slate-950 bg-white text-slate-700" : "border-white/10 bg-white/5 text-white/70"}`}>
+              {phone ? <Phone className="h-4 w-4" style={{ color: identity.accent }} /> : <MapPin className="h-4 w-4" style={{ color: identity.accent }} />}
+              {phone || market}
             </div>
           </header>
 
-          <div className={`site-preview-hero-grid grid flex-1 items-center gap-10 py-10 lg:gap-12 lg:py-14 ${heroGrid}`}>
+          <div className={`site-preview-hero-grid grid flex-1 items-center gap-8 py-8 sm:py-10 lg:gap-12 lg:py-12 ${heroGrid}`}>
             <div>
               <div className={`mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
-                <Sparkles className="h-4 w-4" style={{ color: identity.accent }} />
-                {styleMood.rhythm} concept for {identity.eyebrow}
+                <MapPin className="h-4 w-4" style={{ color: identity.accent }} />
+                Serving {market}
               </div>
               <h1 className="max-w-4xl break-words text-4xl font-black leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
                 {identity.headline}
@@ -775,74 +801,65 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
               </div>
             </div>
 
-            <div className="site-preview-hero-visual relative hidden sm:block">
+            <div className="site-preview-hero-visual relative block">
               <div
                 className="absolute -inset-5 rounded-[2.5rem] opacity-60 blur-2xl"
                 style={{ background: `linear-gradient(135deg, ${identity.accentSoft}, ${identity.accent2}22)` }}
               />
-              <div className={`relative rounded-[2rem] border p-4 shadow-2xl backdrop-blur ${isLight ? "border-slate-200 bg-white/85" : "border-white/10 bg-white/[0.07]"}`}>
-                <div className={`overflow-hidden rounded-[1.5rem] border ${isLight ? "border-slate-200 bg-slate-950 text-white" : "border-white/10 bg-[#0b1220]"}`}>
-                  <div className="flex items-center justify-between gap-3 border-b border-white/10 p-5" style={{ background: identity.surface }}>
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="grid h-14 w-14 place-items-center rounded-2xl text-lg font-black text-slate-950"
-                        style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
-                      >
-                        {initials}
-                      </div>
+              <div className={`relative overflow-hidden rounded-[2rem] border shadow-2xl ${isLight ? "border-slate-200 bg-white" : "border-white/10 bg-[#0b1220]"}`}>
+                <div
+                  className="relative min-h-[330px] bg-cover bg-center p-4 sm:min-h-[430px] sm:p-5"
+                  style={{
+                    backgroundImage: imageBackground(
+                      identity.segment,
+                      0,
+                      "linear-gradient(180deg, rgba(2,6,23,0.10), rgba(2,6,23,0.86))",
+                    ),
+                  }}
+                >
+                  <div className="flex h-full min-h-[300px] flex-col justify-between sm:min-h-[390px]">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-black text-slate-950">
+                        {identity.trustBadges[0] ?? "Trusted local service"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-950/65 px-3 py-2 text-sm font-black text-white backdrop-blur">
+                        <Star className="h-4 w-4 fill-current" style={{ color: identity.accent2 }} />
+                        Local choice
+                      </span>
+                    </div>
+                    <div className="rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-4 text-white backdrop-blur-md sm:p-5">
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-white/50">{identity.visualTitle}</p>
+                      <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">{company}</h2>
+                      <p className="mt-3 text-base leading-7 text-white/76">{identity.visualSubtitle}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className={`grid gap-3 p-4 ${isLight ? "bg-white" : "bg-[#0b1220]"}`}>
+                  {identity.services.slice(0, 3).map(service => (
+                    <div key={service.title} className={`flex items-start gap-3 rounded-2xl border p-3 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-white/[0.04]"}`}>
+                      <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: identity.accent }} />
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">{identity.visualTitle}</p>
-                        <h2 className="mt-1 text-2xl font-black">{company}</h2>
+                        <h3 className="font-black">{service.title}</h3>
+                        <p className={`mt-1 text-sm leading-6 ${mutedClass(isLight)}`}>{service.description}</p>
                       </div>
                     </div>
-                    <Star className="h-7 w-7 fill-current" style={{ color: identity.accent2 }} />
-                  </div>
-
-                  <div className="p-5">
-                    <p className="text-lg leading-8 text-white/70">{identity.visualSubtitle}</p>
-                    <div className="mt-5 hidden gap-3 sm:grid">
-                      {identity.services.slice(0, options.contentDepth === "short" ? 2 : 3).map(service => (
-                        <div key={service.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                          <div className="mb-2 flex items-center gap-2">
-                            <CheckCircle className="h-5 w-5" style={{ color: identity.accent }} />
-                            <h3 className="font-black">{service.title}</h3>
-                          </div>
-                          <p className="text-sm leading-6 text-white/62">{service.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_0.82fr]">
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">Contact</p>
-                        <div className="mt-3 space-y-2 text-white/72">
-                          {address && <p>{address}</p>}
-                          {phone && <p>{phone}</p>}
-                          {website && (
-                            <a href={website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:underline" style={{ color: identity.accent }}>
-                              Current website <ExternalLink className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">Design logic</p>
-                        <p className="mt-3 text-sm leading-6 text-white/70">{styleMood.detail}</p>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={`site-preview-signal-grid mb-10 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/80" : "border-white/10 bg-white/[0.055]"}`}>
+          <div className={`site-preview-signal-grid mb-8 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]" : "border-white/10 bg-white/[0.055]"}`}>
             {[
-              { label: "Lead signal", value: data.status === "has-website" ? "Modernise current site" : "Website gap visible" },
-              { label: "Offer angle", value: identity.pitchHook },
-              { label: "Primary action", value: goalCopy.primary },
+              { label: phone ? "Call direct" : "Quick enquiry", value: phone || goalCopy.primary, icon: Phone },
+              { label: "Local area", value: address || market, icon: MapPin },
+              { label: "Popular service", value: identity.pages[0] ?? category, icon: CheckCircle },
             ].map(item => (
               <div key={item.label} className={`${styleMood.shape} border p-4 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-black/15"}`}>
-                <p className={`text-xs font-black uppercase tracking-[0.18em] ${isLight ? "text-slate-500" : "text-white/42"}`}>{item.label}</p>
+                <div className="flex items-center gap-2">
+                  <item.icon className="h-4 w-4" style={{ color: identity.accent }} />
+                  <p className={`text-xs font-black uppercase tracking-[0.18em] ${isLight ? "text-slate-500" : "text-white/42"}`}>{item.label}</p>
+                </div>
                 <p className="mt-2 text-base font-black leading-6">{item.value}</p>
               </div>
             ))}
@@ -858,9 +875,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
           style={{ background: isLight ? "white" : `linear-gradient(135deg, ${identity.accentSoft}, rgba(255,255,255,0.045))` }}
         >
           <Clock className="mx-auto mb-5 h-8 w-8" style={{ color: identity.accent }} />
-          <h2 className="text-3xl font-black sm:text-5xl">Ready to win more work in {market}?</h2>
+          <h2 className="text-3xl font-black sm:text-5xl">Need {data.category.toLowerCase()} in {market}?</h2>
           <p className={`mx-auto mt-4 max-w-2xl text-lg leading-8 ${mutedClass(isLight)}`}>
-            The page is built to make {company} easier to trust, easier to understand, and easier to contact from a phone.
+            {company} is easy to reach, easy to understand, and ready for customers who want a clear next step.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             {(callLink || options.conversionGoal !== "calls") && (

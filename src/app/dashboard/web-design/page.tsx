@@ -71,7 +71,7 @@ const BUILDER_STEPS: BuilderStep[] = [
     key: "brief",
     label: "Brief",
     title: "Confirm the client angle",
-    description: "Start with the business signal, offer angle, and what the beta page should prove.",
+    description: "Start with the business type, location, offer angle, and what the homepage should make clear.",
     icon: FileText,
   },
   {
@@ -92,7 +92,7 @@ const BUILDER_STEPS: BuilderStep[] = [
     key: "launch",
     label: "Preview",
     title: "Review and export",
-    description: "Open the beta link, save a PDF, or create the outreach proposal from this concept.",
+    description: "Open the website preview, save a PDF, or create the outreach proposal from this direction.",
     icon: Rocket,
   },
 ];
@@ -112,15 +112,15 @@ const THEME_OPTIONS: Option[] = [
 ];
 
 const SECTION_OPTIONS: Option[] = [
-  { value: "5", label: "5 sections", description: "Quick landing page for fast client pitching." },
+  { value: "5", label: "5 sections", description: "Quick landing page for fast client review." },
   { value: "7", label: "7 sections", description: "Balanced homepage with services, proof, and CTA." },
-  { value: "9", label: "9 sections", description: "Full concept with visual proof and page ideas." },
+  { value: "9", label: "9 sections", description: "Full homepage with visual proof and service sections." },
   { value: "11", label: "11 sections", description: "Richer mockup for higher-ticket website deals." },
 ];
 
 const IMAGE_OPTIONS: Option[] = [
-  { value: "abstract", label: "Smart visuals", description: "Free CSS-generated branded visuals, no stock dependency." },
-  { value: "gallery", label: "Gallery blocks", description: "Service-specific image placeholders for work samples." },
+  { value: "abstract", label: "Brand visuals", description: "Graphic brand treatment with fewer photo-heavy sections." },
+  { value: "gallery", label: "Service gallery", description: "Relevant visual cards for services, proof, and work examples." },
   { value: "before-after", label: "Before / after", description: "Comparison section for transformation-based selling." },
   { value: "none", label: "No images", description: "Text-first page when a clean proposal is better." },
 ];
@@ -267,7 +267,7 @@ function WebDesignBuilderContent() {
   const [style, setStyle] = useState(() => optionValue(searchParams.get("style"), STYLE_OPTIONS, "professional"));
   const [theme, setTheme] = useState(() => optionValue(searchParams.get("theme"), THEME_OPTIONS, "dark"));
   const [sections, setSections] = useState(() => optionValue(searchParams.get("sections"), SECTION_OPTIONS, "7"));
-  const [images, setImages] = useState(() => optionValue(searchParams.get("images"), IMAGE_OPTIONS, "abstract"));
+  const [images, setImages] = useState(() => optionValue(searchParams.get("images"), IMAGE_OPTIONS, "gallery"));
   const [contentDepth, setContentDepth] = useState(() => optionValue(searchParams.get("contentDepth"), CONTENT_OPTIONS, "balanced"));
   const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, "quotes"));
   const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, "conversion"));
@@ -327,7 +327,7 @@ function WebDesignBuilderContent() {
             </Link>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Web design studio</p>
-              <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">Build a client-ready website concept</h1>
+              <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">Build a sellable local website concept</h1>
             </div>
           </div>
 
@@ -379,17 +379,17 @@ function WebDesignBuilderContent() {
                 <div>
                   <div className="mb-4 flex flex-wrap gap-2">
                     <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-cyan-200">
-                      {identity.logoLabel} client concept
+                      {identity.logoLabel} website preview
                     </span>
                     <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary-light">
-                      Guided build
+                      Guided setup
                     </span>
                   </div>
                   <h2 className="max-w-3xl text-3xl font-black leading-tight text-foreground sm:text-5xl">
-                    Turn {data.company} into a shareable beta website.
+                    Create a real-looking homepage for {data.company}.
                   </h2>
                   <p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
-                    Start with the live lead signal, choose a direction, then export a preview link or PDF that feels custom enough to open a real sales conversation.
+                    Choose the style, sections, images, and conversion goal, then export a link or PDF that feels specific enough to start a real sales conversation.
                   </p>
                 </div>
               </div>
@@ -413,7 +413,7 @@ function WebDesignBuilderContent() {
             <aside className="border-t border-border bg-background/55 p-6 sm:p-8 lg:border-l lg:border-t-0">
               <h2 className="text-xl font-black text-foreground">Studio flow</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Move from brief to prototype to client-ready preview without scrolling through every control at once.
+                Move from business brief to finished homepage preview without scrolling through every control at once.
               </p>
               <div className="mt-5 space-y-3">
                 {BUILDER_STEPS.map((step, index) => {
@@ -525,7 +525,7 @@ function WebDesignBuilderContent() {
               <div className="space-y-5">
                 <OptionGrid
                   title="Visual direction"
-                  description="Choose the first impression the prospect should feel when they open the beta link."
+                  description="Choose the first impression the prospect should feel when they open the website preview."
                   icon={Palette}
                   options={STYLE_OPTIONS}
                   value={style}
@@ -566,7 +566,7 @@ function WebDesignBuilderContent() {
                 />
                 <OptionGrid
                   title="Image treatment"
-                  description="The preview uses generated design blocks and smart placeholders, so it works without paid stock assets."
+                  description="Use relevant visual treatment without requiring paid stock assets or manual image uploads."
                   icon={ImageIcon}
                   options={IMAGE_OPTIONS}
                   value={images}
@@ -598,7 +598,7 @@ function WebDesignBuilderContent() {
               <div className="grid gap-5 lg:grid-cols-3">
                 {[
                   {
-                    title: "Open beta preview",
+                    title: "Open website preview",
                     copy: "See the full client-facing concept in a clean standalone page.",
                     href: previewHref,
                     icon: ExternalLink,
@@ -679,7 +679,7 @@ function WebDesignBuilderContent() {
                   <span className="h-3 w-3 rounded-full bg-red-400" />
                   <span className="h-3 w-3 rounded-full bg-yellow-400" />
                   <span className="h-3 w-3 rounded-full bg-green-400" />
-                  <span className="ml-2 truncate text-xs text-muted-foreground">beta preview</span>
+                  <span className="ml-2 truncate text-xs text-muted-foreground">website preview</span>
                 </div>
               </div>
               <div className="p-5">
