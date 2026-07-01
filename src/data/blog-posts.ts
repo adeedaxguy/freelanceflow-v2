@@ -1,8 +1,10 @@
 import type { BlogPost } from "@/types";
 import { SEO_LONGFORM_POSTS } from "@/data/seo-longform-posts";
 import { SEO_CONTENT_CLUSTER } from "@/data/seo-content-cluster";
+import { PILLAR_POSTS } from "@/data/pillar-posts";
 
 export const STATIC_POSTS: BlogPost[] = [
+  ...PILLAR_POSTS,
   ...SEO_LONGFORM_POSTS,
   ...SEO_CONTENT_CLUSTER,
   {
@@ -792,4 +794,3 @@ Local businesses need web designers. They just need to be found and shown, speci
   }
 
 ];
-

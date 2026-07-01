@@ -93,14 +93,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Fall back to static post
   const post = STATIC_POSTS.find(p => p.slug === params.slug);
   if (!post) return { title: "Post Not Found" };
+  const title = post.metaTitle || post.title;
+  const description = post.metaDescription || post.excerpt || "";
   const image = getBlogCoverImageUrl(BASE_URL, post.slug, post.coverImage);
   return {
-    title: post.title,
-    description: post.excerpt ?? "",
+    title,
+    description,
+    keywords: post.focusKeyword ? [post.focusKeyword, ...(post.tags ?? [])] : undefined,
     alternates: { canonical: `${BASE_URL}/blog/${post.slug}` },
     openGraph: {
-      title: post.title,
-      description: post.excerpt ?? "",
+      title,
+      description,
       type: "article",
       url: `${BASE_URL}/blog/${post.slug}`,
       images: [{ url: image, width: 1200, height: 630 }],
@@ -108,8 +111,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt ?? "",
+      title,
+      description,
       images: [image],
     },
   };
@@ -500,9 +503,11 @@ export default async function BlogPostPage({ params }: Props) {
     content,
     category: post.category,
     readTime: post.readTime,
-    author: "iCloseLeads Team",
+    author: post.author ?? "iCloseLeads Team",
     createdAt: postDate,
     updatedAt: updatedDate,
+    tags: post.tags,
+    focusKeyword: post.focusKeyword,
   };
   const articleHeadings = extractArticleHeadings(content);
   const relatedPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
@@ -514,14 +519,17 @@ export default async function BlogPostPage({ params }: Props) {
       "@type": "WebPage",
       "@id": `${BASE_URL}/blog/${post.slug}`,
     },
-    "headline": post.title,
-    "description": post.excerpt ?? "",
+    "headline": post.metaTitle || post.title,
+    "description": post.metaDescription || post.excerpt || "",
     "datePublished": postDate.toISOString(),
     "dateModified": updatedDate.toISOString(),
-    "author": { "@type": "Organization", "name": "iCloseLeads" },
+    "author": post.author
+      ? { "@type": "Person", "name": post.author }
+      : { "@type": "Organization", "name": "iCloseLeads" },
     "publisher": { "@type": "Organization", "name": "iCloseLeads", "url": BASE_URL },
     "image": coverImageUrl,
     "articleSection": post.category,
+    "keywords": [post.focusKeyword, ...(post.tags ?? [])].filter(Boolean),
     "wordCount": estimateWordCount(content),
     "isAccessibleForFree": true,
     "url": `${BASE_URL}/blog/${post.slug}`,

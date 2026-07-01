@@ -74,6 +74,11 @@ export interface BlogPost {
   readTime: number;
   createdAt: Date;
   updatedAt: Date;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  author?: string | null;
+  tags?: string[];
+  focusKeyword?: string | null;
 }
 
 export interface ContactSubmission {
