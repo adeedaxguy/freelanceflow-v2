@@ -14,6 +14,7 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "seo:score-ahrefs": "node scripts/score-ahrefs-keywords.mjs",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

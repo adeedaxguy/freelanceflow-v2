@@ -43,3 +43,13 @@ coverage/
 *.zip
 *.pdf
 score-check.ts
+
+# SEO private exports
+seo/data/*.csv
+seo/data/*.tsv
+seo/data/*.xls
+seo/data/*.xlsx
+seo/data/*.zip
+seo/data/raw/
+!seo/data/README.md
+!seo/data/.gitkeep
