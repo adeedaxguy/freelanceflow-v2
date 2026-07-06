@@ -21,7 +21,7 @@ const MEGA_FEATURES = [
     items: [
       { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/use-cases/remote-job-leads" },
       { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/use-cases/local-business-leads" },
-      { label: "Decision Maker Finder", desc: "Find owner and manager contact paths",       href: "/features/lead-discovery#capabilities" },
+      { label: "Decision Maker Finder", desc: "Check owner, manager, and contact paths",    href: "/features/lead-discovery#capabilities" },
       { label: "Live Job Leads",        desc: "Move first on fresh freelance demand",       href: "/use-cases/live-job-leads" },
       { label: "Lead Scoring",          desc: "Prioritise fit, urgency, and contactability", href: "/features/lead-discovery#capabilities" },
     ],
@@ -65,7 +65,7 @@ const MEGA_FEATURES = [
     color: "text-green-400",
     items: [
       { label: "Dashboard Overview",   desc: "See prospecting activity at a glance",  href: "/features/analytics" },
-      { label: "Source Insights",      desc: "Learn which searches create pipeline",  href: "/features/analytics#capabilities" },
+      { label: "Search Insights",      desc: "Learn which searches create pipeline",  href: "/features/analytics#capabilities" },
       { label: "Pipeline Reports",     desc: "Spot where leads are getting stuck",    href: "/features/analytics#workflow" },
       { label: "Usage Tracking",       desc: "Understand limits and weekly activity", href: "/features/analytics#capabilities" },
     ],
@@ -142,11 +142,11 @@ export default function Navbar() {
               </button>
 
               {megaOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[760px] bg-surface/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl overflow-hidden">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[780px] overflow-hidden rounded-2xl border border-border bg-surface/95 shadow-2xl backdrop-blur-xl">
                     {/* Top bar */}
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-gradient-to-r from-primary/5 to-accent/5">
                       <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                        <Zap className="w-4 h-4 text-primary-light" /> All Features
+                        <Zap className="w-4 h-4 text-primary-light" /> Feature Suite
                       </div>
                       <Link href="/features" onClick={() => setMegaOpen(false)}
                         className="flex items-center gap-1 text-xs text-primary-light hover:underline">
@@ -155,7 +155,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Grid */}
-                    <div className="grid grid-cols-3 gap-0 p-5">
+                    <div className="grid grid-cols-3 gap-2 p-5">
                       {MEGA_FEATURES.map((cat) => {
                         const CatIcon = cat.icon;
                         return (
@@ -166,7 +166,7 @@ export default function Navbar() {
                             </div>
                             {cat.items.map((item) => (
                               <Link key={item.label} href={item.href} onClick={() => setMegaOpen(false)}
-                                className="block px-2 py-2 rounded-lg hover:bg-white/5 transition-colors group">
+                                className="block rounded-lg px-2.5 py-2 transition-colors hover:bg-white/5 group">
                                 <p className="text-sm font-medium text-foreground group-hover:text-primary-light transition-colors">{item.label}</p>
                                 <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                               </Link>

@@ -105,6 +105,9 @@ const comparisonRows = [
   ["Avoid marketplace bidding wars", true, false, false, true],
 ];
 
+const panelSurface =
+  "rounded-2xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))]";
+
 export default function FeatureOverviewPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -112,22 +115,22 @@ export default function FeatureOverviewPage() {
       <Navbar />
       <main className="pt-16">
         <section className="relative overflow-hidden border-b border-border">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(159,103,255,0.10),rgba(0,229,160,0.045),rgba(9,9,21,0))]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
             <div>
-              <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
                 <Zap className="h-4 w-4" />
                 iCloseLeads Features
               </div>
-              <h1 className="max-w-4xl text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-                A complete client acquisition platform{" "}
+              <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                Features that turn lead signals{" "}
                 <span className="bg-gradient-to-r from-primary-light via-accent to-blue-400 bg-clip-text text-transparent">
-                  for freelancers who sell direct
+                  into client conversations
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                iCloseLeads brings lead discovery, decision maker checks, AI proposals, Gmail-ready outreach, CRM tracking, analytics, and free freelancer tools into one focused workflow. It is built for people who want clients without depending on crowded marketplaces.
+                iCloseLeads connects discovery, decision maker checks, AI proposals, Gmail-ready outreach, CRM tracking, analytics, and freelancer tools into one focused workflow for winning direct clients.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -157,7 +160,7 @@ export default function FeatureOverviewPage() {
               ["1", "CRM-backed workflow"],
               ["0", "Credit card required"],
             ].map(([value, label]) => (
-              <div key={label} className="rounded-lg border border-border bg-background/65 px-4 py-4 text-center">
+              <div key={label} className="flex min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
                 <p className="text-2xl font-extrabold text-accent">{value}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{label}</p>
               </div>
@@ -176,19 +179,19 @@ export default function FeatureOverviewPage() {
                 The platform is not a loose collection of AI widgets. Each feature sits in the same acquisition loop: find the prospect, write the pitch, prepare the outreach, track the follow-up, and learn what worked.
               </p>
             </div>
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-12 grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">
               {FEATURE_PAGES.map(page => (
                 <Link
                   key={page.slug}
                   href={page.path}
-                  className={cn("group rounded-lg border border-border bg-surface p-5 transition-all", page.theme.hoverBorder)}
+                  className={cn(panelSurface, "group flex h-full min-h-[250px] flex-col p-5 transition-all", page.theme.hoverBorder)}
                 >
                   <div className={cn("mb-5 flex h-11 w-11 items-center justify-center rounded-lg border", page.theme.accentBg, page.theme.accentBorder)}>
                     <Icon name={page.icon} className={cn("h-5 w-5", page.theme.accentText)} />
                   </div>
                   <h3 className="text-lg font-extrabold text-foreground group-hover:text-primary-light">{page.eyebrow}</h3>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">{page.shortDescription}</p>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-light">
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-semibold text-primary-light">
                     Explore feature
                     <ArrowRight className="h-4 w-4" />
                   </span>
@@ -209,34 +212,36 @@ export default function FeatureOverviewPage() {
                 Marketplaces are useful, but they also create bidding pressure, platform dependency, and weak positioning. iCloseLeads is for freelancers who want to build their own pipeline: find buyers, pitch directly, follow up consistently, and keep ownership of the client relationship.
               </p>
             </div>
-            <div className="overflow-hidden rounded-lg border border-border bg-background">
-              <div className="grid grid-cols-[1.35fr_repeat(4,minmax(72px,1fr))] border-b border-border px-4 py-3 text-xs font-bold text-muted-foreground">
-                <span>Workflow</span>
-                <span className="text-center text-primary-light">iCloseLeads</span>
-                <span className="text-center">Marketplace</span>
-                <span className="text-center">Generic CRM</span>
-                <span className="text-center">Manual</span>
-              </div>
-              {comparisonRows.map(([label, iclose, market, crm, manual]) => (
-                <div key={label as string} className="grid grid-cols-[1.35fr_repeat(4,minmax(72px,1fr))] border-b border-border/60 px-4 py-3 text-sm last:border-0">
-                  <span className="text-foreground">{label}</span>
-                  {[iclose, market, crm, manual].map((ok, index) => (
-                    <span key={index} className="flex justify-center">
-                      {ok ? (
-                        <CheckCircle2 className="h-4 w-4 text-accent" />
-                      ) : (
-                        <span className="h-4 w-4 rounded-full border border-border" />
-                      )}
-                    </span>
-                  ))}
+            <div className="overflow-x-auto rounded-2xl border border-border bg-background">
+              <div className="min-w-[720px]">
+                <div className="grid grid-cols-[1.35fr_repeat(4,minmax(72px,1fr))] border-b border-border px-4 py-3 text-xs font-bold text-muted-foreground">
+                  <span>Workflow</span>
+                  <span className="text-center text-primary-light">iCloseLeads</span>
+                  <span className="text-center">Marketplace</span>
+                  <span className="text-center">Generic CRM</span>
+                  <span className="text-center">Manual</span>
                 </div>
-              ))}
+                {comparisonRows.map(([label, iclose, market, crm, manual]) => (
+                  <div key={label as string} className="grid grid-cols-[1.35fr_repeat(4,minmax(72px,1fr))] border-b border-border/60 px-4 py-3 text-sm last:border-0">
+                    <span className="text-foreground">{label}</span>
+                    {[iclose, market, crm, manual].map((ok, index) => (
+                      <span key={index} className="flex justify-center">
+                        {ok ? (
+                          <CheckCircle2 className="h-4 w-4 text-accent" />
+                        ) : (
+                          <span className="h-4 w-4 rounded-full border border-border" />
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl rounded-lg border border-primary/25 bg-primary/10 p-8 text-center">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-primary/25 bg-primary/10 p-8 text-center">
             <Sparkles className="mx-auto mb-5 h-10 w-10 text-primary-light" />
             <h2 className="text-3xl font-extrabold tracking-tight text-foreground">
               Start with one search, not a full sales department

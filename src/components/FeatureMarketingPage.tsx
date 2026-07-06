@@ -135,9 +135,12 @@ function SectionHeader({
   );
 }
 
+const panelSurface =
+  "rounded-2xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))]";
+
 function FeatureCard({ item, page }: { item: FeatureItem; page: FeaturePageData }) {
   return (
-    <div className={cn("rounded-lg border border-border bg-surface p-5 transition-all", page.theme.hoverBorder)}>
+    <div className={cn(panelSurface, "flex h-full min-h-[218px] flex-col p-5 transition-all", page.theme.hoverBorder)}>
       <div className={cn("mb-4 flex h-10 w-10 items-center justify-center rounded-lg border", page.theme.accentBg, page.theme.accentBorder)}>
         <FeatureIcon name={item.icon} className={cn("h-5 w-5", page.theme.accentText)} />
       </div>
@@ -156,15 +159,15 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
       <Navbar />
       <main className="pt-16">
         <section className="relative overflow-hidden border-b border-border">
-          <div className={cn("absolute inset-0 bg-gradient-to-br opacity-80", page.theme.heroWash)} />
+          <div className={cn("absolute inset-0 bg-gradient-to-b opacity-80", page.theme.heroWash)} />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
             <div>
-              <div className={cn("mb-5 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-semibold", page.theme.accentBg, page.theme.accentBorder, page.theme.accentText)}>
+              <div className={cn("mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold", page.theme.accentBg, page.theme.accentBorder, page.theme.accentText)}>
                 <FeatureIcon name={page.icon} className="h-4 w-4" />
                 {page.eyebrow}
               </div>
-              <h1 className="max-w-4xl text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 {page.title}{" "}
                 <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", page.theme.gradientText)}>
                   {page.accentTitle}
@@ -202,7 +205,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
         <section className="border-b border-border bg-surface/35 px-4 py-8 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
             {page.stats.map(stat => (
-              <div key={stat.label} className="rounded-lg border border-border bg-background/65 px-4 py-4 text-center">
+              <div key={stat.label} className="flex min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
                 <p className={cn("text-2xl font-extrabold", page.theme.accentText)}>{stat.value}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{stat.label}</p>
               </div>
@@ -237,11 +240,11 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
           <SectionHeader
             eyebrow="Workflow"
             title={`How ${page.eyebrow.toLowerCase()} works inside iCloseLeads`}
-            description="The pages are optimized for search, but the product story stays grounded in the actual user journey."
+            description="A simple path from first signal to a better next action, without turning prospecting into a messy research project."
           />
-          <div className="mx-auto mt-12 grid max-w-6xl gap-4 lg:grid-cols-4">
+          <div className="mx-auto mt-12 grid max-w-6xl auto-rows-fr gap-4 lg:grid-cols-4">
             {page.workflow.map((item, index) => (
-              <div key={item.title} className="rounded-lg border border-border bg-background p-5">
+              <div key={item.title} className="flex h-full min-h-[230px] flex-col rounded-2xl border border-border bg-background p-5">
                 <div className="mb-5 flex items-center justify-between">
                   <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border", page.theme.accentBg, page.theme.accentBorder)}>
                     <FeatureIcon name={item.icon} className={cn("h-5 w-5", page.theme.accentText)} />
@@ -258,10 +261,10 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
         <section id="capabilities" className="px-4 py-20 sm:px-6 lg:px-8">
           <SectionHeader
             eyebrow="Capabilities"
-            title="What users can do on this page"
-            description="Each feature page explains the practical job-to-be-done, not just a list of generic SaaS benefits."
+            title="What this feature handles"
+            description="Practical building blocks that help freelancers move from a useful lead signal to a stronger client conversation."
           />
-          <div className="mx-auto mt-12 grid max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-6xl auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">
             {page.capabilities.map(item => (
               <FeatureCard key={item.title} item={item} page={page} />
             ))}
@@ -281,7 +284,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
             </div>
             <div className="grid gap-4">
               {page.useCases.map(item => (
-                <div key={item.title} className="grid gap-4 rounded-lg border border-border bg-background p-5 sm:grid-cols-[44px_1fr]">
+                <div key={item.title} className="grid gap-4 rounded-2xl border border-border bg-background p-5 sm:grid-cols-[44px_1fr]">
                   <div className={cn("flex h-11 w-11 items-center justify-center rounded-lg border", page.theme.accentBg, page.theme.accentBorder)}>
                     <FeatureIcon name={item.icon} className={cn("h-5 w-5", page.theme.accentText)} />
                   </div>
@@ -300,11 +303,11 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
             <SectionHeader
               eyebrow="Positioning"
               title="Why this feels different from generic AI tools"
-              description="The page copy is written to show product judgment: fewer empty promises, more concrete workflow detail."
+              description="The workflow stays grounded in the prospect, the pitch, and the follow-up instead of stopping at a generic AI output."
             />
             <div className="mt-12 grid gap-4 md:grid-cols-2">
               {page.differentiators.map(point => (
-                <div key={point} className="flex items-start gap-3 rounded-lg border border-border bg-surface p-5">
+                <div key={point} className="flex min-h-[104px] items-start gap-3 rounded-2xl border border-border bg-surface p-5">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" />
                   <p className="text-sm leading-6 text-muted-foreground">{point}</p>
                 </div>
@@ -317,7 +320,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
           <SectionHeader eyebrow="FAQ" title={`Questions about ${page.eyebrow.toLowerCase()}`} />
           <div className="mx-auto mt-12 grid max-w-4xl gap-4">
             {page.faqs.map(faq => (
-              <div key={faq.q} className="rounded-lg border border-border bg-background p-5">
+              <div key={faq.q} className="rounded-2xl border border-border bg-background p-5">
                 <h3 className="text-base font-bold text-foreground">{faq.q}</h3>
                 <p className="mt-2 text-sm leading-7 text-muted-foreground">{faq.a}</p>
               </div>
@@ -326,7 +329,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
         </section>
 
         <section className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl rounded-lg border border-primary/25 bg-primary/10 p-8 text-center">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-primary/25 bg-primary/10 p-8 text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-foreground">{page.cta.heading}</h2>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-muted-foreground">{page.cta.subheading}</p>
             <Link
@@ -347,7 +350,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 <Link
                   key={item.slug}
                   href={item.path}
-                  className="group rounded-lg border border-border bg-background/70 p-4 transition-all hover:border-primary/35"
+                  className="group flex min-h-[112px] rounded-2xl border border-border bg-background/70 p-4 transition-all hover:border-primary/35"
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg border", item.theme.accentBg, item.theme.accentBorder)}>
