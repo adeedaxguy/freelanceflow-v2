@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
   Mail, Sparkles, ChevronDown, Search, ExternalLink, X, CalendarClock, MapPin,
-  Phone, Users,
+  Phone, Users, Palette,
 } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 import type { Lead } from "@/types";
@@ -209,6 +209,23 @@ function decisionMakerHref(lead: LeadExt) {
   if (lead.sourceUrl) params.set("profileUrl", lead.sourceUrl);
   if (country) params.set("country", country === "usa" ? "us" : "uk");
   return `/dashboard/decision-makers?${params.toString()}`;
+}
+
+function webDesignHref(lead: LeadExt) {
+  const contact = getContactInfo(lead);
+  const params = new URLSearchParams({
+    company: lead.company,
+    category: lead.niche || "Local business",
+    location: contact.address || countryLabel(inferLeadCountry(lead)) || "",
+    address: contact.address,
+    phone: contact.phone,
+    pitch: lead.description?.slice(0, 360) || displayLeadTitle(lead) || "",
+    status: /no website/i.test(displayLeadTitle(lead) ?? "") ? "none" : "unknown",
+  });
+  if (contact.website) params.set("website", normalizeUrl(contact.website));
+  if (lead.sourceUrl) params.set("maps", lead.sourceUrl);
+  if (lead.domain) params.set("domain", lead.domain);
+  return `/dashboard/web-design?${params.toString()}`;
 }
 
 const CRM_PIPELINE: { value: CRMStatus; label: string; color: string; bg: string; desc: string }[] = [
@@ -592,7 +609,7 @@ export default function SavedLeadsPage() {
                       </div>
                       {displayLeadTitle(lead) && <p className="text-xs text-muted-foreground mt-0.5">{displayLeadTitle(lead)}</p>}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center justify-end gap-2">
                       {lead.sourceUrl && (
                         <a href={lead.sourceUrl} target="_blank" rel="noopener noreferrer"
                           className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
@@ -607,6 +624,12 @@ export default function SavedLeadsPage() {
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/10 text-accent border border-accent/25 hover:bg-accent/15 text-xs font-medium transition-all">
                         <Users className="w-3.5 h-3.5" /> Find Owner
                       </button>
+                      {isLocalBusinessLead(lead) && (
+                        <button onClick={() => router.push(webDesignHref(lead))}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-400/10 text-cyan-200 border border-cyan-400/25 hover:bg-cyan-400/15 text-xs font-medium transition-all">
+                          <Palette className="w-3.5 h-3.5" /> Design Site
+                        </button>
+                      )}
                       <button onClick={() => setDeleteId(lead.id)}
                         className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />

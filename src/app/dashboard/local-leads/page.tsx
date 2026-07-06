@@ -18,9 +18,6 @@ import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/ph
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
 const FREE_PLAN_LIMIT      = 100;          // 100 leads per 24 hours
-const LOCAL_LEADS_KEY      = "ff_local_leads_viewed";
-const LOCAL_LEADS_RESET_KEY = "ff_local_leads_reset"; // timestamp of last reset
-const LOCAL_LEADS_LIMIT_KEY = "ff_local_leads_daily_limit";
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
@@ -40,6 +37,16 @@ type LocalLeadsCache = {
 };
 
 type PhoneTypeFilter = "all" | "mobile" | "landline" | "toll_free_service" | "business_unknown";
+
+type UsageStats = {
+  plan: string;
+  limit: number;
+  used: number;
+  remaining: number;
+  nextReset: string;
+  percentage: number;
+  unlimited?: boolean;
+};
 
 const PHONE_TYPE_FILTERS: Array<{ value: PhoneTypeFilter; label: string; title: string }> = [
   { value: "all", label: "Any type", title: "Show all leads regardless of number type." },
@@ -587,7 +594,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
         <div className="flex-1 min-w-0">
           {/* Badge row 1 */}
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -707,6 +714,12 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
             </div>
           </div>
 
+          <div className="mb-3 flex flex-wrap gap-2 text-[11px] font-semibold text-muted-foreground">
+            <span className="rounded-full border border-border bg-surface px-2.5 py-1">1. Verify profile</span>
+            <span className="rounded-full border border-accent/20 bg-accent/5 px-2.5 py-1 text-accent">2. Find owner</span>
+            <span className="rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-primary-light">3. Pitch or design</span>
+          </div>
+
           {/* Pitch toggle */}
           <button onClick={() => setExpanded(v => !v)}
             className="flex items-center gap-2 text-sm font-semibold text-primary-light hover:text-primary transition-colors">
@@ -725,7 +738,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
         </div>
 
         {/* Action column */}
-        <div className="flex flex-col gap-2 flex-shrink-0 w-[132px]">
+        <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 xl:flex xl:w-[132px] xl:flex-col xl:flex-shrink-0">
           <a href={mapsHref} target="_blank" rel="noopener noreferrer"
             title="Search this business on Google Maps to see phone, hours, and reviews"
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
@@ -822,7 +835,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LocalLeadsPage() {
-  const { data: session, status: sessionStatus } = useSession();
+  const { status: sessionStatus } = useSession();
   const [keyword,    setKeyword]    = useState("");
   const [location,   setLocation]   = useState("");
   const [filter,     setFilter]     = useState<"all"|"no_website"|"outdated_website"|"has_website">("no_website");
@@ -840,6 +853,7 @@ export default function LocalLeadsPage() {
   const [leadsViewed,    setLeadsViewed]    = useState(0);
   const [dailyLimit,     setDailyLimit]     = useState(FREE_PLAN_LIMIT);
   const [userPlan,       setUserPlan]       = useState<string>("free");
+  const [usageResetAt,   setUsageResetAt]   = useState<string | null>(null);
   const [showBonus,      setShowBonus]      = useState(false);
   const [limitNotice,    setLimitNotice]    = useState("");
   const [yelpKey,        setYelpKey]        = useState("");
@@ -852,12 +866,16 @@ export default function LocalLeadsPage() {
   const [minRating,      setMinRating]      = useState(0);
   const [showFilters,    setShowFilters]    = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const usageScope = session?.user?.email ?? "";
-  const localLeadsKey = usageScope ? `${LOCAL_LEADS_KEY}:${usageScope}` : LOCAL_LEADS_KEY;
-  const localLeadsResetKey = usageScope ? `${LOCAL_LEADS_RESET_KEY}:${usageScope}` : LOCAL_LEADS_RESET_KEY;
-  const localLeadsLimitKey = usageScope ? `${LOCAL_LEADS_LIMIT_KEY}:${usageScope}` : LOCAL_LEADS_LIMIT_KEY;
 
-  // Load persisted state from localStorage — with 24hr auto-reset
+  const syncUsage = useCallback((usage: UsageStats | null) => {
+    if (!usage) return;
+    setUserPlan(usage.plan ?? "free");
+    setDailyLimit(Number.isFinite(usage.limit) ? usage.limit : FREE_PLAN_LIMIT);
+    setLeadsViewed(Number.isFinite(usage.used) ? usage.used : 0);
+    setUsageResetAt(typeof usage.nextReset === "string" ? usage.nextReset : null);
+  }, []);
+
+  // Load persisted state and latest server-side usage
   useEffect(() => {
     if (sessionStatus === "loading") return;
     // Clear stale lead caches on schema changes
@@ -869,22 +887,6 @@ export default function LocalLeadsPage() {
         sessionStorage.setItem("icl_cache_v", "7");
       }
     } catch {}
-    const resetTs  = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
-    const now      = Date.now();
-    const elapsed  = now - resetTs;
-    if (elapsed >= 24 * 60 * 60 * 1000 || resetTs === 0) {
-      // 24 hours passed — reset counter
-      localStorage.setItem(localLeadsKey,       "0");
-      localStorage.setItem(localLeadsResetKey, String(now));
-      localStorage.setItem(localLeadsLimitKey, String(FREE_PLAN_LIMIT));
-      setLeadsViewed(0);
-      setDailyLimit(FREE_PLAN_LIMIT);
-    } else {
-      const viewed = parseInt(localStorage.getItem(localLeadsKey) ?? "0", 10);
-      const storedLimit = parseInt(localStorage.getItem(localLeadsLimitKey) ?? String(FREE_PLAN_LIMIT), 10);
-      setLeadsViewed(isNaN(viewed) ? 0 : viewed);
-      setDailyLimit(Number.isFinite(storedLimit) && storedLimit >= FREE_PLAN_LIMIT ? storedLimit : FREE_PLAN_LIMIT);
-    }
     setYelpKey(localStorage.getItem(LOCAL_YELP_KEY_KEY) ?? "");
     setFsqKey(localStorage.getItem(LOCAL_FSQ_KEY_KEY)   ?? "");
     // Restore cached results so they persist when switching tabs
@@ -908,11 +910,11 @@ export default function LocalLeadsPage() {
       }
     } catch {}
     setCacheReady(true);
-    // Fetch user plan to bypass limits for paid plans
-    fetch("/api/usage").then(r => r.ok ? r.json() : null).then(d => {
-      if (d?.plan) setUserPlan(d.plan);
-    }).catch(() => {});
-  }, [sessionStatus, localLeadsKey, localLeadsResetKey, localLeadsLimitKey]);
+    fetch("/api/usage")
+      .then(r => r.ok ? r.json() as Promise<UsageStats> : null)
+      .then(syncUsage)
+      .catch(() => {});
+  }, [sessionStatus, syncUsage]);
 
   useEffect(() => {
     if (!cacheReady) return;
@@ -934,12 +936,7 @@ export default function LocalLeadsPage() {
     } catch {}
   }, [cacheReady, results, keyword, location, filter, hasPhone, smallOperatorOnly, phoneTypeFilter, minRating, page, meta, savedIds]);
 
-  // Reset time for display
-  const resetAt = (() => {
-    if (typeof window === "undefined") return null;
-    const resetTs = parseInt(localStorage.getItem(localLeadsResetKey) ?? "0", 10);
-    return resetTs ? new Date(resetTs + 24 * 60 * 60 * 1000) : null;
-  })();
+  const resetAt = usageResetAt ? new Date(usageResetAt) : null;
 
   const isPaidPlan  = userPlan === "pro" || userPlan === "agency";
   const isOverLimit = !isPaidPlan && leadsViewed >= dailyLimit;
@@ -958,25 +955,46 @@ export default function LocalLeadsPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      let data: { results?: LocalLead[]; source?: string; sources?: string[]; total?: number; geocoded?: boolean; cached?: boolean; error?: string; };
+      let data: {
+        results?: LocalLead[];
+        source?: string;
+        sources?: string[];
+        total?: number;
+        totalAvailable?: number;
+        geocoded?: boolean;
+        cached?: boolean;
+        capped?: boolean;
+        usage?: UsageStats;
+        error?: string;
+        nextReset?: string;
+        limit?: number;
+      };
       try {
         data = await res.json() as typeof data;
       } catch {
         setError("Server error. Please try again in a moment.");
         return;
       }
-      if (!res.ok) { setError(data.error ?? "Search failed"); return; }
+      if (!res.ok) {
+        setError(data.error ?? "Search failed");
+        if (res.status === 429) {
+          if (typeof data.limit === "number") setDailyLimit(data.limit);
+          if (typeof data.nextReset === "string") setUsageResetAt(data.nextReset);
+          if (typeof data.limit === "number") setLeadsViewed(data.limit);
+        }
+        return;
+      }
       if (!data.geocoded) {
         setError(`Could not find "${location}" — try a city name like "Chicago, IL" or "Sydney, Australia".`);
         return;
       }
-      const rawResults = data.results ?? [];
-      const allowedCount = isPaidPlan ? rawResults.length : Math.max(0, dailyLimit - leadsViewed);
-      const newResults = isPaidPlan ? rawResults : rawResults.slice(0, allowedCount);
-      if (!isPaidPlan && rawResults.length > newResults.length) {
+      const newResults = data.results ?? [];
+      if (!isPaidPlan && data.capped) {
         setLimitNotice(
           `Showing the first ${newResults.length} businesses available in your free daily allowance. Claim bonus leads to keep searching.`
         );
+      } else {
+        setLimitNotice("");
       }
       setResults(newResults);
       setMeta({ source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources });
@@ -995,21 +1013,13 @@ export default function LocalLeadsPage() {
           savedIds: [...savedIds],
         } satisfies LocalLeadsCache));
       } catch {}
-
-      // Track leads viewed for daily limit
-      const newCount = isPaidPlan ? leadsViewed : Math.min(dailyLimit, leadsViewed + newResults.length);
-      setLeadsViewed(newCount);
-      localStorage.setItem(localLeadsKey, String(newCount));
-      // Set reset timestamp on first search of the day
-      if (!localStorage.getItem(localLeadsResetKey) || parseInt(localStorage.getItem(localLeadsResetKey) ?? "0") === 0) {
-        localStorage.setItem(localLeadsResetKey, String(Date.now()));
-      }
+      syncUsage(data.usage ?? null);
 
       // Scroll results into view
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
     } catch { setError("Network error. Please try again."); }
     finally { setLoading(false); }
-  }, [keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, dailyLimit, leadsViewed, yelpKey, fsqKey, localLeadsKey, localLeadsResetKey]);
+  }, [keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, yelpKey, fsqKey, syncUsage]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -1725,15 +1735,13 @@ export default function LocalLeadsPage() {
       <BonusLeadsModal
         isOpen={showBonus}
         onClose={() => setShowBonus(false)}
-        onBonusClaimed={(newBonus, claim) => {
-          const nextLimit = Math.max(dailyLimit, claim?.localDailyLimit ?? FREE_PLAN_LIMIT + newBonus);
-          setDailyLimit(nextLimit);
+        onBonusClaimed={(_newBonus, _claim) => {
           setLimitNotice("");
           setShowBonus(false);
-          if (typeof window !== "undefined") {
-            localStorage.setItem(localLeadsLimitKey, String(nextLimit));
-            localStorage.setItem(localLeadsResetKey, String(Date.now()));
-          }
+          fetch("/api/usage")
+            .then(r => r.ok ? r.json() as Promise<UsageStats> : null)
+            .then(syncUsage)
+            .catch(() => {});
         }}
         source="local-leads"
         currentPlan={userPlan}

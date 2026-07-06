@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { searchLocalBusinesses, checkRateLimit, type LocalBizLead } from "@/lib/local-leads-engine";
+import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
 
 // Re-export the type so the dashboard page can import it from this route
 export type { LocalBizLead as LocalLead };
@@ -44,6 +45,35 @@ export async function POST(req: NextRequest) {
     select: { plan: true },
   }).then(user => user?.plan ?? (session.user as { plan?: string }).plan ?? "free").catch(() => "free");
   const isAgencyPlan = userPlan === "agency";
+
+  let usage = {
+    plan: userPlan,
+    limit: isAgencyPlan ? 99999 : 100,
+    used: 0,
+    remaining: isAgencyPlan ? 99999 : 100,
+    nextReset: new Date(Date.now() + 86_400_000).toISOString(),
+    percentage: 0,
+    unlimited: isAgencyPlan,
+  };
+
+  try {
+    const nextUsage = await getUsageStats(session.user.id);
+    if (nextUsage) usage = nextUsage;
+  } catch {
+    // Non-fatal: the search can still run, but the UI may fall back to defaults.
+  }
+
+  if (usage.remaining === 0) {
+    return NextResponse.json({
+      error: "Daily limit reached. You have used your free lead allowance for this 24-hour window. Share iCloseLeads to unlock more leads instantly.",
+      plan: usage.plan,
+      limit: usage.limit,
+      nextReset: usage.nextReset,
+      upgrade: true,
+      bonusAvailable: true,
+      usage,
+    }, { status: 429 });
+  }
 
   // Load API keys — env vars first, then per-user DB settings
   let groqKey           = process.env.GROQ_API_KEY            ?? "";
@@ -122,15 +152,36 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const cappedResults = result.leads.slice(0, usage.remaining);
+
+  if (cappedResults.length > 0) {
+    try {
+      await checkAndIncrementLeads(session.user.id, cappedResults.length);
+    } catch {
+      // Non-fatal: results can still be returned even if analytics increment fails.
+    }
+  }
+
+  let updatedUsage = usage;
+  try {
+    const nextUsage = await getUsageStats(session.user.id);
+    if (nextUsage) updatedUsage = nextUsage;
+  } catch {
+    // Non-fatal
+  }
+
   return NextResponse.json({
-    results:  result.leads,
+    results:  cappedResults,
     source:   result.source,
     sources:  result.sources,
-    total:    result.total,
+    total:    cappedResults.length,
+    totalAvailable: result.total,
     geocoded: result.geocoded,
     keyword,
     location,
     filter,
     cached:   result.source === "cache",
+    capped:   result.leads.length > cappedResults.length,
+    usage:    updatedUsage,
   });
 }

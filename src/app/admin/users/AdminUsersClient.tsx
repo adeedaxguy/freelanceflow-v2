@@ -51,6 +51,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           <Shield className="w-6 h-6 text-primary-light" /> User Management
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">{localUsers.length} total users</p>
+        <p className="text-muted-foreground mt-1 text-xs">"Used Today" tracks lead allowance consumed across remote, live, and local lead tools. "Saved" counts leads stored in CRM.</p>
       </div>
 
       {/* Filters */}
@@ -74,7 +75,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           <table className="w-full min-w-[600px] text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-surface/50">
-                {["User","Plan","Leads","Emails","Status","Actions"].map(h => (
+                {["User","Plan","Used Today","Saved","Emails","Status","Actions"].map(h => (
                   <th key={h} className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -105,6 +106,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                       <option value="agency">Agency</option>
                     </select>
                   </td>
+                  <td className="px-5 py-3 text-foreground font-medium">{u.weeklyLeads}</td>
                   <td className="px-5 py-3 text-foreground font-medium">{u._count.leads}</td>
                   <td className="px-5 py-3 text-foreground font-medium">{u._count.sentEmails}</td>
                   <td className="px-5 py-3">
@@ -129,7 +131,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground text-sm">No users found</td></tr>
+                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground text-sm">No users found</td></tr>
               )}
             </tbody>
           </table>

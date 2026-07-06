@@ -125,6 +125,13 @@ function BestMatchBadge({ score }: { score: number }) {
   return null;
 }
 
+function leadNextStep(lead: AggregatedLead & { bmScore?: number }) {
+  if (lead.email && (lead.bmScore ?? 0) >= 80) return "Best match with contact found. Save it, then prepare a fast proposal.";
+  if (lead.email) return "Contact found. Save it and send a concise, specific first message.";
+  if ((lead.bmScore ?? 0) >= 80) return "Strong fit. Open the post, verify the need, then save it for outreach.";
+  return "Open the post, confirm the signal is real, then save if it fits your offer.";
+}
+
 function BestMatchModal({ prefs, onSave, onClose }: {
   prefs: BestMatchPrefs; onSave: (p:BestMatchPrefs)=>void; onClose: ()=>void;
 }) {
@@ -617,6 +624,7 @@ export default function LiveJobsPage() {
                   const isSaving = savingId === lead.id;
                   const isFav    = favIds.has(lead.id);
                   const isNew    = !seenIds.has(lead.id);
+                  const nextStep = leadNextStep(lead);
                   return (
                     <div key={lead.id}
                       className={`group bg-gradient-card border rounded-2xl p-4 sm:p-5 transition-all hover:shadow-card-hover ${lead.bmScore>=80?"border-primary/40 hover:border-primary/60 shadow-sm shadow-primary/10":isFav?"border-yellow-500/30 hover:border-yellow-500/50":"border-border hover:border-primary/30"}`}>
@@ -661,25 +669,29 @@ export default function LiveJobsPage() {
                               <CopyButton text={lead.email}/>
                             </div>
                           )}
+                          <div className="mt-3 flex items-start gap-2 rounded-xl border border-border/60 bg-surface/70 px-3 py-2 text-xs text-muted-foreground">
+                            <Target className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-light" />
+                            <span><strong className="text-foreground">Next step:</strong> {nextStep}</span>
+                          </div>
                         </div>
 
                         {/* Action column */}
-                        <div className="flex flex-col gap-1.5 sm:gap-2 flex-shrink-0 w-[100px] sm:w-[112px]">
+                        <div className="flex flex-col gap-1.5 sm:gap-2 flex-shrink-0 w-[112px] sm:w-[126px]">
                           <button onClick={()=>setFavIds(p=>{const n=new Set(p);n.has(lead.id)?n.delete(lead.id):n.add(lead.id);return n;})}
                             className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isFav?"bg-yellow-500/15 border-yellow-500/40 text-yellow-400":"border-border text-muted-foreground hover:border-yellow-500/30 hover:text-yellow-400"}`}>
-                            <Heart className={`w-3.5 h-3.5 ${isFav?"fill-yellow-400 text-yellow-400":""}`}/>{isFav?"Saved":"Fav"}
+                            <Heart className={`w-3.5 h-3.5 ${isFav?"fill-yellow-400 text-yellow-400":""}`}/>{isFav?"Shortlisted":"Shortlist"}
                           </button>
                           <a href={lead.url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
-                            <ExternalLink className="w-3.5 h-3.5"/> View Job
+                            <ExternalLink className="w-3.5 h-3.5"/> Open Post
                           </a>
                           <button onClick={()=>void handleSave(lead)} disabled={isSaved||isSaving}
                             className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-xs font-medium transition-all ${isSaved?"bg-accent/10 text-accent border border-accent/30 cursor-default":"bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20"}`}>
-                            {isSaved?<><CheckCircle className="w-3.5 h-3.5"/> Done</>:<><Bookmark className="w-3.5 h-3.5"/>{isSaving?"…":"Save"}</>}
+                            {isSaved?<><CheckCircle className="w-3.5 h-3.5"/> Saved</>:<><Bookmark className="w-3.5 h-3.5"/>{isSaving?"…":"Save Lead"}</>}
                           </button>
                           <Link href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(stripHtml(lead.description).slice(0,400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email??"")}`}
                             className="flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
-                            <Sparkles className="w-3.5 h-3.5"/> Apply
+                            <Sparkles className="w-3.5 h-3.5"/> AI Proposal
                           </Link>
                         </div>
                       </div>

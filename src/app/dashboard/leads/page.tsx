@@ -6,6 +6,7 @@ import {
   RefreshCw, Filter, X, TrendingUp, AlertCircle, CheckCircle,
   ChevronDown, Star, Zap, BarChart3, ChevronLeft, ChevronRight,
   Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer, BarChart2, ArrowRight,
+  Target,
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
@@ -174,6 +175,14 @@ function QualityDot({ score }: { score: number }) {
     </span>
   );
   return null;
+}
+
+function leadNextStep(lead: AggregatedLead) {
+  if (lead.email && lead.budget) return "Contact found and budget mentioned. Save it, then send a researched proposal.";
+  if (lead.email) return "Contact found. Save it, then prepare a short proposal while the post is fresh.";
+  if (lead.budget) return "Budget signal found. Open the post, verify fit, then save it for outreach.";
+  if (lead.urgency) return "Urgency signal found. Move quickly with a specific first message.";
+  return "Open the post, verify fit, then save the lead if the need is real.";
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -775,6 +784,7 @@ export default function LeadsPage() {
                   const isSaving   = savingId === lead.id;
                   const isExpanded = expandedIds.has(lead.id);
                   const descLong   = lead.description.length > 180;
+                  const nextStep   = leadNextStep(lead);
                   return (
                     <div key={lead.id}
                       className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-card-hover">
@@ -850,14 +860,18 @@ export default function LeadsPage() {
                               <CopyButton text={lead.email} />
                             </div>
                           )}
+                          <div className="mt-3 flex items-start gap-2 rounded-xl border border-border/60 bg-surface/70 px-3 py-2 text-xs text-muted-foreground">
+                            <Target className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-light" />
+                            <span><strong className="text-foreground">Next step:</strong> {nextStep}</span>
+                          </div>
                         </div>
 
                         {/* Actions */}
                         {/* Desktop: vertical stack. Mobile: horizontal row below content */}
-                        <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 w-[110px]">
+                        <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 w-[126px]">
                           <a href={lead.url} target="_blank" rel="noopener noreferrer"
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
-                            <ExternalLink className="w-3.5 h-3.5" /> View
+                            <ExternalLink className="w-3.5 h-3.5" /> Open Post
                           </a>
                           <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
                             className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -867,7 +881,7 @@ export default function LeadsPage() {
                             }`}>
                             {isSaved
                               ? <><CheckCircle className="w-3.5 h-3.5" /> Saved</>
-                              : <><Bookmark className="w-3.5 h-3.5" /> {isSaving ? "…" : "Save"}</>
+                              : <><Bookmark className="w-3.5 h-3.5" /> {isSaving ? "…" : "Save Lead"}</>
                             }
                           </button>
                           <Link
@@ -882,7 +896,7 @@ export default function LeadsPage() {
                       <div className="sm:hidden flex gap-2 mt-2 pt-3 border-t border-border/50">
                         <a href={lead.url} target="_blank" rel="noopener noreferrer"
                           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border text-muted-foreground text-xs font-medium transition-all active:bg-white/5">
-                          <ExternalLink className="w-3.5 h-3.5" /> View
+                          <ExternalLink className="w-3.5 h-3.5" /> Open
                         </a>
                         <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
                           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
@@ -942,6 +956,7 @@ export default function LeadsPage() {
                     const lead = c.lead;
                     const isSaved  = savedIds.has(lead.id);
                     const isSaving = savingId === lead.id;
+                    const nextStep = leadNextStep(lead);
 
                     return (
                       <div key={lead.id} className="bg-gradient-card border border-border hover:border-accent/30 rounded-xl p-4 transition-all">
@@ -971,6 +986,10 @@ export default function LeadsPage() {
                         <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2 mb-3">
                           {lead.description}
                         </p>
+                        <div className="mb-3 flex items-start gap-2 rounded-xl border border-border/60 bg-surface/70 px-3 py-2 text-xs text-muted-foreground">
+                          <Target className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-light" />
+                          <span><strong className="text-foreground">Next step:</strong> {nextStep}</span>
+                        </div>
 
                         <div className="space-y-1.5">
                           {c.email && (
