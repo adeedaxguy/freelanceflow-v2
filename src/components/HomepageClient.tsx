@@ -89,14 +89,6 @@ function useInView(ref: RefObject<Element>, { once = true, margin = "0px" }: { o
   return inView;
 }
 
-function useScroll(_: unknown = undefined) {
-  return { scrollYProgress: 0 };
-}
-
-function useTransform<T>(_: unknown, __: unknown[], output: T[]) {
-  return output[0] as T;
-}
-
 function useMotionValue(initial: number) {
   const valueRef = useRef(initial);
   return {
@@ -106,6 +98,9 @@ function useMotionValue(initial: number) {
     },
   };
 }
+
+const panelBase =
+  "rounded-2xl border border-border bg-[linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))]";
 
 // ── Scroll Reveal ────────────────────────────────────────────────────
 function Reveal({ children, delay = 0, y = 28, className = "" }: {
@@ -560,16 +555,42 @@ const FEATURES = [
 
 const HERO_PANELS = [
   {
-    title: "Remote, local, and live demand",
-    detail: "Start with the lead engine that matches the kind of client you want.",
+    title: "Lead engines",
+    value: "3",
+    detail: "Remote jobs, local businesses, and live demand in one workflow.",
   },
   {
-    title: "Owner path when a lead looks real",
-    detail: "Move from company name to owner or manager verification before outreach.",
+    title: "Contact path",
+    value: "Owner",
+    detail: "Move from business name to owner, manager, phone, and proof checks.",
   },
   {
-    title: "Review-first proposal workflow",
-    detail: "Turn the signal into a cleaner opener, Gmail draft, and tracked next step.",
+    title: "Outreach",
+    value: "Draft",
+    detail: "Turn the signal into a reviewed Gmail-ready opener and CRM follow-up.",
+  },
+];
+
+const INTELLIGENCE_STEPS = [
+  {
+    label: "Find",
+    title: "Surface demand",
+    desc: "Remote jobs, local business gaps, and urgent public requests enter one clean lead queue.",
+  },
+  {
+    label: "Score",
+    title: "Prioritise fit",
+    desc: "Freshness, niche match, website status, urgency, and contact readiness shape the lead score.",
+  },
+  {
+    label: "Verify",
+    title: "Check the path",
+    desc: "Owner, manager, phone route, profile, social, registry, and proof checks keep outreach grounded.",
+  },
+  {
+    label: "Pitch",
+    title: "Send with context",
+    desc: "The proposal starts from the actual opportunity, then you review and send from your own workflow.",
   },
 ];
 
@@ -766,6 +787,45 @@ function LeadEngineShowcase() {
   );
 }
 
+function LeadIntelligenceStrip() {
+  return (
+    <section className="border-y border-border/70 bg-surface/25 px-4 py-10 sm:py-14">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <Reveal className="max-w-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-accent">Lead Intelligence Layer</p>
+            <h2 className="mt-3 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">
+              A guided path from signal to signed client.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-muted-foreground sm:text-base">
+              iCloseLeads brings lead discovery, qualification, contact-path checks, and outreach into one clean workflow so freelancers know what to pursue and what to say next.
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {INTELLIGENCE_STEPS.map((step, index) => (
+                <div key={step.label} className={`${panelBase} p-4`}>
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-xs font-black text-primary-light">
+                      {index + 1}
+                    </span>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                      {step.label}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-foreground">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function OpportunityCommandCenter() {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = LEAD_ENGINES[activeIndex] ?? LEAD_ENGINES[0]!;
@@ -907,9 +967,6 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
 export default function HomepageClient() {
   const heroRef = useRef<HTMLElement>(null);
   const [showEarlyAccess, setShowEarlyAccess] = useState(true);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY       = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   // Force dark mode on homepage regardless of user preference.
   // On unmount (navigation away), restore the saved class.
@@ -936,61 +993,30 @@ export default function HomepageClient() {
       ════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className={`relative flex min-h-[calc(100svh-150px)] items-start justify-center overflow-hidden ${showEarlyAccess ? "pt-4 sm:pt-10" : "pt-8 sm:pt-16"} pb-12 sm:min-h-[calc(100svh-88px)] sm:pb-8 lg:items-center`}
+        className={`relative overflow-hidden border-b border-border/70 ${showEarlyAccess ? "pt-9 sm:pt-14" : "pt-12 sm:pt-16"} pb-14 sm:pb-16 lg:pt-20 lg:pb-20`}
       >
 
-        {/* Layered mesh gradient background */}
-        <div className="absolute inset-0 mesh-gradient" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#090915_0%,#0c0c1e_48%,#090915_100%)]" />
 
-        {/* Grid lines */}
         <div className="absolute inset-0 opacity-[0.035]"
           style={{ backgroundImage: "linear-gradient(rgba(159,103,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(159,103,255,1) 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
 
-        {/* Animated glows */}
-        <motion.div animate={{ scale: [1, 1.08, 1], opacity: [0.18, 0.28, 0.18] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/4 hidden md:block w-[700px] h-[700px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)", filter: "blur(60px)" }} />
-        <motion.div animate={{ scale: [1.05, 1, 1.05], opacity: [0.12, 0.2, 0.12] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-1/3 right-1/4 hidden md:block w-[500px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(0,229,160,0.2) 0%, transparent 70%)", filter: "blur(50px)" }} />
-
-        {/* Floating particles */}
-        {[
-          { x: 12, y: 22, s: 5,  c: "rgba(159,103,255,0.7)", d: 0    },
-          { x: 82, y: 18, s: 8,  c: "rgba(0,229,160,0.6)",   d: 1.2  },
-          { x: 68, y: 65, s: 6,  c: "rgba(255,209,102,0.5)", d: 0.6  },
-          { x: 25, y: 72, s: 10, c: "rgba(124,58,237,0.5)",  d: 1.8  },
-          { x: 55, y: 8,  s: 4,  c: "rgba(0,229,160,0.5)",   d: 0.9  },
-          { x: 88, y: 78, s: 7,  c: "rgba(159,103,255,0.5)", d: 2.4  },
-          { x: 40, y: 85, s: 5,  c: "rgba(255,209,102,0.4)", d: 0.3  },
-          { x: 5,  y: 50, s: 3,  c: "rgba(0,229,160,0.4)",   d: 1.5  },
-        ].map((p, i) => (
-          <motion.div key={i}
-            className="absolute hidden sm:block rounded-full pointer-events-none"
-            style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.s, height: p.s, background: p.c, boxShadow: `0 0 ${p.s * 3}px ${p.c}` }}
-            animate={{ y: [0, -20, 0], opacity: [0.4, 1, 0.4], scale: [1, 1.3, 1] }}
-            transition={{ duration: 4 + p.d, repeat: Infinity, delay: p.d, ease: "easeInOut" }}
-          />
-        ))}
-
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 mx-auto max-w-5xl px-4 text-center">
+        <motion.div className="relative z-10 mx-auto max-w-5xl px-4 text-center">
           <motion.div
             initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="mb-5 inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light"
+            className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light"
           >
             <Zap className="h-4 w-4" />
-            Freelance Lead Generation Platform
+            Client acquisition OS for freelancers
           </motion.div>
 
           <motion.h1
             initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.72, delay: 0.08 }}
-            className="mx-auto max-w-4xl text-4xl font-extrabold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-[5.5rem]"
+            className="mx-auto max-w-4xl text-4xl font-black leading-[1.03] tracking-tight text-foreground sm:text-6xl lg:text-[5.25rem]"
           >
             Your next <span className="gradient-text">$10k client</span> is already out there.
           </motion.h1>
@@ -1001,7 +1027,7 @@ export default function HomepageClient() {
             transition={{ duration: 0.68, delay: 0.2 }}
             className="mx-auto mt-6 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8"
           >
-            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business leads, and live client demand, then turns each signal into owner-path research, sharper proposals, Gmail-ready outreach, and a tracked pipeline.
+            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business opportunities, and live client demand, then turns each signal into contact-path research, sharper proposals, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
@@ -1026,8 +1052,9 @@ export default function HomepageClient() {
             className="mx-auto grid max-w-4xl gap-3 text-left sm:grid-cols-3"
           >
             {HERO_PANELS.map(panel => (
-              <div key={panel.title} className="rounded-2xl border border-border bg-surface/70 p-4">
-                <p className="text-sm font-semibold text-foreground">{panel.title}</p>
+              <div key={panel.title} className={`${panelBase} p-4`}>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">{panel.title}</p>
+                <p className="mt-2 text-xl font-black text-foreground">{panel.value}</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{panel.detail}</p>
               </div>
             ))}
@@ -1052,15 +1079,9 @@ export default function HomepageClient() {
             ))}
           </motion.div>
         </motion.div>
-
-        {/* Scroll cue */}
-        <motion.div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
-          animate={{ y: [0, 8, 0] }} transition={{ duration: 2.2, repeat: Infinity }}>
-          <div className="w-5 h-8 rounded-full border border-border/60 flex justify-center pt-1.5">
-            <motion.div className="w-1 h-2 rounded-full bg-primary-light/60" animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.2, repeat: Infinity }} />
-          </div>
-        </motion.div>
       </section>
+
+      <LeadIntelligenceStrip />
 
       <LeadEngineShowcase />
 
@@ -1141,20 +1162,16 @@ export default function HomepageClient() {
             badge="Everything You Need"
             badgeColor="accent"
             title={<>The complete client<br />acquisition system</>}
-            sub="Every tool you need to find leads, write proposals, send emails, and track deals — in one focused platform."
+            sub="Every tool you need to find leads, write proposals, prepare outreach, and track deals — in one focused platform."
           />
 
-          <div className="mt-16 grid auto-rows-[340px] grid-cols-1 gap-5 sm:auto-rows-[320px] md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-16 grid auto-rows-[318px] grid-cols-1 gap-5 sm:auto-rows-[304px] md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => (
               <Reveal key={f.title} delay={i * 0.07} className="h-full">
                 <motion.div
-                  whileHover={{ y: -6, borderColor: `${f.tagColor}40` }}
+                  whileHover={{ y: -3, borderColor: `${f.tagColor}40` }}
                   transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                  className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-gradient-card p-6 cursor-default shimmer-line">
-                  {/* Hover glow */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl"
-                    style={{ background: `radial-gradient(ellipse at top left, ${f.tagColor}12 0%, transparent 60%)` }} />
-
+                  className="group relative flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface/45 p-6 cursor-default">
                   <div className="flex items-start justify-between mb-4 relative">
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center"
                       style={{ background: `${f.tagColor}15`, border: `1px solid ${f.tagColor}25` }}>
@@ -1166,7 +1183,7 @@ export default function HomepageClient() {
                     </span>
                   </div>
 
-                  <h3 className="relative mb-2.5 line-clamp-2 text-base font-bold text-foreground transition-colors group-hover:text-white">{f.title}</h3>
+                  <h3 className="relative mb-2.5 line-clamp-2 text-base font-bold text-foreground transition-colors">{f.title}</h3>
                   <p className="relative line-clamp-5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
 
                   <div className="relative mt-auto flex items-center justify-between border-t border-border/60 pt-4">
@@ -1264,28 +1281,17 @@ export default function HomepageClient() {
       <section className="py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <Reveal>
-            <div className="relative rounded-3xl overflow-hidden border border-primary/25">
-              {/* Animated background */}
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-surface/45">
               <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/10" />
-                <motion.div animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }} transition={{ duration: 6, repeat: Infinity }}
-                  className="absolute top-0 left-1/4 w-96 h-96 rounded-full"
-                  style={{ background: "radial-gradient(circle, rgba(124,58,237,0.3) 0%, transparent 70%)", filter: "blur(40px)" }} />
-                <motion.div animate={{ scale: [1.05, 1, 1.05], opacity: [0.2, 0.35, 0.2] }} transition={{ duration: 8, repeat: Infinity, delay: 2 }}
-                  className="absolute bottom-0 right-1/4 w-72 h-72 rounded-full"
-                  style={{ background: "radial-gradient(circle, rgba(0,229,160,0.25) 0%, transparent 70%)", filter: "blur(35px)" }} />
-                {/* Grid overlay */}
-                <div className="absolute inset-0 opacity-[0.04]"
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(159,103,255,0.08),rgba(0,229,160,0.035))]" />
+                <div className="absolute inset-0 opacity-[0.035]"
                   style={{ backgroundImage: "linear-gradient(rgba(159,103,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(159,103,255,1) 1px, transparent 1px)", backgroundSize: "50px 50px" }} />
               </div>
 
               <div className="relative z-10 py-20 px-8 text-center">
-                <motion.div
-                  animate={{ rotate: [0, 5, -5, 0], scale: [1, 1.05, 1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-16 h-16 mx-auto mb-7 rounded-2xl bg-gradient-hero flex items-center justify-center shadow-glow-primary">
+                <div className="w-16 h-16 mx-auto mb-7 rounded-2xl border border-primary/30 bg-primary/15 flex items-center justify-center text-primary-light">
                   <Zap className="w-8 h-8 text-white" />
-                </motion.div>
+                </div>
 
                 <h2 className="text-4xl sm:text-5xl font-extrabold text-foreground mb-5 tracking-tight">
                   Stop waiting for clients<br />to come to you.
