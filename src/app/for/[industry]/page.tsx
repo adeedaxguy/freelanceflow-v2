@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowRight, Check, Zap, MapPin, Users, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Check, Zap, MapPin, Target, TrendingUp } from "lucide-react";
 
 // ── Industry definitions ──────────────────────────────────────────────────────
 const INDUSTRIES: Record<string, {
@@ -22,7 +22,7 @@ const INDUSTRIES: Record<string, {
     sub: "iCloseLeads scans live business profiles in real time to surface local businesses with no website or an outdated one. You get the lead; you make the pitch.",
     pain: "Most web designers spend more time searching for clients than doing actual design work. Cold DMing on Instagram, scrolling through job boards, or waiting for referrals is unpredictable and slow.",
     useCases: [
-      "Search 'plumber' in Manchester and get 40+ businesses with no website in 30 seconds",
+      "Search a local service category in your target city and build a focused list of businesses with no website",
       "Filter by 'no website detected' to find the highest-priority opportunities",
       "Export leads with phone numbers, addresses, and Google Maps links",
       "Write an AI proposal for each lead in one click",
@@ -40,7 +40,7 @@ const INDUSTRIES: Record<string, {
     name: "Marketing Agencies",
     headline: "Find Local Businesses That Need Marketing Help — At Scale",
     sub: "iCloseLeads gives marketing agencies a live pipeline of local businesses, remote job leads, and AI-powered outreach tools — all in one place. Stop prospecting manually.",
-    pain: "Agency business development is expensive. Hiring a BDR costs $50k+/year. Buying a lead list costs thousands. Neither guarantees the leads are relevant, local, or fresh.",
+    pain: "Agency business development is expensive. Hiring outbound help or buying lead lists still does not guarantee the leads are relevant, local, or fresh.",
     useCases: [
       "Search any industry + city and get a live list of businesses to pitch",
       "Find businesses with outdated websites as social media or SEO upsell opportunities",
@@ -169,6 +169,9 @@ export async function generateMetadata({ params }: { params: { industry: string 
     title: `iCloseLeads for ${data.name} — Find Clients & Leads in 2026`,
     description: data.sub,
     keywords: data.keywords,
+    alternates: {
+      canonical: `https://icloseleads.com/for/${params.industry}`,
+    },
     openGraph: {
       title: `iCloseLeads for ${data.name}`,
       description: data.sub,
@@ -265,9 +268,9 @@ export default function ForIndustryPage({ params }: { params: { industry: string
           <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
             {[
               { icon: <Zap className="w-5 h-5 text-primary-light" />, stat: "Multi", label: "Lead channels" },
-              { icon: <MapPin className="w-5 h-5 text-accent" />, stat: "50K+", label: "Cities covered" },
-              { icon: <Users className="w-5 h-5 text-gold" />, stat: "2,847", label: "Freelancers using it" },
-              { icon: <TrendingUp className="w-5 h-5 text-primary-light" />, stat: "100%", label: "Free to start" },
+              { icon: <MapPin className="w-5 h-5 text-accent" />, stat: "Local", label: "Business discovery" },
+              { icon: <Target className="w-5 h-5 text-gold" />, stat: "AI", label: "Proposal drafting" },
+              { icon: <TrendingUp className="w-5 h-5 text-primary-light" />, stat: "Free", label: "Early access" },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 {s.icon}
@@ -286,7 +289,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
               Ready to fill your pipeline?
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              Join thousands of {data.name.toLowerCase()} already using iCloseLeads to find clients without cold calling or expensive ad spend.
+              Use iCloseLeads to build a steadier outreach pipeline without cold calling or expensive ad spend.
             </p>
             <Link href="/auth?mode=signup"
               className="inline-flex items-center gap-2.5 px-10 py-4 rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-all shadow-glow-primary hover:-translate-y-0.5">
@@ -308,7 +311,6 @@ export default function ForIndustryPage({ params }: { params: { industry: string
           "url": `https://icloseleads.com/for/${params.industry}`,
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           "operatingSystem": "Web",
-          "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "247" },
         }) }} />
       </main>
       <Footer />

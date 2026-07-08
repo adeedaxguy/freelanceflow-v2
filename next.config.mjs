@@ -32,6 +32,16 @@ const nextConfig = {
       "@radix-ui/react-tooltip",
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.icloseleads.com" }],
+        destination: "https://icloseleads.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

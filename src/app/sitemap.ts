@@ -6,6 +6,15 @@ import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
+const INDUSTRY_PAGES = [
+  "/for/web-designers",
+  "/for/marketing-agencies",
+  "/for/freelance-copywriters",
+  "/for/seo-consultants",
+  "/for/wordpress-developers",
+  "/for/real-estate-brokers",
+  "/for/shopify-developers",
+] as const;
 
 const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number }[] = [
   // Marketing
@@ -26,6 +35,11 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   { url: "/blog",        changeFrequency: "daily",   priority: 0.85 },
   { url: "/about",       changeFrequency: "monthly", priority: 0.8  },
   { url: "/contact",     changeFrequency: "monthly", priority: 0.7  },
+  ...INDUSTRY_PAGES.map(url => ({
+    url,
+    changeFrequency: "weekly" as const,
+    priority: 0.82,
+  })),
   // Product
   { url: "/changelog",   changeFrequency: "weekly",  priority: 0.75 },
   { url: "/status",      changeFrequency: "hourly",  priority: 0.7  },
