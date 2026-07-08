@@ -28,6 +28,7 @@ export interface BlogHeading {
 }
 
 type ArticleTopic =
+  | "webdesign"
   | "local"
   | "decision"
   | "remote"
@@ -40,6 +41,18 @@ type ArticleTopic =
   | "generic";
 
 const TOPIC_MATCHERS: Array<{ topic: ArticleTopic; terms: string[] }> = [
+  {
+    topic: "webdesign",
+    terms: [
+      "web design leads",
+      "exclusive web design leads",
+      "find web design clients",
+      "web design agency",
+      "website redesign leads",
+      "website design prospect",
+      "web designers",
+    ],
+  },
   {
     topic: "decision",
     terms: ["decision maker", "owner name", "business owner", "manager contact", "owner email", "owner phone"],
@@ -79,6 +92,28 @@ const TOPIC_MATCHERS: Array<{ topic: ArticleTopic; terms: string[] }> = [
 ];
 
 const INTERNAL_LINKS: Record<ArticleTopic, BlogLinkItem[]> = {
+  webdesign: [
+    {
+      href: "/for/web-designers",
+      label: "Web design leads landing page",
+      description: "See the freelancer-focused page built around local website-gap prospecting for web designers.",
+    },
+    {
+      href: "/blog/local-business-leads-for-web-designers",
+      label: "Local business leads for web designers",
+      description: "Find businesses with no website, outdated pages, and clearer redesign triggers.",
+    },
+    {
+      href: "/blog/find-web-design-clients-near-me",
+      label: "Find web design clients near you",
+      description: "Use city and niche prospecting to turn local search demand into better-fit design leads.",
+    },
+    {
+      href: "/use-cases/local-business-leads",
+      label: "Local business lead workflow",
+      description: "Move from business profile to website gap, contact path, notes, and next action.",
+    },
+  ],
   local: [
     {
       href: "/use-cases/local-business-leads",
@@ -275,6 +310,20 @@ const DEFAULT_INTERNAL_LINKS: BlogLinkItem[] = [
 ];
 
 const OUTBOUND_LINKS: Record<ArticleTopic, BlogLinkItem[]> = {
+  webdesign: [
+    {
+      href: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide",
+      label: "Google SEO Starter Guide",
+      description: "Baseline search guidance for making service and support pages clearer to Google and users.",
+      external: true,
+    },
+    {
+      href: "https://support.google.com/business/answer/7091",
+      label: "Google Business Profile help",
+      description: "Useful context when evaluating local business profiles and website gaps for web design outreach.",
+      external: true,
+    },
+  ],
   local: [
     {
       href: "https://support.google.com/business/answer/7091",
