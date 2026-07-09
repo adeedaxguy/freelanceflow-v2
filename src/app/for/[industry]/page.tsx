@@ -18,22 +18,22 @@ const INDUSTRIES: Record<string, {
 }> = {
   "web-designers": {
     name: "Web Designers",
-    headline: "Find Local Businesses That Need a Website — Before Anyone Else Does",
-    sub: "iCloseLeads scans live business profiles in real time to surface local businesses with no website or an outdated one. You get the lead; you make the pitch.",
-    pain: "Most web designers spend more time searching for clients than doing actual design work. Cold DMing on Instagram, scrolling through job boards, or waiting for referrals is unpredictable and slow.",
+    headline: "Find Web Design Leads in Your City Before the Generic Lists Catch Up",
+    sub: "iCloseLeads helps web designers find local businesses with no website, outdated pages, weak mobile conversion paths, and public contact routes worth pitching right now.",
+    pain: "Most web designers spend more time searching for clients than doing design work. Cold DMs, stale lead lists, and passive referrals create a pipeline you cannot control.",
     useCases: [
-      "Search a local service category in your target city and build a focused list of businesses with no website",
-      "Filter by 'no website detected' to find the highest-priority opportunities",
-      "Export leads with phone numbers, addresses, and Google Maps links",
-      "Write an AI proposal for each lead in one click",
+      "Search one city and service category at a time to build a focused list of web design leads",
+      "Filter for no website, outdated website, and phone-visible businesses with a real pitch angle",
+      "Open the map profile, verify the business, and keep the lead context attached to your notes",
+      "Prepare a specific AI-assisted proposal and send it through a Gmail-ready review workflow",
     ],
     features: [
-      { icon: "📍", title: "Local Business Search", desc: "Find businesses in any city globally with website status detected automatically." },
-      { icon: "✍️", title: "AI Proposal Writer", desc: "Generate a personalised cold email for each lead based on their business type and your services." },
-      { icon: "📊", title: "CRM Pipeline", desc: "Track every prospect from cold lead to signed contract in a visual Kanban board." },
-      { icon: "📧", title: "Prepare in Gmail", desc: "Open Gmail with a polished draft ready to review and send manually." },
+      { icon: "📍", title: "Local Web Design Lead Search", desc: "Find businesses by city, category, website status, and visible contact readiness." },
+      { icon: "✍️", title: "AI Proposal Writer", desc: "Generate a personalized cold email around the exact website issue or local conversion gap you found." },
+      { icon: "📊", title: "CRM Pipeline", desc: "Track every prospect from saved lead to reply, follow-up, and signed web project." },
+      { icon: "📧", title: "Prepare in Gmail", desc: "Open Gmail with a polished draft ready to review and send manually from your own inbox." },
     ],
-    keywords: ["find web design clients", "local web design leads", "find businesses without websites"],
+    keywords: ["web design leads", "find web design clients", "local business leads for web designers", "find businesses without websites", "website redesign leads"],
     cta: "Start Finding Web Design Clients Free",
   },
   "marketing-agencies": {
@@ -166,7 +166,9 @@ export async function generateMetadata({ params }: { params: { industry: string 
   const data = INDUSTRIES[params.industry];
   if (!data) return { title: "Not Found" };
   return {
-    title: `iCloseLeads for ${data.name} — Find Clients & Leads in 2026`,
+    title: params.industry === "web-designers"
+      ? "Web Design Leads for Freelancers | Find Local Businesses That Need a Website"
+      : `iCloseLeads for ${data.name} — Find Clients & Leads in 2026`,
     description: data.sub,
     keywords: data.keywords,
     alternates: {

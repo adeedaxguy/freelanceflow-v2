@@ -150,9 +150,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Freelance Cold Outreach",
     title: "Freelance cold outreach",
     accentTitle: "that starts from real buying signals",
-    metaTitle: "Freelance Cold Outreach Software | Find Leads and Write Better Pitches",
+    metaTitle: "Freelance Cold Outreach Software | Find Leads, Write Better Emails, and Track Replies",
     metaDescription:
-      "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, AI proposal drafts, Gmail-ready emails, notes, and CRM follow-up.",
+      "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, Gmail-ready emails, AI proposal drafts, and CRM follow-up built for freelancers.",
     keywords: [
       "freelance cold outreach",
       "freelance cold outreach software",
@@ -162,12 +162,13 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "find freelance clients",
       "freelance lead generation",
       "freelance outreach tool",
+      "freelance cold outreach templates",
       "AI cold email generator for freelancers",
       "personalized freelance proposals",
       "Gmail outreach for freelancers",
     ],
     heroSummary:
-      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied.",
+      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward signup and pipeline use.",
     primaryCta: "Start Outreach Free",
     secondaryCta: "See AI Proposals",
     dashboardPath: "/dashboard/leads",
@@ -277,9 +278,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads for Web Designers and Decision Maker Checks",
+    metaTitle: "Local Business Leads for Web Designers | Find Businesses Without Websites or With Weak Sites",
     metaDescription:
-      "Find local business leads for web designers: no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths.",
+      "Find local business leads for web designers with no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths.",
     keywords: [
       "local business leads",
       "local business leads for web designers",
@@ -296,7 +297,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "website redesign leads",
     ],
     heroSummary:
-      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings.",
+      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into outreach and follow-up without losing context.",
     primaryCta: "Find Local Leads Free",
     secondaryCta: "Read Lead Discovery",
     dashboardPath: "/dashboard/local-leads",

@@ -87,7 +87,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     shortDescription:
       "Find remote jobs, local businesses, decision makers, and high-intent freelance opportunities without opening a dozen tabs.",
     titleTag:
-      "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
+      "Freelance Lead Generation Software for Web Design Leads, Local Leads, and Decision Makers",
     metaDescription:
       "Find freelance clients with remote job leads, web design leads, local business opportunities, decision maker checks, lead scoring, and AI proposals.",
     keywords: [
@@ -405,7 +405,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     shortDescription:
       "Prepare Gmail-ready cold emails, track outreach history, and keep follow-ups organized without auto-blasting.",
     titleTag:
-      "Cold Email Outreach Software for Freelancers with Gmail Drafts",
+      "Cold Email Outreach Software for Freelancers with Gmail Drafts and Follow-Up Tracking",
     metaDescription:
       "Prepare freelance cold outreach in Gmail, write personalized cold emails from lead context, track history, prevent duplicates, and manage follow-ups.",
     keywords: [
@@ -418,6 +418,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       "safe email outreach",
       "manual Gmail outreach workflow",
       "freelance campaign builder",
+      "freelance cold outreach templates",
     ],
     theme: {
       accentText: "text-blue-400",
@@ -428,9 +429,9 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       hoverBorder: "hover:border-blue-400/40",
     },
     audience:
-      "Freelancers who want the structure of an outreach tool without giving up control of the actual send.",
+      "Freelancers and small agencies who want the structure of an outreach tool without giving up control of the actual send.",
     promise:
-      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing.",
+      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing or duplicating work.",
     proof: [
       "Proposal pages support Gmail compose preparation instead of requiring a direct sender.",
       "Outreach usage limits are visible, making the free-plan workflow predictable.",
