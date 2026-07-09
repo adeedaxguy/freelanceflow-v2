@@ -89,10 +89,12 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     titleTag:
       "Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers",
     metaDescription:
-      "Find freelance clients with live remote job leads, local business opportunities, decision maker checks, niche filters, lead scoring, and a built-in proposal workflow.",
+      "Find freelance clients with remote job leads, web design leads, local business opportunities, decision maker checks, lead scoring, and AI proposals.",
     keywords: [
       "freelance lead generation software",
+      "freelance client acquisition",
       "find freelance clients",
+      "web design leads",
       "remote job leads for freelancers",
       "local business leads for web designers",
       "decision maker finder for small business",
@@ -253,9 +255,10 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     titleTag:
       "AI Proposal Generator for Freelancers and Cold Email Outreach",
     metaDescription:
-      "Write personalized freelance proposals, cold emails, subject lines, and follow-ups from lead context. Built for freelancers who want human-sounding outreach.",
+      "Write personalized freelance proposals, cold emails, subject lines, and follow-ups from real lead context. Built for human-sounding outreach.",
     keywords: [
       "AI proposal generator for freelancers",
+      "AI proposal generator",
       "freelance proposal generator",
       "AI cold email generator",
       "proposal writing software for freelancers",
@@ -404,9 +407,10 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     titleTag:
       "Cold Email Outreach Software for Freelancers with Gmail Drafts",
     metaDescription:
-      "Prepare personalized cold emails in Gmail, track outreach history, prevent duplicate outreach, and manage follow-ups from your freelance CRM.",
+      "Prepare freelance cold outreach in Gmail, write personalized cold emails from lead context, track history, prevent duplicates, and manage follow-ups.",
     keywords: [
       "cold email outreach for freelancers",
+      "freelance cold outreach",
       "freelance email outreach software",
       "Gmail cold email drafts",
       "freelance follow up tool",

@@ -13,6 +13,7 @@ const footerLinks = {
     { label: "Decision Maker Finder", href: "/features/lead-discovery#capabilities" },
     { label: "Live Job Leads", href: "/use-cases/live-job-leads" },
     { label: "Pricing",    href: "/pricing"     },
+    { label: "Resources",  href: "/resources"   },
     { label: "Blog",       href: "/blog"        },
     { label: "Changelog",  href: "/changelog"   },
     { label: "Status",     href: "/status"      },

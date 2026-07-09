@@ -1,0 +1,117 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowRight, BookOpen, CheckCircle2 } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { RESOURCE_PAGES } from "@/data/resource-pages";
+
+const BASE_URL = "https://icloseleads.com";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: "Lead Generation Resources for Freelancers and Agencies",
+  description:
+    "Practical iCloseLeads resources for web design leads, local business leads, freelance cold outreach, remote job leads, AI proposals, and decision maker checks.",
+  alternates: { canonical: `${BASE_URL}/resources` },
+  openGraph: {
+    title: "Lead Generation Resources | iCloseLeads",
+    description:
+      "Guides and workflows for finding better freelance leads, qualifying prospects, writing pitches, and tracking follow-up.",
+    url: `${BASE_URL}/resources`,
+    type: "website",
+    siteName: "iCloseLeads",
+  },
+};
+
+function ResourcesJsonLd() {
+  const graph = [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: "Lead Generation Resources",
+      description:
+        "A practical resource hub for freelancers and agencies using iCloseLeads to find and pitch better leads.",
+      url: `${BASE_URL}/resources`,
+      isPartOf: { "@type": "WebSite", name: "iCloseLeads", url: BASE_URL },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: "iCloseLeads resources",
+      itemListElement: RESOURCE_PAGES.map((page, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: page.title,
+        url: `${BASE_URL}/resources/${page.slug}`,
+      })),
+    },
+  ];
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />;
+}
+
+export default function ResourcesPage() {
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <ResourcesJsonLd />
+      <Navbar />
+      <main className="pt-16">
+        <section className="border-b border-border px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
+              <BookOpen className="h-4 w-4" />
+              SEO-backed playbooks
+            </div>
+            <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
+              Lead generation resources built around real search intent
+            </h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
+              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, local businesses, remote job signals, decision maker paths, and outreach angles that move prospects toward a real conversation.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
+                Start Free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/use-cases/local-business-leads" className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+                Explore Local Leads
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {RESOURCE_PAGES.map((page) => (
+              <Link key={page.slug} href={`/resources/${page.slug}`} className="group flex min-h-[360px] min-w-0 flex-col rounded-lg border border-border bg-surface p-6 transition hover:border-primary/40">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-light">{page.keyword}</p>
+                <h2 className="mt-4 text-2xl font-extrabold leading-tight text-foreground group-hover:text-primary-light">{page.title}</h2>
+                <p className="mt-4 flex-1 text-sm leading-7 text-muted-foreground">{page.summary}</p>
+                <div className="mt-6 flex items-center gap-2 border-t border-border pt-5 text-sm font-semibold text-primary-light">
+                  Read playbook
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="border-y border-border bg-surface/35 px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
+            {[
+              "Every guide points to a product workflow, not a dead-end article.",
+              "Each topic is tied to GSC, SERP, competitor, or product evidence.",
+              "Internal links connect resources to signup-intent use cases and feature pages.",
+            ].map((item) => (
+              <div key={item} className="rounded-lg border border-border bg-background p-5 text-sm leading-6 text-muted-foreground">
+                <CheckCircle2 className="mb-3 h-5 w-5 text-accent" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}

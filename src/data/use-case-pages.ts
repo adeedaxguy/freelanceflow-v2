@@ -45,6 +45,8 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Find remote job leads, contract work, freelance job alerts, and niche-matched opportunities. Use iCloseLeads to filter, save, pitch, and track every prospect.",
     keywords: [
       "remote job leads",
+      "remote leads",
+      "remoteleads",
       "remote job leads for freelancers",
       "freelance job alerts",
       "remote freelance jobs",
@@ -153,6 +155,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, AI proposal drafts, Gmail-ready emails, notes, and CRM follow-up.",
     keywords: [
       "freelance cold outreach",
+      "freelance cold outreach software",
       "cold outreach for freelancers",
       "freelance cold email",
       "cold email outreach for freelancers",
@@ -274,12 +277,15 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads and Decision Maker Finder for Web Designers",
+    metaTitle: "Local Business Leads for Web Designers and Decision Maker Checks",
     metaDescription:
-      "Find local business leads with no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths. Built for freelancers selling websites, SEO, ads, and marketing services.",
+      "Find local business leads for web designers: no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths.",
     keywords: [
       "local business leads",
       "local business leads for web designers",
+      "web design leads",
+      "leads for web design",
+      "exclusive web design leads",
       "businesses without websites",
       "outdated website leads",
       "find web design clients",
@@ -400,6 +406,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Track live job leads, urgent freelance opportunities, contact-ready posts, and fresh client demand. Save leads, draft proposals, and follow up from one workflow.",
     keywords: [
       "live job leads",
+      "live freelance leads",
       "fresh freelance opportunities",
       "real-time freelance leads",
       "urgent freelance jobs",

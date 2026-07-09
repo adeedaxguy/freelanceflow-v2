@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { FEATURE_PAGES } from "@/data/feature-pages";
+import { RESOURCE_PAGES } from "@/data/resource-pages";
 import { USE_CASE_PAGES } from "@/data/use-case-pages";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
@@ -33,6 +34,12 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   })),
   { url: "/pricing",     changeFrequency: "weekly",  priority: 0.9  },
   { url: "/blog",        changeFrequency: "daily",   priority: 0.85 },
+  { url: "/resources",   changeFrequency: "weekly",  priority: 0.84 },
+  ...RESOURCE_PAGES.map(page => ({
+    url: `/resources/${page.slug}`,
+    changeFrequency: "weekly" as const,
+    priority: 0.78,
+  })),
   { url: "/about",       changeFrequency: "monthly", priority: 0.8  },
   { url: "/contact",     changeFrequency: "monthly", priority: 0.7  },
   ...INDUSTRY_PAGES.map(url => ({
