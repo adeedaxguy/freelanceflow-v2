@@ -150,9 +150,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Freelance Cold Outreach",
     title: "Freelance cold outreach",
     accentTitle: "that starts from real buying signals",
-    metaTitle: "Freelance Cold Outreach Software | Find Leads, Write Better Emails, and Track Replies",
+    metaTitle: "Freelance Cold Outreach Software | Find Leads, Draft Better Emails, and Track Replies",
     metaDescription:
-      "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, Gmail-ready emails, AI proposal drafts, and CRM follow-up built for freelancers.",
+      "Improve freelance cold outreach with fresh lead discovery, decision-maker checks, Gmail-ready drafts, AI proposal support, and CRM follow-up built for freelancers.",
     keywords: [
       "freelance cold outreach",
       "freelance cold outreach software",
@@ -168,7 +168,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Gmail outreach for freelancers",
     ],
     heroSummary:
-      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward signup and pipeline use.",
+      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward a saved lead, Gmail draft, and follow-up workflow.",
     primaryCta: "Start Outreach Free",
     secondaryCta: "See AI Proposals",
     dashboardPath: "/dashboard/leads",
@@ -177,7 +177,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     audience:
       "Built for freelancers, consultants, and small agencies selling websites, SEO, paid ads, design, copywriting, automation, development, and marketing support.",
     outcome:
-      "A signal-led outreach workflow where every saved lead has context, a pitch angle, a contact route, notes, and follow-up status.",
+      "A signal-led outreach workflow where every saved lead has context, a pitch angle, a contact route, notes, Gmail-ready draft support, and follow-up status.",
     intro: [
       "Most freelance cold outreach fails because it starts with a list, not a reason. A stranger does not need another generic message about your services. They need to see that you noticed a real problem, timing cue, job post, website gap, or business signal that makes your offer relevant now.",
       "iCloseLeads is built for that style of outreach. You can find remote job leads, local business opportunities, live hiring signals, and decision-maker paths, then turn the context into a sharp first message. The result is not more noise. It is a smaller list of better prospects with a stronger reason to reply.",
@@ -268,7 +268,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       },
       {
         q: "How does iCloseLeads help with cold outreach for freelancers?",
-        a: "iCloseLeads helps you find lead signals, save the best prospects, check decision-maker paths, generate proposal drafts, prepare Gmail outreach, and track follow-up so cold outreach becomes a repeatable workflow.",
+        a: "iCloseLeads helps you find lead signals, save the best prospects, check decision-maker paths, generate proposal drafts, prepare Gmail outreach, and track follow-up so cold outreach becomes a repeatable workflow instead of a pile of disconnected tabs.",
       },
     ],
   },
@@ -278,9 +278,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads for Web Designers | Find Businesses Without Websites or With Weak Sites",
+    metaTitle: "Local Business Leads for Web Designers | Find Businesses Without Websites or Weak Sites",
     metaDescription:
-      "Find local business leads for web designers with no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths.",
+      "Find local business leads for web designers with no website, outdated websites, phone numbers, map profiles, and owner or manager verification paths that are easier to turn into outreach.",
     keywords: [
       "local business leads",
       "local business leads for web designers",
@@ -297,7 +297,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "website redesign leads",
     ],
     heroSummary:
-      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into outreach and follow-up without losing context.",
+      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into outreach, proposal drafting, and follow-up without losing context.",
     primaryCta: "Find Local Leads Free",
     secondaryCta: "Read Lead Discovery",
     dashboardPath: "/dashboard/local-leads",

@@ -181,10 +181,14 @@ export default function ResourcePage({ params }: Props) {
                   </div>
                 </div>
                 <div className="rounded-lg border border-accent/25 bg-accent/10 p-6">
-                  <p className="text-sm font-bold text-accent">Free signup path</p>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">Run one focused search, save the best lead, and turn it into a pitch before opening another tab.</p>
+                  <p className="text-sm font-bold text-accent">Turn this into a real workflow</p>
+                  <div className="mt-3 space-y-3 text-sm leading-6 text-muted-foreground">
+                    <p>1. Create a free account and run one niche search instead of collecting ideas in another spreadsheet.</p>
+                    <p>2. Save the best lead while the business context is still visible.</p>
+                    <p>3. Draft the first message in iCloseLeads before you lose the pitch angle.</p>
+                  </div>
                   <Link href="/auth?mode=signup" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-accent">
-                    Start free
+                    Start free and test the workflow
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>

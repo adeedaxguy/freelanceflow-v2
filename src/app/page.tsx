@@ -3,8 +3,8 @@ import HomepageClient from "@/components/HomepageClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
-  title: "iCloseLeads: Freelance Lead Generation Software for Web Design Leads and Cold Outreach",
-  description: "iCloseLeads helps freelancers find web design leads, local business leads, remote job leads, and decision-maker paths, then write better cold outreach and track follow-up.",
+  title: "iCloseLeads: Find Web Design Leads, Local Business Leads, and Cold Outreach Workflows",
+  description: "iCloseLeads helps freelancers find web design leads, local business leads, remote job leads, and decision-maker paths, then turn each lead into a proposal, Gmail-ready outreach draft, and follow-up workflow.",
   keywords: [
     "iCloseLeads",
     "icloseleads.com",
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://icloseleads.com",
     siteName: "iCloseLeads",
-    title: "iCloseLeads: Freelance Lead Generation Software for Web Design Leads and Cold Outreach",
-    description: "Find web design leads, remote jobs, local business leads, owner and manager contact paths, and live job signals, then turn each opportunity into AI-assisted outreach and CRM follow-up.",
+    title: "iCloseLeads: Find Web Design Leads, Local Business Leads, and Cold Outreach Workflows",
+    description: "Find web design leads, remote jobs, local business leads, owner and manager contact paths, and live job signals, then turn each opportunity into AI-assisted outreach, Gmail drafts, and CRM follow-up.",
     images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "iCloseLeads" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "iCloseLeads: Freelance Leads, Cold Outreach, and CRM",
-    description: "Find better freelance leads, identify owner/contact paths, draft sharper outreach, and track every client opportunity.",
+    title: "iCloseLeads: Web Design Leads, Outreach, and CRM",
+    description: "Find better freelance leads, identify owner/contact paths, draft sharper outreach in Gmail, and track every client opportunity.",
     creator: "@icloseleads",
   },
   robots: {
@@ -128,7 +128,7 @@ const useCaseItemListJsonLd = {
       "position": 2,
       "name": "Freelance Cold Outreach",
       "url": "https://icloseleads.com/use-cases/freelance-cold-outreach",
-      "description": "Find lead signals, write researched cold outreach, prepare Gmail drafts, and track follow-up.",
+      "description": "Find lead signals, write researched cold outreach, prepare Gmail drafts, and track follow-up without losing context.",
     },
     {
       "@type": "ListItem",

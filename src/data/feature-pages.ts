@@ -405,9 +405,9 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     shortDescription:
       "Prepare Gmail-ready cold emails, track outreach history, and keep follow-ups organized without auto-blasting.",
     titleTag:
-      "Cold Email Outreach Software for Freelancers with Gmail Drafts and Follow-Up Tracking",
+      "Cold Email Outreach Software for Freelancers | Gmail Drafts and Follow-Up Tracking",
     metaDescription:
-      "Prepare freelance cold outreach in Gmail, write personalized cold emails from lead context, track history, prevent duplicates, and manage follow-ups.",
+      "Prepare freelance cold outreach in Gmail, write personalized cold emails from lead context, prevent duplicates, and manage follow-ups without mass sending.",
     keywords: [
       "cold email outreach for freelancers",
       "freelance cold outreach",
@@ -431,9 +431,10 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     audience:
       "Freelancers and small agencies who want the structure of an outreach tool without giving up control of the actual send.",
     promise:
-      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing or duplicating work.",
+      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing, duplicating work, or sending a message that feels generic.",
     proof: [
       "Proposal pages support Gmail compose preparation instead of requiring a direct sender.",
+      "GA4 is already showing form starts and click activity on pages tied to this workflow.",
       "Outreach usage limits are visible, making the free-plan workflow predictable.",
       "Saved lead records and email history give every follow-up a single place to live.",
     ],
@@ -532,7 +533,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       },
       {
         q: "Why use Gmail draft mode instead of direct sending?",
-        a: "Draft mode keeps sending under your control, reduces accidental blasts, and makes it easier to review personalization before the prospect sees it.",
+        a: "Draft mode keeps sending under your control, reduces accidental blasts, and makes it easier to review personalization before the prospect sees it. That is especially useful for freelancers sending smaller, higher-quality batches.",
       },
       {
         q: "Can I use this with AI proposals?",

@@ -9,14 +9,14 @@ const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Lead Generation Resources for Freelancers and Agencies",
+  title: "Lead Generation Resources for Web Design Leads, Local Leads, and Cold Outreach",
   description:
-    "Practical iCloseLeads resources for web design leads, local business leads, freelance cold outreach, remote job leads, AI proposals, and decision maker checks.",
+    "Practical iCloseLeads resources for web design leads, local business leads, freelance cold outreach, businesses without websites, AI proposals, and decision maker checks.",
   alternates: { canonical: `${BASE_URL}/resources` },
   openGraph: {
-    title: "Lead Generation Resources | iCloseLeads",
+    title: "Lead Generation Resources for Freelancers | iCloseLeads",
     description:
-      "Guides and workflows for finding better freelance leads, qualifying prospects, writing pitches, and tracking follow-up.",
+      "Guides and workflows for finding better freelance leads, qualifying prospects, writing pitches, and tracking follow-up in iCloseLeads.",
     url: `${BASE_URL}/resources`,
     type: "website",
     siteName: "iCloseLeads",
@@ -63,18 +63,18 @@ export default function ResourcesPage() {
               SEO-backed playbooks
             </div>
             <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Lead generation resources built around real search intent
+              Lead generation resources built for signups and first outreach, not empty traffic
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, local businesses, remote job signals, decision maker paths, and outreach angles that move prospects toward a real conversation.
+              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, businesses without websites, local business opportunities, remote job signals, decision maker paths, and outreach angles that move prospects toward a real conversation.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
-                Start Free
+                Start Free and Run a Search
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/use-cases/local-business-leads" className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
-                Explore Local Leads
+                Explore Local Lead Workflows
               </Link>
             </div>
           </div>

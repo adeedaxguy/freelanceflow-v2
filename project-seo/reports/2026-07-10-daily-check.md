@@ -1,157 +1,181 @@
-# iCloseLeads Daily SEO Check — 2026-07-10
+# iCloseLeads Daily SEO Check - 2026-07-10
 
-## Source evidence
+## Research Evidence
 
-### 1. Google Search Console
+### Google Search Console
 
 - Property: `sc-domain:icloseleads.com`
 - Visible report: `Performance on Search results`
-- Date range: `3 months`
 - Search type: `Web`
-- Last update visible: `4.5 hours ago`
-- Topline metrics visible:
-  - Clicks: `8`
-  - Impressions: `289`
-  - Average CTR: `2.8%`
-  - Average position: `32.8`
-- Visible query rows sampled:
-  - `web design leads` — `20` impressions, `0` clicks, position `49.2`
-  - `freelance cold outreach` — `16` impressions, `0` clicks, position `39.8`
-  - `exclusive web design leads` — `9` impressions, `0` clicks, position `62.7`
-  - `ai consulting clients` — `8` impressions, `0` clicks, position `31.0`
-  - `leads for web design` — `8` impressions, `0` clicks, position `42.5`
-- Visible page rows sampled:
-  - `https://www.icloseleads.com/` — `3` clicks, `27` impressions
-  - `https://icloseleads.com/` — `3` clicks, `24` impressions
-  - `/blog/best-lead-sources-for-web-design-agencies` — `1` click, `67` impressions
-  - `/features/email-outreach` — `1` click, `17` impressions
-- Indexing state visible:
-  - Indexed: `82`
-  - Not indexed: `54`
-  - Reasons visible: `3`
-  - Page indexing last update visible: `30/06/2026`
-- Sitemap state visible:
-  - Sitemap: `https://icloseleads.com/sitemap.xml`
+- Date range filter: `3 months`
+- Last update shown: `5 hours ago`
+- Totals visible: `8 clicks`, `289 impressions`, `2.8% CTR`, `32.8 avg position`
+- Query evidence sampled:
+  - `web design leads` - `20 impressions`, `0 clicks`, `49.2 position`
+  - `freelance cold outreach` - `16 impressions`, `0 clicks`, `39.8 position`
+  - `exclusive web design leads` - `9 impressions`, `0 clicks`, `62.7 position`
+  - `ai consulting clients` - `8 impressions`, `0 clicks`, `31.0 position`
+  - `leads for web design` - `8 impressions`, `0 clicks`, `42.5 position`
+- Page evidence sampled:
+  - `https://www.icloseleads.com/` - `3 clicks`, `27 impressions`
+  - `https://icloseleads.com/` - `3 clicks`, `24 impressions`
+  - `https://icloseleads.com/blog/best-lead-sources-for-web-design-agencies` - `1 click`, `67 impressions`
+  - `https://icloseleads.com/features/email-outreach` - `1 click`, `17 impressions`
+  - `https://icloseleads.com/blog/find-clients-for-ai-consulting` - `0 clicks`, `21 impressions`
+  - `https://icloseleads.com/tools/lead-calculator` - `0 clicks`, `19 impressions`
+- Sitemap evidence:
+  - Property sitemap page shows `https://icloseleads.com/sitemap.xml`
   - Submitted: `12 Jun 2026`
   - Last read: `8 Jul 2026`
   - Status: `Success`
   - Discovered pages: `142`
+- Indexing evidence:
+  - Report: `Page indexing`
+  - Last update shown: `30/06/2026`
+  - Indexed: `82`
+  - Not indexed: `54`
+  - Exclusions sampled:
+    - `Discovered - currently not indexed` - `49`
+    - `Duplicate without user-selected canonical` - `3`
+    - `Page with redirect` - `2`
+- Limitations:
+  - Used visible Chrome UI only; no export pulled.
+  - Exact custom date boundaries were not opened beyond the visible `3 months` preset.
 
-### 2. GA4
+### GA4
 
-- Account/property visible: `icloseleads.com / icloseleads`
-- Visible report: `Reports snapshot`
-- Date range: `Last 28 days` (`12 Jun - 9 Jul 2026`)
-- Visible topline metrics:
-  - Active users: `27`
-  - New users: `23`
-  - Average engagement time per active user: `6m 08s`
-  - Active users in last 30 minutes: `1`
-- Visible acquisition mix:
-  - Direct sessions: `30`
-  - Organic Search sessions: `22`
-  - Referral sessions: `21`
-  - Unassigned sessions: `11`
-  - Organic Social sessions: `7`
-  - AI Assistant sessions: `1`
-- Visible landing/page signals:
-  - Homepage title page: `243` views
-  - Main app/home title variant: `43` views
-  - Blog listing title: `38` views
-  - Features page title: `10` views
-  - Pricing page title: `9` views
-- Visible event signals:
-  - `page_view`: `494`
-  - `user_engagement`: `144`
-  - `session_start`: `86`
-  - `scroll`: `76`
-  - `form_start`: `48`
-  - `click`: `38`
-  - `first_visit`: `23`
-- Limitation:
-  - `Key events` card showed `No data available`, so signup/account creation/activation could not be confirmed from GA4 key events today.
+- Account/property shown: `All accounts > icloseleads.com > icloseleads`
+- Visible report: `Home`
+- Date range visible on cards: `Last 7 days`
+- Property-level evidence:
+  - `10 active users`
+  - `0 key events`
+  - `268 event count`
+  - `116 views`
+  - `2 active users in last 30 minutes`
+- Traffic acquisition sample:
+  - `Referral` - `14 sessions`
+  - `Organic Search` - `8 sessions`
+  - `Unassigned` - `8 sessions`
+  - `Direct` - `6 sessions`
+  - `AI Assistant` - `1 session`
+- Page/view sample:
+  - `iCloseLeads - Freelance Lead Generation and Cold Outreach Software` - `43 views`
+  - `Lead Generation Resources for Freelancers and Agencies | iCloseLeads` - `7 views`
+  - `iCloseLeads: Freelance Lead Generation Software for Cold Outreach` - `6 views`
+  - `Local Business Leads for Web Designers | Signals, Filters, and Pitch Angles | iCloseLeads` - `5 views`
+  - `Web Design Leads: Find Local Businesses That Need Better Websites | iCloseLeads` - `5 views`
+  - `Freelance Lead Generation Software for Remote Jobs, Local Leads, and Decision Makers | iCloseLeads` - `4 views`
+- Event sample:
+  - `page_view` - `116`
+  - `user_engagement` - `47`
+  - `session_start` - `30`
+  - `click` - `26`
+  - `form_start` - `24`
+  - `scroll` - `17`
+  - `first_visit` - `8`
+- Limitations:
+  - Used the visible home snapshot only, not deeper custom acquisition explorations.
+  - Key events remain `0`, so signup/activation tracking still needs better visibility.
 
-### 3. RankyTools / Ahrefs
+### Ahrefs / RankyTools
 
-- Tool area used: `Site Explorer`
-- Target: `icloseleads.com`
-- Areas checked:
-  - `Overview`
-  - `Organic keywords` with `United States`
-  - `Top pages` with `United States`
-- Access result:
-  - Session is authenticated today; no login blocker
-- Visible overview metrics:
-  - DR: `1.8`
-  - Backlinks: `494`
-  - Referring domains: `349`
-  - Organic keywords: `0`
-  - Organic traffic: `0`
-- Limitation:
-  - Ahrefs visibility for `icloseleads.com` is still too sparse to drive topic priority by keyword table alone, so GSC carried the search-priority weighting.
+- Surface used: `Ahrefs via ahx.rankytools.com` in the already-open Chrome profile
+- Areas used:
+  - `Referring domains`
+  - `Organic keywords`
+- Country/database sampled for organic keywords: `United States`
+- Evidence:
+  - Referring domains visible: `357 domains`
+  - Organic keywords visible in US sample: `0 keywords`
+  - Referring domain profile is heavily polluted by spam labels and low-quality `.site` / `.shop` domains.
+  - Example spammy domains sampled:
+    - `itxoft-proven-seo-strategies.site`
+    - `itxoft-cost-effective-seo-services.site`
+    - `fiverr-seo-for-business-growth.site`
+    - `buyseobacklinks.shop`
+    - `seo-high-ranking.shop`
+- Access limits:
+  - Overview URL produced a `Sorry, we can't find that page!` message.
+  - Usable data was available from direct submodules, but the dataset appears thin and unreliable for organic keyword discovery today.
 
-### 4. Live SERP sample
+### Live SERP Sampling
 
+- Country bias used: Google US via `gl=us&hl=en&pws=0`
 - Query: `web design leads`
-  - Visible SERP pattern: sponsored result, Reddit discussion result, and a commercial competitor (`Webleadr`) targeting businesses without websites.
+  - SERP patterns sampled:
+    - Reddit discussion
+    - Webleadr landing page
+    - Leadsify landing page
+    - Folyo comparison/article
+    - strategy/how-to posts
+  - Observation: the SERP rewards practical lead-finding workflows and businesses-without-websites framing.
 - Query: `freelance cold outreach`
-  - Visible SERP pattern: AI Overview, tactical guide content from `Double Your Freelancing`, and Reddit discussion intent.
-- Implication:
-  - The winning pages are practical, workflow-led, and explicitly connected to better outreach or better-fit leads. That supports focusing on intent match and conversion-path clarity over generic thought-leadership copy.
+  - SERP patterns sampled:
+    - tutorial/how-to pages
+    - Reddit discussion
+    - cold email legality guide
+    - template/checklist content
+  - Observation: the SERP rewards workflow, templates, and proof-driven cold-email guidance rather than brand messaging alone.
 
-## 20-item agenda
+## 20-Item Agenda
 
-1. Refresh homepage metadata for `web design leads` + `freelance cold outreach`.
-2. Tighten homepage JSON-LD descriptions around web design leads and local business lead use cases.
-3. Refresh `/for/web-designers` H1 + hero copy for `web design leads`.
-4. Refresh `/for/web-designers` keyword set toward local-business lead intent.
-5. Improve `/for/web-designers` use-case bullets for verification + outreach workflow.
-6. Improve `/for/web-designers` feature bullets for Gmail-ready sending and CRM follow-up.
-7. Refresh `/use-cases/freelance-cold-outreach` title/meta for commercial intent.
-8. Add `freelance cold outreach templates` keyword coverage to the outreach use case.
-9. Strengthen `/use-cases/freelance-cold-outreach` hero copy toward signup/use flow.
-10. Refresh `/use-cases/local-business-leads` title/meta toward `local business leads for web designers`.
-11. Strengthen `/use-cases/local-business-leads` hero copy toward outreach follow-up.
-12. Refresh `/features/lead-discovery` title tag around `web design leads`.
-13. Refresh `/features/email-outreach` title/meta toward safer Gmail draft workflow.
-14. Add template-intent keyword support to `/features/email-outreach`.
-15. Strengthen `/features/email-outreach` audience/promise copy around follow-up control.
-16. Add meta fields for `web-designers-find-local-business-clients-2026`.
-17. Add meta fields for `local-business-lead-generation-for-web-designers`.
-18. Refresh pillar metadata for `freelancers-guide-to-cold-email-outreach-2026`.
-19. Add 5-20 authority prospects tied to web-design and outreach pages.
-20. Update central SEO hub trackers and rebuild/deploy the command center.
+| # | Item | Type | Source signal | Acquisition intent | Evidence | Page fit | Conversion path | Difficulty | Brand safety | Ship today |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Refresh homepage metadata for web design leads + outreach workflow | Existing page refresh | GSC + GA4 | High | High | High | Signup | Low | Safe | Yes |
+| 2 | Refresh `/resources` hub messaging around signup + first search | Existing page refresh | GA4 + GSC | High | High | High | Signup | Low | Safe | Yes |
+| 3 | Upgrade resource template CTA block across all resource pages | Template-wide UX/SEO | GA4 behavior | High | Medium | High | Signup to first search | Low | Safe | Yes |
+| 4 | Refresh `/resources/web-design-leads` copy and metadata | Existing page refresh | GSC + SERP | High | High | High | Signup to local leads | Low | Safe | Yes |
+| 5 | Refresh `/resources/businesses-without-websites` copy and metadata | Existing page refresh | SERP + use-case fit | High | Medium | High | Signup to local leads | Low | Safe | Yes |
+| 6 | Refresh `/resources/freelance-cold-outreach` copy and metadata | Existing page refresh | GSC + SERP + GA4 | High | High | High | Signup to outreach workflow | Low | Safe | Yes |
+| 7 | Refresh `/resources/local-business-leads-for-web-designers` copy and metadata | Existing page refresh | GSC + SERP | High | High | High | Signup to local leads | Low | Safe | Yes |
+| 8 | Refresh `/resources/exclusive-web-design-leads` copy and metadata | Existing page refresh | GSC + SERP | Medium | High | High | Signup to qualified prospecting | Low | Safe | Yes |
+| 9 | Refresh `/features/email-outreach` metadata and proof for Gmail-draft workflow | Existing page refresh | GSC + GA4 | High | High | High | Signup to email workflow | Low | Safe | Yes |
+| 10 | Refresh `/use-cases/freelance-cold-outreach` copy for saved-lead to Gmail flow | Existing page refresh | GSC + GA4 + SERP | High | High | High | Signup to outreach workflow | Low | Safe | Yes |
+| 11 | Refresh `/use-cases/local-business-leads` copy for outreach-ready value | Existing page refresh | GSC + GA4 + SERP | High | High | High | Signup to local leads | Low | Safe | Yes |
+| 12 | Build `/resources/outdated-website-leads` expansion with stronger examples | Existing page refresh | GSC cluster fit | Medium | Medium | High | Signup to local leads | Medium | Safe | Queued |
+| 13 | Build `/resources/web-design-proposal-template` page | New resource page | SERP gap | High | Medium | High | Signup to AI proposals | Medium | Safe | Queued |
+| 14 | Build `/resources/cold-email-subject-lines-for-freelancers` page | New resource page | SERP gap | High | Medium | High | Signup to email outreach | Medium | Safe | Queued |
+| 15 | Build `/resources/freelance-follow-up-email-templates` page | New resource page | SERP gap | High | Medium | High | Signup to CRM/outreach | Medium | Safe | Queued |
+| 16 | Refresh `/features/lead-discovery` around businesses-without-websites angle | Existing page refresh | GSC + SERP | High | Medium | High | Signup to search workflow | Low | Safe | Queued |
+| 17 | Refresh `/features/ai-proposals` FAQs around first-message use cases | Existing page refresh | SERP + GA4 | Medium | Medium | High | Signup to proposal workflow | Low | Safe | Queued |
+| 18 | Refresh `/tools/lead-calculator` CTA toward account creation | Existing page refresh | GSC page data | Medium | Medium | Medium | Signup | Low | Safe | Queued |
+| 19 | Refresh `/pricing` CTA copy for early access usage path | Existing page refresh | GA4 conversion gap | High | Medium | High | Signup | Low | Safe | Queued |
+| 20 | Refresh `/auth` onboarding reassurance for first search activation | Existing page refresh | GA4 key-event gap | High | Medium | High | Signup to activation | Medium | Safe | Queued |
 
-## Shipped today
+## Implemented Today
 
-- Safe production batch prepared and validated for these 6 countable items:
-  1. Homepage metadata + structured-description refresh.
-  2. `/for/web-designers` major copy and keyword refresh.
-  3. `/use-cases/freelance-cold-outreach` title/meta/hero refresh.
-  4. `/use-cases/local-business-leads` title/meta/hero refresh.
-  5. `/features/lead-discovery` title-tag refresh.
-  6. `/features/email-outreach` title/meta/keyword/promise refresh.
+1. Homepage metadata refresh for stronger acquisition wording.
+2. Resources hub metadata + hero refresh.
+3. Resource-page template CTA upgrade affecting all resource URLs.
+4. `/resources/web-design-leads` refresh.
+5. `/resources/businesses-without-websites` refresh.
+6. `/resources/freelance-cold-outreach` refresh.
+7. `/resources/local-business-leads-for-web-designers` refresh.
+8. `/resources/exclusive-web-design-leads` refresh.
+9. `/features/email-outreach` refresh.
+10. `/use-cases/freelance-cold-outreach` refresh.
+11. `/use-cases/local-business-leads` refresh.
 
-## Not shipped yet
+## Local Validation
 
-- Blog metadata updates in `src/data/blog-posts.ts` and `src/data/pillar-posts.ts` were drafted locally but held back from the push because those files already had unrelated in-progress changes in the worktree. They are queued for a clean follow-up batch instead of being mixed into today’s safer deploy.
-- Authority prospect logging and central SEO hub updates are still blocked on write access to `/Users/adeedaxguy/Documents/Codex/seo-ops-hub`.
+- `npm run type-check` - passed
+- `npm run build` - passed
+- Existing known build warning remained: Prisma/`DATABASE_URL` warning during static generation, but build completed successfully.
 
-## Validation
+## Authority Notes
 
-- `npm run type-check`: passed
-- `npm run build`: passed
-- Known build limitation repeated:
-  - Build log still prints the existing `DATABASE_URL` warning during static page generation, but the build completes successfully.
+- Ahrefs shows a spam-heavy referring-domain profile, so authority work should prioritize clean editorial prospects over any link-volume tactic.
+- Target pages for authority:
+  - `/resources/web-design-leads`
+  - `/resources/freelance-cold-outreach`
+  - `/use-cases/local-business-leads`
+  - `/features/email-outreach`
 
-## Next measurement date
+## Queued Next 5 Actions
 
-- `2026-07-11`
-
-## Next 5 queued actions
-
-1. Safely isolate and ship the blog metadata upgrades on the web-design and cold-outreach posts.
-2. Add 5-20 authority prospects for web-design lead and outreach pages once hub write access is available.
-3. Update hub CSV logs and rebuild/deploy the SEO Ops Command Center.
-4. Re-check GSC page data for `/features/email-outreach` and `/for/web-designers` after the deploy is live.
-5. Inspect whether the homepage canonical traffic is consolidating further after today’s title/description refresh.
+1. Publish a dedicated `web design proposal template` resource page tied to AI proposals.
+2. Publish a `cold email subject lines for freelancers` resource page tied to Gmail drafts.
+3. Publish a `freelance follow-up email templates` resource page tied to CRM follow-up.
+4. Refresh `lead discovery` feature messaging around businesses-without-websites and local lead verification.
+5. Refresh `pricing` and `auth` pages for signup-to-first-search activation.
