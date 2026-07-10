@@ -99,7 +99,7 @@ export default function ResourcePage({ params }: Props) {
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">{page.summary}</p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
-                    Try iCloseLeads Free
+                    Start Free and Run This Workflow
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link href={page.internalLinks[0]?.href ?? "/features/lead-discovery"} className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
@@ -183,7 +183,7 @@ export default function ResourcePage({ params }: Props) {
                 <div className="rounded-lg border border-accent/25 bg-accent/10 p-6">
                   <p className="text-sm font-bold text-accent">Turn this into a real workflow</p>
                   <div className="mt-3 space-y-3 text-sm leading-6 text-muted-foreground">
-                    <p>1. Create a free account and run one niche search instead of collecting ideas in another spreadsheet.</p>
+                    <p>1. Create a free account and run one focused search instead of collecting ideas in another spreadsheet.</p>
                     <p>2. Save the best lead while the business context is still visible.</p>
                     <p>3. Draft the first message in iCloseLeads before you lose the pitch angle.</p>
                   </div>

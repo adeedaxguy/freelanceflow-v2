@@ -19,9 +19,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
     slug: "web-design-leads",
     title: "Web design leads that are worth pitching",
-    metaTitle: "Web Design Leads: Find Businesses Without Websites and Pitch Better",
+    metaTitle: "Web Design Leads: Find Better-Fit Clients and Pitch With Real Context",
     metaDescription:
-      "Find web design leads from businesses without websites, outdated sites, local search gaps, owner-path signals, and contact-ready context, then turn them into a focused pitch.",
+      "Find web design leads from businesses without websites, outdated sites, local search gaps, and owner-path signals, then turn each lead into a focused first pitch.",
     keyword: "web design leads",
     audience: "Web designers, WordPress developers, Webflow freelancers, and small agencies",
     intent: "The searcher wants a repeatable way to find businesses that may pay for website work.",
@@ -37,9 +37,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Use the pitch to sell calls, bookings, quotes, and trust, not just a prettier website.",
     ],
     proofPoints: [
-      "GSC is already showing impressions for web design leads and leads for web design.",
-      "Live US SERPs show tools and guides winning with businesses-without-websites positioning and practical prospecting language.",
-      "iCloseLeads has the local business lead and owner-path workflow to support this search intent.",
+      "GSC is still surfacing web design leads and leads for web design as one of the clearest acquisition clusters for iCloseLeads.",
+      "Live US SERPs reward practical businesses-without-websites positioning instead of generic agency branding.",
+      "iCloseLeads already connects local discovery, owner-path checks, proposal drafting, and CRM follow-up for this workflow.",
     ],
     pitch:
       "Hi, I found your business while checking local search results and noticed your website presence could be doing more to turn nearby searches into calls. I have a short idea for improving the site and quote flow if you are open to seeing it.",
@@ -62,7 +62,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
     slug: "businesses-without-websites",
     title: "How to find businesses without websites",
-    metaTitle: "Businesses Without Websites: How Freelancers Find Better Web Design Leads",
+    metaTitle: "Businesses Without Websites: Find Better Local Leads Before You Pitch",
     metaDescription:
       "Find businesses without websites using local search signals, map profiles, public phone routes, and a qualification workflow before pitching web design or local SEO help.",
     keyword: "businesses without websites",
@@ -80,9 +80,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Save notes about why a website would help that specific business.",
     ],
     proofPoints: [
-      "Google SERPs show strong search interest around no-website local lead workflows and tools.",
-      "This query has clear purchase intent for web designers and local SEO consultants.",
-      "iCloseLeads can turn the discovery step into a saved lead, proposal draft, and CRM workflow.",
+      "Live US SERPs are full of tools and guides around businesses-without-websites prospecting, which confirms commercial search intent.",
+      "This cluster fits freelancers selling websites, local SEO, and simple conversion-first online presences.",
+      "iCloseLeads can take the search from discovery to saved lead, proposal draft, and follow-up without leaving the workflow.",
     ],
     pitch:
       "Hi, I noticed your business is visible locally but does not seem to have a dedicated website attached to the listing. A simple site could help people check services, trust you faster, and call with less friction.",
@@ -105,7 +105,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
     slug: "freelance-cold-outreach",
     title: "Freelance cold outreach that starts with a real signal",
-    metaTitle: "Freelance Cold Outreach: Find Leads, Draft Gmail Outreach, and Follow Up",
+    metaTitle: "Freelance Cold Outreach: Find Better Leads, Draft Gmail Outreach, and Follow Up",
     metaDescription:
       "Build a freelance cold outreach workflow around real buyer signals, public context, short pitches, Gmail-ready drafts, and CRM follow-up that freelancers can actually maintain.",
     keyword: "freelance cold outreach",
@@ -123,10 +123,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Track the lead so follow-up happens without guessing.",
     ],
     proofPoints: [
-      "GSC shows early impressions for freelance cold outreach.",
-      "Live US SERPs reward practical templates, examples, and workflows over vague advice.",
-      "GA4 shows form starts and page engagement on outreach-related pages even though key events are still at zero.",
-      "iCloseLeads connects discovery, proposal writing, Gmail preparation, and CRM tracking.",
+      "GSC continues to show freelance cold outreach as an early but recurring query cluster for the site.",
+      "Live US SERPs reward practical templates, examples, and workflow pages over vague cold-email advice.",
+      "GA4 shows engagement and form-start activity on outreach-related pages even though key-event tracking is still incomplete.",
+      "iCloseLeads connects discovery, proposal writing, Gmail preparation, and CRM follow-up in one product path.",
     ],
     pitch:
       "Hi, I found your post/profile while researching companies that may need help with [specific issue]. I noticed [signal]. I can help with a small first step that would make this easier to solve.",
@@ -151,7 +151,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     title: "Local business leads for web designers",
     metaTitle: "Local Business Leads for Web Designers | Signals, Filters, and Pitch Angles",
     metaDescription:
-      "Find local business leads for web designers by niche, city, website status, phone visibility, owner path, and pitch-ready business context that is easier to turn into outreach.",
+      "Find local business leads for web designers by niche, city, website status, phone visibility, owner path, and pitch-ready business context.",
     keyword: "local business leads for web designers",
     audience: "Web designers and small studios selling to local companies",
     intent: "The searcher wants local companies that are easier to pitch for website or marketing work.",
@@ -167,9 +167,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Move the best leads into owner-path or proposal workflows.",
     ],
     proofPoints: [
-      "iCloseLeads already appears in Google for this long-tail query and related web-design lead terms.",
-      "The SERP includes direct competitors and lead scraping tools, showing commercial intent.",
-      "The platform can differentiate by combining discovery with pitch and CRM workflow.",
+      "GSC already shows this cluster through web-design-lead and local-business-search impressions tied to iCloseLeads pages.",
+      "The live SERP includes direct tools and prospecting pages, which confirms strong commercial intent.",
+      "iCloseLeads can differentiate by combining local discovery, owner-path checks, proposal drafting, and CRM follow-up.",
     ],
     pitch:
       "Hi, I help local businesses turn search visibility into more calls. I found your listing and noticed a website improvement that could make it easier for customers to choose you.",
@@ -210,9 +210,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Follow up based on the original signal, not a generic reminder.",
     ],
     proofPoints: [
-      "GSC shows impressions for exclusive web design leads.",
-      "Live SERPs and competitor pages sell lists, but users still need verification and workflow.",
-      "iCloseLeads can position exclusivity as better timing plus better qualification.",
+      "GSC still shows impressions for exclusive web design leads even before the cluster has a mature page footprint.",
+      "Live SERPs and competitor pages lean on list language, but buyers still need verification, timing, and workflow support.",
+      "iCloseLeads can position exclusivity as earlier signals plus better qualification, not a mystery spreadsheet.",
     ],
     pitch:
       "Hi, I noticed a specific website opportunity while checking your local search presence. I am not sending a generic design pitch; I have one practical improvement in mind for your business.",
@@ -253,9 +253,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Pitch one practical modernization sprint instead of a vague redesign.",
     ],
     proofPoints: [
-      "Outdated-site filters are already part of the local business lead workflow.",
-      "This cluster supports web design leads without duplicating the main page.",
-      "The pitch naturally leads to AI proposal and web design preview workflows.",
+      "Outdated-site filters already sit inside the local business lead workflow, so the search intent maps cleanly to product behavior.",
+      "This cluster supports the broader web design leads topic without duplicating the main businesses-without-websites angle.",
+      "The pitch naturally moves into AI proposal, outreach, and saved-lead follow-up workflows.",
     ],
     pitch:
       "Hi, I checked your website from a mobile customer’s point of view and saw a few places where people may drop off before calling. I can show you a simple refresh plan focused on more enquiries.",
@@ -339,9 +339,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Save evidence and next steps in the lead notes.",
     ],
     proofPoints: [
-      "GSC shows early impressions for ai consulting clients.",
-      "Live SERPs emphasize practical outcomes, proof of concepts, and workflow automation.",
-      "This cluster can attract high-value freelancers while staying product-relevant.",
+      "GSC is already surfacing ai consulting clients as an early long-tail opportunity for the site.",
+      "The query only makes sense when the pitch stays tied to practical automation and workflow outcomes.",
+      "This cluster can attract higher-value freelancers while staying consistent with iCloseLeads' signal-first positioning.",
     ],
     pitch:
       "Hi, I noticed you are dealing with [workflow/problem]. I help teams turn repetitive work into a practical automation plan, starting with one small process that can be tested quickly.",

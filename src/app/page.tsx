@@ -109,6 +109,11 @@ const softwareJsonLd = {
     "priceCurrency": "USD",
     "description": "Free early access plan available.",
   },
+  "potentialAction": {
+    "@type": "RegisterAction",
+    "target": "https://icloseleads.com/auth?mode=signup",
+    "name": "Create a free iCloseLeads account"
+  }
 };
 
 const useCaseItemListJsonLd = {

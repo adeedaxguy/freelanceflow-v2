@@ -92,10 +92,10 @@ export default function UseCasesPage() {
               Use Cases
             </div>
             <h1 className="mx-auto max-w-4xl break-words text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Four focused ways to find freelance clients
+              Four focused ways to find freelance clients and start using iCloseLeads faster
             </h1>
             <p className="mx-auto mt-6 max-w-2xl break-words text-lg leading-8 text-muted-foreground">
-              iCloseLeads is built around the prospecting motions freelancers search for most: remote job leads, cold outreach, local business leads, and live job leads. Pick the path that matches how you sell.
+              iCloseLeads is built around the prospecting motions freelancers search for most: remote job leads, cold outreach, local business leads, and live job leads. Pick the path that matches how you sell, then move straight into a product workflow instead of another generic explainer.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light">
@@ -144,7 +144,7 @@ export default function UseCasesPage() {
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary-light">Why It Works</p>
               <h2 className="mt-3 break-words text-3xl font-extrabold text-foreground">Built around specific prospecting intent</h2>
               <p className="mt-4 break-words text-base leading-7 text-muted-foreground">
-                Instead of one broad product page, each guide answers a concrete client-acquisition problem with a clear workflow, examples, and next steps.
+                Instead of one broad product page, each guide answers a concrete client-acquisition problem with a clear workflow, examples, next steps, and a direct path into the product.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">

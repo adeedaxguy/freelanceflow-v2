@@ -89,7 +89,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     titleTag:
       "Freelance Lead Generation Software for Web Design Leads, Local Leads, and Decision Makers",
     metaDescription:
-      "Find freelance clients with remote job leads, web design leads, local business opportunities, decision maker checks, lead scoring, and AI proposals.",
+      "Find freelance clients with remote job leads, web design leads, businesses-without-websites searches, decision maker checks, lead scoring, and AI proposals.",
     keywords: [
       "freelance lead generation software",
       "freelance client acquisition",
@@ -115,12 +115,12 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     audience:
       "Freelancers, consultants, agencies, and service providers who want qualified opportunities without marketplace bidding wars.",
     promise:
-      "Replace manual lead hunting with a repeatable discovery workflow: choose a niche, search fresh signals, filter by intent, save the best prospects, and write the first pitch while the context is still fresh.",
+      "Replace manual lead hunting with a repeatable discovery workflow: choose a niche, search fresh signals, filter by intent, save the best prospects, and write the first pitch while the business context is still fresh.",
     proof: [
-      "Remote job leads, local business leads, and Decision Maker Finder live in focused dashboards.",
-      "Saved leads flow into the same CRM, proposal, and outreach workflow.",
-      "Local lead workflows can continue into owner, manager, social profile, phone route, and proof-link checks.",
-      "Source coverage is abstracted in the product UI so users focus on lead quality, not raw data plumbing.",
+      "Remote job leads, local business leads, and Decision Maker Finder live in focused dashboards built around buyer intent.",
+      "Saved leads move into the same CRM, proposal, and outreach workflow instead of dying in a spreadsheet.",
+      "Local lead workflows continue into owner, manager, social profile, phone route, and proof-link checks.",
+      "The product fits the exact acquisition motions surfacing in GSC: web design leads, local-business gaps, and freelance cold outreach.",
     ],
     stats: [
       { value: "3 paths", label: "Remote, local, and decision maker discovery" },
@@ -431,11 +431,11 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     audience:
       "Freelancers and small agencies who want the structure of an outreach tool without giving up control of the actual send.",
     promise:
-      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing, duplicating work, or sending a message that feels generic.",
+      "Use AI to prepare better emails, then review and send them yourself. The workflow keeps every action tied to the lead record so you can follow up with context instead of guessing, duplicating work, or sending something that feels generic.",
     proof: [
-      "Proposal pages support Gmail compose preparation instead of requiring a direct sender.",
-      "GA4 is already showing form starts and click activity on pages tied to this workflow.",
-      "Outreach usage limits are visible, making the free-plan workflow predictable.",
+      "Proposal pages support Gmail compose preparation instead of forcing a black-box sender.",
+      "GA4 is already showing engagement and form-start activity around outreach-oriented landing paths.",
+      "Outreach usage limits are visible, which makes the free-plan workflow predictable for early users.",
       "Saved lead records and email history give every follow-up a single place to live.",
     ],
     stats: [
@@ -586,8 +586,8 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       "Keep the pipeline close to the prospecting workflow. Every saved lead can move through the same stages, carry private notes, and stay ready for the next follow-up.",
     proof: [
       "Saved leads feed the pipeline instead of sitting in a disconnected list.",
-      "Status updates, notes, proposal actions, and exports are available inside the dashboard.",
-      "The CRM is intentionally simpler than enterprise systems because freelancers need speed more than admin overhead.",
+      "Status updates, notes, proposal actions, and exports stay available inside the dashboard that users already touch during lead search.",
+      "The CRM is intentionally simpler than enterprise systems because freelancers need weekly momentum more than admin overhead.",
     ],
     stats: [
       { value: "6", label: "Core pipeline stages" },
