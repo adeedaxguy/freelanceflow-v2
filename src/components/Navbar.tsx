@@ -190,9 +190,9 @@ export default function Navbar() {
                           </span>
                         ))}
                       </div>
-                      <Link href="/auth?mode=signup" prefetch={false} onClick={() => setMegaOpen(false)}
+                      <Link href="/auth?mode=signup&intent=nav-first-search&source=mega-menu" prefetch={false} onClick={() => setMegaOpen(false)}
                         className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-light text-white text-xs font-semibold transition-colors">
-                        Get Started Free <ArrowRight className="w-3 h-3" />
+                        Find Leads Free <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
                 </div>
@@ -217,9 +217,9 @@ export default function Navbar() {
             <Link href="/auth" prefetch={false} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Sign In
             </Link>
-            <Link href="/auth?mode=signup" prefetch={false}
+            <Link href="/auth?mode=signup&intent=nav-first-search&source=desktop-nav" prefetch={false}
               className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
-              Get Started Free
+              Find Leads Free
             </Link>
           </div>
 
@@ -255,9 +255,9 @@ export default function Navbar() {
               <div className="pt-2 border-t border-border space-y-2">
                 <Link href="/auth" prefetch={false} onClick={() => setIsOpen(false)}
                   className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
-                <Link href="/auth?mode=signup" prefetch={false} onClick={() => setIsOpen(false)}
+                <Link href="/auth?mode=signup&intent=nav-first-search&source=mobile-nav" prefetch={false} onClick={() => setIsOpen(false)}
                   className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
-                  Get Started Free
+                  Find Leads Free
                 </Link>
               </div>
             </div>

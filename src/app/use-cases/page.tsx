@@ -98,8 +98,8 @@ export default function UseCasesPage() {
               iCloseLeads is built around the prospecting motions freelancers search for most: remote job leads, cold outreach, local business leads, and live job leads. Pick the path that matches how you sell, then move straight into a product workflow instead of another generic explainer.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light">
-                Start Free
+              <Link href="/auth?mode=signup&intent=use-cases-overview&source=use-cases-hero" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light">
+                Run first search free
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/features/lead-discovery" className="inline-flex items-center justify-center rounded-xl border border-border bg-surface/70 px-7 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">

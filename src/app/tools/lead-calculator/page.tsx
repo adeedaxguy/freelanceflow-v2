@@ -168,7 +168,7 @@ export default function LeadCalculatorPage() {
                   Stop spending {fmt(calc.timeCostPerWeek)}/week on manual prospecting.
                   iCloseLeads finds, scores, and surfaces live opportunities automatically.
                 </p>
-                <Link href="/auth?mode=signup"
+                <Link href="/auth?mode=signup&intent=lead-calculator&source=tool-cta"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
                   <Zap className="w-4 h-4" />
                   Start Finding Leads Free
@@ -188,7 +188,7 @@ export default function LeadCalculatorPage() {
             <p>A lead's value depends on your close rate and average project size. A freelancer with a 5% close rate and $2,500 average project has leads worth $125 each. At 50 leads a week, that's $6,250 in potential weekly revenue. The question is: how much does it cost you to find those 50 leads?</p>
             <h3>How to improve your close rate</h3>
             <p>The single biggest lever is lead quality. Cold leads with low relevance to your services will close at 1–2%. Warm, targeted leads — people actively posting for your exact skillset — close at 10–20%. Tools like <a href="https://icloseleads.com/dashboard/leads">iCloseLeads lead discovery</a> focus exclusively on high-intent leads so your time goes into closing, not sifting.</p>
-            <p>Want to start finding better leads? <a href="https://icloseleads.com/auth?mode=signup">Try iCloseLeads free</a> — no credit card, no time limit during Early Access.</p>
+            <p>Want to start finding better leads? <a href="https://icloseleads.com/auth?mode=signup&intent=lead-calculator&source=tool-content">Try iCloseLeads free</a> — no credit card, no time limit during Early Access.</p>
           </div>
         </section>
       </main>

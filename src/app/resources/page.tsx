@@ -76,7 +76,7 @@ export default function ResourcesPage() {
               Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, businesses without websites, local business opportunities, remote job signals, decision maker paths, and outreach angles that move a visitor toward a real account and workflow run.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/auth?mode=signup" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
+              <Link href="/auth?mode=signup&intent=resources-overview&source=resources-hero" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
                 Start Free and Run a Search
                 <ArrowRight className="h-4 w-4" />
               </Link>

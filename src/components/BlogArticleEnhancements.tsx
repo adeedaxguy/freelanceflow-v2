@@ -124,10 +124,10 @@ export function BlogConversionPanel({ post }: { post: BlogArticleSource }) {
           </p>
         </div>
         <Link
-          href="/auth?mode=signup"
+          href={`/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=blog-conversion-panel`}
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
         >
-          Start Free
+          Run a free lead search
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

@@ -8,10 +8,10 @@ import { MessageCircle, X, Send, Bot, User, Loader2, ChevronDown, ArrowRight } f
 interface Message { role: "user" | "assistant"; content: string; }
 
 const QUICK_QUESTIONS = [
+  "What happens after I sign up?",
   "Which lead engine should I use?",
   "Find remote job leads",
   "Is it free right now?",
-  "Write a local pitch",
 ];
 
 function shouldShowSignupCta(message: Message): boolean {
@@ -125,10 +125,10 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
                   </div>
                   {shouldShowSignupCta(msg) && (
                     <Link
-                      href="/auth?mode=signup"
+                      href="/auth?mode=signup&intent=chat-first-search&source=floating-chat"
                       className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold text-accent hover:border-accent/45 hover:bg-accent/15 transition-colors"
                     >
-                      Start free
+                      Run first search free
                       <ArrowRight className="w-3 h-3" />
                     </Link>
                   )}

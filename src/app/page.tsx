@@ -111,8 +111,8 @@ const softwareJsonLd = {
   },
   "potentialAction": {
     "@type": "RegisterAction",
-    "target": "https://icloseleads.com/auth?mode=signup",
-    "name": "Create a free iCloseLeads account"
+    "target": "https://icloseleads.com/auth?mode=signup&intent=first-search",
+    "name": "Run a free iCloseLeads lead search"
   }
 };
 

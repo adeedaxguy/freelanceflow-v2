@@ -76,7 +76,7 @@ export default function AffiliatePage() {
               Refer freelancers to iCloseLeads and earn 30% recurring commission for the lifetime of their subscription. Turn your audience into passive income.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth?mode=signup" className="px-8 py-4 bg-primary hover:bg-primary-light text-white rounded-xl font-semibold text-lg transition-colors">
+              <Link href="/auth?mode=signup&intent=affiliate-program&source=affiliate-hero" className="px-8 py-4 bg-primary hover:bg-primary-light text-white rounded-xl font-semibold text-lg transition-colors">
                 Join the Program
               </Link>
               <a href="#how-it-works" className="px-8 py-4 bg-surface border border-border hover:border-primary/30 text-foreground rounded-xl font-semibold text-lg transition-all">
@@ -204,7 +204,7 @@ export default function AffiliatePage() {
           <div className="max-w-2xl mx-auto px-4 text-center">
             <h2 className="text-4xl font-extrabold text-foreground mb-4">Ready to Start Earning?</h2>
             <p className="text-muted-foreground mb-8">Join 2,400+ affiliates earning recurring commissions with iCloseLeads.</p>
-            <Link href="/auth?mode=signup" className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-light text-white rounded-xl font-semibold text-lg transition-colors">
+            <Link href="/auth?mode=signup&intent=affiliate-program&source=affiliate-final-cta" className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-light text-white rounded-xl font-semibold text-lg transition-colors">
               <Zap className="w-5 h-5" /> Join the Affiliate Program
             </Link>
             <p className="text-xs text-muted-foreground mt-4">Questions? Email us at <a href="mailto:affiliates@icloseleads.com" className="text-primary-light hover:underline">affiliates@icloseleads.com</a></p>

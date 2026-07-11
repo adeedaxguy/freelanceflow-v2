@@ -204,7 +204,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
               {data.sub}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth?mode=signup"
+              <Link href={`/auth?mode=signup&intent=${encodeURIComponent(params.industry)}&source=industry-hero`}
                 className="flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-all shadow-glow-primary hover:-translate-y-0.5 w-full sm:w-auto justify-center">
                 <Zap className="w-5 h-5" />
                 {data.cta}
@@ -293,7 +293,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
               Use iCloseLeads to build a steadier outreach pipeline without cold calling or expensive ad spend.
             </p>
-            <Link href="/auth?mode=signup"
+            <Link href={`/auth?mode=signup&intent=${encodeURIComponent(params.industry)}&source=industry-final-cta`}
               className="inline-flex items-center gap-2.5 px-10 py-4 rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-all shadow-glow-primary hover:-translate-y-0.5">
               <Zap className="w-5 h-5" />
               {data.cta}

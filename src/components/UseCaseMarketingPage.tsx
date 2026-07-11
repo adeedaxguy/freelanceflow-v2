@@ -117,7 +117,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
               <p className="mt-6 max-w-2xl break-words text-lg leading-8 text-muted-foreground">{page.heroSummary}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/auth?mode=signup"
+                  href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=use-case-hero`}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
                   {page.primaryCta}
@@ -304,10 +304,10 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
-                  href="/auth?mode=signup"
+                  href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=use-case-final-cta`}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
-                  Start Free
+                  Run this workflow free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link

@@ -612,6 +612,15 @@ const FAQS = [
   { q: "Can I cancel at any time?", a: "Yes — cancel anytime from your profile with zero friction. You keep access until the end of your billing period. No cancellation fees." },
 ];
 
+function signupHref(intent: string, source = "homepage") {
+  return `/auth?mode=signup&intent=${encodeURIComponent(intent)}&source=${encodeURIComponent(source)}`;
+}
+
+function trackMarketingEvent(eventName: string, extra: Record<string, string | number | boolean> = {}) {
+  if (typeof window === "undefined") return;
+  (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", eventName, extra);
+}
+
 function LeadEngineShowcase() {
   const [activeId, setActiveId] = useState(LEAD_ENGINES[0]!.id);
   const active = LEAD_ENGINES.find(engine => engine.id === activeId) ?? LEAD_ENGINES[0]!;
@@ -677,11 +686,12 @@ function LeadEngineShowcase() {
                   </div>
                   <div className="flex flex-col gap-2 sm:items-end">
                     <Link
-                      href={active.route}
+                      href={signupHref(active.id, "homepage-lead-engines")}
                       prefetch={false}
+                      onClick={() => trackMarketingEvent("homepage_cta_click", { location: "lead_engine_panel", intent: active.id })}
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary-light hover:bg-primary/20 transition-all flex-shrink-0"
                     >
-                      Try this engine <ArrowRight className="w-4 h-4" />
+                      Run this search free <ArrowRight className="w-4 h-4" />
                     </Link>
                     <Link
                       href={active.publicRoute}
@@ -905,8 +915,13 @@ function OpportunityCommandCenter() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {active.leads[0]?.cta}. Open with the exact signal, show one relevant proof point, and ask for a small next step.
               </p>
-              <Link href={active.route} prefetch={false} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-light transition-colors">
-                Explore {active.label} <ArrowRight className="w-4 h-4" />
+              <Link
+                href={signupHref(active.id, "homepage-command-center")}
+                prefetch={false}
+                onClick={() => trackMarketingEvent("homepage_cta_click", { location: "command_center", intent: active.id })}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-white hover:bg-primary-light transition-colors"
+              >
+                Run {active.label} free <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
           </AnimatePresence>
@@ -921,6 +936,173 @@ function OpportunityCommandCenter() {
   );
 }
 
+function FirstSearchPreview() {
+  const [activeId, setActiveId] = useState(LEAD_ENGINES[0]!.id);
+  const active = LEAD_ENGINES.find(engine => engine.id === activeId) ?? LEAD_ENGINES[0]!;
+  const featuredLead = active.leads[0] ?? active.leads[active.leads.length - 1]!;
+  const searchPrompts: Record<string, string> = {
+    "remote-jobs": "WordPress retainers, remote, newest first",
+    "local-business-leads": "Cleaning companies in Austin, no website, has phone",
+    "live-jobs": "Urgent funnel help, budget mentioned, contact found",
+  };
+
+  return (
+    <section id="first-search-preview" className="border-y border-border/70 bg-surface/30 px-4 py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch">
+          <Reveal className="flex flex-col justify-center">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">Before you create an account</p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl">
+              Pick the lead type. See the first-search payoff.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-muted-foreground">
+              People hesitate when a tool feels vague. This is what iCloseLeads is designed to do right after signup: find a real lead path, explain why it matters, and hand you the next outreach move.
+            </p>
+
+            <div className="mt-7 grid gap-2">
+              {LEAD_ENGINES.map(engine => {
+                const isActive = engine.id === activeId;
+                return (
+                  <button
+                    key={engine.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveId(engine.id);
+                      trackMarketingEvent("homepage_preview_intent_select", { intent: engine.id });
+                    }}
+                    className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition-all ${
+                      isActive
+                        ? "border-primary/45 bg-primary/10 text-foreground shadow-glow-primary"
+                        : "border-border bg-background/70 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                    }`}
+                  >
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+                      style={{ color: engine.color, background: `${engine.color}14`, borderColor: `${engine.color}30` }}
+                    >
+                      {engine.icon}
+                    </span>
+                    <span>
+                      <span className="block text-sm font-bold">{engine.label}</span>
+                      <span className="block text-xs leading-5 text-muted-foreground">{engine.title}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link
+                href={signupHref(active.id, "homepage-first-search-preview")}
+                prefetch={false}
+                onClick={() => trackMarketingEvent("homepage_cta_click", { location: "first_search_preview", intent: active.id })}
+                className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary px-7 py-3.5 text-sm font-bold text-white shadow-glow-primary transition-all hover:-translate-y-0.5 hover:bg-primary-light sm:text-base"
+              >
+                <Zap className="h-5 w-5" />
+                Run this first search free
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <p className="text-xs leading-5 text-muted-foreground">
+                No card. Free early access. Your dashboard opens after signup.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="h-full overflow-hidden rounded-2xl border border-border bg-gradient-card">
+              <div className="border-b border-border bg-background/50 p-4 sm:p-5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge color={active.id === "live-jobs" ? "gold" : active.id === "local-business-leads" ? "accent" : "primary"}>
+                    First search preview
+                  </Badge>
+                  <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-semibold text-muted-foreground">
+                    {active.label}
+                  </span>
+                </div>
+                <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
+                  <Search className="h-4 w-4 shrink-0 text-primary-light" />
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
+                    {searchPrompts[active.id] ?? active.keywords[0]}
+                  </span>
+                  <span className="hidden text-xs font-semibold text-accent sm:inline">Ready</span>
+                </div>
+              </div>
+
+              <div className="p-4 sm:p-5">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    { label: "Lead found", value: active.label },
+                    { label: "Score", value: `${featuredLead.score}/100` },
+                    { label: "Next move", value: featuredLead.cta },
+                  ].map(item => (
+                    <div key={item.label} className="rounded-xl border border-border bg-background/70 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{item.label}</p>
+                      <p className="mt-1 text-sm font-bold leading-snug text-foreground">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-border bg-background/75 p-4">
+                  <div className="flex items-start gap-4">
+                    <span
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: `${active.color}16`, color: active.color }}
+                    >
+                      {active.id === "local-business-leads" ? <Building2 className="h-6 w-6" /> : active.id === "live-jobs" ? <Radio className="h-6 w-6" /> : <Briefcase className="h-6 w-6" />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-extrabold text-foreground">{featuredLead.name}</h3>
+                        <span className="rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 text-[11px] font-bold text-accent">
+                          Score {featuredLead.score}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">{featuredLead.detail}</p>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-border">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${featuredLead.score}%`, background: `linear-gradient(90deg, ${active.color}, #00E5A0)` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {[
+                    { title: "Why it matters", body: featuredLead.signal },
+                    { title: "Pitch angle", body: featuredLead.cta },
+                    { title: "What happens next", body: active.id === "local-business-leads" ? "Find owner path" : "Draft proposal" },
+                  ].map(item => (
+                    <div key={item.title} className="rounded-xl border border-primary/15 bg-primary/5 p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary-light">{item.title}</p>
+                      <p className="mt-1 text-sm leading-5 text-muted-foreground">{item.body}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-accent/20 bg-accent/5 p-4">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                    <Sparkles className="h-4 w-4 text-accent" />
+                    Signup unlocks the real workflow
+                  </div>
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-3">
+                    {["Run the live search", "Save the lead", active.id === "local-business-leads" ? "Open owner checks" : "Generate the proposal"].map(item => (
+                      <span key={item} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // ── Early Access Banner (dismissible) ────────────────────────────────────────
 function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) {
@@ -944,11 +1126,12 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
           <span className="text-white/40 hidden sm:inline">·</span>
           <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
           <Link
-            href="/auth?mode=signup"
+            href={signupHref("banner-first-search", "early-access-banner")}
             prefetch={false}
+            onClick={() => trackMarketingEvent("homepage_cta_click", { location: "early_access_banner", intent: "first_search" })}
             className="ml-1 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/20 hover:bg-primary/30 text-primary-light text-xs font-semibold border border-primary/25 transition-all"
           >
-            Get free access <ArrowRight className="w-3 h-3" />
+            Run a free search <ArrowRight className="w-3 h-3" />
           </Link>
         </span>
         <button
@@ -1033,17 +1216,26 @@ export default function HomepageClient() {
           {/* CTAs */}
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.4 }}
             className="mb-8 mt-8 flex flex-col items-center justify-center gap-3 sm:mb-10 sm:flex-row sm:gap-4">
-            <Link href="/auth?mode=signup" prefetch={false} className="group relative flex w-full sm:w-auto items-center justify-center gap-2.5 px-7 sm:px-9 py-3.5 sm:py-4 rounded-2xl bg-primary text-white text-sm sm:text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden">
+            <Link
+              href={signupHref("hero-first-search", "homepage-hero")}
+              prefetch={false}
+              onClick={() => trackMarketingEvent("homepage_cta_click", { location: "hero", intent: "first_search" })}
+              className="group relative flex w-full sm:w-auto items-center justify-center gap-2.5 px-7 sm:px-9 py-3.5 sm:py-4 rounded-2xl bg-primary text-white text-sm sm:text-base font-bold transition-all shadow-glow-primary hover:shadow-lg hover:bg-primary-light hover:-translate-y-0.5 overflow-hidden"
+            >
               <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
               <Zap className="w-5 h-5 relative z-10" />
-              <span className="relative z-10">Start Free — No Card Needed</span>
+              <span className="relative z-10">Run First Lead Search Free</span>
               <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="#how-it-works" className="hidden sm:flex items-center gap-2 px-7 py-4 rounded-2xl border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground text-base font-medium transition-all hover:bg-surface/60 hover:-translate-y-0.5">
+            <a href="#first-search-preview" className="hidden sm:flex items-center gap-2 px-7 py-4 rounded-2xl border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground text-base font-medium transition-all hover:bg-surface/60 hover:-translate-y-0.5">
               <Play className="w-4 h-4" />
-              See how it works
+              Preview the first search
             </a>
           </motion.div>
+
+          <p className="mx-auto -mt-4 mb-8 max-w-xl text-xs leading-5 text-muted-foreground sm:text-sm">
+            No card required. Start with remote jobs, local businesses, or live job signals in under 60 seconds.
+          </p>
 
           <motion.div
             initial={false}
@@ -1080,6 +1272,8 @@ export default function HomepageClient() {
           </motion.div>
         </motion.div>
       </section>
+
+      <FirstSearchPreview />
 
       <LeadIntelligenceStrip />
 
@@ -1301,14 +1495,18 @@ export default function HomepageClient() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Link href="/auth?mode=signup" prefetch={false}
-                    className="group relative flex items-center gap-3 px-10 py-4 rounded-2xl bg-primary text-white text-lg font-bold transition-all shadow-glow-primary hover:shadow-xl hover:bg-primary-light hover:-translate-y-1 overflow-hidden">
+                  <Link
+                    href={signupHref("final-first-search", "homepage-final-cta")}
+                    prefetch={false}
+                    onClick={() => trackMarketingEvent("homepage_cta_click", { location: "final_cta", intent: "first_search" })}
+                    className="group relative flex items-center gap-3 px-10 py-4 rounded-2xl bg-primary text-white text-lg font-bold transition-all shadow-glow-primary hover:shadow-xl hover:bg-primary-light hover:-translate-y-1 overflow-hidden"
+                  >
                     <span className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Zap className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">Find My First Lead — Free</span>
+                    <span className="relative z-10">Run My First Search — Free</span>
                     <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <Link href="/auth?mode=signup&plan=pro" prefetch={false}
+                  <Link href={signupHref("pricing-interest", "homepage-final-cta")} prefetch={false}
                     className="flex items-center gap-2 px-8 py-4 rounded-2xl border border-gold/30 hover:border-gold/60 text-gold font-semibold text-base transition-all hover:-translate-y-0.5 hover:bg-gold/5">
                     <Star className="w-4 h-4 fill-gold" />
                     See Early Access

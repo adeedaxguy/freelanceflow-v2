@@ -134,10 +134,10 @@ export default function FeatureOverviewPage() {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/auth?mode=signup"
+                  href="/auth?mode=signup&intent=features-overview&source=features-hero"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
-                  Start Free
+                  Run first search free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
@@ -250,7 +250,7 @@ export default function FeatureOverviewPage() {
               Pick a niche, find real opportunities, save the best leads, and write the first pitch from the same workspace.
             </p>
             <Link
-              href="/auth?mode=signup"
+              href="/auth?mode=signup&intent=features-overview&source=features-final-cta"
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
             >
               Try iCloseLeads Free

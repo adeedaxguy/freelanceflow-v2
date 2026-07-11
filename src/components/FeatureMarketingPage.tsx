@@ -176,7 +176,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{page.description}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/auth?mode=signup"
+                  href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=feature-hero`}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
                   {page.cta.button}
@@ -333,7 +333,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
             <h2 className="text-3xl font-extrabold tracking-tight text-foreground">{page.cta.heading}</h2>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-muted-foreground">{page.cta.subheading}</p>
             <Link
-              href="/auth?mode=signup"
+              href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=feature-final-cta`}
               className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
             >
               {page.cta.button}

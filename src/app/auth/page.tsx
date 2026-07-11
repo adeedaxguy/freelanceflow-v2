@@ -25,6 +25,37 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: "Invalid email or password.",
 };
 
+const SIGNUP_INTENT_COPY = {
+  remote: {
+    badge: "Remote job search ready",
+    title: "Find remote client leads",
+    body: "Create your free account, then search fresh remote jobs by niche and turn the best match into a proposal.",
+  },
+  local: {
+    badge: "Local lead search ready",
+    title: "Find local business leads",
+    body: "Create your free account, then search local businesses, save prospects, and open owner/contact checks.",
+  },
+  live: {
+    badge: "Live job search ready",
+    title: "Find urgent client signals",
+    body: "Create your free account, then review fresh live job signals and draft outreach while the need is still warm.",
+  },
+  default: {
+    badge: "First search ready",
+    title: "Run your first lead search",
+    body: "Create your free account, then choose remote jobs, local businesses, or live job signals from the dashboard.",
+  },
+};
+
+function getSignupIntentCopy(intent: string) {
+  const normalized = intent.toLowerCase();
+  if (normalized.includes("remote")) return SIGNUP_INTENT_COPY.remote;
+  if (normalized.includes("local")) return SIGNUP_INTENT_COPY.local;
+  if (normalized.includes("live")) return SIGNUP_INTENT_COPY.live;
+  return SIGNUP_INTENT_COPY.default;
+}
+
 function strengthLabel(p: string): { label: string; color: string; width: string } {
   if (!p) return { label: "", color: "bg-border", width: "0%" };
   if (p.length < 6)  return { label: "Too short", color: "bg-destructive", width: "20%" };
@@ -72,6 +103,9 @@ function AuthForm() {
   const [referral,  setReferral]  = useState("");
   // Prefill plan from URL params
   const planParam = params.get("plan") ?? "";
+  const intentParam = params.get("intent") ?? "";
+  const sourceParam = params.get("source") ?? "";
+  const signupIntentCopy = getSignupIntentCopy(intentParam);
 
   // Sync mode from URL
   useEffect(() => {
@@ -116,6 +150,8 @@ function AuthForm() {
     (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", eventName, {
       auth_mode: mode,
       auth_step: step,
+      signup_intent: intentParam || "default",
+      signup_source: sourceParam || "direct",
       ...extra,
     });
   };
@@ -184,10 +220,15 @@ function AuthForm() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
+      const signupAttribution = [
+        referral,
+        intentParam ? `intent: ${intentParam}` : "",
+        sourceParam ? `source: ${sourceParam}` : "",
+      ].filter(Boolean).join(" | ");
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, expertise, referralSource: referral, plan: planParam }),
+        body: JSON.stringify({ name, email, password, expertise, referralSource: signupAttribution, plan: planParam }),
       });
       const data = await res.json() as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Registration failed");
@@ -196,7 +237,8 @@ function AuthForm() {
       trackAuthEvent("sign_up", {
         method: "credentials",
         selected_expertise_count: expertise.length,
-        has_referral_source: Boolean(referral),
+        has_referral_source: Boolean(signupAttribution),
+        signup_intent: intentParam || "default",
       });
       router.push("/dashboard");
     } catch (err) {
@@ -222,13 +264,23 @@ function AuthForm() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            Join 10,000+ freelancers growing their income
+            {mode === "signup" ? signupIntentCopy.badge : "Join 10,000+ freelancers growing their income"}
           </div>
           <h2 className="text-4xl font-extrabold text-foreground leading-tight mb-4">
-            Find your next<br /><span className="gradient-text">$10k client</span><br />in minutes.
+            {mode === "signup" ? (
+              <>
+                {signupIntentCopy.title}<br /><span className="gradient-text">in minutes.</span>
+              </>
+            ) : (
+              <>
+                Find your next<br /><span className="gradient-text">$10k client</span><br />in minutes.
+              </>
+            )}
           </h2>
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-            AI-powered lead discovery, personalized proposals, and safe Gmail-ready outreach — all in one place.
+            {mode === "signup"
+              ? signupIntentCopy.body
+              : "AI-powered lead discovery, personalized proposals, and safe Gmail-ready outreach — all in one place."}
           </p>
           <div className="space-y-3">
             {[
@@ -286,6 +338,17 @@ function AuthForm() {
                 <h1 className="text-2xl font-extrabold text-foreground mb-6">
                   {mode === "signin" ? "Welcome back" : "Create your account"}
                 </h1>
+
+                {mode === "signup" && (
+                  <div className="mb-6 rounded-2xl border border-accent/20 bg-accent/5 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-accent">
+                      <Zap className="h-4 w-4" />
+                      {signupIntentCopy.badge}
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-foreground">{signupIntentCopy.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{signupIntentCopy.body}</p>
+                  </div>
+                )}
 
                 {/* OAuth Buttons */}
                 {providersLoaded && oauthProviderCount > 0 && (
