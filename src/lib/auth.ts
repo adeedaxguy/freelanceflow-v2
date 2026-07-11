@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { notifyNewUserSignup } from "@/lib/admin-notifications";
 
 declare module "next-auth" {
   interface Session {
@@ -149,6 +150,19 @@ export const authOptions: NextAuthOptions = {
             user.id = newUser.id;
             (user as { role?: string; plan?: string }).role = newUser.role;
             (user as { role?: string; plan?: string }).plan = newUser.plan ?? "free";
+
+            try {
+              await notifyNewUserSignup({
+                id: newUser.id,
+                name: user.name ?? normalizedEmail.split("@")[0] ?? null,
+                email: normalizedEmail,
+                plan: newUser.plan ?? "free",
+                expertise: [],
+                referralSource: `${account.provider} OAuth`,
+              });
+            } catch (notificationError) {
+              console.error("[auth] OAuth signup notification failed:", notificationError);
+            }
           }
         } catch (err) {
           console.error(`[auth] ${account?.provider} signIn error:`, err);

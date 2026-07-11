@@ -111,6 +111,15 @@ function AuthForm() {
   const strength = strengthLabel(password);
   const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
 
+  const trackAuthEvent = (eventName: string, extra: Record<string, string | number | boolean> = {}) => {
+    if (typeof window === "undefined") return;
+    (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", eventName, {
+      auth_mode: mode,
+      auth_step: step,
+      ...extra,
+    });
+  };
+
   const handleGoogleSignIn = async () => {
     if (!oauthProviders.google) {
       setError("Google sign-in is not available right now. Please use email sign-in.");
@@ -118,9 +127,11 @@ function AuthForm() {
     }
     setGoogleLoading(true);
     setError("");
+    trackAuthEvent("auth_oauth_click", { provider: "google" });
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
     } catch {
+      trackAuthEvent("auth_oauth_error", { provider: "google" });
       setError("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
     }
@@ -133,9 +144,11 @@ function AuthForm() {
     }
     setGithubLoading(true);
     setError("");
+    trackAuthEvent("auth_oauth_click", { provider: "github" });
     try {
       await signIn("github", { callbackUrl: "/dashboard" });
     } catch {
+      trackAuthEvent("auth_oauth_error", { provider: "github" });
       setError("GitHub sign-in failed. Please try again.");
       setGithubLoading(false);
     }
@@ -147,16 +160,22 @@ function AuthForm() {
 
     if (mode === "signin") {
       const res = await signIn("credentials", { email, password, redirect: false });
-      if (res?.error) { setError("Invalid email or password"); setLoading(false); return; }
+      if (res?.error) {
+        trackAuthEvent("auth_login_error", { method: "credentials" });
+        setError("Invalid email or password"); setLoading(false); return;
+      }
+      trackAuthEvent("auth_login_success", { method: "credentials" });
       router.push("/dashboard");
       return;
     }
     // Sign up — validate then go to onboarding step
     if (password.length < 8) {
+      trackAuthEvent("auth_signup_step1_error", { reason: "password_too_short" });
       setError("Password must be at least 8 characters");
       setLoading(false);
       return;
     }
+    trackAuthEvent("auth_signup_step1_continue", { method: "credentials" });
     setLoading(false);
     setStep(2);
   };
@@ -174,8 +193,14 @@ function AuthForm() {
       if (!res.ok) throw new Error(data.error ?? "Registration failed");
       const signInRes = await signIn("credentials", { email, password, redirect: false });
       if (signInRes?.error) throw new Error("Login after registration failed");
+      trackAuthEvent("sign_up", {
+        method: "credentials",
+        selected_expertise_count: expertise.length,
+        has_referral_source: Boolean(referral),
+      });
       router.push("/dashboard");
     } catch (err) {
+      trackAuthEvent("auth_signup_error", { method: "credentials" });
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally { setLoading(false); }
   };
@@ -372,14 +397,14 @@ function AuthForm() {
                       <span className="w-6 h-1.5 rounded-full bg-border" />
                       <span className="w-6 h-1.5 rounded-full bg-primary" />
                     </div>
-                    <span className="text-xs font-bold text-primary-light uppercase tracking-wider">Step 2 of 2</span>
+                    <span className="text-xs font-bold text-primary-light uppercase tracking-wider">Optional setup</span>
                   </div>
-                  <h1 className="text-2xl font-extrabold text-foreground">Tell us about yourself</h1>
-                  <p className="text-muted-foreground text-sm mt-1">We use this to personalise your AI proposals and lead recommendations.</p>
+                  <h1 className="text-2xl font-extrabold text-foreground">Personalize your first search</h1>
+                  <p className="text-muted-foreground text-sm mt-1">Pick a niche if you want better first recommendations. You can leave this empty and change it later.</p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-foreground mb-3">Your Expertise <span className="text-muted-foreground font-normal">(pick up to 4)</span></label>
+                  <label className="block text-sm font-semibold text-foreground mb-3">Your Expertise <span className="text-muted-foreground font-normal">(optional, pick up to 4)</span></label>
                   <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
                     {NICHES.map(n => (
                       <button key={n.id} type="button" onClick={() => toggleExpertise(n.id)}
@@ -394,7 +419,7 @@ function AuthForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find iCloseLeads?</label>
+                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find iCloseLeads? <span className="text-muted-foreground font-normal">(optional)</span></label>
                   <div className="grid grid-cols-3 gap-2">
                     {REFERRAL_OPTIONS.map(r => (
                       <button key={r} type="button" onClick={() => setReferral(r)}
@@ -412,7 +437,7 @@ function AuthForm() {
                 <button type="submit" disabled={loading}
                   className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-hero text-white font-semibold transition-all shadow-glow-primary disabled:opacity-60">
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                  Launch My Dashboard
+                  Create Free Account
                 </button>
                 <button type="button" onClick={() => setStep(1)} className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors">
                   ← Back
