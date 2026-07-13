@@ -9,9 +9,9 @@ const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Lead Generation Resources for Web Design Leads, Local Leads, and Cold Outreach",
+  title: "Lead Generation Resources for Leads, Proposal Templates, Subject Lines, and Follow-Ups",
   description:
-    "Practical iCloseLeads resources for web design leads, businesses without websites, freelance cold outreach, local business prospecting, and first-step client acquisition workflows.",
+    "Practical iCloseLeads resources for web design leads, remote leads, proposal templates, subject lines, follow-up emails, local prospecting, and client acquisition workflows.",
   keywords: [
     "web design leads",
     "businesses without websites",
@@ -70,10 +70,10 @@ export default function ResourcesPage() {
               SEO-backed playbooks
             </div>
             <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Lead generation resources built for signups, first searches, and first outreach
+              Lead generation resources built for signups, first searches, proposals, and follow-ups
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, businesses without websites, local business opportunities, remote job signals, decision maker paths, and outreach angles that move a visitor toward a real account and workflow run.
+              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to find web design leads, businesses without websites, local business opportunities, remote job signals, proposal angles, subject lines, and follow-up workflows that move a visitor toward a real account and workflow run.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/auth?mode=signup&intent=resources-overview&source=resources-hero" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
@@ -108,7 +108,7 @@ export default function ResourcesPage() {
             {[
               "Every guide points to a product workflow, not a dead-end article.",
               "Each topic is tied to GSC, SERP, competitor, or product evidence.",
-              "Internal links connect resources to signup-intent use cases and feature pages.",
+              "Internal links connect resources to signup-intent use cases, proposal paths, and feature pages.",
             ].map((item) => (
               <div key={item} className="rounded-lg border border-border bg-background p-5 text-sm leading-6 text-muted-foreground">
                 <CheckCircle2 className="mb-3 h-5 w-5 text-accent" />

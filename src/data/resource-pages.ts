@@ -45,7 +45,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I found your business while checking local search results and noticed your website presence could be doing more to turn nearby searches into calls. I have a short idea for improving the site and quote flow if you are open to seeing it.",
     internalLinks: [
       { label: "Find local business leads", href: "/use-cases/local-business-leads" },
-      { label: "Lead discovery features", href: "/features/lead-discovery" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "AI proposal generator", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -56,6 +56,49 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         q: "Should I buy web design leads?",
         a: "Only if you can verify the business, the need, and the contact route. A smaller verified list usually beats a large generic list.",
+      },
+    ],
+  },
+  {
+    slug: "web-design-proposal-template",
+    title: "Web design proposal template that starts from a real lead",
+    metaTitle: "Web Design Proposal Template for Freelancers | Pitch Local and SMB Website Work",
+    metaDescription:
+      "Use a web design proposal template built for freelancers who pitch local businesses, outdated websites, and website-redesign leads with real context instead of generic filler.",
+    keyword: "web design proposal template",
+    audience: "Web designers, Webflow freelancers, WordPress developers, and small agencies",
+    intent: "The searcher wants a proposal structure that helps close website projects without sounding recycled.",
+    summary:
+      "A strong web design proposal template does not begin with your agency bio. It begins with the buyer's website problem, the business outcome, the scope you actually recommend, and one next step that feels easy to say yes to.",
+    leadIn:
+      "Use the lead signal before you write the proposal. If the business has no website, an outdated mobile experience, or a weak booking path, the proposal should reflect that exact gap. iCloseLeads helps you move from saved lead to AI-assisted draft while the context is still fresh enough to sound personal.",
+    steps: [
+      "Open the lead and write down the visible website or conversion problem first.",
+      "Frame the proposal around business outcomes like calls, quotes, bookings, trust, or speed to launch.",
+      "Keep scope tight enough that the buyer understands what happens first.",
+      "Show one relevant proof point instead of a full portfolio dump.",
+      "End with one clear next step such as a call, mockup review, or starter sprint.",
+    ],
+    proofPoints: [
+      "Public SERPs for web design proposal templates are dominated by broad template libraries, which leaves space for a freelancer-first page tied to real lead context.",
+      "iCloseLeads already connects local lead discovery, proposal drafting, and outreach preparation in one workflow.",
+      "This topic is a clean conversion bridge from acquisition intent into AI proposals, saved leads, and Gmail-ready outreach.",
+    ],
+    pitch:
+      "Hi, I checked your website and noticed one issue that may be costing you calls or quote requests. I put together a short proposal focused on fixing that first, with a clear scope and timeline if you want to review it.",
+    internalLinks: [
+      { label: "Web design leads", href: "/resources/web-design-leads" },
+      { label: "AI proposal generator", href: "/features/ai-proposals" },
+      { label: "Local business leads", href: "/use-cases/local-business-leads" },
+    ],
+    faqs: [
+      {
+        q: "What should a web design proposal include?",
+        a: "A good proposal includes the problem you noticed, the outcome you are aiming for, the proposed scope, timeline, investment framing, and one simple next step.",
+      },
+      {
+        q: "Should I use the same proposal for every website lead?",
+        a: "No. The structure can stay consistent, but the problem statement, proof, and scope should reflect the actual lead you are pitching.",
       },
     ],
   },
@@ -88,7 +131,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I noticed your business is visible locally but does not seem to have a dedicated website attached to the listing. A simple site could help people check services, trust you faster, and call with less friction.",
     internalLinks: [
       { label: "Local business leads use case", href: "/use-cases/local-business-leads" },
-      { label: "Find owner paths", href: "/features/lead-discovery" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "Track saved leads", href: "/features/crm-pipeline" },
     ],
     faqs: [
@@ -132,8 +175,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I found your post/profile while researching companies that may need help with [specific issue]. I noticed [signal]. I can help with a small first step that would make this easier to solve.",
     internalLinks: [
       { label: "Cold outreach use case", href: "/use-cases/freelance-cold-outreach" },
-      { label: "Email outreach feature", href: "/features/email-outreach" },
-      { label: "AI proposals", href: "/features/ai-proposals" },
+      { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
+      { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
     ],
     faqs: [
       {
@@ -175,7 +218,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I help local businesses turn search visibility into more calls. I found your listing and noticed a website improvement that could make it easier for customers to choose you.",
     internalLinks: [
       { label: "Local leads dashboard", href: "/use-cases/local-business-leads" },
-      { label: "Decision maker workflow", href: "/features/lead-discovery" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "CRM pipeline", href: "/features/crm-pipeline" },
     ],
     faqs: [
@@ -261,7 +304,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I checked your website from a mobile customer’s point of view and saw a few places where people may drop off before calling. I can show you a simple refresh plan focused on more enquiries.",
     internalLinks: [
       { label: "Local business lead filters", href: "/use-cases/local-business-leads" },
-      { label: "Create pitch drafts", href: "/features/ai-proposals" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "Web design leads guide", href: "/resources/web-design-leads" },
     ],
     faqs: [
@@ -304,7 +347,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I saw your remote post and the requirement around [specific need] stood out. I have handled similar work and can suggest a small first step to get this moving quickly.",
     internalLinks: [
       { label: "Remote jobs use case", href: "/use-cases/remote-job-leads" },
-      { label: "Lead discovery", href: "/features/lead-discovery" },
+      { label: "Remote job proposal template", href: "/resources/remote-job-proposal-template" },
       { label: "Proposal generator", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -315,6 +358,49 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         q: "Which remote leads should I save?",
         a: "Save leads with clear scope, recent posting time, strong niche match, and enough context to write a specific proposal.",
+      },
+    ],
+  },
+  {
+    slug: "remote-job-proposal-template",
+    title: "Remote job proposal template for freelancers",
+    metaTitle: "Remote Job Proposal Template | Write Better Freelance Project Pitches",
+    metaDescription:
+      "Use a remote job proposal template built for freelancers who reply to fresh job posts, contract opportunities, and project briefs with tighter, context-aware pitches.",
+    keyword: "remote job proposal template",
+    audience: "Freelancers pitching remote contract work, startup projects, and agency overflow work",
+    intent: "The searcher wants a proposal format that helps them reply quickly without sounding generic.",
+    summary:
+      "A remote job proposal template should help you reply fast, but the winning detail is still specificity. The best pitches mirror the client's brief, show one relevant proof point, and make the first deliverable feel low-friction.",
+    leadIn:
+      "Use the job post as the outline. Pull the scope clue, urgency signal, and likely first deliverable into the proposal before the listing goes stale. iCloseLeads helps you find the lead, save it, and draft a cleaner first response while the buyer's language is still visible.",
+    steps: [
+      "Read the full job post before drafting anything.",
+      "Mirror the buyer's stated scope in the opening line so they know the proposal is for them.",
+      "Choose one proof point that matches the project type, not your whole history.",
+      "Suggest a realistic first deliverable or first-week sprint.",
+      "Keep the close simple: invite a short reply, call, or review step.",
+    ],
+    proofPoints: [
+      "Remote-job SERPs reward fast, practical templates and examples more than vague application advice.",
+      "iCloseLeads already supports remote lead discovery, proposal drafting, and saved-lead follow-up in one product path.",
+      "This page supports signups from users who are ready to pitch now rather than browse generic remote-work content.",
+    ],
+    pitch:
+      "Hi, I saw your post and the need around [specific deliverable] stood out. I put together a short proposal focused on the first step I would take so you can judge fit quickly.",
+    internalLinks: [
+      { label: "Remote job leads", href: "/resources/remote-job-leads" },
+      { label: "Remote job use case", href: "/use-cases/remote-job-leads" },
+      { label: "AI proposal generator", href: "/features/ai-proposals" },
+    ],
+    faqs: [
+      {
+        q: "What should a remote job proposal focus on first?",
+        a: "Lead with the exact deliverable or problem named in the job post, then show one relevant proof point and the first step you would take.",
+      },
+      {
+        q: "How long should a remote proposal be?",
+        a: "Usually shorter than you think. The goal is clarity, fit, and momentum, not a long biography.",
       },
     ],
   },
@@ -405,6 +491,49 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     ],
   },
   {
+    slug: "freelance-proposal-subject-lines",
+    title: "Freelance proposal subject lines that do not look mass-sent",
+    metaTitle: "Freelance Proposal Subject Lines | Better Openers for Outreach and Pitches",
+    metaDescription:
+      "Write freelance proposal subject lines that reflect the lead context, the business problem, and the next step instead of generic outreach phrasing.",
+    keyword: "freelance proposal subject lines",
+    audience: "Freelancers writing proposals, cold emails, and first-touch outreach",
+    intent: "The searcher wants subject-line frameworks that help a proposal get opened without hurting trust.",
+    summary:
+      "A subject line should preview why the email matters to this buyer. Generic lines like quick question or following up waste your strongest signal. Use the lead context, service angle, or deliverable instead.",
+    leadIn:
+      "The subject line is not separate from the proposal. It should borrow the same reason for outreach: the job post, website gap, launch pressure, booking issue, or visible workflow problem. iCloseLeads can generate a first draft, but the best version still reflects the actual lead.",
+    steps: [
+      "Start with the buyer signal instead of your name or company name.",
+      "Use a deliverable, problem, or timing cue that already appears in the lead context.",
+      "Avoid fake urgency, gimmicks, and vague curiosity lines.",
+      "Keep the subject calm enough to fit a real business email.",
+      "Match the subject line to the first sentence so the open feels coherent.",
+    ],
+    proofPoints: [
+      "Public SERPs around subject lines skew toward broad sales advice, leaving room for a freelancer-specific page connected to real lead context.",
+      "iCloseLeads already supports subject-line generation inside the proposal and outreach workflow.",
+      "This page creates a direct bridge from informational search intent into AI proposals, email outreach, and free tools.",
+    ],
+    pitch:
+      "A better subject line usually sounds like the first line of a useful conversation: specific to the lead, honest about the offer, and calm enough to earn the open.",
+    internalLinks: [
+      { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+      { label: "AI proposal generator", href: "/features/ai-proposals" },
+      { label: "Email outreach feature", href: "/features/email-outreach" },
+    ],
+    faqs: [
+      {
+        q: "Should I use follow-up as the first subject line?",
+        a: "Usually no. A first-touch email should earn the open with a real reason, not pretend there was already a conversation.",
+      },
+      {
+        q: "What makes a proposal subject line feel human?",
+        a: "Specific context, plain language, and a direct connection to the buyer's problem make the email feel human instead of mass-sent.",
+      },
+    ],
+  },
+  {
     slug: "ai-proposal-generator-for-freelancers",
     title: "AI proposal generator for freelancers",
     metaTitle: "AI Proposal Generator for Freelancers | Turn Leads Into Better Pitches",
@@ -432,9 +561,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "I saw your need around [specific issue]. I can help with a focused first step: [outcome]. If useful, I can send a short plan showing what I would change first.",
     internalLinks: [
-      { label: "AI proposal feature", href: "/features/ai-proposals" },
-      { label: "Email outreach", href: "/features/email-outreach" },
-      { label: "Find leads first", href: "/features/lead-discovery" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      { label: "Remote job proposal template", href: "/resources/remote-job-proposal-template" },
+      { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
     ],
     faqs: [
       {
@@ -475,8 +604,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "Hi, I noticed a specific opportunity where my work could help with [business outcome]. I can share a quick first-step plan if you are open to it.",
     internalLinks: [
-      { label: "Lead discovery", href: "/features/lead-discovery" },
-      { label: "Use cases", href: "/use-cases" },
+      { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
+      { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
       { label: "CRM pipeline", href: "/features/crm-pipeline" },
     ],
     faqs: [
@@ -487,6 +616,49 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         q: "What should I improve first?",
         a: "Improve lead quality first. Better leads make proposals, follow-ups, and conversion easier.",
+      },
+    ],
+  },
+  {
+    slug: "proposal-follow-up-email",
+    title: "Proposal follow-up email that adds value instead of pressure",
+    metaTitle: "Proposal Follow-Up Email for Freelancers | Stay Top of Mind Without Sounding Pushy",
+    metaDescription:
+      "Write a proposal follow-up email that stays tied to the original lead, adds one useful detail, and keeps freelance deals moving without awkward pressure.",
+    keyword: "proposal follow up email",
+    audience: "Freelancers and agencies following up on proposals, quotes, and first-touch outreach",
+    intent: "The searcher wants a follow-up structure that increases replies without sounding robotic or desperate.",
+    summary:
+      "A proposal follow-up email works best when it adds context, not guilt. Remind the buyer why you reached out, include one useful detail, and make the next step easier than ignoring the message.",
+    leadIn:
+      "Most follow-ups fail because they forget the original signal. If the lead came from a job post, local business gap, or website issue, bring that back into the follow-up. iCloseLeads keeps the lead context, proposal draft, and follow-up path together so the second message does not feel disconnected.",
+    steps: [
+      "Wait long enough for the first message to be seen, but not so long that the context goes cold.",
+      "Reference the original problem or deliverable in one sentence.",
+      "Add one useful detail such as a clearer scope, a timeline note, or a practical suggestion.",
+      "Ask for one low-friction next step instead of a broad decision.",
+      "Track the follow-up date so the sequence stays intentional.",
+    ],
+    proofPoints: [
+      "Public follow-up-email SERPs are crowded with generic etiquette posts, which leaves room for a freelancer page grounded in real lead and proposal context.",
+      "iCloseLeads already supports Gmail-ready drafts, outreach history, and follow-up tracking.",
+      "This topic supports activation because users who need follow-up help usually also need saved leads, email history, and proposal context in one place.",
+    ],
+    pitch:
+      "Hi, following up on the proposal I sent over about [specific issue]. I added one practical idea below that may make the first step easier to evaluate if the timing is still right.",
+    internalLinks: [
+      { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+      { label: "Email outreach feature", href: "/features/email-outreach" },
+      { label: "CRM pipeline", href: "/features/crm-pipeline" },
+    ],
+    faqs: [
+      {
+        q: "What should a proposal follow-up email include?",
+        a: "Include the original context, one new useful detail, and a simple next step. That keeps the follow-up helpful instead of repetitive.",
+      },
+      {
+        q: "How many times should I follow up?",
+        a: "That depends on the lead and timing, but each follow-up should add context or value rather than repeat the same ask.",
       },
     ],
   },
@@ -519,7 +691,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I saw your recent need for [service]. Since this looks time-sensitive, I can help with a focused first step and send a quick plan today.",
     internalLinks: [
       { label: "Live job use case", href: "/use-cases/live-job-leads" },
-      { label: "Remote leads", href: "/resources/remote-job-leads" },
+      { label: "Remote job proposal template", href: "/resources/remote-job-proposal-template" },
       { label: "AI proposals", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -562,7 +734,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I found your business while researching local website opportunities. I noticed one practical change that could make it easier for customers to understand your services and contact you.",
     internalLinks: [
       { label: "Web design leads", href: "/resources/web-design-leads" },
-      { label: "Local business leads", href: "/use-cases/local-business-leads" },
+      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "Lead calculator", href: "/tools/lead-calculator" },
     ],
     faqs: [
