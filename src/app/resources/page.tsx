@@ -110,6 +110,12 @@ export default function ResourcesPage() {
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
               Guides for freelancers and agencies who need clients, not vague motivation. Learn how to compare lead generation tools, build a cold outreach CRM workflow, find decision-maker paths, qualify web design leads, write proposals, and follow up in a way that moves a visitor toward a real account and workflow run.
             </p>
+            <div className="mt-6 max-w-3xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
+              <p className="mt-3 text-base leading-7 text-foreground">
+                These resources help freelancers turn lead-generation searches into a practical next step: find a better prospect, understand why the lead matters, and move into iCloseLeads for the search, saved lead, proposal draft, and follow-up workflow.
+              </p>
+            </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/auth?mode=signup&intent=resources-overview&source=resources-hero" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
                 Start Free and Run a Search

@@ -93,6 +93,7 @@ function SectionHeader({
 
 export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }) {
   const otherUseCases = USE_CASE_PAGES.filter(item => item.slug !== page.slug);
+  const shortAnswer = `${page.title} work best when you start from a real buyer signal, qualify the fit quickly, and move the best lead into a proposal and follow-up workflow. iCloseLeads gives freelancers one place to search, save, draft, and track that process.`;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -115,6 +116,10 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl break-words text-lg leading-8 text-muted-foreground">{page.heroSummary}</p>
+              <div className="mt-6 max-w-2xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
+                <p className="mt-3 text-base leading-7 text-foreground">{shortAnswer}</p>
+              </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=use-case-hero`}

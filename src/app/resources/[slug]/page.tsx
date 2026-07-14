@@ -96,6 +96,7 @@ function ResourceJsonLd({ page }: { page: NonNullable<ReturnType<typeof getResou
 export default function ResourcePage({ params }: Props) {
   const page = getResourcePage(params.slug);
   if (!page) notFound();
+  const shortAnswer = `${page.summary} iCloseLeads helps ${page.audience.toLowerCase()} turn that workflow into a focused search, a saved lead, and a first outreach draft without bouncing between separate tools.`;
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -114,13 +115,9 @@ export default function ResourcePage({ params }: Props) {
                   {page.title}
                 </h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">{page.summary}</p>
-                <div className="ai-answer-box mt-6 max-w-3xl rounded-lg border border-accent/25 bg-accent/10 p-5 text-base leading-7 text-muted-foreground">
-                  <p>
-                    <strong className="text-foreground">Short answer:</strong> {page.summary}
-                  </p>
-                  <p className="mt-3">
-                    iCloseLeads connects this topic to a real freelancer workflow: find the lead, save the context, draft a proposal, prepare outreach, and track the follow-up from one account.
-                  </p>
+                <div className="ai-answer-box mt-6 max-w-3xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
+                  <p className="mt-3 text-base leading-7 text-foreground">{shortAnswer}</p>
                 </div>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-hero`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">

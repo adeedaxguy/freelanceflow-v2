@@ -152,6 +152,7 @@ function FeatureCard({ item, page }: { item: FeatureItem; page: FeaturePageData 
 
 export default function FeatureMarketingPage({ page }: { page: FeaturePageData }) {
   const otherFeatures = FEATURE_PAGES.filter(item => item.slug !== page.slug);
+  const shortAnswer = `${page.eyebrow} helps freelancers move from a lead signal to the next action faster by keeping the workflow inside iCloseLeads instead of splitting research, drafting, and follow-up across separate tools. ${page.promise}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -174,6 +175,10 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{page.description}</p>
+              <div className="mt-6 max-w-2xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
+                <p className="mt-3 text-base leading-7 text-foreground">{shortAnswer}</p>
+              </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=feature-hero`}
