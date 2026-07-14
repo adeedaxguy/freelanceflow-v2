@@ -55,6 +55,23 @@ function ResourceJsonLd({ page }: { page: NonNullable<ReturnType<typeof getResou
     },
     {
       "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "iCloseLeads",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: BASE_URL,
+      audience: { "@type": "Audience", audienceType: page.audience },
+      featureList: [
+        "Lead discovery",
+        "Saved lead context",
+        "AI proposal drafting",
+        "Email outreach preparation",
+        "CRM follow-up tracking",
+      ],
+      description: `iCloseLeads helps ${page.audience.toLowerCase()} find leads, save context, draft proposals, prepare outreach, and track follow-up.`,
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: page.faqs.map((faq) => ({
         "@type": "Question",

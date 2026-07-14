@@ -1496,6 +1496,1150 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       }
     ]
   },
+  {
+    "slug": "lead-list-builder-for-freelancers",
+    "title": "Lead list builder workflow for freelancers",
+    "metaTitle": "Lead List Builder for Freelancers | Build Smaller Lists That Convert",
+    "metaDescription": "Use a lead list builder workflow that starts with niche, signal, fit, contact path, and follow-up instead of a generic spreadsheet.",
+    "keyword": "lead list builder",
+    "audience": "Freelancers and solo agencies building their first outbound client list",
+    "intent": "The searcher wants software or a process for building a targeted prospect list.",
+    "summary": "A lead list builder is useful when it helps you choose better prospects, not just more rows. The strongest lists start with one offer, one buyer type, a visible business signal, and a clear follow-up path.",
+    "leadIn": "iCloseLeads helps freelancers turn lead-list building into a real workflow: search one niche, qualify the signal, save the lead, draft the pitch, and track the next step before moving to another prospect.",
+    "steps": [
+      "Choose one service offer and one buyer segment for the list.",
+      "Search for leads with public signals that match the offer.",
+      "Remove companies you cannot explain in one sentence.",
+      "Save fit notes, contact route, and the first pitch angle.",
+      "Move qualified leads into proposal and follow-up stages."
+    ],
+    "proofPoints": [
+      "Round 1 Ahrefs Content Gap research showed adjacent lead-generation and prospecting gaps around tools, services, and outbound workflows.",
+      "Public SERP patterns reward pages that explain list quality, source fit, and follow-up rather than raw database volume.",
+      "This topic maps directly to iCloseLeads signup, first search, saved lead, proposal, and CRM activation."
+    ],
+    "pitch": "Hi, I am building a focused list of companies around [niche] and noticed [public signal]. I had one practical idea for improving [outcome] if you are open to the short version.",
+    "internalLinks": [
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Freelance client acquisition software",
+        "href": "/resources/freelance-client-acquisition-software"
+      },
+      {
+        "label": "Outbound lead generation software",
+        "href": "/resources/outbound-lead-generation-software-for-freelancers"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is a lead list builder?",
+        "a": "A lead list builder is a workflow or tool for collecting, qualifying, and organizing prospects before outreach."
+      },
+      {
+        "q": "What should freelancers track in a lead list?",
+        "a": "Track niche, source, business signal, contact route, pitch reason, stage, last touch, and next follow-up."
+      }
+    ]
+  },
+  {
+    "slug": "sales-prospecting-tool-for-freelancers",
+    "title": "Sales prospecting tool workflow for freelancers",
+    "metaTitle": "Sales Prospecting Tool for Freelancers | Find Leads and Pitch With Context",
+    "metaDescription": "A freelancer-friendly sales prospecting tool workflow for finding qualified businesses, saving context, writing outreach, and following up.",
+    "keyword": "sales prospecting tool",
+    "audience": "Freelancers who need a repeatable way to find and contact potential clients",
+    "intent": "The searcher wants a tool that helps with proactive sales prospecting.",
+    "summary": "A sales prospecting tool should help you move from a real business signal to a relevant conversation. For freelancers, the key is context: who the prospect is, why now, and what first step makes sense.",
+    "leadIn": "Use iCloseLeads as a prospecting workspace instead of a disconnected search tab. Find the lead, save the reason, draft the message, and keep the follow-up tied to the original signal.",
+    "steps": [
+      "Start with a niche and offer instead of a broad company search.",
+      "Look for timing or need signals that make outreach relevant.",
+      "Save the lead only if the pitch angle is clear.",
+      "Write the first message around the signal and outcome.",
+      "Use CRM stages to avoid losing warm prospects."
+    ],
+    "proofPoints": [
+      "Ahrefs gap work and live SERP checks both point toward prospecting-tool intent as a strong bridge between research and signup.",
+      "Competitor pages often emphasize database size; iCloseLeads can compete on workflow quality and freelancer fit.",
+      "The page supports activation because it points users toward one search, one saved lead, and one pitch."
+    ],
+    "pitch": "Hi, I found your company while researching [segment]. I noticed [signal] and thought there may be a focused way to help with [outcome].",
+    "internalLinks": [
+      {
+        "label": "Lead list builder",
+        "href": "/resources/lead-list-builder-for-freelancers"
+      },
+      {
+        "label": "Lead discovery feature",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/resources/freelance-cold-outreach"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What makes a sales prospecting tool useful for freelancers?",
+        "a": "It should help them find fit, save context, write a specific pitch, and follow up without managing multiple disconnected spreadsheets."
+      },
+      {
+        "q": "Should freelancers prospect at high volume?",
+        "a": "Usually no. Smaller batches with clearer signals tend to create better conversations and lower outreach risk."
+      }
+    ]
+  },
+  {
+    "slug": "b2b-prospecting-tool-for-freelancers",
+    "title": "B2B prospecting tool for freelancers and small teams",
+    "metaTitle": "B2B Prospecting Tool for Freelancers | Qualify Before Outreach",
+    "metaDescription": "Use a B2B prospecting tool workflow to find companies, qualify public signals, choose contact paths, and send more relevant freelance outreach.",
+    "keyword": "b2b prospecting tool",
+    "audience": "Freelancers and small teams selling services to businesses",
+    "intent": "The searcher wants software for finding and qualifying B2B prospects.",
+    "summary": "A B2B prospecting tool is strongest when it helps you identify fit before outreach. The best prospects have a matching business type, visible need, contact route, and reason to reply.",
+    "leadIn": "iCloseLeads gives B2B prospecting a freelancer-friendly path: search a defined segment, save company context, prepare the proposal or email, and track the opportunity from first contact to follow-up.",
+    "steps": [
+      "Define the B2B segment and problem you solve.",
+      "Search for companies with public signals related to that problem.",
+      "Check whether the buyer role is likely reachable.",
+      "Write a pitch that speaks to the business outcome.",
+      "Review replies and refine the segment weekly."
+    ],
+    "proofPoints": [
+      "Round 1 Ahrefs Content Gap research surfaced B2B lead-generation and outbound software terms that fit iCloseLeads' product path.",
+      "B2B prospecting pages can rank when they answer process, tool, and qualification questions clearly.",
+      "The workflow strengthens iCloseLeads' association with B2B prospecting, qualified leads, and outreach follow-up."
+    ],
+    "pitch": "Hi, I work with [B2B segment] on [outcome]. I noticed [signal] and thought there may be a simple first step worth testing.",
+    "internalLinks": [
+      {
+        "label": "B2B lead generation agency alternative",
+        "href": "/resources/b2b-lead-generation-agency-alternative"
+      },
+      {
+        "label": "Outbound lead generation software",
+        "href": "/resources/outbound-lead-generation-software-for-freelancers"
+      },
+      {
+        "label": "Sales pipeline guide",
+        "href": "/resources/sales-pipeline-for-freelancers"
+      },
+      {
+        "label": "Analytics dashboard",
+        "href": "/features/analytics"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is B2B prospecting?",
+        "a": "B2B prospecting is the process of finding and qualifying businesses that may need your service before starting a sales conversation."
+      },
+      {
+        "q": "How should freelancers choose B2B prospects?",
+        "a": "Choose prospects with segment fit, a visible business signal, a reachable contact path, and a clear reason your offer helps."
+      }
+    ]
+  },
+  {
+    "slug": "client-acquisition-platform-for-freelancers",
+    "title": "Client acquisition platform for freelancers",
+    "metaTitle": "Client Acquisition Platform for Freelancers | From Lead Search to Follow-Up",
+    "metaDescription": "A practical client acquisition platform workflow for freelancers: find leads, qualify fit, draft proposals, send outreach, and manage follow-up.",
+    "keyword": "client acquisition platform",
+    "audience": "Freelancers who want one workflow for finding and closing better clients",
+    "intent": "The searcher wants software that supports the full client acquisition process.",
+    "summary": "A client acquisition platform should connect the whole path from lead discovery to follow-up. If the tools are disconnected, freelancers lose the reason they found the lead in the first place.",
+    "leadIn": "iCloseLeads is built around the full acquisition loop: find a lead, keep the context, generate a proposal, prepare outreach, and track the next action from the same account.",
+    "steps": [
+      "Pick the offer and client segment before searching.",
+      "Find leads through local, remote, or live job signals.",
+      "Save the reason each lead is worth pitching.",
+      "Draft the first proposal or email from context.",
+      "Track every follow-up until the lead is won, paused, or disqualified."
+    ],
+    "proofPoints": [
+      "GA4 and product-path evidence from earlier rounds show that signup, proposal, and CRM activation matter more than traffic alone.",
+      "Ahrefs competitor gaps around tools and software create an opening for a workflow-first acquisition page.",
+      "The page creates a clear conversion bridge from search intent into account creation."
+    ],
+    "pitch": "Hi, I noticed [public signal] while researching companies in [segment]. I can send a short idea for [outcome] if this is a priority.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition",
+        "href": "/resources/freelance-client-acquisition"
+      },
+      {
+        "label": "Lead generation tools",
+        "href": "/resources/best-lead-generation-tools-for-freelancers"
+      },
+      {
+        "label": "AI proposal generator",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is a client acquisition platform?",
+        "a": "It is software that helps you find prospects, qualify them, prepare outreach or proposals, and manage follow-up until there is an outcome."
+      },
+      {
+        "q": "Why should freelancers use one platform?",
+        "a": "Keeping lead context, pitch, and follow-up together makes outreach more specific and easier to maintain."
+      }
+    ]
+  },
+  {
+    "slug": "freelance-lead-management",
+    "title": "Freelance lead management workflow",
+    "metaTitle": "Freelance Lead Management | Track Leads, Pitches, and Follow-Ups",
+    "metaDescription": "Manage freelance leads with a simple workflow for stages, notes, pitch context, follow-up dates, and outcomes.",
+    "keyword": "freelance lead management",
+    "audience": "Freelancers who have prospects but inconsistent follow-up",
+    "intent": "The searcher wants to organize leads and avoid losing opportunities.",
+    "summary": "Freelance lead management is the discipline of knowing where every prospect came from, why they fit, what was sent, and what should happen next.",
+    "leadIn": "iCloseLeads turns lead management into a daily operating system: save the lead, keep the pitch reason, move stages, and schedule the next action before the opportunity goes cold.",
+    "steps": [
+      "Create stages for new, qualified, contacted, follow-up, won, paused, and not fit.",
+      "Save source and signal notes with each lead.",
+      "Attach the proposal or outreach angle to the record.",
+      "Set the next follow-up date before leaving the lead.",
+      "Review stuck leads at the end of each week."
+    ],
+    "proofPoints": [
+      "Sales pipeline and CRM topics appeared in the Ahrefs-backed support cluster from earlier rounds.",
+      "Lead management supports product activation after a visitor signs up and saves the first lead.",
+      "This page reinforces iCloseLeads as a CRM-lite workflow for freelancer acquisition."
+    ],
+    "pitch": "Hi, I reached out earlier because [signal] suggested [outcome] may be worth improving. I wanted to follow up with the short version of the idea.",
+    "internalLinks": [
+      {
+        "label": "Sales pipeline for freelancers",
+        "href": "/resources/sales-pipeline-for-freelancers"
+      },
+      {
+        "label": "CRM pipeline feature",
+        "href": "/features/crm-pipeline"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/resources/freelance-cold-outreach"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead management for freelancers?",
+        "a": "It is the process of tracking prospects, qualification notes, outreach, follow-ups, and outcomes so client acquisition does not depend on memory."
+      },
+      {
+        "q": "What is the most important field to track?",
+        "a": "The reason the lead fits your offer. Without that, follow-up becomes generic."
+      }
+    ]
+  },
+  {
+    "slug": "lead-qualification-checklist-for-freelancers",
+    "title": "Lead qualification checklist for freelancers",
+    "metaTitle": "Lead Qualification Checklist for Freelancers | Before You Send Outreach",
+    "metaDescription": "Use this lead qualification checklist to confirm fit, signal, contact route, timing, value, and follow-up before pitching a freelance prospect.",
+    "keyword": "lead qualification checklist",
+    "audience": "Freelancers who want fewer poor-fit pitches and better prospecting discipline",
+    "intent": "The searcher wants a checklist for deciding whether a lead is worth contacting.",
+    "summary": "Lead qualification protects your time. A prospect should pass fit, signal, contact path, timing, and offer relevance before it enters your outreach pipeline.",
+    "leadIn": "Use iCloseLeads to save the checklist outcome with each lead so your pipeline stays focused on prospects you can actually explain, pitch, and follow up.",
+    "steps": [
+      "Fit: does the business match your niche and offer?",
+      "Signal: is there a public reason to reach out now?",
+      "Contact: is there a credible route to the right person or inbox?",
+      "Value: can your service plausibly improve a business outcome?",
+      "Follow-up: do you know the next step after the first message?"
+    ],
+    "proofPoints": [
+      "Qualification content supports high-intent prospecting keywords without encouraging spammy outreach.",
+      "Competitor pages often skip the operational checklist freelancers need before sending.",
+      "The checklist creates a strong internal link bridge into lead discovery, CRM, and proposal workflows."
+    ],
+    "pitch": "Hi, I found [company] while checking [niche] businesses and noticed [signal]. It looks like there may be a practical opportunity around [outcome].",
+    "internalLinks": [
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Lead scoring for freelancers",
+        "href": "/resources/lead-scoring-for-freelancers"
+      },
+      {
+        "label": "Email validator checklist",
+        "href": "/resources/email-validator-for-freelance-leads"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What makes a lead qualified?",
+        "a": "A qualified lead matches your offer, shows a relevant signal, has a credible contact route, and deserves a specific next step."
+      },
+      {
+        "q": "Should freelancers qualify before finding emails?",
+        "a": "Yes. Contact research is only useful after the company is worth contacting."
+      }
+    ]
+  },
+  {
+    "slug": "lead-scoring-for-freelancers",
+    "title": "Lead scoring for freelancers",
+    "metaTitle": "Lead Scoring for Freelancers | Prioritize Prospects Before Outreach",
+    "metaDescription": "Score freelance leads by niche fit, urgency, contact path, business value, pitch clarity, and follow-up readiness.",
+    "keyword": "lead scoring for freelancers",
+    "audience": "Freelancers and agencies choosing which prospects to pitch first",
+    "intent": "The searcher wants a practical way to prioritize leads.",
+    "summary": "Lead scoring helps freelancers decide what to work on first. The best score is simple: fit, timing, visible need, contact route, value, and confidence in the pitch.",
+    "leadIn": "iCloseLeads works best when every saved lead has a clear priority. Use scoring to focus the day on the prospects most likely to become conversations, not the easiest rows to collect.",
+    "steps": [
+      "Give fit a high score when the prospect matches your exact offer.",
+      "Add urgency when the signal is recent or time-sensitive.",
+      "Score contact route based on clarity and role fit.",
+      "Score value based on the business outcome you can improve.",
+      "Lower the score when the pitch reason feels weak."
+    ],
+    "proofPoints": [
+      "Freelance lead scoring is already part of the site's broader content footprint and fits the CRM activation path.",
+      "This resource creates a direct answer page for users deciding which lead to contact next.",
+      "The scoring model supports higher-quality outreach and stronger follow-up discipline."
+    ],
+    "pitch": "Hi, I prioritized reaching out because [signal] suggests [outcome] may be timely. I can send one practical suggestion if you are reviewing this area.",
+    "internalLinks": [
+      {
+        "label": "Lead qualification checklist",
+        "href": "/resources/lead-qualification-checklist-for-freelancers"
+      },
+      {
+        "label": "Freelance lead management",
+        "href": "/resources/freelance-lead-management"
+      },
+      {
+        "label": "Analytics dashboard",
+        "href": "/features/analytics"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What should freelancers include in lead scoring?",
+        "a": "Use fit, timing, need, contact route, value, and pitch clarity. Keep the system simple enough to use daily."
+      },
+      {
+        "q": "Does lead scoring predict closing?",
+        "a": "No score guarantees a close, but it helps you spend more time on prospects with better evidence."
+      }
+    ]
+  },
+  {
+    "slug": "local-business-lead-generation-software",
+    "title": "Local business lead generation software for freelancers",
+    "metaTitle": "Local Business Lead Generation Software | Find and Pitch Better SMB Leads",
+    "metaDescription": "Use local business lead generation software to find SMB prospects, qualify public signals, draft outreach, and manage follow-up.",
+    "keyword": "local business lead generation software",
+    "audience": "Freelancers selling web design, SEO, ads, automation, content, or consulting to local businesses",
+    "intent": "The searcher wants software for finding local business prospects.",
+    "summary": "Local business lead generation works when the lead has context: category, location, website status, phone route, reviews, and a business reason to improve.",
+    "leadIn": "iCloseLeads helps freelancers search local niches, save the business context, prepare a pitch, and follow up from one workflow instead of juggling search tabs and spreadsheets.",
+    "steps": [
+      "Pick one local category and service offer.",
+      "Search one city, suburb, or region at a time.",
+      "Qualify profile completeness, website status, reviews, and contact route.",
+      "Save notes about the business outcome you can improve.",
+      "Draft a short pitch and schedule follow-up."
+    ],
+    "proofPoints": [
+      "Local business leads remain one of the strongest project-fit clusters for iCloseLeads.",
+      "SERP competitors often focus on lists; iCloseLeads can compete through qualification, proposal, and CRM workflow depth.",
+      "The page supports users who need real prospects for web design, SEO, ads, and local service offers."
+    ],
+    "pitch": "Hi, I found your business while checking local results for [category]. I noticed [signal] and had one practical idea that could help more customers contact you.",
+    "internalLinks": [
+      {
+        "label": "Local business leads",
+        "href": "/use-cases/local-business-leads"
+      },
+      {
+        "label": "Businesses without websites",
+        "href": "/resources/businesses-without-websites"
+      },
+      {
+        "label": "Website design prospecting",
+        "href": "/resources/website-design-prospecting"
+      },
+      {
+        "label": "Web design proposal template",
+        "href": "/resources/web-design-proposal-template"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is local business lead generation software?",
+        "a": "It is software that helps you find, qualify, organize, and follow up with local business prospects."
+      },
+      {
+        "q": "Which local leads should freelancers prioritize?",
+        "a": "Prioritize leads with a visible business need, reachable contact route, active local demand, and a clear fit for your offer."
+      }
+    ]
+  },
+  {
+    "slug": "google-maps-lead-generation-for-freelancers",
+    "title": "Google Maps lead generation for freelancers",
+    "metaTitle": "Google Maps Lead Generation for Freelancers | Qualify Local Prospects",
+    "metaDescription": "Use Google Maps lead generation carefully: qualify business profiles, website gaps, contact routes, and pitch angles before outreach.",
+    "keyword": "google maps lead generation",
+    "audience": "Freelancers prospecting local businesses from public map and search signals",
+    "intent": "The searcher wants to use map listings as a source of local leads.",
+    "summary": "Google Maps lead generation is not about scraping every listing. It works when you use public profile signals to identify businesses where your service can improve calls, bookings, trust, or visibility.",
+    "leadIn": "iCloseLeads helps turn local map-style research into a cleaner workflow: qualify the business, save the reason, draft the outreach, and track follow-up instead of collecting unqualified names.",
+    "steps": [
+      "Search one local category and region at a time.",
+      "Look for profile, website, review, and service clues.",
+      "Avoid outreach when the business need is unclear.",
+      "Save a specific reason before drafting the message.",
+      "Use follow-up sparingly and respectfully."
+    ],
+    "proofPoints": [
+      "Public SERPs show persistent demand around map-based prospecting and local lead discovery.",
+      "This page gives iCloseLeads a safer, quality-led answer to a topic that can otherwise become spammy.",
+      "The workflow ties local discovery to proposals, CRM, and signup activation."
+    ],
+    "pitch": "Hi, I found your business while checking local listings for [category]. I noticed [public signal] and had one specific idea for improving [outcome].",
+    "internalLinks": [
+      {
+        "label": "Local business lead generation software",
+        "href": "/resources/local-business-lead-generation-software"
+      },
+      {
+        "label": "Local business leads use case",
+        "href": "/use-cases/local-business-leads"
+      },
+      {
+        "label": "Outdated website leads",
+        "href": "/resources/outdated-website-leads"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Can freelancers use Google Maps for lead generation?",
+        "a": "Yes, when they use public business signals responsibly and contact only businesses with a relevant, specific reason."
+      },
+      {
+        "q": "What should I avoid?",
+        "a": "Avoid mass scraping, generic pitches, private assumptions, and outreach that cannot be tied to a clear business benefit."
+      }
+    ]
+  },
+  {
+    "slug": "cold-email-outreach-software-for-freelancers",
+    "title": "Cold email outreach software for freelancers",
+    "metaTitle": "Cold Email Outreach Software for Freelancers | Context Before Volume",
+    "metaDescription": "Use cold email outreach software with qualified freelance leads, context-rich pitches, safer follow-up, and CRM tracking.",
+    "keyword": "cold email outreach software",
+    "audience": "Freelancers preparing to send direct outreach to qualified prospects",
+    "intent": "The searcher wants software to manage cold email outreach.",
+    "summary": "Cold email outreach software should help you send more relevant messages, not hide weak targeting behind volume. The lead reason matters more than the automation.",
+    "leadIn": "iCloseLeads connects lead discovery, saved context, proposal drafting, and outreach preparation so your first message can reference the actual reason you found the prospect.",
+    "steps": [
+      "Qualify the company before writing the email.",
+      "Write the opener from the public signal.",
+      "Keep the first ask small and relevant.",
+      "Track follow-up dates and outcomes.",
+      "Stop or pause when the fit is weak."
+    ],
+    "proofPoints": [
+      "Email outreach and verifier topics appeared as strong adjacent gaps in earlier Ahrefs research.",
+      "The page supports users close to taking action, which fits signup and activation goals.",
+      "It positions iCloseLeads around responsible, context-led outreach rather than generic sending volume."
+    ],
+    "pitch": "Hi, I found [company] while researching [segment] and noticed [signal]. I had a short idea for [outcome] if it is useful.",
+    "internalLinks": [
+      {
+        "label": "Email outreach feature",
+        "href": "/features/email-outreach"
+      },
+      {
+        "label": "Email verifier workflow",
+        "href": "/resources/email-verifier-for-cold-outreach"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/resources/freelance-cold-outreach"
+      },
+      {
+        "label": "Cold outreach CRM",
+        "href": "/resources/cold-outreach-crm-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What should cold email outreach software do for freelancers?",
+        "a": "It should help them organize qualified leads, write specific messages, manage follow-up, and avoid sending disconnected bulk outreach."
+      },
+      {
+        "q": "Is cold email legal?",
+        "a": "Rules depend on the recipient location and context. Freelancers should use transparent, relevant outreach and respect unsubscribe or no-contact requests."
+      }
+    ]
+  },
+  {
+    "slug": "proposal-generator-for-freelancers",
+    "title": "Proposal generator for freelancers",
+    "metaTitle": "Proposal Generator for Freelancers | Write From Lead Context",
+    "metaDescription": "Use a proposal generator for freelancers that starts from the actual lead signal, scope, outcome, and next step.",
+    "keyword": "proposal generator for freelancers",
+    "audience": "Freelancers who need to turn leads into specific proposals faster",
+    "intent": "The searcher wants software or a process to generate better freelance proposals.",
+    "summary": "A proposal generator is only useful when it starts from the real lead context. The strongest proposal explains the problem noticed, the outcome, the recommended first step, and why the freelancer is relevant.",
+    "leadIn": "iCloseLeads connects the saved lead and AI proposal workflow so the draft can use the business signal instead of a generic template.",
+    "steps": [
+      "Open the saved lead before generating a proposal.",
+      "Write the problem statement from the buyer's context.",
+      "Choose one outcome and one first deliverable.",
+      "Keep proof relevant to the lead type.",
+      "End with a low-friction next step."
+    ],
+    "proofPoints": [
+      "Proposal and outreach pages are central to iCloseLeads activation after a user finds a lead.",
+      "SERP competitors often provide templates; iCloseLeads can compete by tying generation to a real saved lead.",
+      "The page reinforces the product's AI proposal feature without inventing performance claims."
+    ],
+    "pitch": "Hi, I reviewed [signal] and put together a short proposal around [outcome]. The first step would be [deliverable], then we can decide whether a larger project makes sense.",
+    "internalLinks": [
+      {
+        "label": "AI proposal generator",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Web design proposal template",
+        "href": "/resources/web-design-proposal-template"
+      },
+      {
+        "label": "Remote job proposal template",
+        "href": "/resources/remote-job-proposal-template"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What makes a proposal generator good for freelancers?",
+        "a": "It should turn lead context into a clear problem, outcome, scope, proof point, and next step."
+      },
+      {
+        "q": "Should freelancers send AI-generated proposals unchanged?",
+        "a": "No. Review the draft, remove unsupported claims, and make sure it matches the actual lead."
+      }
+    ]
+  },
+  {
+    "slug": "freelance-outreach-automation",
+    "title": "Freelance outreach automation without losing context",
+    "metaTitle": "Freelance Outreach Automation | Automate Follow-Up, Not Bad Targeting",
+    "metaDescription": "A safer freelance outreach automation workflow for qualified leads, specific messages, follow-up reminders, and CRM stages.",
+    "keyword": "freelance outreach automation",
+    "audience": "Freelancers who want outreach systems without becoming generic or spammy",
+    "intent": "The searcher wants to automate part of their outreach workflow.",
+    "summary": "Freelance outreach automation should reduce admin work, not remove judgment. Automate reminders, stages, and drafts only after the lead is qualified and the message is specific.",
+    "leadIn": "iCloseLeads keeps automation grounded in context: the saved lead, the pitch reason, the proposal, and the follow-up stage stay connected.",
+    "steps": [
+      "Qualify every lead before automation enters the workflow.",
+      "Use automation for reminders and organization first.",
+      "Review message drafts before sending.",
+      "Keep the follow-up tied to the original signal.",
+      "Stop sequences when the lead becomes irrelevant or risky."
+    ],
+    "proofPoints": [
+      "Automation intent is valuable, but backlink and outreach policies require relevance, truthfulness, and risk control.",
+      "This resource positions iCloseLeads as a safer operating system for outreach, not a spam tool.",
+      "The page supports activation into CRM stages and follow-up workflows."
+    ],
+    "pitch": "Hi, I followed up because [original signal] still looks relevant to [outcome]. If this is not a priority, I will close the loop.",
+    "internalLinks": [
+      {
+        "label": "Cold email outreach software",
+        "href": "/resources/cold-email-outreach-software-for-freelancers"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      },
+      {
+        "label": "Email outreach",
+        "href": "/features/email-outreach"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What parts of freelance outreach should be automated?",
+        "a": "Automate reminders, stage movement, templates, and draft organization. Keep targeting and final message review human."
+      },
+      {
+        "q": "What should not be automated?",
+        "a": "Do not automate outreach to unqualified leads, risky claims, misleading subject lines, or follow-ups after someone opts out."
+      }
+    ]
+  },
+  {
+    "slug": "find-business-owner-email",
+    "title": "How to find a business owner email responsibly",
+    "metaTitle": "Find Business Owner Email | Responsible Prospecting Workflow",
+    "metaDescription": "Find a business owner email responsibly by qualifying the company, checking public contact paths, and writing outreach around a real business signal.",
+    "keyword": "find business owner email",
+    "audience": "Freelancers and small agencies prospecting owner-led businesses",
+    "intent": "The searcher wants to contact the owner or decision maker of a business.",
+    "summary": "Finding a business owner email should come after qualification. First confirm the company, the business reason, and whether owner outreach is appropriate.",
+    "leadIn": "iCloseLeads helps you keep contact research attached to the business context so the eventual outreach is specific, respectful, and easier to track.",
+    "steps": [
+      "Confirm that the owner is the right decision maker.",
+      "Check public website, profile, and contact pages first.",
+      "Avoid private assumptions or sensitive personal details.",
+      "Save the business reason and contact route.",
+      "Write a short message that gives the owner an easy next step."
+    ],
+    "proofPoints": [
+      "Decision-maker and email lookup topics are already validated by earlier gap research and internal resource pages.",
+      "Owner-led businesses fit iCloseLeads' local prospecting and web design lead workflows.",
+      "The page answers contact-intent queries while keeping the outreach approach safe and context-led."
+    ],
+    "pitch": "Hi, I found your business while checking [category] companies and noticed [signal]. If you are the right person, I can send a short idea for improving [outcome].",
+    "internalLinks": [
+      {
+        "label": "Find decision maker email",
+        "href": "/resources/find-decision-maker-email-small-business"
+      },
+      {
+        "label": "Email lookup workflow",
+        "href": "/resources/email-lookup-for-freelance-outreach"
+      },
+      {
+        "label": "Local business leads",
+        "href": "/use-cases/local-business-leads"
+      },
+      {
+        "label": "Lead qualification checklist",
+        "href": "/resources/lead-qualification-checklist-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Should I always contact the owner?",
+        "a": "No. Contact the owner only when they are likely to own the decision and the outreach reason is relevant."
+      },
+      {
+        "q": "What should I avoid when looking for owner emails?",
+        "a": "Avoid sensitive personal details, private assumptions, scraped personal data, and messages with no clear business reason."
+      }
+    ]
+  },
+  {
+    "slug": "small-business-leads-for-freelancers",
+    "title": "Small business leads for freelancers",
+    "metaTitle": "Small Business Leads for Freelancers | Find Better SMB Prospects",
+    "metaDescription": "Find small business leads by category, location, website status, contact route, and pitch-ready business signals.",
+    "keyword": "small business leads",
+    "audience": "Freelancers selling services to SMBs and local operators",
+    "intent": "The searcher wants a source or workflow for finding small business prospects.",
+    "summary": "Small business leads work best when the business has a clear need and a reachable path. A smaller list of qualified SMBs usually beats a broad list with no pitch reason.",
+    "leadIn": "iCloseLeads helps freelancers find SMB leads, save context, prepare a proposal, and track follow-up in one workflow.",
+    "steps": [
+      "Choose categories where your service has direct business value.",
+      "Search by location or niche to keep outreach specific.",
+      "Qualify website, profile, reviews, phone, and service clues.",
+      "Save the reason the business fits your offer.",
+      "Pitch the outcome, not a generic service menu."
+    ],
+    "proofPoints": [
+      "Small business and local lead intent supports iCloseLeads' strongest acquisition use case.",
+      "Competitor pages often present lists; iCloseLeads can win on qualification and workflow.",
+      "The page creates internal links into local business, web design, decision-maker, and CRM assets."
+    ],
+    "pitch": "Hi, I found your business while researching [category] companies. I noticed [signal] and had one idea that could help with [customer outcome].",
+    "internalLinks": [
+      {
+        "label": "Local business lead generation software",
+        "href": "/resources/local-business-lead-generation-software"
+      },
+      {
+        "label": "Businesses without websites",
+        "href": "/resources/businesses-without-websites"
+      },
+      {
+        "label": "Find business owner email",
+        "href": "/resources/find-business-owner-email"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What are small business leads?",
+        "a": "They are SMB prospects with enough fit, need, and contact context to justify outreach."
+      },
+      {
+        "q": "Which small businesses are best for freelancers?",
+        "a": "Prioritize businesses where your service clearly improves calls, bookings, revenue operations, trust, visibility, or speed."
+      }
+    ]
+  },
+  {
+    "slug": "agency-client-acquisition-software",
+    "title": "Agency client acquisition software for small teams",
+    "metaTitle": "Agency Client Acquisition Software | Find, Pitch, and Track Better Leads",
+    "metaDescription": "Use agency client acquisition software to find better prospects, save context, write proposals, and keep follow-up visible.",
+    "keyword": "agency client acquisition software",
+    "audience": "Small agencies and micro-agencies building a repeatable lead workflow",
+    "intent": "The searcher wants software for agency prospecting and client acquisition.",
+    "summary": "Agency client acquisition software should make prospecting repeatable without flattening every lead into the same pitch. The team needs source, context, owner, stage, and next action.",
+    "leadIn": "iCloseLeads gives small teams a shared way to find prospects, keep notes, prepare proposals, and move leads through follow-up without losing the original reason.",
+    "steps": [
+      "Assign one segment or offer per prospecting sprint.",
+      "Capture the source, signal, and target service for every lead.",
+      "Keep proposal notes attached to the lead.",
+      "Use stages so the team knows what happens next.",
+      "Review stuck leads and refine qualification criteria."
+    ],
+    "proofPoints": [
+      "Agency-focused acquisition terms connect to existing iCloseLeads web design, local business, and CRM clusters.",
+      "This page supports higher-value users while staying truthful about small-team workflow benefits.",
+      "It gives internal links a commercial bridge between freelancer and agency use cases."
+    ],
+    "pitch": "Hi, our team found [company] while researching [segment]. We noticed [signal] and had one focused idea for improving [outcome].",
+    "internalLinks": [
+      {
+        "label": "Client acquisition platform",
+        "href": "/resources/client-acquisition-platform-for-freelancers"
+      },
+      {
+        "label": "B2B prospecting tool",
+        "href": "/resources/b2b-prospecting-tool-for-freelancers"
+      },
+      {
+        "label": "Lead management",
+        "href": "/resources/freelance-lead-management"
+      },
+      {
+        "label": "Analytics",
+        "href": "/features/analytics"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What should agencies track during client acquisition?",
+        "a": "Track source, segment, signal, pitch owner, lead stage, last touch, next action, and outcome."
+      },
+      {
+        "q": "Can small agencies use freelancer-style prospecting?",
+        "a": "Yes, but they need clearer ownership, shared notes, and consistent follow-up discipline."
+      }
+    ]
+  },
+  {
+    "slug": "freelancer-crm-with-email-follow-up",
+    "title": "Freelancer CRM with email follow-up",
+    "metaTitle": "Freelancer CRM With Email Follow-Up | Keep Outreach Moving",
+    "metaDescription": "A freelancer CRM with email follow-up helps track prospects, messages, reply status, next action, and proposal context.",
+    "keyword": "freelancer CRM with email follow up",
+    "audience": "Freelancers who send outreach and need a simple follow-up system",
+    "intent": "The searcher wants CRM software that supports outreach follow-up.",
+    "summary": "A freelancer CRM with email follow-up keeps the next action visible. The point is not to send more reminders; it is to follow up when the lead is still relevant and the context is clear.",
+    "leadIn": "iCloseLeads connects saved leads, pitch notes, proposal drafts, and follow-up stages so outreach does not disappear after the first message.",
+    "steps": [
+      "Save every qualified lead before sending outreach.",
+      "Attach the message angle or proposal to the lead.",
+      "Set a follow-up date based on timing and relevance.",
+      "Mark replies, no-fit leads, and paused opportunities clearly.",
+      "Review follow-ups before adding more new leads."
+    ],
+    "proofPoints": [
+      "CRM and follow-up topics are strong activation assets because they help users keep using the product after the first search.",
+      "Existing resources already support proposal follow-up; this page adds the software-intent angle.",
+      "The topic connects directly to iCloseLeads' CRM pipeline and email outreach feature."
+    ],
+    "pitch": "Hi, I wanted to follow up on [original signal]. If [outcome] is not a priority right now, I can close the loop and reconnect later.",
+    "internalLinks": [
+      {
+        "label": "CRM pipeline feature",
+        "href": "/features/crm-pipeline"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      },
+      {
+        "label": "Freelance lead management",
+        "href": "/resources/freelance-lead-management"
+      },
+      {
+        "label": "Email outreach",
+        "href": "/features/email-outreach"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Do freelancers need a CRM?",
+        "a": "They need a way to track lead context, messages, stages, and follow-up. A simple CRM is often enough."
+      },
+      {
+        "q": "What makes follow-up effective?",
+        "a": "Relevant context, timing, respect, and a clear next step. Generic reminders are easy to ignore."
+      }
+    ]
+  },
+  {
+    "slug": "lead-enrichment-for-freelance-prospecting",
+    "title": "Lead enrichment for freelance prospecting",
+    "metaTitle": "Lead Enrichment for Freelance Prospecting | Add Context Before Outreach",
+    "metaDescription": "Use lead enrichment to add safe business context: niche, website status, contact route, signal, offer fit, and follow-up plan.",
+    "keyword": "lead enrichment for freelance prospecting",
+    "audience": "Freelancers who need better context before contacting prospects",
+    "intent": "The searcher wants to enrich or improve prospect records before outreach.",
+    "summary": "Lead enrichment should make outreach more relevant. Add business context that helps the prospect understand why you are reaching out, not private or unsupported assumptions.",
+    "leadIn": "iCloseLeads helps freelancers enrich leads with source, signal, notes, proposal context, and follow-up state so the first message feels grounded.",
+    "steps": [
+      "Add company category, location, and source.",
+      "Record the public signal that makes outreach relevant.",
+      "Check website, profile, and contact route.",
+      "Add the outcome your offer can improve.",
+      "Avoid sensitive, private, or speculative details."
+    ],
+    "proofPoints": [
+      "Email lookup and decision-maker gaps make enrichment an important supporting topic.",
+      "This page differentiates safe business context from risky personal-data collection.",
+      "It supports better AI proposal drafts because the saved lead has useful context."
+    ],
+    "pitch": "Hi, I found [company] through [source] and noticed [public signal]. I work on [outcome] for similar businesses and can send a short idea.",
+    "internalLinks": [
+      {
+        "label": "Email lookup",
+        "href": "/resources/email-lookup-for-freelance-outreach"
+      },
+      {
+        "label": "Find business owner email",
+        "href": "/resources/find-business-owner-email"
+      },
+      {
+        "label": "AI proposal generator",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Lead qualification checklist",
+        "href": "/resources/lead-qualification-checklist-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead enrichment?",
+        "a": "Lead enrichment is adding useful context to a prospect record so qualification, outreach, and follow-up are more accurate."
+      },
+      {
+        "q": "What should freelancers avoid enriching?",
+        "a": "Avoid sensitive personal details, unsupported assumptions, and data that does not help a respectful business conversation."
+      }
+    ]
+  },
+  {
+    "slug": "outbound-sales-workflow-for-freelancers",
+    "title": "Outbound sales workflow for freelancers",
+    "metaTitle": "Outbound Sales Workflow for Freelancers | Search, Pitch, Follow Up",
+    "metaDescription": "Build an outbound sales workflow for freelancers that connects lead search, qualification, proposals, email outreach, and CRM follow-up.",
+    "keyword": "outbound sales workflow",
+    "audience": "Freelancers building a repeatable direct sales habit",
+    "intent": "The searcher wants a step-by-step outbound sales process.",
+    "summary": "An outbound sales workflow gives freelancers a repeatable path: choose a segment, find qualified leads, write from context, send carefully, follow up, and learn from outcomes.",
+    "leadIn": "iCloseLeads turns outbound sales into a daily workflow instead of a scattered set of tabs and reminders.",
+    "steps": [
+      "Choose the weekly segment and offer.",
+      "Find leads with public evidence of fit.",
+      "Score and qualify the best prospects.",
+      "Draft a short proposal or outreach message.",
+      "Track follow-up and update the pipeline based on replies."
+    ],
+    "proofPoints": [
+      "Outbound software and sales pipeline terms came from the Ahrefs-backed opportunity set.",
+      "Workflow pages can outperform generic advice by showing the exact sequence a user should run.",
+      "The page sends users into lead discovery, proposals, outreach, and CRM activation."
+    ],
+    "pitch": "Hi, I found [company] while researching [segment]. Because [signal], I thought [outcome] may be worth a quick first step.",
+    "internalLinks": [
+      {
+        "label": "Outbound lead generation software",
+        "href": "/resources/outbound-lead-generation-software-for-freelancers"
+      },
+      {
+        "label": "Sales prospecting tool",
+        "href": "/resources/sales-prospecting-tool-for-freelancers"
+      },
+      {
+        "label": "Lead scoring",
+        "href": "/resources/lead-scoring-for-freelancers"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What are the stages of outbound sales for freelancers?",
+        "a": "Segment choice, lead search, qualification, pitch draft, outreach, follow-up, and outcome review."
+      },
+      {
+        "q": "How often should freelancers run outbound sales?",
+        "a": "Small daily or weekly batches are easier to personalize and improve than occasional large pushes."
+      }
+    ]
+  },
+  {
+    "slug": "freelance-prospecting-tool",
+    "title": "Freelance prospecting tool for finding better leads",
+    "metaTitle": "Freelance Prospecting Tool | Find, Qualify, and Pitch Better Leads",
+    "metaDescription": "Use a freelance prospecting tool workflow to find leads, save context, draft proposals, and follow up without losing the pitch reason.",
+    "keyword": "freelance prospecting tool",
+    "audience": "Freelancers who want a practical system for finding new clients",
+    "intent": "The searcher wants a tool for prospecting freelance clients.",
+    "summary": "A freelance prospecting tool should help you create better conversations. It should connect the lead source, the qualification reason, the outreach message, and the next follow-up.",
+    "leadIn": "iCloseLeads helps freelancers move from search to saved lead to proposal to follow-up without rebuilding context every time.",
+    "steps": [
+      "Choose one prospecting lane: local businesses, remote jobs, live jobs, or niche B2B companies.",
+      "Search for a small batch of relevant leads.",
+      "Qualify each lead before saving.",
+      "Generate or draft outreach from the saved context.",
+      "Track the next action so the pipeline stays active."
+    ],
+    "proofPoints": [
+      "Freelance prospecting sits at the center of existing iCloseLeads product and content clusters.",
+      "The page captures users before they search for a specific feature name.",
+      "It strengthens entity co-occurrence between iCloseLeads, prospecting tools, lead discovery, proposals, and follow-up."
+    ],
+    "pitch": "Hi, I found your business while prospecting [segment]. I noticed [signal] and thought a small improvement around [outcome] may be useful.",
+    "internalLinks": [
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Client acquisition platform",
+        "href": "/resources/client-acquisition-platform-for-freelancers"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/resources/freelance-cold-outreach"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is a freelance prospecting tool?",
+        "a": "It is software that helps freelancers find possible clients, qualify them, prepare outreach, and manage follow-up."
+      },
+      {
+        "q": "What is the first prospecting step?",
+        "a": "Pick one buyer type and one offer. Broad prospecting usually creates weaker pitches."
+      }
+    ]
+  },
+  {
+    "slug": "sales-leads-for-web-designers",
+    "title": "Sales leads for web designers",
+    "metaTitle": "Sales Leads for Web Designers | Find Website Buyers With Better Signals",
+    "metaDescription": "Find sales leads for web designers using website gaps, local demand, contact routes, and proposal-ready business context.",
+    "keyword": "sales leads for web designers",
+    "audience": "Web designers, WordPress freelancers, Webflow freelancers, and small studios",
+    "intent": "The searcher wants prospects that may buy website design or redesign work.",
+    "summary": "The best sales leads for web designers show a visible business reason: no website, dated mobile experience, weak booking path, poor trust signals, or local visibility gaps.",
+    "leadIn": "iCloseLeads helps designers search local categories, save the website issue, draft a proposal, and follow up while the business context is still fresh.",
+    "steps": [
+      "Pick one category where website quality influences calls or bookings.",
+      "Look for no-website, outdated-site, trust, speed, or conversion gaps.",
+      "Confirm profile activity and contact route.",
+      "Write the pitch around business outcomes.",
+      "Track follow-up so good prospects do not disappear."
+    ],
+    "proofPoints": [
+      "Web design leads are already a validated iCloseLeads search and content cluster.",
+      "This page adds a sales-leads phrase variant without duplicating the older web-design-leads page angle.",
+      "It connects directly to proposal templates, local lead workflows, and CRM follow-up."
+    ],
+    "pitch": "Hi, I found your business while checking local website opportunities. I noticed [website signal] and had one idea for turning more visitors into calls or enquiries.",
+    "internalLinks": [
+      {
+        "label": "Web design leads",
+        "href": "/resources/web-design-leads"
+      },
+      {
+        "label": "Website design prospecting",
+        "href": "/resources/website-design-prospecting"
+      },
+      {
+        "label": "Web design proposal template",
+        "href": "/resources/web-design-proposal-template"
+      },
+      {
+        "label": "Local business leads",
+        "href": "/use-cases/local-business-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What are sales leads for web designers?",
+        "a": "They are prospects with evidence that website work could improve trust, calls, bookings, enquiries, or local visibility."
+      },
+      {
+        "q": "Should web designers buy lead lists?",
+        "a": "Only with caution. A verified, smaller list with clear business signals usually beats a large generic list."
+      }
+    ]
+  },
+  {
+    "slug": "remote-client-leads-for-freelancers",
+    "title": "Remote client leads for freelancers",
+    "metaTitle": "Remote Client Leads for Freelancers | Find and Pitch Better Opportunities",
+    "metaDescription": "Find remote client leads by niche, timing, scope, contact path, proposal fit, and follow-up readiness.",
+    "keyword": "remote client leads",
+    "audience": "Freelancers selling remote services to startups, SMBs, agencies, and operators",
+    "intent": "The searcher wants remote prospects or opportunities that can become clients.",
+    "summary": "Remote client leads are strongest when timing and fit line up. A fresh signal, clear scope, and specific proposal can beat a generic application sent to every listing.",
+    "leadIn": "iCloseLeads helps freelancers find remote leads, save the scope clue, draft a proposal, and follow up before the opportunity goes stale.",
+    "steps": [
+      "Choose one remote service niche for the search.",
+      "Prioritize fresh opportunities with clear scope.",
+      "Save the buyer language and expected outcome.",
+      "Draft the proposal from the actual brief.",
+      "Follow up quickly while the need is active."
+    ],
+    "proofPoints": [
+      "Remote job and live job pages already support an iCloseLeads acquisition path.",
+      "This page targets remote-client wording that captures users who do not search for jobs specifically.",
+      "It links traffic toward remote leads, proposal, and CRM workflows."
+    ],
+    "pitch": "Hi, I saw the need around [remote project signal]. I can help with [first deliverable] and send a short plan if you are still reviewing options.",
+    "internalLinks": [
+      {
+        "label": "Remote job leads",
+        "href": "/resources/remote-job-leads"
+      },
+      {
+        "label": "Remote job proposal template",
+        "href": "/resources/remote-job-proposal-template"
+      },
+      {
+        "label": "Live job leads",
+        "href": "/resources/live-job-leads"
+      },
+      {
+        "label": "AI proposal generator",
+        "href": "/features/ai-proposals"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What are remote client leads?",
+        "a": "They are remote opportunities or companies with enough scope, timing, and fit to justify a tailored freelance pitch."
+      },
+      {
+        "q": "How fast should freelancers respond?",
+        "a": "Fast enough to be relevant, but not so fast that the proposal ignores the actual brief."
+      }
+    ]
+  },
+  {
+    "slug": "lead-generation-workflow-for-freelancers",
+    "title": "Lead generation workflow for freelancers",
+    "metaTitle": "Lead Generation Workflow for Freelancers | Daily Search to Follow-Up",
+    "metaDescription": "A simple lead generation workflow for freelancers: choose a segment, search, qualify, save, pitch, follow up, and review.",
+    "keyword": "lead generation workflow for freelancers",
+    "audience": "Freelancers who want a repeatable client acquisition routine",
+    "intent": "The searcher wants a practical workflow rather than a one-off tactic.",
+    "summary": "A lead generation workflow helps freelancers repeat the right actions: choose a market, find qualified prospects, write from context, follow up, and improve based on outcomes.",
+    "leadIn": "iCloseLeads gives the workflow one place to live, from lead discovery to proposal drafting and CRM follow-up.",
+    "steps": [
+      "Monday: choose one segment and offer.",
+      "Tuesday: find and qualify a focused lead batch.",
+      "Wednesday: draft proposals or outreach from context.",
+      "Thursday: send or prepare follow-ups.",
+      "Friday: review replies, saved leads, and next week's focus."
+    ],
+    "proofPoints": [
+      "Workflow terms support product education and activation better than broad motivation content.",
+      "This page gives answer engines a clear extractable process tied to iCloseLeads.",
+      "The workflow links every acquisition feature into one understandable routine."
+    ],
+    "pitch": "Hi, I found [company] during a focused prospecting sprint for [segment]. I noticed [signal] and had one idea for [outcome].",
+    "internalLinks": [
+      {
+        "label": "Freelance prospecting tool",
+        "href": "/resources/freelance-prospecting-tool"
+      },
+      {
+        "label": "Client acquisition platform",
+        "href": "/resources/client-acquisition-platform-for-freelancers"
+      },
+      {
+        "label": "Lead list builder",
+        "href": "/resources/lead-list-builder-for-freelancers"
+      },
+      {
+        "label": "Sales pipeline",
+        "href": "/resources/sales-pipeline-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is the best lead generation workflow for freelancers?",
+        "a": "Choose one segment, find a focused batch, qualify carefully, write from context, follow up, and review what worked."
+      },
+      {
+        "q": "How many leads should a freelancer work per day?",
+        "a": "Work only as many as you can qualify and personalize properly. Small consistent batches usually beat large unfocused lists."
+      }
+    ]
+  },
 ];
 
 export function getResourcePage(slug: string) {
