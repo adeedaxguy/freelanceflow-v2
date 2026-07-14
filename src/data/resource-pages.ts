@@ -46,6 +46,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Find local business leads", href: "/use-cases/local-business-leads" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      { label: "Decision maker email workflow", href: "/resources/find-decision-maker-email-small-business" },
       { label: "AI proposal generator", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -132,6 +133,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Local business leads use case", href: "/use-cases/local-business-leads" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      { label: "Find decision maker email", href: "/resources/find-decision-maker-email-small-business" },
       { label: "Track saved leads", href: "/features/crm-pipeline" },
     ],
     faqs: [
@@ -175,6 +177,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I found your post/profile while researching companies that may need help with [specific issue]. I noticed [signal]. I can help with a small first step that would make this easier to solve.",
     internalLinks: [
       { label: "Cold outreach use case", href: "/use-cases/freelance-cold-outreach" },
+      { label: "Cold outreach CRM for freelancers", href: "/resources/cold-outreach-crm-for-freelancers" },
       { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
       { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
     ],
@@ -218,6 +221,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I help local businesses turn search visibility into more calls. I found your listing and noticed a website improvement that could make it easier for customers to choose you.",
     internalLinks: [
       { label: "Local leads dashboard", href: "/use-cases/local-business-leads" },
+      { label: "Decision maker email workflow", href: "/resources/find-decision-maker-email-small-business" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "CRM pipeline", href: "/features/crm-pipeline" },
     ],
@@ -261,6 +265,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I noticed a specific website opportunity while checking your local search presence. I am not sending a generic design pitch; I have one practical improvement in mind for your business.",
     internalLinks: [
       { label: "Web design lead workflow", href: "/resources/web-design-leads" },
+      { label: "Lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
       { label: "Local business leads", href: "/use-cases/local-business-leads" },
       { label: "Saved lead CRM", href: "/features/crm-pipeline" },
     ],
@@ -305,6 +310,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Local business lead filters", href: "/use-cases/local-business-leads" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
       { label: "Web design leads guide", href: "/resources/web-design-leads" },
     ],
     faqs: [
@@ -348,6 +354,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Remote jobs use case", href: "/use-cases/remote-job-leads" },
       { label: "Remote job proposal template", href: "/resources/remote-job-proposal-template" },
+      { label: "Client acquisition software", href: "/resources/freelance-client-acquisition-software" },
       { label: "Proposal generator", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -405,6 +412,221 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     ],
   },
   {
+    slug: "best-lead-generation-tools-for-freelancers",
+    title: "Best lead generation tools for freelancers who need clients now",
+    metaTitle: "Best Lead Generation Tools for Freelancers | Compare Outreach Workflows",
+    metaDescription:
+      "Compare lead generation tools for freelancers by lead source, proposal workflow, CRM fit, outreach support, and how quickly each tool can help you take action.",
+    keyword: "best lead generation tools for freelancers",
+    audience: "Freelancers, consultants, independent contractors, and small agencies comparing client acquisition tools",
+    intent: "The searcher wants a practical tool shortlist for finding clients, not a generic B2B sales software list.",
+    summary:
+      "The best lead generation tool for a freelancer is the one that helps you find a relevant buyer signal, save the lead, write a specific first message, and follow up without building a separate sales stack.",
+    leadIn:
+      "Generic B2B tools can be too heavy when you only need a focused weekly client pipeline. Compare tools by what happens after the lead appears: can you qualify it, save it, draft a pitch, prepare outreach, and remember the follow-up? iCloseLeads is built around that freelancer workflow.",
+    steps: [
+      "Decide whether you need remote job signals, local business leads, decision-maker checks, or all three.",
+      "Check whether the tool helps you qualify leads before exporting them.",
+      "Look for proposal or cold-email support tied to the actual lead context.",
+      "Avoid tools that only sell volume without a clear outreach workflow.",
+      "Choose the tool that gets you from search to first reviewed pitch fastest.",
+    ],
+    proofPoints: [
+      "Live Google SERPs show a dedicated competitor listicle for this exact query, confirming list-comparison intent.",
+      "The current SERP also surfaces broad tools like Apollo and Instantly, leaving room for a freelancer-first workflow angle.",
+      "GA4 shows iCloseLeads resource and local lead pages already earning views, so expanding the resource hub supports visible user paths.",
+    ],
+    pitch:
+      "If you are comparing lead tools, test one real workflow: find five leads, save the best two, draft one proposal, and schedule one follow-up. A tool that cannot complete that loop may not fit freelance acquisition.",
+    internalLinks: [
+      { label: "Freelance client acquisition", href: "/resources/freelance-client-acquisition" },
+      { label: "Lead discovery software", href: "/features/lead-discovery" },
+      { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
+    ],
+    faqs: [
+      {
+        q: "What should freelancers look for in lead generation software?",
+        a: "Look for relevant lead sources, qualification filters, saved lead notes, proposal support, outreach preparation, and follow-up tracking.",
+      },
+      {
+        q: "Do freelancers need the same tools as sales teams?",
+        a: "Usually no. Freelancers often need a lighter workflow that moves from buyer signal to pitch quickly instead of a full enterprise sales stack.",
+      },
+    ],
+  },
+  {
+    slug: "cold-outreach-crm-for-freelancers",
+    title: "Cold outreach CRM for freelancers",
+    metaTitle: "Cold Outreach CRM for Freelancers | Leads, Proposals, Gmail, and Follow-Up",
+    metaDescription:
+      "Use a cold outreach CRM for freelancers to find prospects, save context, draft better first messages, prepare Gmail outreach, and track follow-ups.",
+    keyword: "cold outreach CRM for freelancers",
+    audience: "Freelancers and service providers who contact prospects directly",
+    intent: "The searcher wants a lightweight CRM that supports cold outreach without enterprise sales complexity.",
+    summary:
+      "A cold outreach CRM for freelancers should remember why each lead matters. The useful record is not just a name and email; it is the buyer signal, pitch angle, proposal draft, outreach status, and next follow-up.",
+    leadIn:
+      "Many CRM results are either generic templates or sales-team platforms. Freelancers need a smaller loop: find the lead, save the reason, write a specific first message, send from a familiar inbox, and follow up while the context is still visible. iCloseLeads connects those steps around client acquisition.",
+    steps: [
+      "Save the lead only after the buyer signal is clear.",
+      "Track the source, problem, pitch angle, and current stage.",
+      "Draft outreach from the saved context instead of starting from a blank CRM note.",
+      "Prepare Gmail outreach after reviewing the message for accuracy.",
+      "Use follow-up stages so good prospects do not disappear after the first email.",
+    ],
+    proofPoints: [
+      "Live SERPs for this query surface Reddit CRM advice, Notion templates, and broad outreach platforms, showing practical demand but weak freelancer-specific ownership.",
+      "iCloseLeads already includes saved leads, proposal generation, outreach preparation, sent email history, campaigns, and follow-up support.",
+      "This topic maps to activation because the page can push searchers into saving leads and generating proposals, not just reading advice.",
+    ],
+    pitch:
+      "Your CRM should help you remember the reason for the outreach. Before sending, check the lead signal, proposal angle, stage, and next follow-up so the message feels researched.",
+    internalLinks: [
+      { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+      { label: "Email outreach feature", href: "/features/email-outreach" },
+      { label: "CRM pipeline feature", href: "/features/crm-pipeline" },
+    ],
+    faqs: [
+      {
+        q: "What CRM fields matter for freelance outreach?",
+        a: "Track the lead source, business problem, contact route, proposal angle, outreach status, follow-up date, and notes from each interaction.",
+      },
+      {
+        q: "Can a freelancer use a spreadsheet instead of a CRM?",
+        a: "A spreadsheet can work early, but it usually breaks when proposal drafts, sent emails, lead notes, and follow-up timing need to stay together.",
+      },
+    ],
+  },
+  {
+    slug: "find-decision-maker-email-small-business",
+    title: "How to find a decision maker email for a small business",
+    metaTitle: "Find Decision Maker Email for Small Business | Safe Outreach Workflow",
+    metaDescription:
+      "Find small business decision maker paths using public profiles, business websites, phone routes, social links, registry clues, and careful verification before outreach.",
+    keyword: "find decision maker email small business",
+    audience: "Freelancers, agencies, and consultants pitching local businesses",
+    intent: "The searcher wants a realistic way to reach the owner, manager, or right contact for a small business.",
+    summary:
+      "Small businesses do not always publish a direct owner email. A safer workflow is to verify the business, check public owner or manager signals, use the website or phone route when appropriate, and save proof before writing outreach.",
+    leadIn:
+      "Decision-maker research should improve relevance without crossing privacy or trust lines. Start with public business data, then look for official contact pages, owner mentions, social profiles, professional profiles, and local registry clues. iCloseLeads helps keep the proof and pitch context attached to the lead.",
+    steps: [
+      "Confirm the business website, map profile, category, and location first.",
+      "Look for owner, founder, manager, director, or marketing contact mentions on official pages.",
+      "Check public social and professional profiles only when they clearly match the business.",
+      "Use the public phone or contact form when a direct email is not visible.",
+      "Save proof links and avoid pretending you found private data.",
+    ],
+    proofPoints: [
+      "Live SERPs are led by broad data vendors and decision-maker tools, but small business outreach often needs verification and public-route guidance.",
+      "iCloseLeads already has a Decision Maker Finder workflow connected to local lead discovery.",
+      "The page can convert local lead searchers into an account path that includes owner-path checks, saved notes, and proposal drafting.",
+    ],
+    pitch:
+      "Hi, I am trying to reach the person who handles website or growth decisions for your business. I noticed one practical improvement and wanted to ask where the best place is to send a short note.",
+    internalLinks: [
+      { label: "Decision maker finder", href: "/resources/decision-maker-finder" },
+      { label: "Local business leads", href: "/use-cases/local-business-leads" },
+      { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
+    ],
+    faqs: [
+      {
+        q: "Can I always find a small business owner's email?",
+        a: "No. Many owners do not publish direct emails. Use verified public routes and avoid guessing private contact details.",
+      },
+      {
+        q: "What is the safest first outreach route?",
+        a: "Use the official website contact page, public business email, phone route, or clearly matched professional profile when available.",
+      },
+    ],
+  },
+  {
+    slug: "freelance-client-acquisition-software",
+    title: "Freelance client acquisition software",
+    metaTitle: "Freelance Client Acquisition Software | Find Leads and Pitch Faster",
+    metaDescription:
+      "Compare what freelance client acquisition software should do: find buyer signals, qualify leads, generate proposals, prepare outreach, and track follow-ups.",
+    keyword: "freelance client acquisition software",
+    audience: "Freelancers and solo agencies building a repeatable client pipeline",
+    intent: "The searcher wants software support for getting clients, not another motivational guide.",
+    summary:
+      "Freelance client acquisition software should turn scattered prospecting into one repeatable loop: find leads, qualify fit, draft the pitch, send or prepare outreach, and track the next action.",
+    leadIn:
+      "The SERP for client acquisition is heavy with videos and broad advice. That leaves a clear gap for a software-led workflow page that shows what to do inside the product. iCloseLeads gives freelancers a practical path from search to saved lead to proposal to follow-up.",
+    steps: [
+      "Pick one service offer and one audience segment.",
+      "Run a focused lead search instead of browsing every possible source.",
+      "Save only leads with clear fit, timing, and contactability.",
+      "Generate a proposal from the lead context, then edit it before sending.",
+      "Review the pipeline weekly so follow-up becomes a habit.",
+    ],
+    proofPoints: [
+      "Live Google results for this query skew toward YouTube advice, which creates space for an actionable product resource.",
+      "GA4 shows iCloseLeads homepage and resource titles already getting views, so a software-intent page supports existing user behavior.",
+      "This page has a direct funnel path into signup, lead search, proposal generation, and CRM stages.",
+    ],
+    pitch:
+      "A useful acquisition workflow should answer one question every week: which specific prospects are worth pitching, and what is the next action for each one?",
+    internalLinks: [
+      { label: "Freelance client acquisition", href: "/resources/freelance-client-acquisition" },
+      { label: "Best lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
+      { label: "Lead discovery feature", href: "/features/lead-discovery" },
+    ],
+    faqs: [
+      {
+        q: "What does client acquisition software do for freelancers?",
+        a: "It helps freelancers find prospects, qualify fit, prepare outreach, generate proposals, and track follow-up from one workflow.",
+      },
+      {
+        q: "Is client acquisition only cold outreach?",
+        a: "No. It can include remote job leads, local business leads, referrals, content leads, direct outreach, proposal follow-up, and pipeline management.",
+      },
+    ],
+  },
+  {
+    slug: "lead-generation-for-independent-contractors",
+    title: "Lead generation for independent contractors",
+    metaTitle: "Lead Generation for Independent Contractors | Find Better Client Signals",
+    metaDescription:
+      "Independent contractors can use iCloseLeads to find remote jobs, local business leads, decision-maker paths, proposals, and follow-up workflows.",
+    keyword: "lead generation for independent contractors",
+    audience: "Independent contractors, freelancers, consultants, and solo service providers",
+    intent: "The searcher wants client opportunities without relying entirely on referrals or marketplaces.",
+    summary:
+      "Independent contractors need lead generation that fits a small operator: focused searches, visible buyer signals, simple qualification, personal proposals, and follow-up they can actually maintain.",
+    leadIn:
+      "A contractor does not need a bloated sales department. The useful system is smaller and sharper: choose the service, find active demand, save the prospects that fit, write a specific pitch, and keep track of what happens next. iCloseLeads is built around that working rhythm.",
+    steps: [
+      "Choose one service or package to sell this week.",
+      "Search remote, live, or local leads based on where the buyer signal is strongest.",
+      "Score leads by fit, timing, problem clarity, and contact path.",
+      "Turn the best lead into a short proposal or outreach draft.",
+      "Track follow-up so a promising lead does not vanish after one message.",
+    ],
+    proofPoints: [
+      "The cluster broadens iCloseLeads beyond freelancers while staying truthful to the product audience.",
+      "It connects directly to the lead discovery, proposal, email outreach, and CRM features already visible on the site.",
+      "The page strengthens brand + concept co-occurrence around iCloseLeads and independent contractor lead generation.",
+    ],
+    pitch:
+      "Hi, I help with [service] and noticed a specific opportunity around [business problem]. If useful, I can send a short first-step plan you can review without a long call.",
+    internalLinks: [
+      { label: "Lead generation tools for freelancers", href: "/resources/best-lead-generation-tools-for-freelancers" },
+      { label: "Remote job leads", href: "/resources/remote-job-leads" },
+      { label: "AI proposal generator", href: "/features/ai-proposals" },
+    ],
+    faqs: [
+      {
+        q: "How can independent contractors generate leads?",
+        a: "Start with a narrow offer, search for public buyer signals, qualify the best prospects, write context-aware outreach, and follow up consistently.",
+      },
+      {
+        q: "What lead sources work for contractors?",
+        a: "Remote job posts, local business profiles, hiring signals, referrals, content inquiries, and public decision-maker routes can all work when the offer is specific.",
+      },
+    ],
+  },
+  {
     slug: "ai-consulting-clients",
     title: "How AI consultants can find better client leads",
     metaTitle: "AI Consulting Clients: Find Companies With Real Automation Problems",
@@ -433,6 +655,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I noticed you are dealing with [workflow/problem]. I help teams turn repetitive work into a practical automation plan, starting with one small process that can be tested quickly.",
     internalLinks: [
       { label: "Find remote leads", href: "/use-cases/remote-job-leads" },
+      { label: "Client acquisition software", href: "/resources/freelance-client-acquisition-software" },
       { label: "Freelance lead discovery", href: "/features/lead-discovery" },
       { label: "Track pipeline", href: "/features/crm-pipeline" },
     ],
@@ -477,6 +700,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Lead discovery", href: "/features/lead-discovery" },
       { label: "Local business leads", href: "/use-cases/local-business-leads" },
+      { label: "Decision maker email workflow", href: "/resources/find-decision-maker-email-small-business" },
       { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
     ],
     faqs: [
@@ -604,7 +828,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "Hi, I noticed a specific opportunity where my work could help with [business outcome]. I can share a quick first-step plan if you are open to it.",
     internalLinks: [
+      { label: "Best lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
       { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
+      { label: "Client acquisition software", href: "/resources/freelance-client-acquisition-software" },
       { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
       { label: "CRM pipeline", href: "/features/crm-pipeline" },
     ],
@@ -692,6 +918,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Live job use case", href: "/use-cases/live-job-leads" },
       { label: "Remote job proposal template", href: "/resources/remote-job-proposal-template" },
+      { label: "Lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
       { label: "AI proposals", href: "/features/ai-proposals" },
     ],
     faqs: [
@@ -734,6 +961,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Hi, I found your business while researching local website opportunities. I noticed one practical change that could make it easier for customers to understand your services and contact you.",
     internalLinks: [
       { label: "Web design leads", href: "/resources/web-design-leads" },
+      { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
       { label: "Lead calculator", href: "/tools/lead-calculator" },
     ],
