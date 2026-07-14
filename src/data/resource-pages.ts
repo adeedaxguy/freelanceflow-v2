@@ -976,6 +976,526 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       },
     ],
   },
+  {
+    "slug": "email-lookup-for-freelance-outreach",
+    "title": "Email lookup for freelance outreach",
+    "metaTitle": "Email Lookup for Freelance Outreach | Find Better Contact Paths",
+    "metaDescription": "Use email lookup for freelance outreach without guessing: qualify the lead, check the domain, choose a contact path, and prepare a focused first message.",
+    "keyword": "email lookup",
+    "audience": "Freelancers and small agencies who already know which company they want to pitch",
+    "intent": "The searcher wants to find a professional contact path before sending outreach.",
+    "summary": "Email lookup is useful only after the lead is worth contacting. Start with the business signal, confirm the company domain, choose the most relevant role, and write the outreach around why that person should care.",
+    "leadIn": "Do not treat email lookup as a list-building shortcut. Use iCloseLeads to save the lead context first, then use the contact route to support a specific pitch instead of sending a generic message to every address you can find.",
+    "steps": [
+      "Confirm the company is a good fit for your offer before looking for an email.",
+      "Check the website, job post, local profile, or public signal that created the outreach reason.",
+      "Look for the role most likely to own the problem you solve.",
+      "Save the contact path with notes about why the pitch is relevant.",
+      "Prepare a short email that references the signal and one next step."
+    ],
+    "proofPoints": [
+      "Round 1 Ahrefs Content Gap research surfaced email lookup as a high-fit competitor gap for iCloseLeads.",
+      "The topic connects directly to decision-maker research, saved leads, proposal drafting, and Gmail-ready outreach.",
+      "iCloseLeads is strongest when contact research starts from a qualified opportunity instead of a purchased generic list."
+    ],
+    "pitch": "Hi, I found your company while researching teams that may need help with [specific problem]. I noticed [signal], and I had one practical idea that could help. Is this the right place to send it?",
+    "internalLinks": [
+      {
+        "label": "Decision maker email workflow",
+        "href": "/resources/find-decision-maker-email-small-business"
+      },
+      {
+        "label": "Cold email outreach software",
+        "href": "/features/email-outreach"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is email lookup?",
+        "a": "Email lookup is the process of finding a likely professional contact address for a company or person after you already know the prospect is worth contacting."
+      },
+      {
+        "q": "Should freelancers look up emails before qualifying leads?",
+        "a": "No. Qualify the company and pitch angle first. Email lookup is a contact step, not a substitute for lead research."
+      }
+    ]
+  },
+  {
+    "slug": "email-finder-for-freelancers",
+    "title": "Email finder workflow for freelancers",
+    "metaTitle": "Email Finder for Freelancers | Turn Qualified Leads Into Outreach",
+    "metaDescription": "A freelancer-friendly email finder workflow for turning qualified leads into specific outreach without losing context or spamming generic lists.",
+    "keyword": "email finder",
+    "audience": "Freelancers who need a contact route after finding a relevant company",
+    "intent": "The searcher wants a tool or process for finding a business email address.",
+    "summary": "An email finder should help you reach the right person, not replace your judgment. The best workflow starts with a qualified lead, then finds the cleanest route to a person who owns the problem.",
+    "leadIn": "iCloseLeads keeps the lead, source, notes, and pitch in one workflow so the email finder step does not become disconnected data collection.",
+    "steps": [
+      "Start from a saved lead or company profile.",
+      "Identify the decision area: marketing, operations, owner, founder, hiring manager, or partnerships.",
+      "Check whether a public contact route already exists.",
+      "Use the email finder step only for qualified leads.",
+      "Draft the first message from the original signal, not from the email address."
+    ],
+    "proofPoints": [
+      "Ahrefs gap research showed email finder terms overlapping with lead-generation competitors.",
+      "Email finder intent is a strong bridge into iCloseLeads signup because users need the next action after finding a lead.",
+      "The product path can connect lead search, contact notes, AI proposals, and follow-up tracking."
+    ],
+    "pitch": "Hi, I found your team through [source] and noticed [specific signal]. I work on [offer] for teams in this situation, and I can send a short idea if you are the right person.",
+    "internalLinks": [
+      {
+        "label": "Email lookup workflow",
+        "href": "/resources/email-lookup-for-freelance-outreach"
+      },
+      {
+        "label": "AI proposal generator",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/use-cases/freelance-cold-outreach"
+      },
+      {
+        "label": "Cold outreach CRM",
+        "href": "/resources/cold-outreach-crm-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What makes an email finder useful for freelancers?",
+        "a": "It is useful when it helps you contact a qualified prospect with context, not when it creates a large unqualified list."
+      },
+      {
+        "q": "What should I do after finding an email?",
+        "a": "Save the lead, write a message around the business signal, and schedule follow-up before moving to the next prospect."
+      }
+    ]
+  },
+  {
+    "slug": "email-verifier-for-cold-outreach",
+    "title": "Email verifier workflow for cold outreach",
+    "metaTitle": "Email Verifier for Cold Outreach | Reduce Risk Before You Send",
+    "metaDescription": "Use an email verifier workflow before cold outreach: qualify the prospect, check the contact route, keep the pitch specific, and avoid risky volume sending.",
+    "keyword": "email verifier",
+    "audience": "Freelancers preparing cold outreach to qualified prospects",
+    "intent": "The searcher wants to reduce bounce risk and send outreach more responsibly.",
+    "summary": "Email verification should protect a qualified outreach workflow. It cannot make a weak lead good, but it can reduce avoidable risk before you send a specific, relevant message.",
+    "leadIn": "In iCloseLeads, verification should sit after qualification and before outreach. The goal is safer sending, not permission to mass-email poor-fit prospects.",
+    "steps": [
+      "Confirm that the prospect matches your offer and audience.",
+      "Check whether the contact path belongs to the right role.",
+      "Avoid sending when the source, domain, or address looks uncertain.",
+      "Write a short message tied to the original lead signal.",
+      "Track the lead and follow-up result so the pipeline stays clean."
+    ],
+    "proofPoints": [
+      "Email verifier appeared in the Ahrefs competitor gap set as a clear adjacent intent.",
+      "The topic supports iCloseLeads' safe outreach and CRM positioning.",
+      "Verification content can attract users who are close to sending their first campaign or proposal."
+    ],
+    "pitch": "Hi, I found your company through [lead signal]. Before sending a longer idea, I wanted to check whether you handle [problem area] or if there is a better contact.",
+    "internalLinks": [
+      {
+        "label": "Email outreach feature",
+        "href": "/features/email-outreach"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Does email verification make cold outreach safe?",
+        "a": "It reduces some delivery risk, but relevance, consent rules, targeting, message quality, and respectful follow-up still matter."
+      },
+      {
+        "q": "When should freelancers verify an email?",
+        "a": "After the lead is qualified and before sending the first message or adding the contact to a follow-up workflow."
+      }
+    ]
+  },
+  {
+    "slug": "email-validator-for-freelance-leads",
+    "title": "Email validator checklist for freelance leads",
+    "metaTitle": "Email Validator Checklist for Freelance Leads | iCloseLeads",
+    "metaDescription": "A practical email validator checklist for freelance leads: confirm the company, role, contact path, pitch reason, and follow-up plan before outreach.",
+    "keyword": "email validator",
+    "audience": "Freelancers cleaning up prospect lists before outreach",
+    "intent": "The searcher wants to validate an email address or contact path before sending.",
+    "summary": "An email validator is most useful when it is part of a wider lead-quality check. Validate the address, but also validate the company fit, role fit, timing, and pitch reason.",
+    "leadIn": "Use this checklist before outreach so your pipeline does not fill with contacts you cannot confidently explain or follow up with.",
+    "steps": [
+      "Validate that the company fits your niche.",
+      "Validate the public signal that makes the outreach timely.",
+      "Validate that the role or inbox can reasonably own the problem.",
+      "Validate the email route only after the first three checks pass.",
+      "Validate the follow-up date before you send."
+    ],
+    "proofPoints": [
+      "Email validator terms appeared alongside email verifier and email finder in Round 1 gap research.",
+      "This page gives iCloseLeads a practical answer for users who are close to sending outreach.",
+      "The checklist naturally points to saved leads, notes, outreach, and CRM follow-up."
+    ],
+    "pitch": "Hi, I came across [company] while looking for teams with [specific signal]. I think there may be a quick win around [problem]. Should I send the short version here?",
+    "internalLinks": [
+      {
+        "label": "Email verifier workflow",
+        "href": "/resources/email-verifier-for-cold-outreach"
+      },
+      {
+        "label": "Cold outreach CRM",
+        "href": "/resources/cold-outreach-crm-for-freelancers"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Analytics",
+        "href": "/features/analytics"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Is email validation the same as lead qualification?",
+        "a": "No. Email validation checks the contact route. Lead qualification checks whether the company, timing, and pitch angle are worth your time."
+      },
+      {
+        "q": "What should I validate before sending outreach?",
+        "a": "Validate company fit, role fit, contact route, pitch reason, and follow-up plan."
+      }
+    ]
+  },
+  {
+    "slug": "reverse-email-lookup-for-prospecting",
+    "title": "Reverse email lookup for prospecting",
+    "metaTitle": "Reverse Email Lookup for Prospecting | Check Context Before Pitching",
+    "metaDescription": "Use reverse email lookup carefully in prospecting: confirm company context, avoid guessing, and turn a contact into a qualified lead workflow.",
+    "keyword": "reverse email lookup",
+    "audience": "Freelancers who have a contact but need to understand the business context",
+    "intent": "The searcher has an email address and wants to understand who or what company it belongs to.",
+    "summary": "Reverse email lookup can help you understand context, but it should not become invasive guesswork. Use it to confirm fit, company relevance, and whether the contact belongs in your outreach pipeline.",
+    "leadIn": "If you start with an email instead of a company, slow down. iCloseLeads works best when the contact is connected to a real lead record, a reason to pitch, and a clean follow-up plan.",
+    "steps": [
+      "Confirm the domain and company behind the email.",
+      "Check whether the company matches your service niche.",
+      "Look for a public signal that justifies outreach.",
+      "Do not use sensitive or private assumptions in the pitch.",
+      "Save the contact only if the context is clear and relevant."
+    ],
+    "proofPoints": [
+      "Reverse email lookup appeared in the Ahrefs gap list as an adjacent contact-intelligence term.",
+      "The safe angle is context validation, not invasive enrichment.",
+      "This content strengthens iCloseLeads' authority around responsible prospect research."
+    ],
+    "pitch": "Hi, I found your contact while checking companies around [business context]. I noticed [public signal] and had one relevant idea for [outcome] if this is useful.",
+    "internalLinks": [
+      {
+        "label": "Email lookup workflow",
+        "href": "/resources/email-lookup-for-freelance-outreach"
+      },
+      {
+        "label": "Find decision maker email",
+        "href": "/resources/find-decision-maker-email-small-business"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Can reverse email lookup help with prospecting?",
+        "a": "It can help confirm company context, but it should not replace public lead signals or respectful outreach judgment."
+      },
+      {
+        "q": "What should I avoid?",
+        "a": "Avoid private assumptions, sensitive claims, scraped personal details, or outreach that cannot be tied to a relevant business reason."
+      }
+    ]
+  },
+  {
+    "slug": "professional-email-address-for-outreach",
+    "title": "Professional email address for outreach",
+    "metaTitle": "Professional Email Address for Outreach | Freelance Cold Email Setup",
+    "metaDescription": "Set up a professional email address for freelance outreach, then pair it with qualified leads, specific pitches, and CRM follow-up inside iCloseLeads.",
+    "keyword": "professional email",
+    "audience": "Freelancers preparing to send client outreach from a credible inbox",
+    "intent": "The searcher wants to know what kind of email address to use for business outreach.",
+    "summary": "A professional email address helps trust, but it does not fix weak targeting. Use a real domain, a clear sender identity, a relevant offer, and a follow-up workflow that respects the prospect.",
+    "leadIn": "Before sending outreach, make sure your sender identity and lead workflow match. A polished inbox matters less if the message is generic or the lead was never qualified.",
+    "steps": [
+      "Use a domain-based email address when possible.",
+      "Keep the sender name recognizable and consistent with your website or profile.",
+      "Avoid sending high volume from a new or untrusted inbox.",
+      "Use iCloseLeads to focus on smaller qualified batches.",
+      "Track replies and follow-ups so outreach stays organized."
+    ],
+    "proofPoints": [
+      "Professional email appeared in the Round 1 Ahrefs gap set as a support topic around outreach readiness.",
+      "The page bridges setup intent into the product's email outreach and CRM workflows.",
+      "It supports safer, smaller-batch outreach rather than mass sending."
+    ],
+    "pitch": "Hi, I help [type of business] improve [specific outcome]. I found [public signal] and thought there may be one practical way to help without a big project.",
+    "internalLinks": [
+      {
+        "label": "Cold email outreach",
+        "href": "/features/email-outreach"
+      },
+      {
+        "label": "Freelance cold outreach use case",
+        "href": "/use-cases/freelance-cold-outreach"
+      },
+      {
+        "label": "Proposal subject lines",
+        "href": "/resources/freelance-proposal-subject-lines"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Should freelancers use a Gmail address or domain email?",
+        "a": "A domain-based email usually looks more professional, but the bigger factors are relevance, trust, sending behavior, and a clear reason for the message."
+      },
+      {
+        "q": "Does a professional email increase replies?",
+        "a": "It can help trust, but replies usually come from better lead fit, stronger context, and a clear next step."
+      }
+    ]
+  },
+  {
+    "slug": "lead-generation-services-alternative-for-freelancers",
+    "title": "Lead generation services alternative for freelancers",
+    "metaTitle": "Lead Generation Services Alternative for Freelancers | Build Your Own Pipeline",
+    "metaDescription": "Compare lead generation services with a self-managed iCloseLeads workflow for freelancers who want more control over quality, context, and follow-up.",
+    "keyword": "lead generation services",
+    "audience": "Freelancers comparing outsourced lead generation with doing it themselves",
+    "intent": "The searcher is considering paying someone else to find leads.",
+    "summary": "Lead generation services can help, but freelancers still need to understand lead quality, pitch context, and follow-up. A self-managed workflow gives you more control over who you contact and why.",
+    "leadIn": "If you outsource lead generation too early, you may get names without context. iCloseLeads gives freelancers a way to build a smaller, more specific pipeline they can actually pitch.",
+    "steps": [
+      "Define your offer and target buyer before buying or building leads.",
+      "Choose the signals that make a prospect worth contacting.",
+      "Search and save leads in focused batches.",
+      "Draft pitches from the actual business context.",
+      "Review the pipeline weekly and refine the criteria."
+    ],
+    "proofPoints": [
+      "Lead generation services appeared as a high-volume adjacent Ahrefs gap, but the iCloseLeads angle is control and workflow quality.",
+      "The page creates an alternative/comparison path without attacking agencies or making fake claims.",
+      "It moves users toward account creation, searches, saved leads, proposals, and CRM follow-up."
+    ],
+    "pitch": "Hi, I am building a focused prospect list around [niche] and noticed [public signal]. I think [specific outcome] could be improved with a small first step.",
+    "internalLinks": [
+      {
+        "label": "Lead generation tools for freelancers",
+        "href": "/resources/best-lead-generation-tools-for-freelancers"
+      },
+      {
+        "label": "Lead discovery feature",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Freelance client acquisition software",
+        "href": "/resources/freelance-client-acquisition-software"
+      },
+      {
+        "label": "CRM pipeline",
+        "href": "/features/crm-pipeline"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "Should freelancers hire lead generation services?",
+        "a": "Sometimes, but only after you understand your target buyer, offer, qualification criteria, and follow-up process."
+      },
+      {
+        "q": "What is the alternative?",
+        "a": "Build a focused pipeline yourself with lead discovery, saved context, AI-assisted outreach, and CRM follow-up."
+      }
+    ]
+  },
+  {
+    "slug": "b2b-lead-generation-agency-alternative",
+    "title": "B2B lead generation agency alternative",
+    "metaTitle": "B2B Lead Generation Agency Alternative | iCloseLeads for Freelancers",
+    "metaDescription": "A practical B2B lead generation agency alternative for freelancers and small teams that want qualified leads, context, proposals, and CRM follow-up.",
+    "keyword": "b2b lead generation agency",
+    "audience": "Freelancers and small agencies comparing outsourced B2B lead generation options",
+    "intent": "The searcher may be looking for an agency but also needs a more controlled, lower-friction workflow.",
+    "summary": "A B2B lead generation agency can be useful when the offer is mature. Earlier on, freelancers often need a tighter self-managed workflow so they learn which signals, niches, and pitches actually convert.",
+    "leadIn": "Use iCloseLeads when you need a practical agency alternative: find the lead, keep the context, prepare the proposal, and track follow-up without handing the whole pipeline to someone else.",
+    "steps": [
+      "Choose one B2B buyer segment for the week.",
+      "Search for companies showing public buying or operational signals.",
+      "Save only the leads where you can explain the business reason.",
+      "Prepare outreach around a specific problem and offer.",
+      "Review replies and update your criteria before scaling."
+    ],
+    "proofPoints": [
+      "B2B lead generation agency came from the Ahrefs gap list as a commercial comparison term.",
+      "The iCloseLeads position is an alternative for freelancers who want ownership, not a replacement for every agency use case.",
+      "The page supports signup intent from users comparing lead-gen options."
+    ],
+    "pitch": "Hi, I work with [B2B segment] on [specific outcome]. I noticed [signal] and had a practical idea that may be worth testing before you commit to a larger campaign.",
+    "internalLinks": [
+      {
+        "label": "Lead generation services alternative",
+        "href": "/resources/lead-generation-services-alternative-for-freelancers"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Analytics dashboard",
+        "href": "/features/analytics"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "When should I hire a B2B lead generation agency?",
+        "a": "Consider an agency when your offer, target buyer, proof, and follow-up process are already clear enough to scale."
+      },
+      {
+        "q": "When is a self-managed tool better?",
+        "a": "A self-managed tool is often better while you are testing niches, learning signal quality, and building a pipeline you understand."
+      }
+    ]
+  },
+  {
+    "slug": "sales-pipeline-for-freelancers",
+    "title": "What is a sales pipeline for freelancers?",
+    "metaTitle": "What Is a Sales Pipeline? A Freelancer-Friendly Guide",
+    "metaDescription": "Learn what a sales pipeline is, how freelancers should structure one, and how iCloseLeads connects leads, proposals, outreach, and follow-up.",
+    "keyword": "what is a sales pipeline",
+    "audience": "Freelancers who have leads but no consistent follow-up system",
+    "intent": "The searcher wants a clear definition and practical pipeline stages.",
+    "summary": "A sales pipeline is the set of stages a lead moves through from first discovery to conversation, proposal, follow-up, and closed work. For freelancers, it keeps prospecting from depending on memory.",
+    "leadIn": "iCloseLeads turns pipeline work into a simple loop: find a lead, save the context, write the first message, track the stage, and follow up until the opportunity is won, paused, or closed.",
+    "steps": [
+      "New lead: save the company, source, and reason.",
+      "Qualified: confirm fit, contact path, and pitch angle.",
+      "Contacted: send or prepare the first message.",
+      "Follow-up: schedule the next touchpoint.",
+      "Outcome: mark won, paused, not fit, or future nurture."
+    ],
+    "proofPoints": [
+      "What is a sales pipeline appeared in Ahrefs gap research as a broad support topic that can educate early-stage users.",
+      "Pipeline education supports CRM activation after signup.",
+      "The page connects informational intent to a concrete iCloseLeads workflow."
+    ],
+    "pitch": "Hi, I noticed [signal] and thought it might be worth a short conversation around [outcome]. If now is not the right time, I can send the quick version and follow up later.",
+    "internalLinks": [
+      {
+        "label": "CRM pipeline feature",
+        "href": "/features/crm-pipeline"
+      },
+      {
+        "label": "Cold outreach CRM for freelancers",
+        "href": "/resources/cold-outreach-crm-for-freelancers"
+      },
+      {
+        "label": "Proposal follow-up email",
+        "href": "/resources/proposal-follow-up-email"
+      },
+      {
+        "label": "Analytics dashboard",
+        "href": "/features/analytics"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is a sales pipeline?",
+        "a": "A sales pipeline is a set of stages that show where each opportunity sits, what happened last, and what should happen next."
+      },
+      {
+        "q": "Why do freelancers need a pipeline?",
+        "a": "Because without one, follow-up depends on memory and new client conversations become inconsistent."
+      }
+    ]
+  },
+  {
+    "slug": "outbound-lead-generation-software-for-freelancers",
+    "title": "Outbound lead generation software for freelancers",
+    "metaTitle": "Outbound Lead Generation Software for Freelancers | iCloseLeads Workflow",
+    "metaDescription": "Use outbound lead generation software to find qualified freelance prospects, prepare outreach, and track follow-up without turning into a volume spam workflow.",
+    "keyword": "outbound lead generation software",
+    "audience": "Freelancers and solo operators building a direct client acquisition system",
+    "intent": "The searcher wants software for proactive prospecting and outreach.",
+    "summary": "Outbound lead generation software should help freelancers find the right prospects, write from context, and follow up consistently. It should not push volume before fit.",
+    "leadIn": "Use iCloseLeads as an outbound workflow, not just a database. The goal is to turn public buying signals into a small number of better conversations.",
+    "steps": [
+      "Choose one offer and one audience.",
+      "Search for leads with public signals that match the offer.",
+      "Save the best prospects with notes.",
+      "Draft outreach around the signal and business outcome.",
+      "Track replies, follow-ups, and next actions in the CRM."
+    ],
+    "proofPoints": [
+      "Outbound lead generation software is a natural parent cluster for email lookup, lead discovery, and CRM follow-up topics.",
+      "The page gives iCloseLeads a product-fit way to capture users who want proactive acquisition.",
+      "It reinforces safe, qualified outreach instead of generic volume."
+    ],
+    "pitch": "Hi, I found [company] while researching [audience]. I noticed [signal] and had one specific idea for improving [outcome]. Would it be useful if I sent the short version?",
+    "internalLinks": [
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "Email outreach",
+        "href": "/features/email-outreach"
+      },
+      {
+        "label": "Freelance cold outreach",
+        "href": "/use-cases/freelance-cold-outreach"
+      },
+      {
+        "label": "Sales pipeline guide",
+        "href": "/resources/sales-pipeline-for-freelancers"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is outbound lead generation software?",
+        "a": "It is software that helps you proactively find prospects, prepare outreach, and manage follow-up instead of waiting for inbound referrals."
+      },
+      {
+        "q": "What should freelancers avoid?",
+        "a": "Avoid generic lists, copied templates, high-volume sending, and outreach without a visible business reason."
+      }
+    ]
+  },
 ];
 
 export function getResourcePage(slug: string) {
