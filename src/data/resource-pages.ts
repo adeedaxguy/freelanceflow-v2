@@ -4,11 +4,13 @@ export type ResourcePage = {
   metaTitle: string;
   metaDescription: string;
   keyword: string;
+  relatedSearches?: string[];
   audience: string;
   intent: string;
   summary: string;
   leadIn: string;
   steps: string[];
+  qualificationChecks?: { signal: string; whyItMatters: string; nextMove: string }[];
   proofPoints: string[];
   pitch: string;
   internalLinks: { label: string; href: string }[];
@@ -23,6 +25,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     metaDescription:
       "Find web design leads from businesses without websites, outdated sites, local search gaps, and owner-path signals, then turn each lead into a focused first pitch.",
     keyword: "web design leads",
+    relatedSearches: [
+      "web design leads for free",
+      "website leads",
+      "best web design leads",
+      "verified web design leads",
+    ],
     audience: "Web designers, WordPress developers, Webflow freelancers, and small agencies",
     intent: "The searcher wants a repeatable way to find businesses that may pay for website work.",
     summary:
@@ -36,9 +44,26 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Open the map/profile proof before saving the lead.",
       "Use the pitch to sell calls, bookings, quotes, and trust, not just a prettier website.",
     ],
+    qualificationChecks: [
+      {
+        signal: "No website or clearly outdated site",
+        whyItMatters: "This gives your first message a visible before-state instead of a generic offer.",
+        nextMove: "Save the lead only after you can explain the website gap in one sentence.",
+      },
+      {
+        signal: "Phone, reviews, and active local category",
+        whyItMatters: "A reachable business with visible demand is easier to turn into calls or quote-flow pitches.",
+        nextMove: "Open the profile proof and note the trust or conversion angle before drafting.",
+      },
+      {
+        signal: "Owner path or direct decision-maker route",
+        whyItMatters: "The lead is stronger when you know how to reach the person who can approve the work.",
+        nextMove: "Move the lead into decision-maker research before opening Gmail.",
+      },
+    ],
     proofPoints: [
       "GSC is still surfacing web design leads and leads for web design as one of the clearest acquisition clusters for iCloseLeads.",
-      "Live US SERPs reward practical businesses-without-websites positioning instead of generic agency branding.",
+      "Live US SERPs reward practical businesses-without-websites positioning, prospecting tools, and comparison-style pages instead of generic agency branding.",
       "iCloseLeads already connects local discovery, owner-path checks, proposal drafting, and CRM follow-up for this workflow.",
     ],
     pitch:
@@ -110,6 +135,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     metaDescription:
       "Find businesses without websites using local search signals, map profiles, public phone routes, and a qualification workflow before pitching web design or local SEO help.",
     keyword: "businesses without websites",
+    relatedSearches: [
+      "find businesses without websites",
+      "businesses without websites leads",
+      "website redesign prospects",
+      "local businesses that need websites",
+    ],
     audience: "Freelancers selling websites, SEO, branding, booking systems, or local marketing",
     intent: "The searcher wants a practical way to discover offline or under-served local businesses.",
     summary:
@@ -123,8 +154,25 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Look for owner or manager routes only when the profile looks worth pitching.",
       "Save notes about why a website would help that specific business.",
     ],
+    qualificationChecks: [
+      {
+        signal: "Active map profile with reviews",
+        whyItMatters: "Demand already exists, so a website improvement can be tied to real calls or bookings.",
+        nextMove: "Use the review and category context in your first sentence.",
+      },
+      {
+        signal: "No dedicated domain or only a social page",
+        whyItMatters: "This creates a clear business case without inventing urgency.",
+        nextMove: "Frame the pitch around trust, quote requests, and easier contact.",
+      },
+      {
+        signal: "Service category where buyers compare options",
+        whyItMatters: "Categories like dental, cleaning, roofing, or legal work respond better to trust and conversion arguments.",
+        nextMove: "Prioritize those leads before broad local lists.",
+      },
+    ],
     proofPoints: [
-      "Live US SERPs are full of tools and guides around businesses-without-websites prospecting, which confirms commercial search intent.",
+      "Live US SERPs are full of tools, Reddit threads, and prospecting guides around businesses-without-websites research, which confirms commercial search intent.",
       "This cluster fits freelancers selling websites, local SEO, and simple conversion-first online presences.",
       "iCloseLeads can take the search from discovery to saved lead, proposal draft, and follow-up without leaving the workflow.",
     ],
@@ -154,6 +202,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     metaDescription:
       "Build a freelance cold outreach workflow around real buyer signals, public context, short pitches, Gmail-ready drafts, and CRM follow-up that freelancers can actually maintain.",
     keyword: "freelance cold outreach",
+    relatedSearches: [
+      "cold outreach for freelancers",
+      "freelance cold email",
+      "freelance outreach tool",
+      "freelance cold outreach templates",
+    ],
     audience: "Freelancers and solo agencies selling services directly",
     intent: "The searcher wants clients without relying only on job boards, marketplaces, or referrals.",
     summary:
@@ -166,6 +220,23 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Open with the observation instead of your biography.",
       "Offer one practical next step, not a long menu of services.",
       "Track the lead so follow-up happens without guessing.",
+    ],
+    qualificationChecks: [
+      {
+        signal: "Fresh trigger such as a job post, launch, or website gap",
+        whyItMatters: "A recent signal makes the message feel timely instead of random.",
+        nextMove: "Reference that trigger in the first line before mentioning your service.",
+      },
+      {
+        signal: "Proof you can help with the specific issue",
+        whyItMatters: "Cold outreach wins when the proof is narrow and believable.",
+        nextMove: "Add one relevant example and remove the rest of the portfolio noise.",
+      },
+      {
+        signal: "Follow-up path in CRM",
+        whyItMatters: "Most freelancers lose replies because the second step is not tracked.",
+        nextMove: "Save the lead before sending so status and next action stay attached.",
+      },
     ],
     proofPoints: [
       "GSC continues to show freelance cold outreach as an early but recurring query cluster for the site.",
@@ -199,6 +270,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     metaDescription:
       "Find local business leads for web designers by niche, city, website status, phone visibility, owner path, and pitch-ready business context.",
     keyword: "local business leads for web designers",
+    relatedSearches: [
+      "local business leads",
+      "find web design clients",
+      "web design leads",
+      "website redesign leads",
+    ],
     audience: "Web designers and small studios selling to local companies",
     intent: "The searcher wants local companies that are easier to pitch for website or marketing work.",
     summary:
@@ -211,6 +288,23 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Filter by no website, outdated site, phone visibility, and small operator clues.",
       "Save only the businesses you can explain in one sentence.",
       "Move the best leads into owner-path or proposal workflows.",
+    ],
+    qualificationChecks: [
+      {
+        signal: "City plus category fit",
+        whyItMatters: "Local specificity makes both examples and outreach more believable.",
+        nextMove: "Keep each search to one city and one category at a time.",
+      },
+      {
+        signal: "Visible website or conversion weakness",
+        whyItMatters: "Weak mobile UX, no booking path, or no website gives you a precise service angle.",
+        nextMove: "Write the pitch around calls, quotes, or bookings instead of design taste.",
+      },
+      {
+        signal: "Low-friction contact route",
+        whyItMatters: "A visible phone or owner path keeps the lead actionable after signup.",
+        nextMove: "Attach the proof link and contact route to the saved lead record immediately.",
+      },
     ],
     proofPoints: [
       "GSC already shows this cluster through web-design-lead and local-business-search impressions tied to iCloseLeads pages.",
@@ -243,6 +337,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     metaDescription:
       "Learn what exclusive web design leads should mean, how to verify quality, and how to build your own less-crowded prospecting workflow inside iCloseLeads.",
     keyword: "exclusive web design leads",
+    relatedSearches: [
+      "exclusive web design leads",
+      "web design leads for sale",
+      "verified web design leads",
+      "buy web design leads",
+    ],
     audience: "Freelancers comparing lead lists, lead tools, and direct prospecting systems",
     intent: "The searcher wants leads that are not already being pitched by every agency.",
     summary:
@@ -255,6 +355,23 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Verify profile, phone, website, and category before outreach.",
       "Save notes so your pitch is not interchangeable.",
       "Follow up based on the original signal, not a generic reminder.",
+    ],
+    qualificationChecks: [
+      {
+        signal: "Reason the lead looks exclusive",
+        whyItMatters: "Exclusivity only matters when it comes from timing, verification, or overlooked context.",
+        nextMove: "Document the signal before you draft the pitch.",
+      },
+      {
+        signal: "Verified fit instead of list volume",
+        whyItMatters: "A smaller high-fit list usually beats a large recycled vendor list.",
+        nextMove: "Reject leads you cannot explain or verify quickly.",
+      },
+      {
+        signal: "Personalized follow-up angle",
+        whyItMatters: "Less-crowded outreach usually comes from better context, not secret databases.",
+        nextMove: "Store the proof link and follow-up note in CRM before sending.",
+      },
     ],
     proofPoints: [
       "GSC still shows impressions for exclusive web design leads even before the cluster has a mature page footprint.",

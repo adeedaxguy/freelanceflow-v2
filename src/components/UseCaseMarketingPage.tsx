@@ -94,6 +94,11 @@ function SectionHeader({
 export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }) {
   const otherUseCases = USE_CASE_PAGES.filter(item => item.slug !== page.slug);
   const shortAnswer = `${page.title} work best when you start from a real buyer signal, qualify the fit quickly, and move the best lead into a proposal and follow-up workflow. iCloseLeads gives freelancers one place to search, save, draft, and track that process.`;
+  const kickoffSteps = [
+    `Open ${page.title.toLowerCase()} inside iCloseLeads and search one niche instead of broad prospecting.`,
+    "Save only the leads you can explain in a sentence while the source context is still visible.",
+    "Turn the best lead into a proposal draft or Gmail-ready follow-up before the timing advantage disappears.",
+  ];
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -146,6 +151,16 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                     <p className="mt-2 break-words leading-6">{value}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-6 rounded-lg border border-accent/25 bg-accent/10 p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">After Signup</p>
+                <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                  {kickoffSteps.map((step, index) => (
+                    <p key={step}>
+                      {index + 1}. {step}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
 

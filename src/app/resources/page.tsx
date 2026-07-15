@@ -9,9 +9,9 @@ const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Lead Generation Resources, Tools, CRM Workflows, Proposal Templates, and Follow-Ups",
+  title: "Lead Generation Resources for Freelancers, Web Design Leads, and Cold Outreach Workflows",
   description:
-    "Practical iCloseLeads resources for freelancer lead generation tools, cold outreach CRM workflows, decision maker email research, proposal templates, local prospecting, and client acquisition.",
+    "Practical iCloseLeads resources for freelancer lead generation, web design leads, local business prospecting, Gmail-ready cold outreach, proposal templates, and CRM follow-up workflows.",
   keywords: [
     "best lead generation tools for freelancers",
     "cold outreach CRM for freelancers",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/resources` },
   openGraph: {
-    title: "Lead Generation Resources for Freelancers | iCloseLeads",
+    title: "Lead Generation Resources for Freelancers and Web Design Leads | iCloseLeads",
     description:
       "Guides and workflows for finding better freelance leads, qualifying prospects, writing pitches, and turning search intent into signups and first outreach.",
     url: `${BASE_URL}/resources`,
@@ -105,7 +105,7 @@ export default function ResourcesPage() {
               SEO-backed playbooks
             </div>
             <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Lead generation resources built for signups, first searches, proposals, CRM follow-ups, and decision-maker research
+              Lead generation resources for freelancers who need web design leads, local business prospects, and outreach workflows that convert
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
               Guides for freelancers and agencies who need clients, not vague motivation. Learn how to compare lead generation tools, build a cold outreach CRM workflow, find decision-maker paths, qualify web design leads, write proposals, and follow up in a way that moves a visitor toward a real account and workflow run.
@@ -113,7 +113,7 @@ export default function ResourcesPage() {
             <div className="mt-6 max-w-3xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
               <p className="mt-3 text-base leading-7 text-foreground">
-                These resources help freelancers turn lead-generation searches into a practical next step: find a better prospect, understand why the lead matters, and move into iCloseLeads for the search, saved lead, proposal draft, and follow-up workflow.
+                These resources help freelancers turn lead-generation searches into a practical next step: qualify a better prospect, understand why the lead matters, and move into iCloseLeads for the search, saved lead, proposal draft, and follow-up workflow.
               </p>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -148,7 +148,7 @@ export default function ResourcesPage() {
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
             {[
               "Every guide points to a product workflow, not a dead-end article.",
-              "Each topic is tied to GSC, GA4, SERP, competitor, or product evidence.",
+              "Each topic is tied to GSC, GA4, live SERP, competitor, or product evidence.",
               "Internal links connect resources to signup-intent use cases, proposal paths, and feature pages.",
             ].map((item) => (
               <div key={item} className="rounded-lg border border-border bg-background p-5 text-sm leading-6 text-muted-foreground">

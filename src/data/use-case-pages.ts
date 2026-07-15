@@ -168,7 +168,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Gmail outreach for freelancers",
     ],
     heroSummary:
-      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward a saved lead, Gmail draft, and follow-up workflow.",
+      "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward a saved lead, Gmail draft, and follow-up workflow instead of another disconnected spreadsheet.",
     primaryCta: "Start Outreach Free",
     secondaryCta: "See AI Proposals",
     dashboardPath: "/dashboard/leads",
@@ -180,7 +180,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "A signal-led outreach workflow where every saved lead has context, a pitch angle, a contact route, notes, Gmail-ready draft support, and follow-up status.",
     intro: [
       "Most freelance cold outreach fails because it starts with a list, not a reason. A stranger does not need another generic message about your services. They need to see that you noticed a real problem, timing cue, job post, website gap, or business signal that makes your offer relevant now.",
-      "iCloseLeads is built for that style of outreach. You can find remote job leads, local business opportunities, live hiring signals, and decision-maker paths, then turn the context into a sharp first message. The result is not more noise. It is a smaller list of better prospects with a stronger reason to reply.",
+      "iCloseLeads is built for that style of outreach. You can find remote job leads, local business opportunities, live hiring signals, and decision-maker paths, then turn the context into a sharp first message. The result is not more noise. It is a smaller list of better prospects with a stronger reason to reply and a clearer route into Gmail and follow-up.",
     ],
     signals: [
       {
@@ -297,7 +297,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "website redesign leads",
     ],
     heroSummary:
-      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into outreach, proposal drafting, and follow-up without losing context.",
+      "Find businesses that already show a reason to pitch: no website, outdated site, weak local presence, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into outreach, proposal drafting, and follow-up without losing context or bouncing between tools.",
     primaryCta: "Find Local Leads Free",
     secondaryCta: "Read Lead Discovery",
     dashboardPath: "/dashboard/local-leads",
@@ -309,7 +309,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "A practical local prospecting workflow where each lead includes the business profile, website signal, contact details when available, owner/manager research path, pitch angle, notes, and CRM status.",
     intro: [
       "Local prospecting works best when it starts with a visible business problem. A cleaning company with no website, a dental clinic with an outdated site, or a trades business with a weak mobile experience is not just a name in a spreadsheet. It is a business likely losing trust, calls, bookings, or quote requests.",
-      "iCloseLeads helps freelancers search by business type and city, then filter by website status and contact readiness. When a lead looks worth pursuing, Decision Maker Finder helps you look for public owner or manager signals, social profiles, phone routes, registry guidance, and proof links. The goal is not to pretend every business needs the same service. The goal is to find the gap, verify the contact route, and write a useful first message.",
+      "iCloseLeads helps freelancers search by business type and city, then filter by website status and contact readiness. When a lead looks worth pursuing, Decision Maker Finder helps you look for public owner or manager signals, social profiles, phone routes, registry guidance, and proof links. The goal is not to pretend every business needs the same service. The goal is to find the gap, verify the contact route, and write a useful first message that ties back to calls, quotes, or bookings.",
     ],
     signals: [
       { label: "No or unknown website", detail: "Useful for web design, landing page, booking flow, and starter website offers." },

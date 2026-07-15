@@ -120,7 +120,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       "Remote job leads, local business leads, and Decision Maker Finder live in focused dashboards built around buyer intent.",
       "Saved leads move into the same CRM, proposal, and outreach workflow instead of dying in a spreadsheet.",
       "Local lead workflows continue into owner, manager, social profile, phone route, and proof-link checks.",
-      "The product fits the exact acquisition motions surfacing in GSC: web design leads, local-business gaps, and freelance cold outreach.",
+      "The product fits the exact acquisition motions surfacing in GSC and live SERPs: web design leads, businesses-without-websites prospecting, local-business gaps, and freelance cold outreach.",
     ],
     stats: [
       { value: "3 paths", label: "Remote, local, and decision maker discovery" },
@@ -435,6 +435,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     proof: [
       "Proposal pages support Gmail compose preparation instead of forcing a black-box sender.",
       "GA4 is already showing engagement and form-start activity around outreach-oriented landing paths.",
+      "Landing-page behavior already shows `/auth`, `/resources`, and `/dashboard/local-leads` as real workflow entry points even while key-event tracking remains incomplete.",
       "Outreach usage limits are visible, which makes the free-plan workflow predictable for early users.",
       "Saved lead records and email history give every follow-up a single place to live.",
     ],

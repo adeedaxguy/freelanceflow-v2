@@ -153,6 +153,11 @@ function FeatureCard({ item, page }: { item: FeatureItem; page: FeaturePageData 
 export default function FeatureMarketingPage({ page }: { page: FeaturePageData }) {
   const otherFeatures = FEATURE_PAGES.filter(item => item.slug !== page.slug);
   const shortAnswer = `${page.eyebrow} helps freelancers move from a lead signal to the next action faster by keeping the workflow inside iCloseLeads instead of splitting research, drafting, and follow-up across separate tools. ${page.promise}`;
+  const kickoffSteps = [
+    `Start with ${page.eyebrow.toLowerCase()} only after you have one focused lead or workflow to test.`,
+    "Use the feature on a small, real batch so the notes, draft, or follow-up path stays specific.",
+    "Move the result into the next product step immediately instead of exporting it to another tool.",
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -201,6 +206,16 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                     {label}
                   </span>
                 ))}
+              </div>
+              <div className="mt-6 max-w-2xl rounded-2xl border border-accent/25 bg-accent/10 p-5">
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Best first run</p>
+                <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                  {kickoffSteps.map((step, index) => (
+                    <p key={step}>
+                      {index + 1}. {step}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
             <FeatureInteractiveDemo type={page.slug} />

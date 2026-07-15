@@ -97,6 +97,11 @@ export default function ResourcePage({ params }: Props) {
   const page = getResourcePage(params.slug);
   if (!page) notFound();
   const shortAnswer = `${page.summary} iCloseLeads helps ${page.audience.toLowerCase()} turn that workflow into a focused search, a saved lead, and a first outreach draft without bouncing between separate tools.`;
+  const workflowKickoff = [
+    "Create a free account and run one focused search tied to this page's keyword.",
+    "Save the best lead while the map, job, or website context is still open.",
+    "Turn the saved lead into a proposal draft or Gmail-ready outreach before the reason goes stale.",
+  ];
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -141,6 +146,22 @@ export default function ResourcePage({ params }: Props) {
           <section className="px-4 py-14 sm:px-6 lg:px-8">
             <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.72fr_0.28fr]">
               <div className="min-w-0 space-y-10">
+                {page.relatedSearches?.length ? (
+                  <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
+                    <h2 className="text-2xl font-extrabold text-foreground">Searches this workflow should help with</h2>
+                    <p className="mt-4 text-base leading-7 text-muted-foreground">
+                      This page is built to answer the commercial search variants real freelancers use before they sign up, search, and save a lead.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {page.relatedSearches.map((term) => (
+                        <span key={term} className="rounded-full border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground">
+                          {term}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+
                 <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
                   <h2 className="flex items-center gap-3 text-2xl font-extrabold text-foreground">
                     <ClipboardList className="h-6 w-6 text-primary-light" />
@@ -156,6 +177,26 @@ export default function ResourcePage({ params }: Props) {
                     ))}
                   </div>
                 </section>
+
+                {page.qualificationChecks?.length ? (
+                  <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
+                    <h2 className="text-2xl font-extrabold text-foreground">Qualify the lead before you pitch</h2>
+                    <p className="mt-4 text-base leading-7 text-muted-foreground">
+                      Generic lead vendors stop at the list. A stronger workflow verifies why the business is worth contacting before you draft the message.
+                    </p>
+                    <div className="mt-6 grid gap-4">
+                      {page.qualificationChecks.map((check) => (
+                        <div key={check.signal} className="rounded-lg border border-border bg-background p-5">
+                          <h3 className="text-base font-bold text-foreground">{check.signal}</h3>
+                          <p className="mt-2 text-sm leading-6 text-muted-foreground">{check.whyItMatters}</p>
+                          <p className="mt-3 rounded-lg border border-primary/20 bg-primary/10 p-3 text-sm leading-6 text-primary-light">
+                            Next move: {check.nextMove}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
 
                 <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
                   <h2 className="text-2xl font-extrabold text-foreground">Why this matters for iCloseLeads users</h2>
@@ -205,9 +246,11 @@ export default function ResourcePage({ params }: Props) {
                 <div className="rounded-lg border border-accent/25 bg-accent/10 p-6">
                   <p className="text-sm font-bold text-accent">Turn this into a real workflow</p>
                   <div className="mt-3 space-y-3 text-sm leading-6 text-muted-foreground">
-                    <p>1. Create a free account and run one focused search instead of collecting ideas in another spreadsheet.</p>
-                    <p>2. Save the best lead while the business context is still visible.</p>
-                    <p>3. Draft the first message in iCloseLeads before you lose the pitch angle.</p>
+                    {workflowKickoff.map((step, index) => (
+                      <p key={step}>
+                        {index + 1}. {step}
+                      </p>
+                    ))}
                   </div>
                   <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-workflow-panel`} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-accent">
                     Start free and test the workflow
