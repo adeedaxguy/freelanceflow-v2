@@ -68,6 +68,23 @@ interface UsageStats {
   nextReset: string;
   percentage: number;
 }
+interface SourceDiag {
+  source: string;
+  ok: boolean;
+  fetched: number;
+  kept: number;
+  errorMessage?: string;
+}
+interface SearchDiagnostics {
+  sources: SourceDiag[];
+  totalFetched: number;
+  totalAfterMinConfidence: number;
+  autoBroadened?: boolean;
+  requestedMaxHours?: number;
+  effectiveMaxHours?: number;
+  initialResultCount?: number;
+  broadenReason?: "empty" | "thin" | null;
+}
 const DEFAULT_PREFS: BestMatchPrefs = {
   minConfidence: 40,
   preferRemote: true,
@@ -228,6 +245,7 @@ export default function LiveJobsPage() {
   const [activeSources,   setActiveSources]   = useState<string[]>([]);
   const [totalFound,      setTotalFound]      = useState(0);
   const [usage,           setUsage]           = useState<UsageStats | null>(null);
+  const [diagnostics,     setDiagnostics]     = useState<SearchDiagnostics | null>(null);
   // Source filter — "all" or one specific source id
   const [sourceFilter,    setSourceFilter]    = useState<string>("all");
 
@@ -250,8 +268,9 @@ export default function LiveJobsPage() {
       // Restore last results so they persist when switching tabs
       const cached = sessionStorage.getItem(SS_LIVE_KEY);
       if (cached) {
-        const { leads: cl, fetchedAt: ft } = JSON.parse(cached) as { leads: AggregatedLead[]; fetchedAt: string };
+        const { leads: cl, fetchedAt: ft, diagnostics: dg } = JSON.parse(cached) as { leads: AggregatedLead[]; fetchedAt: string; diagnostics?: SearchDiagnostics };
         setLeads(cl); setFetchedAt(ft);
+        if (dg) setDiagnostics(dg);
       }
       const last = parseInt(localStorage.getItem(COOLDOWN_KEY)??"0");
       const elapsed = Date.now() - last;
@@ -284,7 +303,7 @@ export default function LiveJobsPage() {
 
   const fetchLive = useCallback(async (force = false) => {
     if (!force && countdown > 0) return;
-    setLoading(true); setError(""); setActiveSources([]); setTotalFound(0);
+    setLoading(true); setError(""); setActiveSources([]); setTotalFound(0); setDiagnostics(null);
     const nichesToFetch = selectedNiches.length > 0 ? selectedNiches : LIVE_NICHES;
 
     try {
@@ -310,6 +329,7 @@ export default function LiveJobsPage() {
         total?: number;
         activeSources?: string[];
         usage?: UsageStats;
+        diagnostics?: SearchDiagnostics;
         error?: string;
       };
 
@@ -317,6 +337,7 @@ export default function LiveJobsPage() {
       setTotalFound(data.total ?? fetched.length);
       setActiveSources(data.activeSources ?? []);
       if (data.usage) setUsage(data.usage);
+      setDiagnostics(data.diagnostics ?? null);
 
       const prev = prevSeenRef.current;
       fetched.sort((a, b) => {
@@ -330,7 +351,7 @@ export default function LiveJobsPage() {
       setFetchedAt(ft);
       setPage(1);
       setSourceFilter("all"); // reset source filter on new fetch
-      try { sessionStorage.setItem(SS_LIVE_KEY, JSON.stringify({ leads: fetched, fetchedAt: ft })); } catch {}
+      try { sessionStorage.setItem(SS_LIVE_KEY, JSON.stringify({ leads: fetched, fetchedAt: ft, diagnostics: data.diagnostics ?? null })); } catch {}
 
       const newSeen = new Set([...prev, ...fetched.map(l => l.id)]);
       setSeenIds(newSeen);
@@ -613,6 +634,25 @@ export default function LiveJobsPage() {
             {error && (
               <div className="flex items-center gap-3 text-destructive bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
                 <AlertCircle className="w-4 h-4 flex-shrink-0"/><p className="text-sm">{error}</p>
+              </div>
+            )}
+
+            {diagnostics?.autoBroadened && leads.length > 0 && (
+              <div className="flex items-start gap-3 text-foreground bg-gold/5 border border-gold/20 rounded-xl px-4 py-3">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-gold" />
+                <p className="text-sm">
+                  {diagnostics.broadenReason === "thin" ? (
+                    <>
+                      Only <strong>{diagnostics.initialResultCount ?? 0}</strong> strong match{(diagnostics.initialResultCount ?? 0) === 1 ? "" : "es"} appeared in the last <strong>{diagnostics.requestedMaxHours}h</strong>,
+                      so iCloseLeads added the best nearby matches from the last <strong>{Math.round((diagnostics.effectiveMaxHours ?? 168) / 24)} days</strong>.
+                    </>
+                  ) : (
+                    <>
+                      Nothing strong appeared in the last <strong>{diagnostics.requestedMaxHours}h</strong>,
+                      so iCloseLeads added the best nearby matches from the last <strong>{Math.round((diagnostics.effectiveMaxHours ?? 168) / 24)} days</strong>.
+                    </>
+                  )}
+                </p>
               </div>
             )}
 

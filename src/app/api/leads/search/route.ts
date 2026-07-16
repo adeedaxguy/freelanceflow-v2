@@ -38,6 +38,8 @@ const UNLIMITED_EMAILS = new Set([
   "adnanaimanager@gmail.com",
 ]);
 
+const MIN_USEFUL_FRESH_RESULTS = 12;
+
 /**
  * Per-user dedup fingerprint. Combines the FULL normalized company name with
  * the domain — not a truncated substring of either.
@@ -123,12 +125,22 @@ export async function POST(req: NextRequest) {
       freshOnly,
     });
 
-    // Auto-broaden fallback: if a fresh search returns nothing, silently widen
-    // the time window. We tell the UI it was broadened so it can warn the user
-    // that these aren't the freshest possible.
+    // Auto-broaden fallback: if a fresh search returns nothing, or returns too
+    // few useful matches, widen the time window. We tell the UI it was broadened
+    // so it can be honest that these are the best nearby matches, not only the
+    // strict requested window.
     let effectiveMaxHours = maxHours;
     let autoBroadened = false;
-    if (rawLeads.length === 0 && maxHours < 168) {
+    const initialResultCount = rawLeads.length;
+    let broadenReason: "empty" | "thin" | null =
+      initialResultCount === 0 ? "empty" :
+      initialResultCount < MIN_USEFUL_FRESH_RESULTS ? "thin" :
+      null;
+
+    const shouldBroaden = () =>
+      rawLeads.length < MIN_USEFUL_FRESH_RESULTS && effectiveMaxHours < 720;
+
+    if (shouldBroaden() && maxHours < 168) {
       effectiveMaxHours = 168;
       autoBroadened = true;
       const retry = await aggregateLeadsWithDiagnostics(nicheList, {
@@ -140,7 +152,7 @@ export async function POST(req: NextRequest) {
       rawLeads = retry.leads;
       diagnostics = retry.diagnostics;
     }
-    if (rawLeads.length === 0 && effectiveMaxHours < 720) {
+    if (shouldBroaden()) {
       effectiveMaxHours = 720;
       autoBroadened = true;
       const retry = await aggregateLeadsWithDiagnostics(nicheList, {
@@ -151,6 +163,9 @@ export async function POST(req: NextRequest) {
       });
       rawLeads = retry.leads;
       diagnostics = retry.diagnostics;
+    }
+    if (autoBroadened && !broadenReason) {
+      broadenReason = rawLeads.length === 0 ? "empty" : "thin";
     }
 
     let leads: AggregatedLead[] = rawLeads.filter(l =>
@@ -211,6 +226,9 @@ export async function POST(req: NextRequest) {
         autoBroadened,
         requestedMaxHours: maxHours,
         effectiveMaxHours,
+        initialResultCount,
+        minimumUsefulResults: MIN_USEFUL_FRESH_RESULTS,
+        broadenReason,
       },
     });
   } catch (error) {

@@ -53,6 +53,9 @@ interface SearchDiagnostics {
   autoBroadened?: boolean;
   requestedMaxHours?: number;
   effectiveMaxHours?: number;
+  initialResultCount?: number;
+  minimumUsefulResults?: number;
+  broadenReason?: "empty" | "thin" | null;
 }
 interface ContactInfo {
   company: string;
@@ -638,8 +641,17 @@ export default function LeadsPage() {
         <div className="flex items-start gap-3 text-foreground bg-gold/5 border border-gold/20 rounded-xl px-4 py-3">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-gold" />
           <p className="text-sm">
-            Nothing fresh in the last <strong>{diagnostics.requestedMaxHours}h</strong> for these niches —
-            showing leads from the last <strong>{Math.round((diagnostics.effectiveMaxHours ?? 168) / 24)} days</strong> instead.
+            {diagnostics.broadenReason === "thin" ? (
+              <>
+                Only <strong>{diagnostics.initialResultCount ?? 0}</strong> strong match{(diagnostics.initialResultCount ?? 0) === 1 ? "" : "es"} appeared in the last <strong>{diagnostics.requestedMaxHours}h</strong>,
+                so iCloseLeads added the best nearby matches from the last <strong>{Math.round((diagnostics.effectiveMaxHours ?? 168) / 24)} days</strong>.
+              </>
+            ) : (
+              <>
+                Nothing strong appeared in the last <strong>{diagnostics.requestedMaxHours}h</strong> for these niches,
+                so iCloseLeads added the best nearby matches from the last <strong>{Math.round((diagnostics.effectiveMaxHours ?? 168) / 24)} days</strong>.
+              </>
+            )}
           </p>
         </div>
       )}
