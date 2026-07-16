@@ -8,7 +8,7 @@ import { LEAD_GENERATION_PAGES } from "@/data/lead-generation-pages";
 const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
-  title: "Lead Generation Pages for Freelancers | iCloseLeads",
+  title: "Lead Generation Pages for Freelancers",
   description:
     "Compare iCloseLeads lead generation paths for web design leads, freelance client leads, remote freelance jobs, local business leads, and businesses without websites.",
   keywords: [
