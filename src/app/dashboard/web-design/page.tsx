@@ -50,6 +50,7 @@ type DesignOptions = {
   contentDepth: string;
   conversionGoal: string;
   layout: string;
+  prompt: string;
 };
 
 type Option = {
@@ -149,6 +150,10 @@ function clean(value: string | null, fallback = "") {
   return (next || fallback).slice(0, 240);
 }
 
+function cleanPrompt(value: string | null | undefined) {
+  return (value ?? "").replace(/\s+/g, " ").trim().slice(0, 720);
+}
+
 function safeHttpUrl(value: string) {
   try {
     const url = new URL(value);
@@ -187,7 +192,73 @@ function buildPreviewSearch(data: DraftData, options: DesignOptions) {
 
   if (data.website) params.set("website", data.website);
   if (data.maps) params.set("maps", data.maps);
+  if (options.prompt) params.set("prompt", options.prompt);
   return params.toString();
+}
+
+function promptIncludes(prompt: string, terms: string[]) {
+  const normalized = prompt.toLowerCase();
+  return terms.some(term => normalized.includes(term));
+}
+
+function inferDesignOptionsFromPrompt(prompt: string, current: DesignOptions): DesignOptions {
+  const next = { ...current, prompt: cleanPrompt(prompt) };
+  if (!next.prompt) return next;
+
+  if (promptIncludes(next.prompt, ["luxury", "premium", "high end", "high-end", "expensive", "elegant", "exclusive"])) {
+    next.style = "premium";
+    next.layout = "showcase";
+    next.sections = "9";
+    next.contentDepth = "detailed";
+  }
+  if (promptIncludes(next.prompt, ["bold", "loud", "energetic", "stand out", "punchy", "strong contrast"])) {
+    next.style = "bold";
+    next.layout = "conversion";
+  }
+  if (promptIncludes(next.prompt, ["creative", "funky", "playful", "colourful", "colorful", "different", "memorable"])) {
+    next.style = "creative";
+    next.images = "gallery";
+  }
+  if (promptIncludes(next.prompt, ["friendly", "family", "neighbourhood", "neighborhood", "warm", "local feel", "approachable"])) {
+    next.style = "friendly";
+  }
+  if (promptIncludes(next.prompt, ["minimal", "simple", "clean", "fast", "no clutter", "straight to the point"])) {
+    next.style = "minimal";
+    next.sections = "5";
+    next.contentDepth = "short";
+    next.layout = "conversion";
+  }
+  if (promptIncludes(next.prompt, ["serious", "professional", "trust", "credible", "corporate", "established"])) {
+    next.style = "professional";
+  }
+
+  if (promptIncludes(next.prompt, ["light", "white", "bright", "airy"])) next.theme = "light";
+  if (promptIncludes(next.prompt, ["dark", "black", "midnight", "premium dark"])) next.theme = "dark";
+
+  if (promptIncludes(next.prompt, ["before after", "before-and-after", "transformation", "case study", "proof"])) next.images = "before-after";
+  if (promptIncludes(next.prompt, ["gallery", "photos", "photo", "images", "portfolio", "show work"])) next.images = "gallery";
+  if (promptIncludes(next.prompt, ["no images", "text only", "text-first"])) next.images = "none";
+  if (promptIncludes(next.prompt, ["brand visuals", "abstract", "graphic"])) next.images = "abstract";
+
+  if (promptIncludes(next.prompt, ["call", "phone", "ring", "tap to call"])) next.conversionGoal = "calls";
+  if (promptIncludes(next.prompt, ["quote", "estimate", "enquiry", "inquiry", "lead form"])) next.conversionGoal = "quotes";
+  if (promptIncludes(next.prompt, ["book", "booking", "appointment", "schedule"])) next.conversionGoal = "bookings";
+  if (promptIncludes(next.prompt, ["visit", "walk in", "directions", "store", "shop"])) next.conversionGoal = "visits";
+
+  if (promptIncludes(next.prompt, ["story", "editorial", "brand story", "magazine"])) next.layout = "editorial";
+  if (promptIncludes(next.prompt, ["showcase", "visual", "portfolio", "gallery-led"])) next.layout = "showcase";
+  if (promptIncludes(next.prompt, ["conversion", "sales", "landing page", "lead gen", "cta"])) next.layout = "conversion";
+
+  if (promptIncludes(next.prompt, ["full", "complete", "long", "detailed", "all sections"])) {
+    next.sections = "11";
+    next.contentDepth = "detailed";
+  }
+  if (promptIncludes(next.prompt, ["balanced", "not too long", "medium"])) {
+    next.sections = "7";
+    next.contentDepth = "balanced";
+  }
+
+  return next;
 }
 
 function OptionGrid({
@@ -271,6 +342,7 @@ function WebDesignBuilderContent() {
   const [contentDepth, setContentDepth] = useState(() => optionValue(searchParams.get("contentDepth"), CONTENT_OPTIONS, "balanced"));
   const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, "quotes"));
   const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, "conversion"));
+  const [designPrompt, setDesignPrompt] = useState(() => cleanPrompt(searchParams.get("prompt")));
 
   const options = useMemo<DesignOptions>(() => ({
     style,
@@ -280,7 +352,8 @@ function WebDesignBuilderContent() {
     contentDepth,
     conversionGoal,
     layout,
-  }), [contentDepth, conversionGoal, images, layout, sections, style, theme]);
+    prompt: designPrompt,
+  }), [contentDepth, conversionGoal, designPrompt, images, layout, sections, style, theme]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data, options)}`;
   const pdfHref = `${previewHref}&print=1`;
@@ -291,11 +364,12 @@ function WebDesignBuilderContent() {
   const canGoBack = activeStep > 0;
   const canGoNext = activeStep < BUILDER_STEPS.length - 1;
   const selectedSummary = [
+    designPrompt ? "Prompt-led" : null,
     optionLabel(STYLE_OPTIONS, style),
     optionLabel(THEME_OPTIONS, theme),
     `${sections} sections`,
     optionLabel(GOAL_OPTIONS, conversionGoal),
-  ];
+  ].filter(Boolean) as string[];
 
   const proposalHref = `/dashboard/proposal/new?${new URLSearchParams({
     company: data.company,
@@ -311,6 +385,18 @@ function WebDesignBuilderContent() {
     await navigator.clipboard.writeText(absoluteUrl);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
+  }
+
+  function applyDesignPrompt() {
+    const inferred = inferDesignOptionsFromPrompt(designPrompt, options);
+    setDesignPrompt(inferred.prompt);
+    setStyle(inferred.style);
+    setTheme(inferred.theme);
+    setSections(inferred.sections);
+    setImages(inferred.images);
+    setContentDepth(inferred.contentDepth);
+    setConversionGoal(inferred.conversionGoal);
+    setLayout(inferred.layout);
   }
 
   return (
@@ -482,40 +568,73 @@ function WebDesignBuilderContent() {
             </div>
 
             {activeStepData.key === "brief" && (
-              <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr]">
-                <div className="rounded-3xl border border-border bg-background/55 p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Client brief</p>
-                  <h3 className="mt-3 text-3xl font-black text-foreground">{data.company}</h3>
-                  <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.subheadline}</p>
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    {[
-                      ["Category", data.category],
-                      ["Market", data.location],
-                      ["Phone", data.phone || "Not provided"],
-                      ["Website status", data.status || "Unknown"],
-                    ].map(([label, value]) => (
-                      <div key={label} className="rounded-2xl border border-border bg-surface/65 p-4">
-                        <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
-                        <p className="mt-1 break-words font-bold text-foreground">{value}</p>
+              <div className="space-y-4">
+                <div className="rounded-3xl border border-primary/25 bg-primary/10 p-5">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Wand2 className="h-5 w-5 text-primary-light" />
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Prompt the website direction</p>
                       </div>
-                    ))}
+                      <h3 className="mt-3 text-2xl font-black text-foreground">Tell iCloseLeads what kind of site should sell this business.</h3>
+                      <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                        Write the direction like you would brief a designer. The builder will convert it into style, theme, sections, imagery, copy depth, and CTA focus.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={applyDesignPrompt}
+                      disabled={!designPrompt.trim()}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-hero px-4 py-3 text-sm font-black text-white shadow-glow transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Apply prompt
+                    </button>
                   </div>
+                  <textarea
+                    value={designPrompt}
+                    onChange={event => setDesignPrompt(cleanPrompt(event.target.value))}
+                    rows={5}
+                    placeholder="Example: Create a premium but friendly auto repair website with before-and-after proof, strong local trust, quote requests as the main CTA, detailed service sections, and a clean dark visual style."
+                    className="mt-5 min-h-[150px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
 
-                <div className="rounded-3xl border border-accent/25 bg-accent/10 p-5">
-                  <Sparkles className="h-7 w-7 text-accent" />
-                  <h3 className="mt-4 text-2xl font-black text-foreground">Recommended sales angle</h3>
-                  <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.pitchHook}</p>
-                  <div className="mt-5 space-y-3">
-                    {identity.services.slice(0, 3).map(service => (
-                      <div key={service.title} className="flex items-start gap-3 rounded-2xl border border-accent/20 bg-background/40 p-3">
-                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" />
-                        <div>
-                          <p className="font-black text-foreground">{service.title}</p>
-                          <p className="mt-1 text-sm leading-5 text-muted-foreground">{service.description}</p>
+                <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr]">
+                  <div className="rounded-3xl border border-border bg-background/55 p-5">
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Client brief</p>
+                    <h3 className="mt-3 text-3xl font-black text-foreground">{data.company}</h3>
+                    <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.subheadline}</p>
+                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                      {[
+                        ["Category", data.category],
+                        ["Market", data.location],
+                        ["Phone", data.phone || "Not provided"],
+                        ["Website status", data.status || "Unknown"],
+                      ].map(([label, value]) => (
+                        <div key={label} className="rounded-2xl border border-border bg-surface/65 p-4">
+                          <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+                          <p className="mt-1 break-words font-bold text-foreground">{value}</p>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-accent/25 bg-accent/10 p-5">
+                    <Sparkles className="h-7 w-7 text-accent" />
+                    <h3 className="mt-4 text-2xl font-black text-foreground">Recommended sales angle</h3>
+                    <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.pitchHook}</p>
+                    <div className="mt-5 space-y-3">
+                      {identity.services.slice(0, 3).map(service => (
+                        <div key={service.title} className="flex items-start gap-3 rounded-2xl border border-accent/20 bg-background/40 p-3">
+                          <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" />
+                          <div>
+                            <p className="font-black text-foreground">{service.title}</p>
+                            <p className="mt-1 text-sm leading-5 text-muted-foreground">{service.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -762,6 +881,12 @@ function WebDesignBuilderContent() {
             <div className="rounded-[2rem] border border-border bg-surface p-5 shadow-card">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Current build recipe</p>
               <div className="mt-4 space-y-3">
+                {designPrompt && (
+                  <div className="rounded-2xl border border-primary/25 bg-primary/10 px-4 py-3">
+                    <span className="text-sm font-black text-primary-light">Prompt brief</span>
+                    <p className="mt-1 line-clamp-4 text-sm leading-6 text-muted-foreground">{designPrompt}</p>
+                  </div>
+                )}
                 {[
                   ["Direction", optionLabel(STYLE_OPTIONS, style)],
                   ["Theme", optionLabel(THEME_OPTIONS, theme)],

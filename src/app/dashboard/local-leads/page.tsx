@@ -7,7 +7,7 @@ import {
   X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
   Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  ArrowRight, Filter, Users, Store, Palette,
+  ArrowRight, Filter, Users, Store, Palette, Download,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -176,6 +176,100 @@ function decisionMakerLocation(lead: LocalLead, searchLocation?: string) {
 function googleMapsBusinessProfileUrl(lead: LocalLead) {
   const query = [lead.name, lead.address, lead.city, lead.country].filter(Boolean).join(", ");
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query || lead.name)}`;
+}
+
+function csvCell(value: unknown) {
+  const text = Array.isArray(value)
+    ? value.filter(Boolean).join(" | ")
+    : value == null
+      ? ""
+      : String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
+function safeCsvSlug(value: string) {
+  return (value || "local-leads")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64) || "local-leads";
+}
+
+function exportLocalLeadsCsv(leads: LocalLead[], keyword: string, location: string, filters: string[]) {
+  if (!leads.length) return;
+
+  const headers = [
+    "Business",
+    "Category",
+    "Address",
+    "City",
+    "Country",
+    "Phone",
+    "Phone Type",
+    "Phone Type Confidence",
+    "Website Status",
+    "Website",
+    "Rating",
+    "Reviews",
+    "Score",
+    "Urgency",
+    "Business Scale",
+    "Revenue Estimate",
+    "Google Maps",
+    "Email",
+    "Guessed Emails",
+    "Pitch Subject",
+    "Pitch Opener",
+    "Pitch Points",
+    "Search Keyword",
+    "Search Location",
+    "Active Filters",
+    "Exported At",
+  ];
+
+  const exportedAt = new Date().toISOString();
+  const rows = leads.map(lead => {
+    const phoneInfo = getPhoneTypeInfo(lead.phone, lead.country);
+    return [
+      lead.name,
+      lead.categoryLabel || lead.category,
+      lead.address,
+      lead.city,
+      lead.country,
+      lead.phone,
+      phoneInfo.shortLabel,
+      phoneInfo.confidence,
+      lead.websiteStatus,
+      lead.website,
+      lead.rating,
+      lead.reviewCount,
+      lead.score,
+      lead.urgency,
+      lead.businessScale,
+      lead.revenueEst,
+      lead.mapsUrl || googleMapsBusinessProfileUrl(lead),
+      lead.email,
+      lead.guessedEmails,
+      lead.pitchSubject,
+      lead.pitchOpener,
+      lead.pitchPoints,
+      keyword,
+      location,
+      filters.length ? filters.join(" | ") : "None",
+      exportedAt,
+    ].map(csvCell).join(",");
+  });
+
+  const csv = [headers.map(csvCell).join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `${safeCsvSlug(keyword)}-${safeCsvSlug(location)}-local-leads.csv`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 function getLocalLeadCallScript(lead: LocalLead) {
@@ -1485,6 +1579,16 @@ export default function LocalLeadsPage() {
                 {smallOperatorCount > 0 && <span className="text-cyan-300 font-medium">{smallOperatorCount} small operators</span>}
                 {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
                 <div className="ml-auto flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => exportLocalLeadsCsv(filteredResults, keyword, location, activeFilterLabels)}
+                    disabled={filteredResults.length === 0}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary-light transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-45"
+                    title="Download the current searched and filtered business results as a CSV file"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Export CSV
+                  </button>
                   {meta?.cached && (
                     <span className="flex items-center gap-1 text-xs bg-surface text-muted-foreground px-2 py-0.5 rounded-full border border-border">
                       <Clock className="w-3 h-3"/> Cached (24hr)

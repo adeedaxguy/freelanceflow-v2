@@ -47,6 +47,7 @@ type SearchParams = {
   contentDepth?: string | string[];
   conversionGoal?: string | string[];
   layout?: string | string[];
+  prompt?: string | string[];
   print?: string | string[];
 };
 
@@ -71,6 +72,71 @@ type PreviewOptions = {
   conversionGoal: "calls" | "quotes" | "bookings" | "visits";
   layout: "conversion" | "editorial" | "showcase";
 };
+
+function promptIncludes(prompt: string, terms: string[]) {
+  const normalized = prompt.toLowerCase();
+  return terms.some(term => normalized.includes(term));
+}
+
+function inferPreviewOptionsFromPrompt(prompt: string, current: PreviewOptions): PreviewOptions {
+  if (!prompt) return current;
+  const next = { ...current };
+
+  if (promptIncludes(prompt, ["luxury", "premium", "high end", "high-end", "expensive", "elegant", "exclusive"])) {
+    next.style = "premium";
+    next.layout = "showcase";
+    next.sections = Math.max(next.sections, 9);
+    next.contentDepth = "detailed";
+  }
+  if (promptIncludes(prompt, ["bold", "loud", "energetic", "stand out", "punchy", "strong contrast"])) {
+    next.style = "bold";
+    next.layout = "conversion";
+  }
+  if (promptIncludes(prompt, ["creative", "funky", "playful", "colourful", "colorful", "different", "memorable"])) {
+    next.style = "creative";
+    next.images = "gallery";
+  }
+  if (promptIncludes(prompt, ["friendly", "family", "neighbourhood", "neighborhood", "warm", "local feel", "approachable"])) {
+    next.style = "friendly";
+  }
+  if (promptIncludes(prompt, ["minimal", "simple", "clean", "fast", "no clutter", "straight to the point"])) {
+    next.style = "minimal";
+    next.sections = 5;
+    next.contentDepth = "short";
+    next.layout = "conversion";
+  }
+  if (promptIncludes(prompt, ["serious", "professional", "trust", "credible", "corporate", "established"])) {
+    next.style = "professional";
+  }
+
+  if (promptIncludes(prompt, ["light", "white", "bright", "airy"])) next.theme = "light";
+  if (promptIncludes(prompt, ["dark", "black", "midnight", "premium dark"])) next.theme = "dark";
+
+  if (promptIncludes(prompt, ["before after", "before-and-after", "transformation", "case study", "proof"])) next.images = "before-after";
+  if (promptIncludes(prompt, ["gallery", "photos", "photo", "images", "portfolio", "show work"])) next.images = "gallery";
+  if (promptIncludes(prompt, ["no images", "text only", "text-first"])) next.images = "none";
+  if (promptIncludes(prompt, ["brand visuals", "abstract", "graphic"])) next.images = "abstract";
+
+  if (promptIncludes(prompt, ["call", "phone", "ring", "tap to call"])) next.conversionGoal = "calls";
+  if (promptIncludes(prompt, ["quote", "estimate", "enquiry", "inquiry", "lead form"])) next.conversionGoal = "quotes";
+  if (promptIncludes(prompt, ["book", "booking", "appointment", "schedule"])) next.conversionGoal = "bookings";
+  if (promptIncludes(prompt, ["visit", "walk in", "directions", "store", "shop"])) next.conversionGoal = "visits";
+
+  if (promptIncludes(prompt, ["story", "editorial", "brand story", "magazine"])) next.layout = "editorial";
+  if (promptIncludes(prompt, ["showcase", "visual", "portfolio", "gallery-led"])) next.layout = "showcase";
+  if (promptIncludes(prompt, ["conversion", "sales", "landing page", "lead gen", "cta"])) next.layout = "conversion";
+
+  if (promptIncludes(prompt, ["full", "complete", "long", "detailed", "all sections"])) {
+    next.sections = 11;
+    next.contentDepth = "detailed";
+  }
+  if (promptIncludes(prompt, ["balanced", "not too long", "medium"])) {
+    next.sections = 7;
+    next.contentDepth = "balanced";
+  }
+
+  return next;
+}
 
 const GOAL_COPY: Record<PreviewOptions["conversionGoal"], { primary: string; secondary: string; section: string }> = {
   calls: {
@@ -530,6 +596,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   const maps = safeHttpUrl(searchParams?.maps);
   const website = safeHttpUrl(searchParams?.website);
   const pitch = clean(searchParams?.pitch);
+  const designPrompt = clean(searchParams?.prompt);
   const data: PreviewData = {
     company,
     category,
@@ -542,7 +609,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     status: clean(searchParams?.status, "unknown"),
   };
 
-  const options: PreviewOptions = {
+  const baseOptions: PreviewOptions = {
     style: option(searchParams?.style, ["professional", "premium", "bold", "friendly", "minimal", "creative"] as const, "professional"),
     theme: option(searchParams?.theme, ["dark", "light"] as const, "dark"),
     sections: sectionCount(searchParams?.sections),
@@ -551,6 +618,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     conversionGoal: option(searchParams?.conversionGoal, ["calls", "quotes", "bookings", "visits"] as const, "quotes"),
     layout: option(searchParams?.layout, ["conversion", "editorial", "showcase"] as const, "conversion"),
   };
+  const options = inferPreviewOptionsFromPrompt(designPrompt, baseOptions);
 
   const identity = getSiteDraftIdentity(data);
   const initials = businessInitials(company);
