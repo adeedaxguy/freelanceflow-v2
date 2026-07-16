@@ -9,7 +9,7 @@ import {
   FileText, Megaphone, User, Wrench, MessageCircle, Zap,
   CalendarDays, GitMerge, Mail, Menu, X, Radio, ChevronRight,
   LogOut, Crown, Shield, Sparkles, MapPin, ChevronLeft,
-  Command, Users, Palette,
+  Command, Users, Palette, PhoneCall,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
@@ -40,6 +40,8 @@ const NAV_GROUPS = [
     label: "Outreach",
     items: [
       { href: "/dashboard/campaigns",  label: "Campaigns",   icon: Megaphone },
+      { href: "/dashboard/softphone",  label: "Softphone",   icon: PhoneCall,    badge: "SOON" },
+      { href: "/dashboard/whatsapp",   label: "WhatsApp",    icon: MessageCircle, badge: "SOON" },
       { href: "/dashboard/templates",  label: "Templates",   icon: FileText },
       { href: "/dashboard/sent",       label: "Outreach History", icon: Send },
       { href: "/dashboard/analytics",  label: "Analytics",   icon: BarChart2 },
@@ -88,6 +90,15 @@ function NavLink({
   href: string; label: string; icon: React.ElementType;
   active: boolean; onClick?: () => void; badge?: string; collapsed?: boolean;
 }) {
+  const badgeClass =
+    badge === "LIVE"
+      ? "bg-accent/20 text-accent border-accent/30"
+      : badge === "SOON"
+        ? "bg-gold/10 text-gold border-gold/25"
+        : badge === "BETA"
+          ? "bg-accent/10 text-accent border-accent/25"
+          : "bg-primary/20 text-primary-light border-primary/30";
+
   const inner = (
     <Link
       href={href}
@@ -104,15 +115,10 @@ function NavLink({
       {!collapsed && (
         <>
           <span className="flex-1">{label}</span>
-          {badge === "LIVE" && (
-            <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-              LIVE
-            </span>
-          )}
-          {badge === "NEW" && (
-            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/20 text-primary-light border border-primary/30">
-              NEW
+          {badge && (
+            <span className={`flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${badgeClass}`}>
+              {badge === "LIVE" && <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />}
+              {badge}
             </span>
           )}
         </>

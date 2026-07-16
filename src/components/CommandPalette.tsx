@@ -6,7 +6,7 @@ import {
   Search, LayoutDashboard, Radio, Bookmark,
   Send, BarChart2, Settings, FileText, Megaphone, User,
   Wrench, MessageCircle, Zap, CalendarDays, GitMerge,
-  Mail, MapPin, ArrowRight, Crown, Users, Palette,
+  Mail, MapPin, ArrowRight, Crown, Users, Palette, PhoneCall,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +24,8 @@ const COMMANDS = [
   { id: "web-design",     label: "Web Design",             desc: "Create client website concepts", href: "/dashboard/web-design", icon: Palette,     group: "AI Tools", badge: "NEW" },
   { id: "followups",      label: "Follow-Ups",             desc: "Plan Gmail follow-ups",  href: "/dashboard/followups",        icon: CalendarDays,    group: "AI Tools" },
   { id: "campaigns",      label: "Campaigns",              desc: "Organize outreach",      href: "/dashboard/campaigns",        icon: Megaphone,       group: "Outreach" },
+  { id: "softphone",      label: "Softphone",              desc: "Calling workspace coming soon", href: "/dashboard/softphone", icon: PhoneCall,      group: "Outreach", badge: "SOON" },
+  { id: "whatsapp",       label: "WhatsApp",               desc: "WhatsApp outreach coming soon", href: "/dashboard/whatsapp",  icon: MessageCircle,  group: "Outreach", badge: "SOON" },
   { id: "templates",      label: "Templates",              desc: "Email templates",        href: "/dashboard/templates",        icon: FileText,        group: "Outreach" },
   { id: "sent",           label: "Outreach History",       desc: "Prepared and sent emails", href: "/dashboard/sent",           icon: Send,            group: "Outreach" },
   { id: "analytics",      label: "Analytics",              desc: "Performance stats",      href: "/dashboard/analytics",        icon: BarChart2,       group: "Outreach" },
@@ -201,7 +203,9 @@ export default function CommandPalette() {
                               <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full border flex-shrink-0 ${
                                 cmd.badge === "LIVE"
                                   ? "bg-accent/20 text-accent border-accent/30"
-                                  : "bg-primary/20 text-primary-light border-primary/30"
+                                  : cmd.badge === "SOON"
+                                    ? "bg-gold/10 text-gold border-gold/25"
+                                    : "bg-primary/20 text-primary-light border-primary/30"
                               }`}>
                                 {cmd.badge}
                               </span>

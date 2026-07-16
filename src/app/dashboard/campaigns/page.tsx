@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, type FormEvent } from "react";
-import { Plus, Trash2, Mail } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Clock3, Lock, Plus, ShieldCheck, Trash2, Mail } from "lucide-react";
 import { CampaignStatusBadge } from "@/components/Badge";
 import ConfirmModal from "@/components/ConfirmModal";
 import { formatDate } from "@/lib/utils";
@@ -10,11 +11,13 @@ import type { Campaign } from "@/types";
 interface ApiResponse { campaigns: Campaign[]; }
 
 export default function CampaignsPage() {
+  const { data: session } = useSession();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", niche: "" });
+  const isAdmin = session?.user?.role === "ADMIN";
 
   const fetchCampaigns = useCallback(async () => {
     setLoading(true);
@@ -49,6 +52,57 @@ export default function CampaignsPage() {
         <button onClick={() => setCreating(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary">
           <Plus className="w-4 h-4" /> New Campaign
         </button>
+      </div>
+
+      <div className={`rounded-2xl border p-5 ${
+        isAdmin
+          ? "border-accent/25 bg-accent/5"
+          : "border-gold/25 bg-gold/5"
+      }`}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start gap-3">
+            <div className={`w-10 h-10 rounded-xl border flex items-center justify-center flex-shrink-0 ${
+              isAdmin
+                ? "border-accent/25 bg-accent/10"
+                : "border-gold/25 bg-gold/10"
+            }`}>
+              {isAdmin ? (
+                <ShieldCheck className="w-5 h-5 text-accent" />
+              ) : (
+                <Clock3 className="w-5 h-5 text-gold" />
+              )}
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-foreground font-semibold">
+                  {isAdmin ? "Admin beta: bulk sending lab" : "Bulk email sending is coming soon"}
+                </h2>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                  isAdmin ? "bg-accent/10 text-accent" : "bg-gold/10 text-gold"
+                }`}>
+                  {isAdmin ? "Admin only" : "Soon"}
+                </span>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground max-w-3xl">
+                Campaign organization is live. Automated bulk sending stays gated until
+                review steps, daily caps, unsubscribe handling, bounced-message tracking,
+                and abuse prevention are fully tested.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 lg:min-w-[360px]">
+            {[
+              "Review first",
+              "Rate limited",
+              "Opt-out ready",
+            ].map(item => (
+              <div key={item} className="rounded-xl border border-border bg-background/60 px-3 py-2 text-xs font-semibold text-muted-foreground flex items-center gap-2">
+                <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {loading ? (
