@@ -152,6 +152,49 @@ const useCaseItemListJsonLd = {
   ],
 };
 
+const leadGenerationItemListJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "iCloseLeads signup-intent lead generation pages",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Web Design Leads",
+      "url": "https://icloseleads.com/lead-generation/web-design-leads",
+      "description": "Find businesses and remote opportunities with visible website, conversion, or local SEO needs.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Freelance Client Leads",
+      "url": "https://icloseleads.com/lead-generation/freelance-client-leads",
+      "description": "Find freelance prospects from remote jobs, local business signals, live opportunities, and outreach-ready context.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Remote Freelance Jobs",
+      "url": "https://icloseleads.com/lead-generation/remote-freelance-jobs",
+      "description": "Find fresh remote freelance jobs and turn the best matches into proposal-ready leads.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "name": "Local Business Leads",
+      "url": "https://icloseleads.com/lead-generation/local-business-leads",
+      "description": "Search local businesses by city, category, website signal, phone route, and pitch fit.",
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "name": "Businesses Without Websites",
+      "url": "https://icloseleads.com/lead-generation/businesses-without-websites",
+      "description": "Find no-website or unknown-website local prospects and verify them before pitching.",
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <>
@@ -160,6 +203,7 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(useCaseItemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(leadGenerationItemListJsonLd) }} />
     </>
   );
 }

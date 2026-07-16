@@ -6,10 +6,14 @@ import Logo from "./Logo";
 const footerLinks = {
   Product: [
     { label: "Features",   href: "/features"   },
+    { label: "Lead Generation", href: "/lead-generation" },
+    { label: "Web Design Leads", href: "/lead-generation/web-design-leads" },
+    { label: "Freelance Client Leads", href: "/lead-generation/freelance-client-leads" },
+    { label: "Businesses Without Websites", href: "/lead-generation/businesses-without-websites" },
     { label: "Use Cases",  href: "/use-cases"  },
-    { label: "Remote Job Leads", href: "/use-cases/remote-job-leads" },
+    { label: "Remote Freelance Jobs", href: "/lead-generation/remote-freelance-jobs" },
     { label: "Freelance Cold Outreach", href: "/use-cases/freelance-cold-outreach" },
-    { label: "Local Business Leads", href: "/use-cases/local-business-leads" },
+    { label: "Local Business Leads", href: "/lead-generation/local-business-leads" },
     { label: "Decision Maker Finder", href: "/features/lead-discovery#capabilities" },
     { label: "Live Job Leads", href: "/use-cases/live-job-leads" },
     { label: "Pricing",    href: "/pricing"     },

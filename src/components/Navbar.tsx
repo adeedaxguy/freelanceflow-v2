@@ -19,11 +19,12 @@ const MEGA_FEATURES = [
     icon: Search,
     color: "text-primary-light",
     items: [
-      { label: "Remote Job Leads",      desc: "Fresh opportunities matched to your niche", href: "/use-cases/remote-job-leads" },
-      { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/use-cases/local-business-leads" },
+      { label: "Web Design Leads",      desc: "Find companies with real website gaps",      href: "/lead-generation/web-design-leads" },
+      { label: "Remote Freelance Jobs", desc: "Fresh opportunities matched to your niche", href: "/lead-generation/remote-freelance-jobs" },
+      { label: "Local Business Leads",  desc: "Find companies worth pitching by city",      href: "/lead-generation/local-business-leads" },
+      { label: "Businesses Without Websites", desc: "Prioritise no-site local prospects",  href: "/lead-generation/businesses-without-websites" },
       { label: "Decision Maker Finder", desc: "Check owner, manager, and contact paths",    href: "/features/lead-discovery#capabilities" },
-      { label: "Live Job Leads",        desc: "Move first on fresh freelance demand",       href: "/use-cases/live-job-leads" },
-      { label: "Lead Scoring",          desc: "Prioritise fit, urgency, and contactability", href: "/features/lead-discovery#capabilities" },
+      { label: "Freelance Client Leads", desc: "A broader path for client acquisition",     href: "/lead-generation/freelance-client-leads" },
     ],
   },
   {

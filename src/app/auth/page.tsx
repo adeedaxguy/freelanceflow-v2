@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, type FormEvent } from "react";
+import { useState, useEffect, useCallback, Suspense, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +26,21 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
 };
 
 const SIGNUP_INTENT_COPY = {
+  webDesign: {
+    badge: "Web design lead search ready",
+    title: "Find web design leads",
+    body: "Create your free account, then search businesses and remote opportunities with clear website, conversion, or local SEO signals.",
+  },
+  freelanceClients: {
+    badge: "Client lead search ready",
+    title: "Find freelance client leads",
+    body: "Create your free account, then choose the lead path that fits your service and save the prospects worth pitching.",
+  },
+  noWebsite: {
+    badge: "No-website lead search ready",
+    title: "Find businesses without websites",
+    body: "Create your free account, then search local businesses with no or unknown website status and verify the best ones before outreach.",
+  },
   remote: {
     badge: "Remote job search ready",
     title: "Find remote client leads",
@@ -50,6 +65,9 @@ const SIGNUP_INTENT_COPY = {
 
 function getSignupIntentCopy(intent: string) {
   const normalized = intent.toLowerCase();
+  if (normalized.includes("web-design")) return SIGNUP_INTENT_COPY.webDesign;
+  if (normalized.includes("freelance-client")) return SIGNUP_INTENT_COPY.freelanceClients;
+  if (normalized.includes("businesses-without-websites")) return SIGNUP_INTENT_COPY.noWebsite;
   if (normalized.includes("remote")) return SIGNUP_INTENT_COPY.remote;
   if (normalized.includes("local")) return SIGNUP_INTENT_COPY.local;
   if (normalized.includes("live")) return SIGNUP_INTENT_COPY.live;
@@ -145,7 +163,7 @@ function AuthForm() {
   const strength = strengthLabel(password);
   const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
 
-  const trackAuthEvent = (eventName: string, extra: Record<string, string | number | boolean> = {}) => {
+  const trackAuthEvent = useCallback((eventName: string, extra: Record<string, string | number | boolean> = {}) => {
     if (typeof window === "undefined") return;
     (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", eventName, {
       auth_mode: mode,
@@ -154,7 +172,15 @@ function AuthForm() {
       signup_source: sourceParam || "direct",
       ...extra,
     });
-  };
+  }, [mode, step, intentParam, sourceParam]);
+
+  useEffect(() => {
+    if (mode !== "signup") return;
+    trackAuthEvent("view_signup_page", {
+      has_signup_intent: Boolean(intentParam),
+      has_signup_source: Boolean(sourceParam),
+    });
+  }, [mode, intentParam, sourceParam, trackAuthEvent]);
 
   const handleGoogleSignIn = async () => {
     if (!oauthProviders.google) {
@@ -163,6 +189,7 @@ function AuthForm() {
     }
     setGoogleLoading(true);
     setError("");
+    if (mode === "signup") trackAuthEvent("signup_started", { method: "google" });
     trackAuthEvent("auth_oauth_click", { provider: "google" });
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
@@ -180,6 +207,7 @@ function AuthForm() {
     }
     setGithubLoading(true);
     setError("");
+    if (mode === "signup") trackAuthEvent("signup_started", { method: "github" });
     trackAuthEvent("auth_oauth_click", { provider: "github" });
     try {
       await signIn("github", { callbackUrl: "/dashboard" });
@@ -211,6 +239,7 @@ function AuthForm() {
       setLoading(false);
       return;
     }
+    trackAuthEvent("signup_started", { method: "credentials" });
     trackAuthEvent("auth_signup_step1_continue", { method: "credentials" });
     setLoading(false);
     setStep(2);
@@ -239,6 +268,11 @@ function AuthForm() {
         selected_expertise_count: expertise.length,
         has_referral_source: Boolean(signupAttribution),
         signup_intent: intentParam || "default",
+      });
+      trackAuthEvent("signup_completed", {
+        method: "credentials",
+        selected_expertise_count: expertise.length,
+        has_referral_source: Boolean(signupAttribution),
       });
       router.push("/dashboard");
     } catch (err) {
@@ -324,7 +358,7 @@ function AuthForm() {
           {step === 1 && (
             <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-8">
               {(["signin", "signup"] as const).map(m => (
-                <button key={m} onClick={() => { setMode(m); setError(""); }}
+                <button key={m} onClick={() => { setMode(m); setError(""); if (m === "signup") trackAuthEvent("signup_started", { method: "mode_toggle" }); }}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === m ? "bg-primary text-white shadow-glow-primary" : "text-muted-foreground hover:text-foreground"}`}>
                   {m === "signin" ? "Sign In" : "Create Account"}
                 </button>
@@ -437,7 +471,7 @@ function AuthForm() {
                   {mode === "signin" ? (
                     <p className="text-center text-sm text-muted-foreground">
                       Don&apos;t have an account?{" "}
-                      <button type="button" onClick={() => setMode("signup")} className="text-primary-light hover:underline font-medium">Sign up free</button>
+                      <button type="button" onClick={() => { setMode("signup"); trackAuthEvent("signup_started", { method: "signin_footer_link" }); }} className="text-primary-light hover:underline font-medium">Sign up free</button>
                     </p>
                   ) : (
                     <p className="text-center text-xs text-muted-foreground">

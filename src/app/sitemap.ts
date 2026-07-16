@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { FEATURE_PAGES } from "@/data/feature-pages";
+import { LEAD_GENERATION_PAGES } from "@/data/lead-generation-pages";
 import { RESOURCE_PAGES } from "@/data/resource-pages";
 import { USE_CASE_PAGES } from "@/data/use-case-pages";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
@@ -25,6 +26,12 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
     url: page.path,
     changeFrequency: "weekly" as const,
     priority: 0.86,
+  })),
+  { url: "/lead-generation", changeFrequency: "weekly", priority: 0.9 },
+  ...LEAD_GENERATION_PAGES.map(page => ({
+    url: page.path,
+    changeFrequency: "weekly" as const,
+    priority: 0.89,
   })),
   { url: "/use-cases",   changeFrequency: "weekly",  priority: 0.9  },
   ...USE_CASE_PAGES.map(page => ({
