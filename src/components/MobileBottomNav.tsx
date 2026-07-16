@@ -10,7 +10,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Search, Radio, Bookmark, MoreHorizontal,
+  LayoutDashboard, Search, Radio, MoreHorizontal, MapPin,
 } from "lucide-react";
 
 const TABS: Array<{
@@ -20,10 +20,10 @@ const TABS: Array<{
   isLive?: boolean;
   tourId?: string;
 }> = [
-  { href: "/dashboard",             label: "Home",  icon: LayoutDashboard, tourId: "mobile-home" },
-  { href: "/dashboard/leads",       label: "Jobs",  icon: Search,          tourId: "mobile-jobs" },
-  { href: "/dashboard/live-jobs",   label: "Live",  icon: Radio,           isLive: true, tourId: "mobile-live" },
-  { href: "/dashboard/saved-leads", label: "Saved", icon: Bookmark,        tourId: "mobile-saved" },
+  { href: "/dashboard",             label: "Home",   icon: LayoutDashboard, tourId: "mobile-home" },
+  { href: "/dashboard/local-leads", label: "Local",  icon: MapPin,          tourId: "mobile-local" },
+  { href: "/dashboard/leads",       label: "Remote", icon: Search,          tourId: "mobile-jobs" },
+  { href: "/dashboard/live-jobs",   label: "Live",   icon: Radio,           isLive: true, tourId: "mobile-live" },
 ];
 
 export default function MobileBottomNav() {

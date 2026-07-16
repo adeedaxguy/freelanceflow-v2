@@ -20,9 +20,9 @@ const NAV_GROUPS = [
     label: "Leads",
     items: [
       { href: "/dashboard",               label: "Overview",             icon: LayoutDashboard },
-      { href: "/dashboard/live-jobs",     label: "Live Jobs",            icon: Radio,   badge: "LIVE" },
-      { href: "/dashboard/leads",         label: "Remote Jobs",          icon: Search },
       { href: "/dashboard/local-leads",   label: "Local Business Leads", icon: MapPin,  badge: "NEW" },
+      { href: "/dashboard/leads",         label: "Remote Jobs",          icon: Search },
+      { href: "/dashboard/live-jobs",     label: "Live Jobs",            icon: Radio,   badge: "LIVE" },
       { href: "/dashboard/decision-makers", label: "Decision Makers",    icon: Users },
       { href: "/dashboard/saved-leads",   label: "Saved Leads",          icon: Bookmark },
       { href: "/dashboard/pipeline",      label: "CRM Pipeline",         icon: GitMerge },
