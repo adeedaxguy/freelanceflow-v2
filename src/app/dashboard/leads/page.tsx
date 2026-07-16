@@ -154,6 +154,9 @@ const SOURCE_COLORS: Record<string, string> = {
   freelancermap: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
   himalayas:     "bg-cyan-500/15 text-cyan-400 border-cyan-500/20",
   nodesk:        "bg-lime-500/15 text-lime-400 border-lime-500/20",
+  greenhouse:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/20",
+  lever:         "bg-blue-500/15 text-blue-300 border-blue-500/20",
+  ashby:         "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/20",
 };
 
 function SourcePill({ source }: { source: string }) {

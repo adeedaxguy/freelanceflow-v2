@@ -16,6 +16,9 @@
  *  12. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/
  *  13. Dribbble Jobs       — https://dribbble.com/jobs.rss
  *  14. Jobspresso          — https://jobspresso.co/feed/                      [replaces Freelancermap]
+ *  15. Greenhouse boards   — selected public startup/company boards
+ *  16. Lever boards        — selected public startup/company boards
+ *  17. Ashby boards        — selected public startup/company boards
  *
  * v5 changes:
  *  - Reddit switched to public Atom RSS (no OAuth, 100% reliable)
@@ -44,7 +47,10 @@ export type LeadSource =
   | "dribbble"
   | "freelancermap"   // shows Jobspresso feed (freelancermap.com URL was wrong)
   | "himalayas"       // himalayas.app — startup/remote jobs RSS
-  | "nodesk";         // nodesk.co — curated remote-work RSS
+  | "nodesk"          // nodesk.co — curated remote-work RSS
+  | "greenhouse"      // selected public Greenhouse job boards
+  | "lever"           // selected public Lever job boards
+  | "ashby";          // selected public Ashby job boards
 
 /** Canonical display labels for every source — used by the UI source-filter chips */
 export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
@@ -64,6 +70,9 @@ export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
   freelancermap: "Contract Jobs",
   himalayas:    "Startup Remote",
   nodesk:       "Remote Jobs F",
+  greenhouse:   "Verified Hiring A",
+  lever:        "Verified Hiring B",
+  ashby:        "Verified Hiring C",
 };
 
 export interface AggregatedLead {
@@ -612,21 +621,41 @@ const REDDIT_SUBS: Array<{
 }> = [
   {
     sub:    "forhire",
-    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t),
+    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t) || /\b(looking\s+for|need|seeking|wanted)\b/i.test(t),
   },
   {
     sub:    "freelance_forhire",
-    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t),
+    filter: t => /\[hiring\]/i.test(t) || /\[h\]\s/i.test(t) || /\b(looking\s+for|need|seeking|wanted)\b/i.test(t),
   },
   {
     sub:    "hiring",
     // r/hiring: all posts are from hirers UNLESS tagged [For Hire] / [FH]
-    filter: t => !/\[for\s*hire\]/i.test(t) && !/\[fh\]/i.test(t),
+    filter: t => !/\[for\s*hire\]/i.test(t) && !/\[fh\]/i.test(t) && !/\b(hire\s+me|available\s+for|portfolio)\b/i.test(t),
   },
   {
     sub:    "slavelabour",
     // slavelabour: [Offer] = someone offering a service; [Task] = hiring
     filter: t => /\[task\]/i.test(t),
+  },
+  {
+    sub:    "jobbit",
+    filter: t => /\b(hiring|looking\s+for|need|seeking|wanted|contract|remote)\b/i.test(t) && !/\b(for\s+hire|hire\s+me|available\s+for)\b/i.test(t),
+  },
+  {
+    sub:    "RemoteJobs",
+    filter: t => /\b(hiring|looking\s+for|need|seeking|wanted|remote)\b/i.test(t) && !/\b(for\s+hire|hire\s+me|available\s+for)\b/i.test(t),
+  },
+  {
+    sub:    "remotework",
+    filter: t => /\b(hiring|looking\s+for|need|seeking|wanted|remote)\b/i.test(t) && !/\b(for\s+hire|hire\s+me|available\s+for)\b/i.test(t),
+  },
+  {
+    sub:    "remoteworking",
+    filter: t => /\b(hiring|looking\s+for|need|seeking|wanted|remote)\b/i.test(t) && !/\b(for\s+hire|hire\s+me|available\s+for)\b/i.test(t),
+  },
+  {
+    sub:    "hireawriter",
+    filter: t => /\[hiring\]|\b(hiring|looking\s+for|need|seeking|wanted|paid)\b/i.test(t) && !/\b(for\s+hire|hire\s+me|available\s+for)\b/i.test(t),
   },
 ];
 
@@ -642,6 +671,273 @@ async function fetchReddit(
   );
   const leads = results.flat();
   return { leads, raw: leads.length };
+}
+
+// ─── Source 4: Public ATS feeds (Greenhouse, Lever, Ashby) ───────────────────
+// These are public job-board APIs used by startups and software companies. They
+// do not require scraping or user API keys, and are treated as generic verified
+// hiring channels in the UI.
+
+const GREENHOUSE_BOARDS = [
+  { token: "webflow",    company: "Webflow" },
+  { token: "stripe",     company: "Stripe" },
+  { token: "figma",      company: "Figma" },
+  { token: "twilio",     company: "Twilio" },
+  { token: "asana",      company: "Asana" },
+  { token: "cloudflare", company: "Cloudflare" },
+  { token: "reddit",     company: "Reddit" },
+  { token: "datadog",    company: "Datadog" },
+];
+
+const LEVER_BOARDS = [
+  { token: "caseware",       company: "Caseware" },
+  { token: "enveda",         company: "Enveda" },
+  { token: "peerspace",      company: "Peerspace" },
+  { token: "questanalytics", company: "Quest Analytics" },
+  { token: "revinate",       company: "Revinate" },
+];
+
+const ASHBY_BOARDS = [
+  { token: "linear",     company: "Linear" },
+  { token: "modal",      company: "Modal" },
+  { token: "perplexity", company: "Perplexity" },
+  { token: "supabase",   company: "Supabase" },
+  { token: "cursor",     company: "Cursor" },
+  { token: "ramp",       company: "Ramp" },
+];
+
+interface GreenhouseJob {
+  id?: number | string;
+  absolute_url?: string;
+  title?: string;
+  company_name?: string;
+  first_published?: string;
+  updated_at?: string;
+  content?: string;
+  location?: { name?: string };
+  departments?: { name?: string }[];
+  offices?: { name?: string }[];
+}
+interface GreenhouseResponse { jobs?: GreenhouseJob[]; }
+
+interface LeverJob {
+  id?: string;
+  text?: string;
+  hostedUrl?: string;
+  applyUrl?: string;
+  createdAt?: number;
+  descriptionPlain?: string;
+  descriptionBodyPlain?: string;
+  additionalPlain?: string;
+  categories?: { team?: string; location?: string; commitment?: string };
+  workplaceType?: string;
+}
+
+interface AshbyJob {
+  id?: string;
+  title?: string;
+  department?: string;
+  team?: string;
+  employmentType?: string;
+  location?: string;
+  publishedAt?: string;
+  isListed?: boolean;
+  isRemote?: boolean;
+  workplaceType?: string;
+  jobUrl?: string;
+  applyUrl?: string;
+  descriptionPlain?: string;
+  descriptionHtml?: string;
+}
+interface AshbyResponse { jobs?: AshbyJob[]; }
+
+function parsePostedDate(...values: Array<string | number | undefined>): Date | null {
+  for (const value of values) {
+    if (!value) continue;
+    const date = typeof value === "number" ? new Date(value) : new Date(value);
+    if (!isNaN(date.getTime())) return date;
+  }
+  return null;
+}
+
+function atsQualityBoost(confidence: number, title: string, desc: string): number {
+  const text = `${title} ${desc}`.toLowerCase();
+  let boost = 0;
+  if (/\b(remote|contract|freelance|consultant|part[-\s]?time)\b/i.test(text)) boost += 8;
+  if (/\b(marketing|growth|website|web|design|developer|engineer|content|seo|paid social|facebook|instagram)\b/i.test(text)) boost += 4;
+  return Math.min(100, confidence + boost);
+}
+
+async function fetchGreenhouseBoards(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const results = await Promise.all(GREENHOUSE_BOARDS.map(async board => {
+    try {
+      const res = await withTimeout(
+        fetch(`https://boards-api.greenhouse.io/v1/boards/${board.token}/jobs`, {
+          headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/json" },
+          ...cacheOpts(freshOnly, 900),
+        }),
+        8000,
+      );
+      if (!res.ok) return { leads: [] as AggregatedLead[], raw: 0 };
+      const data = await res.json() as GreenhouseResponse;
+      const jobs = (data.jobs ?? []).slice(0, 80);
+      let inWindow = 0;
+      const leads = jobs.flatMap((job): AggregatedLead[] => {
+        if (!job.title) return [];
+        const posted = parsePostedDate(job.first_published, job.updated_at);
+        if (!posted) return [];
+        const hrs = hoursAgo(posted);
+        if (hrs > maxHours) return [];
+        inWindow++;
+        const tags = [
+          ...(job.departments ?? []).map(d => d.name ?? ""),
+          ...(job.offices ?? []).map(o => o.name ?? ""),
+          job.location?.name ?? "",
+        ].filter(Boolean).slice(0, 8);
+        const desc = stripHtml([job.content, job.location?.name, ...tags].filter(Boolean).join(" "));
+        const confidence = atsQualityBoost(scoreMatch(job.title, desc, tags, keywords), job.title, desc);
+        if (confidence < SOURCE_FLOOR) return [];
+        const budget  = extractBudget(desc);
+        const urgency = detectUrgency(`${job.title} ${desc}`);
+        const email   = extractEmail(desc);
+        const company = (job.company_name || board.company).trim();
+        const domain  = companyToDomain(company);
+        const id      = String(job.id ?? job.absolute_url ?? Math.random());
+        return [{
+          id: `gh-${board.token}-${id}`,
+          company, domain, email,
+          title: job.title.trim(),
+          description: truncate(desc || `${company} public job-board posting.`),
+          url: job.absolute_url ?? `https://job-boards.greenhouse.io/${board.token}`,
+          source: "greenhouse", sourceLabel: ALL_SOURCE_LABELS.greenhouse,
+          postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+          tags, confidence, budget, urgency,
+          qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.title, budget, urgency }),
+        }];
+      });
+      return { leads, raw: inWindow };
+    } catch { return { leads: [] as AggregatedLead[], raw: 0 }; }
+  }));
+  return {
+    leads: results.flatMap(r => r.leads),
+    raw: results.reduce((sum, r) => sum + r.raw, 0),
+  };
+}
+
+async function fetchLeverBoards(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const results = await Promise.all(LEVER_BOARDS.map(async board => {
+    try {
+      const res = await withTimeout(
+        fetch(`https://api.lever.co/v0/postings/${board.token}?mode=json`, {
+          headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/json" },
+          ...cacheOpts(freshOnly, 900),
+        }),
+        8000,
+      );
+      if (!res.ok) return { leads: [] as AggregatedLead[], raw: 0 };
+      const jobs = (await res.json() as LeverJob[]).slice(0, 80);
+      let inWindow = 0;
+      const leads = jobs.flatMap((job): AggregatedLead[] => {
+        if (!job.text) return [];
+        const posted = parsePostedDate(job.createdAt);
+        if (!posted) return [];
+        const hrs = hoursAgo(posted);
+        if (hrs > maxHours) return [];
+        inWindow++;
+        const tags = [
+          job.categories?.team ?? "",
+          job.categories?.location ?? "",
+          job.categories?.commitment ?? "",
+          job.workplaceType ?? "",
+        ].filter(Boolean).slice(0, 8);
+        const desc = stripHtml([
+          job.descriptionPlain,
+          job.descriptionBodyPlain,
+          job.additionalPlain,
+          ...tags,
+        ].filter(Boolean).join(" "));
+        const confidence = atsQualityBoost(scoreMatch(job.text, desc, tags, keywords), job.text, desc);
+        if (confidence < SOURCE_FLOOR) return [];
+        const budget  = extractBudget(desc);
+        const urgency = detectUrgency(`${job.text} ${desc}`);
+        const email   = extractEmail(desc);
+        const domain  = companyToDomain(board.company);
+        return [{
+          id: `lever-${board.token}-${job.id ?? Math.random()}`,
+          company: board.company, domain, email,
+          title: job.text.trim(),
+          description: truncate(desc || `${board.company} public job-board posting.`),
+          url: job.hostedUrl ?? job.applyUrl ?? `https://jobs.lever.co/${board.token}`,
+          source: "lever", sourceLabel: ALL_SOURCE_LABELS.lever,
+          postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+          tags, confidence, budget, urgency,
+          qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.text, budget, urgency }),
+        }];
+      });
+      return { leads, raw: inWindow };
+    } catch { return { leads: [] as AggregatedLead[], raw: 0 }; }
+  }));
+  return {
+    leads: results.flatMap(r => r.leads),
+    raw: results.reduce((sum, r) => sum + r.raw, 0),
+  };
+}
+
+async function fetchAshbyBoards(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const results = await Promise.all(ASHBY_BOARDS.map(async board => {
+    try {
+      const res = await withTimeout(
+        fetch(`https://api.ashbyhq.com/posting-api/job-board/${board.token}`, {
+          headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/json" },
+          ...cacheOpts(freshOnly, 900),
+        }),
+        8000,
+      );
+      if (!res.ok) return { leads: [] as AggregatedLead[], raw: 0 };
+      const data = await res.json() as AshbyResponse;
+      const jobs = (data.jobs ?? []).filter(j => j.isListed !== false).slice(0, 80);
+      let inWindow = 0;
+      const leads = jobs.flatMap((job): AggregatedLead[] => {
+        if (!job.title) return [];
+        const posted = parsePostedDate(job.publishedAt);
+        if (!posted) return [];
+        const hrs = hoursAgo(posted);
+        if (hrs > maxHours) return [];
+        inWindow++;
+        const tags = [
+          job.department ?? "",
+          job.team ?? "",
+          job.employmentType ?? "",
+          job.location ?? "",
+          job.isRemote ? "remote" : "",
+          job.workplaceType ?? "",
+        ].filter(Boolean).slice(0, 8);
+        const desc = stripHtml([job.descriptionPlain, job.descriptionHtml, ...tags].filter(Boolean).join(" "));
+        const confidence = atsQualityBoost(scoreMatch(job.title, desc, tags, keywords), job.title, desc);
+        if (confidence < SOURCE_FLOOR) return [];
+        const budget  = extractBudget(desc);
+        const urgency = detectUrgency(`${job.title} ${desc}`);
+        const email   = extractEmail(desc);
+        const domain  = companyToDomain(board.company);
+        return [{
+          id: `ashby-${board.token}-${job.id ?? Math.random()}`,
+          company: board.company, domain, email,
+          title: job.title.trim(),
+          description: truncate(desc || `${board.company} public job-board posting.`),
+          url: job.jobUrl ?? job.applyUrl ?? `https://jobs.ashbyhq.com/${board.token}`,
+          source: "ashby", sourceLabel: ALL_SOURCE_LABELS.ashby,
+          postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+          tags, confidence, budget, urgency,
+          qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.title, budget, urgency }),
+        }];
+      });
+      return { leads, raw: inWindow };
+    } catch { return { leads: [] as AggregatedLead[], raw: 0 }; }
+  }));
+  return {
+    leads: results.flatMap(r => r.leads),
+    raw: results.reduce((sum, r) => sum + r.raw, 0),
+  };
 }
 
 // ─── Source 4: WeWorkRemotely ─────────────────────────────────────────────────
@@ -1594,7 +1890,33 @@ const SOURCE_RUNNERS: Array<{
   { name: "dribbble",      run: (_n, k, h, f) => fetchDribbbleJobs(k, h, f) },
   { name: "himalayas",     run: (_n, k, h, f) => fetchHimalayas(k, h, f) },
   { name: "nodesk",        run: (_n, k, h, f) => fetchNoDesk(k, h, f) },
+  { name: "greenhouse",    run: (_n, k, h, f) => fetchGreenhouseBoards(k, h, f) },
+  { name: "lever",         run: (_n, k, h, f) => fetchLeverBoards(k, h, f) },
+  { name: "ashby",         run: (_n, k, h, f) => fetchAshbyBoards(k, h, f) },
 ];
+
+const DEFAULT_DISABLED_SOURCES = new Set<LeadSource>([
+  // These public feeds currently return hard errors in production probes. Keep
+  // them callable through explicit source filters so we can re-test recovery,
+  // but do not spend normal user searches on broken channels.
+  "jobicy",
+  "githubissues",
+  "freelancermap",
+  "himalayas",
+  "nodesk",
+]);
+
+const SOURCE_RANK_BOOST: Partial<Record<LeadSource, number>> = {
+  ashby:          5,
+  greenhouse:     5,
+  lever:          4,
+  weworkremotely: 3,
+  arbeitnow:      2,
+  remotive:       2,
+  reddit:         2,
+  remoteok:       1,
+  workingnomads:  1,
+};
 
 export async function aggregateLeads(niche: string | string[], options: AggregateOptions = {}): Promise<AggregatedLead[]> {
   const { leads } = await aggregateLeadsWithDiagnostics(niche, options);
@@ -1618,7 +1940,7 @@ export async function aggregateLeadsWithDiagnostics(
 
   const runners = filterSource && filterSource !== "all"
     ? SOURCE_RUNNERS.filter(r => r.name === filterSource)
-    : SOURCE_RUNNERS;
+    : SOURCE_RUNNERS.filter(r => !DEFAULT_DISABLED_SOURCES.has(r.name));
 
   const results = await Promise.all(runners.map(async (r) => {
     try {
@@ -1648,7 +1970,9 @@ export async function aggregateLeadsWithDiagnostics(
   // Sort: freshest → quality → confidence
   all.sort((a, b) => {
     if (a.hoursAgo !== b.hoursAgo) return a.hoursAgo - b.hoursAgo;
-    if (b.qualityScore !== a.qualityScore) return b.qualityScore - a.qualityScore;
+    const aq = a.qualityScore + (SOURCE_RANK_BOOST[a.source] ?? 0);
+    const bq = b.qualityScore + (SOURCE_RANK_BOOST[b.source] ?? 0);
+    if (bq !== aq) return bq - aq;
     return b.confidence - a.confidence;
   });
 

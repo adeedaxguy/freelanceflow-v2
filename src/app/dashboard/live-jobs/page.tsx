@@ -44,6 +44,9 @@ const ALL_SOURCES: { id: string; label: string }[] = [
   { id: "dribbble",      label: "Design Jobs" },
   { id: "himalayas",     label: "Startup Remote" },
   { id: "nodesk",        label: "No Desk" },
+  { id: "greenhouse",    label: "Verified Hiring A" },
+  { id: "lever",         label: "Verified Hiring B" },
+  { id: "ashby",         label: "Verified Hiring C" },
 ];
 
 const PAGE_SIZE    = 25;

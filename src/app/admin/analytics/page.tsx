@@ -15,6 +15,9 @@ const SOURCE_COLORS: Record<string, string> = {
   weworkremotely: "bg-purple-500",
   arbeitnow:      "bg-pink-500",
   reddit:         "bg-orange-500",
+  greenhouse:     "bg-emerald-500",
+  lever:          "bg-blue-500",
+  ashby:          "bg-fuchsia-500",
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -23,6 +26,9 @@ const SOURCE_LABELS: Record<string, string> = {
   weworkremotely: "WeWorkRemotely",
   arbeitnow:      "Arbeitnow",
   reddit:         "Reddit",
+  greenhouse:     "Verified Hiring A",
+  lever:          "Verified Hiring B",
+  ashby:          "Verified Hiring C",
 };
 
 const CRM_STAGES = [

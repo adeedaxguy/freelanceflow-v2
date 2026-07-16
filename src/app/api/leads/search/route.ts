@@ -29,7 +29,7 @@ const VALID_SOURCES: LeadSource[] = [
   "arbeitnow", "jobicy", "workingnomads", "hackernews",
   "ycjobs", "authenticjobs", "githubissues",
   "freelancermap", "smashingjobs", "dribbble",
-  "himalayas", "nodesk",
+  "himalayas", "nodesk", "greenhouse", "lever", "ashby",
 ];
 
 const UNLIMITED_EMAILS = new Set([
