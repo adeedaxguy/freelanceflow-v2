@@ -1559,6 +1559,25 @@ function searchLocationPart(value?: string) {
   return compact ? ` ${compact}` : "";
 }
 
+function looseSearchText(value: string) {
+  return value
+    .replace(/[“”"]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function ownerDiscoveryQuery(company: string, location?: string) {
+  return [looseSearchText(company), compactLocationForSearch(location), "owner"]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function ownerRoleMentionsQuery(company: string, location?: string) {
+  return [looseSearchText(company), compactLocationForSearch(location), "owner founder manager"]
+    .filter(Boolean)
+    .join(" ");
+}
+
 async function searchPastedProfile(input: DecisionFinderInput, sourceLink: DecisionSourceLink | null) {
   const candidates: CandidateDraft[] = [];
   const evidence: DecisionFinderEvidence[] = [];
@@ -1623,22 +1642,30 @@ async function searchPastedProfile(input: DecisionFinderInput, sourceLink: Decis
   return { candidates, evidence };
 }
 
-function buildSearchLinks(input: DecisionFinderInput, domain?: string): DecisionFinderSearchLink[] {
+export function buildDecisionFinderSearchLinks(input: DecisionFinderInput, domain?: string): DecisionFinderSearchLink[] {
   const links: DecisionFinderSearchLink[] = [];
   const location = searchLocationPart(input.location);
+  const looseLocation = compactLocationForSearch(input.location);
   const company = input.company;
+  const looseCompany = looseSearchText(company);
   const sourceLink = resolveDecisionSourceLink(input);
 
   links.push({
     label: "Find possible owner name",
-    detail: "Start broad: search the business name with the city/state and owner keyword.",
-    url: googleSearchUrl(`"${company}"${location} owner`),
+    detail: "Start broad with the business name, city/state, and owner keyword. This avoids over-filtering small-business results.",
+    url: googleSearchUrl(ownerDiscoveryQuery(company, input.location)),
   });
 
   links.push({
     label: "Search owner and founder mentions",
-    detail: "Use a wider public search for founder, manager, proprietor, or director mentions.",
-    url: googleSearchUrl(`"${company}"${location} founder OR owner OR manager`),
+    detail: "Use a broader public search for owner, founder, or manager mentions without strict operators.",
+    url: googleSearchUrl(ownerRoleMentionsQuery(company, input.location)),
+  });
+
+  links.push({
+    label: "Exact business owner search",
+    detail: "Use this only if the broad search is noisy; it keeps the business name exact but avoids extra role filters.",
+    url: googleSearchUrl(`"${company}" owner${looseLocation ? ` ${looseLocation}` : ""}`),
   });
 
   if (sourceLink && sourceLink.kind !== "website") {
@@ -1650,32 +1677,32 @@ function buildSearchLinks(input: DecisionFinderInput, domain?: string): Decision
     links.push({
       label: "Verify phone and email route",
       detail: "Search public pages for contact details after you have a likely owner or manager path.",
-      url: googleSearchUrl(`"${company}"${location} contact OR phone OR email`),
+      url: googleSearchUrl([looseCompany, looseLocation, "contact phone email"].filter(Boolean).join(" ")),
     });
   }
 
   links.push({
     label: "LinkedIn profile search",
-    detail: "Open a filtered public search for owners, founders, directors, and managers.",
-    url: googleSearchUrl(`site:linkedin.com/in "${company}"${location} owner OR founder OR director`),
+    detail: "Search public LinkedIn profile results without exact-match filters first.",
+    url: googleSearchUrl(["site:linkedin.com/in", looseCompany, looseLocation, "owner founder"].filter(Boolean).join(" ")),
   });
 
   links.push({
     label: "Public social profile search",
-    detail: "Search public profile pages for named decision makers connected to this business.",
-    url: googleSearchUrl(`"${company}"${location} (owner OR founder OR manager) (facebook OR instagram OR linkedin)`),
+    detail: "Search public social pages where owners often appear before formal directories do.",
+    url: googleSearchUrl([looseCompany, looseLocation, "owner facebook instagram linkedin"].filter(Boolean).join(" ")),
   });
 
   if (domain) {
     links.push({
       label: "Official site decision-maker search",
       detail: "Search the business website for leadership, about, team, and contact mentions.",
-      url: googleSearchUrl(`site:${domain} owner OR founder OR director OR team OR about`),
+      url: googleSearchUrl(`site:${domain} owner founder team about`),
     });
     links.push({
       label: "Official contact detail search",
       detail: "Search the company's own domain for public email, phone, and contact-page mentions before outreach.",
-      url: googleSearchUrl(`site:${domain} contact OR email OR phone OR telephone`),
+      url: googleSearchUrl(`site:${domain} contact email phone telephone`),
     });
   }
 
@@ -1797,7 +1824,7 @@ export async function findDecisionMakers(input: DecisionFinderInput): Promise<De
     location: input.location?.trim() || undefined,
     candidates,
     evidence,
-    searchLinks: buildSearchLinks({ ...input, company }, domain),
+    searchLinks: buildDecisionFinderSearchLinks({ ...input, company }, domain),
     warnings,
   };
 }

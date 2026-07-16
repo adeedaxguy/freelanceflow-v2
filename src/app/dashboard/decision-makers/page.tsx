@@ -222,10 +222,23 @@ function searchLocationPart(value?: string) {
   return compact ? ` ${compact}` : "";
 }
 
+function looseSearchText(value: string) {
+  return value
+    .replace(/[“”"]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function ownerDiscoveryQuery(company: string, location?: string) {
+  return [looseSearchText(company), compactLocationForSearch(location), "owner"]
+    .filter(Boolean)
+    .join(" ");
+}
+
 function candidateProfileSearchUrl(candidate: DecisionMakerCandidate, location?: string) {
   const context = searchLocationPart(location);
   if (candidate.isGenericContact) {
-    return googleSearchUrl(`"${candidate.company}"${context} owner`);
+    return googleSearchUrl(ownerDiscoveryQuery(candidate.company, location));
   }
   return googleSearchUrl(`"${candidate.name}" "${candidate.company}"${context}`);
 }
@@ -234,13 +247,13 @@ function candidateContactSearchUrl(candidate: DecisionMakerCandidate, domain?: s
   const context = searchLocationPart(location);
   if (candidate.isGenericContact) {
     const query = domain
-      ? `site:${domain} ${candidate.company} (contact OR phone OR email)`
-      : `"${candidate.company}"${context} (contact OR phone OR email)`;
+      ? `site:${domain} contact phone email`
+      : [looseSearchText(candidate.company), compactLocationForSearch(location), "contact phone email"].filter(Boolean).join(" ");
     return googleSearchUrl(query);
   }
   const query = domain
-    ? `site:${domain} "${candidate.name}" (contact OR phone OR email)`
-    : `"${candidate.name}" "${candidate.company}"${context} (contact OR phone OR email)`;
+    ? `site:${domain} "${candidate.name}" contact phone email`
+    : `"${candidate.name}" "${candidate.company}"${context} contact phone email`;
   return googleSearchUrl(query);
 }
 
@@ -261,27 +274,26 @@ function compactCandidateText(value: string, maxLength = 150) {
 }
 
 function socialDiscoveryLinks(company: string, location?: string) {
-  const context = searchLocationPart(location);
   return [
     {
       label: "LinkedIn",
       icon: Users,
-      url: googleSearchUrl(`site:linkedin.com/in "${company}"${context} owner`),
+      url: googleSearchUrl(["site:linkedin.com/in", looseSearchText(company), compactLocationForSearch(location), "owner founder"].filter(Boolean).join(" ")),
     },
     {
       label: "Facebook",
       icon: Globe,
-      url: googleSearchUrl(`site:facebook.com "${company}"${context}`),
+      url: googleSearchUrl(["site:facebook.com", looseSearchText(company), compactLocationForSearch(location)].filter(Boolean).join(" ")),
     },
     {
       label: "Instagram",
       icon: Sparkles,
-      url: googleSearchUrl(`site:instagram.com "${company}"${context}`),
+      url: googleSearchUrl(["site:instagram.com", looseSearchText(company), compactLocationForSearch(location)].filter(Boolean).join(" ")),
     },
     {
       label: "X",
       icon: Link2,
-      url: googleSearchUrl(`"${company}"${context} owner OR founder OR manager`),
+      url: googleSearchUrl([looseSearchText(company), compactLocationForSearch(location), "owner founder manager"].filter(Boolean).join(" ")),
     },
   ];
 }
