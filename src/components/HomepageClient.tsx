@@ -597,7 +597,7 @@ const INTELLIGENCE_STEPS = [
 const STATS = [
   { to: 3, suffix: "", prefix: "", label: "Core lead engines", sub: "remote, local + owners, and live jobs", color: "text-primary-light" },
   { to: 16, suffix: "+", prefix: "", label: "Signal paths monitored", sub: "fresh demand in one workflow", color: "text-accent" },
-  { to: 100, suffix: "", prefix: "", label: "Free daily lead allowance", sub: "during early access", color: "text-gold" },
+  { to: 20, suffix: "", prefix: "", label: "Free weekly leads", sub: "on the free plan", color: "text-gold" },
   { to: 6, suffix: "", prefix: "", label: "Pipeline stages", sub: "from saved lead to won deal", color: "text-blue-400" },
 ];
 

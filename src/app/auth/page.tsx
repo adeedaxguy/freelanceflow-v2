@@ -63,6 +63,44 @@ const SIGNUP_INTENT_COPY = {
   },
 };
 
+const SIGNUP_NEXT_STEP_COPY = {
+  webDesign: [
+    "Choose a city and business category worth pitching.",
+    "Save the strongest website-gap lead with proof notes.",
+    "Draft a proposal before the context gets stale.",
+  ],
+  freelanceClients: [
+    "Choose the lead path that matches your service.",
+    "Save the prospects that show real buying intent.",
+    "Turn the best fit into a reviewed outreach draft.",
+  ],
+  noWebsite: [
+    "Search local businesses with no or weak website presence.",
+    "Verify the business category, phone route, and demand signal.",
+    "Pitch trust, bookings, or quote flow instead of a generic redesign.",
+  ],
+  remote: [
+    "Search fresh remote jobs by niche and recency.",
+    "Save the roles where the problem is clear.",
+    "Draft a proposal while the brief is still fresh.",
+  ],
+  local: [
+    "Search one city and one service category at a time.",
+    "Open the best local lead and check the owner/contact path.",
+    "Save the lead before you draft outreach.",
+  ],
+  live: [
+    "Sort the live feed by the freshest signals first.",
+    "Save the lead with the clearest deadline or urgency cue.",
+    "Prepare the opener while the need is still warm.",
+  ],
+  default: [
+    "Pick one lead engine instead of browsing everything.",
+    "Save one lead with a real reason to contact them.",
+    "Draft or prepare the first outreach step right away.",
+  ],
+} satisfies Record<keyof typeof SIGNUP_INTENT_COPY, string[]>;
+
 function getSignupIntentCopy(intent: string) {
   const normalized = intent.toLowerCase();
   if (normalized.includes("web-design")) return SIGNUP_INTENT_COPY.webDesign;
@@ -72,6 +110,17 @@ function getSignupIntentCopy(intent: string) {
   if (normalized.includes("local")) return SIGNUP_INTENT_COPY.local;
   if (normalized.includes("live")) return SIGNUP_INTENT_COPY.live;
   return SIGNUP_INTENT_COPY.default;
+}
+
+function getSignupNextSteps(intent: string) {
+  const normalized = intent.toLowerCase();
+  if (normalized.includes("web-design")) return SIGNUP_NEXT_STEP_COPY.webDesign;
+  if (normalized.includes("freelance-client")) return SIGNUP_NEXT_STEP_COPY.freelanceClients;
+  if (normalized.includes("businesses-without-websites")) return SIGNUP_NEXT_STEP_COPY.noWebsite;
+  if (normalized.includes("remote")) return SIGNUP_NEXT_STEP_COPY.remote;
+  if (normalized.includes("local")) return SIGNUP_NEXT_STEP_COPY.local;
+  if (normalized.includes("live")) return SIGNUP_NEXT_STEP_COPY.live;
+  return SIGNUP_NEXT_STEP_COPY.default;
 }
 
 function strengthLabel(p: string): { label: string; color: string; width: string } {
@@ -124,6 +173,7 @@ function AuthForm() {
   const intentParam = params.get("intent") ?? "";
   const sourceParam = params.get("source") ?? "";
   const signupIntentCopy = getSignupIntentCopy(intentParam);
+  const signupNextSteps = getSignupNextSteps(intentParam);
 
   // Sync mode from URL
   useEffect(() => {
@@ -298,7 +348,7 @@ function AuthForm() {
         <div className="relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-medium mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            {mode === "signup" ? signupIntentCopy.badge : "Join 10,000+ freelancers growing their income"}
+            {mode === "signup" ? signupIntentCopy.badge : "Search, save, pitch, and follow up"}
           </div>
           <h2 className="text-4xl font-extrabold text-foreground leading-tight mb-4">
             {mode === "signup" ? (
@@ -307,7 +357,7 @@ function AuthForm() {
               </>
             ) : (
               <>
-                Find your next<br /><span className="gradient-text">$10k client</span><br />in minutes.
+                Find your next<br /><span className="gradient-text">qualified client</span><br />in minutes.
               </>
             )}
           </h2>
@@ -318,10 +368,10 @@ function AuthForm() {
           </p>
           <div className="space-y-3">
             {[
-              "100 free leads per day during Early Access",
-              "AI proposals powered by Groq (free tier)",
-              "Live job and local business lead discovery",
-              "Full CRM pipeline to track every deal",
+              "Free plan includes 20 leads per week",
+              "Free plan includes 10 proposals per month",
+              "Search remote jobs, local businesses, and live signals",
+              "Save leads and track follow-up in one CRM pipeline",
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="w-5 h-5 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
@@ -334,13 +384,18 @@ function AuthForm() {
 
           {/* Social proof */}
           <div className="mt-8 pt-8 border-t border-border">
-            <div className="flex -space-x-2 mb-3">
-              {["A","B","C","D","E"].map((l, i) => (
-                <div key={i} className="w-8 h-8 rounded-full border-2 border-background flex items-center justify-center text-xs font-bold text-white"
-                  style={{ background: `hsl(${200 + i * 30}, 70%, 45%)` }}>{l}</div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">After signup</p>
+            <div className="mt-4 space-y-3">
+              {signupNextSteps.map((stepText, index) => (
+                <div key={stepText} className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-xs font-bold text-primary-light">
+                    {index + 1}
+                  </div>
+                  <p>{stepText}</p>
+                </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground"><span className="text-foreground font-semibold">2,847 freelancers</span> signed up this month</p>
+            <p className="mt-4 text-sm text-muted-foreground">No credit card required. Start with one focused search and keep the next step attached to the lead.</p>
           </div>
         </div>
 
@@ -381,6 +436,19 @@ function AuthForm() {
                     </div>
                     <p className="mt-2 text-sm font-semibold text-foreground">{signupIntentCopy.title}</p>
                     <p className="mt-1 text-xs leading-5 text-muted-foreground">{signupIntentCopy.body}</p>
+                    <div className="mt-4 rounded-xl border border-border bg-background/70 p-3">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary-light">Best first run</p>
+                      <ul className="mt-2 space-y-2 text-xs leading-5 text-muted-foreground">
+                        {signupNextSteps.map((stepText, index) => (
+                          <li key={stepText} className="flex items-start gap-2">
+                            <span className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary-light">
+                              {index + 1}
+                            </span>
+                            <span>{stepText}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 )}
 
