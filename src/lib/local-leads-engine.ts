@@ -1419,7 +1419,7 @@ async function checkWebsite(url: string): Promise<WebInfo> {
     // Use GET so we can also scrape phone numbers from the HTML
     const r = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/2.0)" },
-      signal:  AbortSignal.timeout(6000),
+      signal:  AbortSignal.timeout(3500),
       redirect: "follow",
     });
     if (r.status >= 400) return { status: "unreachable" };
@@ -1456,6 +1456,14 @@ async function checkWebsite(url: string): Promise<WebInfo> {
     }
     return { status: "alive", phone };
   } catch { return { status: "unreachable" }; }
+}
+
+function quickWebsiteStatus(url: string): WebInfo | null {
+  const lc = url.toLowerCase();
+  for (const h of OUTDATED_HOSTS) {
+    if (lc.includes(h)) return { status: "outdated", tech: "Outdated website builder" };
+  }
+  return null;
 }
 
 const GENERIC_NAME_TOKENS = new Set([
@@ -1793,12 +1801,19 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
   // No demo fallback — return real results only (even if empty).
   // If 0 results: the UI shows a clear "no real data found" message.
 
-  // 4. Validate websites in parallel (8 concurrent max)
-  const BATCH = 8;
+  // 4. Validate websites in bounded batches.
+  // Local lead searches must feel reliable in production; one slow website or
+  // Overpass mirror should not turn the whole page into a vague network error.
+  const BATCH = 16;
+  const websiteStartedAt = Date.now();
+  const websiteBudgetMs = filter === "outdated_website" ? 14_000 : 7_000;
+  const maxWebsiteChecks = filter === "outdated_website" ? 64 : 28;
+  let websiteChecks = 0;
   const leads: LocalBizLead[] = [];
 
-  for (let i = 0; i < merged.length; i += BATCH) {
-    const batch = merged.slice(i, i + BATCH);
+  const mergedForValidation = merged.slice(0, Math.max(limit, maxWebsiteChecks, 80));
+  for (let i = 0; i < mergedForValidation.length; i += BATCH) {
+    const batch = mergedForValidation.slice(i, i + BATCH);
     const validated = await Promise.all(
       batch.map(async (raw) => {
         let webInfo: WebInfo | null = null;
@@ -1809,8 +1824,22 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           // Demo data or pre-enriched source has explicit status
           wsStatus = raw.websiteStatus;
         } else if (trustedWebsite) {
-          webInfo  = await checkWebsite(trustedWebsite).catch(() => null);
-          wsStatus = webInfo?.status ?? "unreachable";
+          const quickStatus = quickWebsiteStatus(trustedWebsite);
+          if (quickStatus) {
+            webInfo = quickStatus;
+            wsStatus = quickStatus.status;
+          } else if (
+            websiteChecks < maxWebsiteChecks &&
+            Date.now() - websiteStartedAt < websiteBudgetMs
+          ) {
+            websiteChecks += 1;
+            webInfo  = await checkWebsite(trustedWebsite).catch(() => null);
+            wsStatus = webInfo?.status ?? "alive";
+          } else {
+            // When the deadline is exhausted, keep the lead usable instead of
+            // blocking the full search. Users can still open/verify the profile.
+            wsStatus = "alive";
+          }
         } else {
           // Only mark "none" if from a rich source that reliably stores website data.
           // OSM/Photon/Nominatim rarely store website URLs, so absence of a URL
@@ -1888,7 +1917,10 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
       .filter(l => l.opportunityType === "no_website" || l.opportunityType === "outdated_website")
       .sort((a,b) => b.score - a.score)
       .slice(0, 8);
-    await Promise.allSettled(topLeads.map(l => enhanceWithAI(l, groqKey)));
+    await Promise.race([
+      Promise.allSettled(topLeads.map(l => enhanceWithAI(l, groqKey))),
+      new Promise(resolve => setTimeout(resolve, 4_000)),
+    ]);
   }
 
   // 6. Sort by score

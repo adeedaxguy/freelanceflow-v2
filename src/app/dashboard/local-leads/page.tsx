@@ -21,6 +21,7 @@ const FREE_PLAN_LIMIT      = 100;          // 100 leads per 24 hours
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
+const LOCAL_SEARCH_TIMEOUT_MS = 45_000;
 
 type LocalLeadsCache = {
   results?: LocalLead[];
@@ -270,6 +271,28 @@ function exportLocalLeadsCsv(leads: LocalLead[], keyword: string, location: stri
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(url);
+}
+
+async function postLocalLeadSearch(body: Record<string, unknown>, retry = true): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), LOCAL_SEARCH_TIMEOUT_MS);
+
+  try {
+    return await fetch("/api/local-leads/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (retry) {
+      await new Promise(resolve => window.setTimeout(resolve, 900));
+      return postLocalLeadSearch(body, false);
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 function getLocalLeadCallScript(lead: LocalLead) {
@@ -1045,10 +1068,7 @@ export default function LocalLeadsPage() {
       if (yelpKey) body.yelpKey = yelpKey;
       if (fsqKey)  body.foursquareKey = fsqKey;
 
-      const res = await fetch("/api/local-leads/search", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const res = await postLocalLeadSearch(body);
       let data: {
         results?: LocalLead[];
         source?: string;
@@ -1111,7 +1131,13 @@ export default function LocalLeadsPage() {
 
       // Scroll results into view
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    } catch { setError("Network error. Please try again."); }
+    } catch (err) {
+      setError(
+        err instanceof DOMException && err.name === "AbortError"
+          ? "Search is taking too long because a live data source is slow. Try again in a moment."
+          : "Network error. Please try again — live search will retry once automatically."
+      );
+    }
     finally { setLoading(false); }
   }, [keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, yelpKey, fsqKey, syncUsage]);
 
