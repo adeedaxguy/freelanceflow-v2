@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
+import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
@@ -279,6 +280,16 @@ export default function LeadsPage() {
   const [forceCooldown,   setForceCooldown]  = useState(0);
 
   const resultsTopRef = useRef<HTMLDivElement>(null);
+  const {
+    appliedByUrl,
+    countsByUrl,
+    loadingUrl: applyingUrl,
+    pendingPrompt,
+    markApplied,
+    rememberOpenedPost,
+    closePrompt,
+    confirmPromptApplied,
+  } = useLeadApplications(leads.map(lead => ({ title: lead.title, url: lead.url })));
 
   // Cooldown tickers
   useEffect(() => {
@@ -441,6 +452,12 @@ export default function LeadsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <AppliedReturnPrompt
+        lead={pendingPrompt}
+        loading={!!pendingPrompt && applyingUrl === pendingPrompt.url}
+        onYes={confirmPromptApplied}
+        onNo={closePrompt}
+      />
       <div className="flex flex-col xl:flex-row gap-6 items-start">
       {/* ── Main column ───────────────────────────────────────── */}
       <div className="flex-1 min-w-0 space-y-6">
@@ -800,6 +817,8 @@ export default function LeadsPage() {
                   const isExpanded = expandedIds.has(lead.id);
                   const descLong   = lead.description.length > 180;
                   const nextStep   = leadNextStep(lead);
+                  const hasApplied = !!appliedByUrl[lead.url];
+                  const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
                     <div key={lead.id}
                       className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-card-hover">
@@ -883,11 +902,18 @@ export default function LeadsPage() {
 
                         {/* Actions */}
                         {/* Desktop: vertical stack. Mobile: horizontal row below content */}
-                        <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 w-[126px]">
-                          <a href={lead.url} target="_blank" rel="noopener noreferrer"
+                        <div className="hidden sm:flex flex-col gap-2 flex-shrink-0 w-[146px]">
+                          <a href={lead.url} target="_blank" rel="noopener noreferrer" onClick={() => rememberOpenedPost({ title: lead.title, url: lead.url })}
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
                             <ExternalLink className="w-3.5 h-3.5" /> Open Post
                           </a>
+                          <AppliedButton
+                            leadUrl={lead.url}
+                            applied={hasApplied}
+                            count={appliedCount}
+                            loading={applyingUrl === lead.url}
+                            onClick={markApplied}
+                          />
                           <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
                             className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                               isSaved
@@ -908,11 +934,20 @@ export default function LeadsPage() {
                       </div>
 
                       {/* Mobile action row — full width below content */}
-                      <div className="sm:hidden flex gap-2 mt-2 pt-3 border-t border-border/50">
-                        <a href={lead.url} target="_blank" rel="noopener noreferrer"
+                      <div className="sm:hidden grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-border/50">
+                        <a href={lead.url} target="_blank" rel="noopener noreferrer" onClick={() => rememberOpenedPost({ title: lead.title, url: lead.url })}
                           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg border border-border text-muted-foreground text-xs font-medium transition-all active:bg-white/5">
                           <ExternalLink className="w-3.5 h-3.5" /> Open
                         </a>
+                        <AppliedButton
+                          leadUrl={lead.url}
+                          applied={hasApplied}
+                          count={appliedCount}
+                          loading={applyingUrl === lead.url}
+                          onClick={markApplied}
+                          compact
+                          className="py-2.5"
+                        />
                         <button onClick={() => void handleSave(lead)} disabled={isSaved || isSaving}
                           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
                             isSaved

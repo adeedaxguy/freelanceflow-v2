@@ -30,9 +30,22 @@ const TABLE_MIGRATIONS = [
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
   },
+  {
+    name: "LeadApplication",
+    sql: `CREATE TABLE IF NOT EXISTS "LeadApplication" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "leadUrl" TEXT NOT NULL,
+      "appliedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "LeadApplication_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+  },
   { name: "Template.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_userId_idx" ON "Template"("userId")` },
   { name: "Template.isDefault_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_isDefault_idx" ON "Template"("isDefault")` },
   { name: "ContactSubmission.resolved_idx", sql: `CREATE INDEX IF NOT EXISTS "ContactSubmission_resolved_idx" ON "ContactSubmission"("resolved")` },
+  { name: "LeadApplication.userId_leadUrl_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "LeadApplication_userId_leadUrl_key" ON "LeadApplication"("userId", "leadUrl")` },
+  { name: "LeadApplication.leadUrl_idx", sql: `CREATE INDEX IF NOT EXISTS "LeadApplication_leadUrl_idx" ON "LeadApplication"("leadUrl")` },
+  { name: "LeadApplication.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "LeadApplication_userId_idx" ON "LeadApplication"("userId")` },
 ];
 
 const MIGRATIONS = [

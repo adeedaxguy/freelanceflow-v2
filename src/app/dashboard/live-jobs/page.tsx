@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import type { AggregatedLead } from "@/lib/leads-aggregator";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
+import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
@@ -254,6 +255,16 @@ export default function LiveJobsPage() {
 
   const prevSeenRef = useRef<Set<string>>(new Set());
   const timerRef    = useRef<ReturnType<typeof setInterval>|null>(null);
+  const {
+    appliedByUrl,
+    countsByUrl,
+    loadingUrl: applyingUrl,
+    pendingPrompt,
+    markApplied,
+    rememberOpenedPost,
+    closePrompt,
+    confirmPromptApplied,
+  } = useLeadApplications(leads.map(lead => ({ title: lead.title, url: lead.url })));
 
   useEffect(() => {
     try {
@@ -441,6 +452,12 @@ export default function LiveJobsPage() {
   return (
     <>
       {showBMModal && <BestMatchModal prefs={prefs} onSave={savePrefs} onClose={()=>setShowBMModal(false)}/>}
+      <AppliedReturnPrompt
+        lead={pendingPrompt}
+        loading={!!pendingPrompt && applyingUrl === pendingPrompt.url}
+        onYes={confirmPromptApplied}
+        onNo={closePrompt}
+      />
       <div className="p-4 sm:p-6 lg:p-8">
 
         {/* Header */}
@@ -668,6 +685,8 @@ export default function LiveJobsPage() {
                   const isFav    = favIds.has(lead.id);
                   const isNew    = !seenIds.has(lead.id);
                   const nextStep = leadNextStep(lead);
+                  const hasApplied = !!appliedByUrl[lead.url];
+                  const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
                     <div key={lead.id}
                       className={`group bg-gradient-card border rounded-2xl p-4 sm:p-5 transition-all hover:shadow-card-hover ${lead.bmScore>=80?"border-primary/40 hover:border-primary/60 shadow-sm shadow-primary/10":isFav?"border-yellow-500/30 hover:border-yellow-500/50":"border-border hover:border-primary/30"}`}>
@@ -719,15 +738,23 @@ export default function LiveJobsPage() {
                         </div>
 
                         {/* Action column */}
-                        <div className="flex flex-col gap-1.5 sm:gap-2 flex-shrink-0 w-[112px] sm:w-[126px]">
+                        <div className="flex flex-col gap-1.5 sm:gap-2 flex-shrink-0 w-[124px] sm:w-[146px]">
                           <button onClick={()=>setFavIds(p=>{const n=new Set(p);n.has(lead.id)?n.delete(lead.id):n.add(lead.id);return n;})}
                             className={`flex items-center justify-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isFav?"bg-yellow-500/15 border-yellow-500/40 text-yellow-400":"border-border text-muted-foreground hover:border-yellow-500/30 hover:text-yellow-400"}`}>
                             <Heart className={`w-3.5 h-3.5 ${isFav?"fill-yellow-400 text-yellow-400":""}`}/>{isFav?"Shortlisted":"Shortlist"}
                           </button>
-                          <a href={lead.url} target="_blank" rel="noopener noreferrer"
+                          <a href={lead.url} target="_blank" rel="noopener noreferrer" onClick={() => rememberOpenedPost({ title: lead.title, url: lead.url })}
                             className="flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 text-xs font-medium transition-all">
                             <ExternalLink className="w-3.5 h-3.5"/> Open Post
                           </a>
+                          <AppliedButton
+                            leadUrl={lead.url}
+                            applied={hasApplied}
+                            count={appliedCount}
+                            loading={applyingUrl === lead.url}
+                            onClick={markApplied}
+                            compact
+                          />
                           <button onClick={()=>void handleSave(lead)} disabled={isSaved||isSaving}
                             className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-xs font-medium transition-all ${isSaved?"bg-accent/10 text-accent border border-accent/30 cursor-default":"bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20"}`}>
                             {isSaved?<><CheckCircle className="w-3.5 h-3.5"/> Saved</>:<><Bookmark className="w-3.5 h-3.5"/>{isSaving?"…":"Save Lead"}</>}

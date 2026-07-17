@@ -56,11 +56,15 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   const userId = session?.user?.id ?? null;
 
-  const param = req.nextUrl.searchParams.get("urls") ?? "";
-  const urls = param
-    .split(",")
+  const repeatedUrls = req.nextUrl.searchParams.getAll("url");
+  const commaSeparatedUrls = req.nextUrl.searchParams.get("urls") ?? "";
+  const urls = [
+    ...repeatedUrls,
+    ...commaSeparatedUrls.split(","),
+  ]
     .map((u) => u.trim())
     .filter(Boolean)
+    .filter((u, index, arr) => arr.indexOf(u) === index)
     .slice(0, 200); // cap to avoid massive queries
 
   if (urls.length === 0) {
