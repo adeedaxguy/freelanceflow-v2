@@ -10,41 +10,41 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#090915",
-        surface: "#10102A",
-        border: "#20204A",
+        background: "hsl(var(--background) / <alpha-value>)",
+        surface: "hsl(var(--card) / <alpha-value>)",
+        border: "hsl(var(--border) / <alpha-value>)",
         primary: {
-          DEFAULT: "#7C3AED",
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
           light: "#9F67FF",
-          foreground: "#FFFFFF",
+          foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
         },
         accent: {
-          DEFAULT: "#00E5A0",
-          foreground: "#090915",
+          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
+          foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
         },
         gold: "#FFD166",
-        foreground: "#F2F2FF",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
         muted: {
-          DEFAULT: "#20204A",
-          foreground: "#9090B8",
+          DEFAULT: "hsl(var(--muted) / <alpha-value>)",
+          foreground: "hsl(var(--muted-foreground) / <alpha-value>)",
         },
         card: {
-          DEFAULT: "#10102A",
-          foreground: "#F2F2FF",
+          DEFAULT: "hsl(var(--card) / <alpha-value>)",
+          foreground: "hsl(var(--card-foreground) / <alpha-value>)",
         },
         destructive: {
-          DEFAULT: "#EF4444",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--destructive) / <alpha-value>)",
+          foreground: "hsl(var(--destructive-foreground) / <alpha-value>)",
         },
-        ring: "#7C3AED",
-        input: "#20204A",
+        ring: "hsl(var(--ring) / <alpha-value>)",
+        input: "hsl(var(--input) / <alpha-value>)",
         popover: {
-          DEFAULT: "#10102A",
-          foreground: "#F2F2FF",
+          DEFAULT: "hsl(var(--popover) / <alpha-value>)",
+          foreground: "hsl(var(--popover-foreground) / <alpha-value>)",
         },
         secondary: {
-          DEFAULT: "#20204A",
-          foreground: "#F2F2FF",
+          DEFAULT: "hsl(var(--secondary) / <alpha-value>)",
+          foreground: "hsl(var(--secondary-foreground) / <alpha-value>)",
         },
       },
       fontFamily: {
@@ -55,11 +55,11 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-hero": "linear-gradient(135deg, #7C3AED 0%, #00E5A0 100%)",
-        "gradient-card": "linear-gradient(145deg, #10102A, #181840)",
-        "gradient-card-hover": "linear-gradient(145deg, #14143A, #1E1E50)",
+        "gradient-card": "linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)))",
+        "gradient-card-hover": "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))",
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "dot-pattern": "radial-gradient(circle, #1E1E3A 1px, transparent 1px)",
-        "grid-pattern": "linear-gradient(#1E1E3A 1px, transparent 1px), linear-gradient(to right, #1E1E3A 1px, transparent 1px)",
+        "dot-pattern": "radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px)",
+        "grid-pattern": "linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px)",
       },
       backgroundSize: {
         "dot-sm": "20px 20px",

@@ -22,6 +22,7 @@ import {
   Rocket,
   SlidersHorizontal,
   Sparkles,
+  Shuffle,
   Sun,
   Wand2,
 } from "lucide-react";
@@ -29,6 +30,12 @@ import {
   businessInitials,
   getSiteDraftIdentity,
 } from "@/lib/site-draft";
+import {
+  DESIGN_VARIATIONS,
+  nextDesignVariationId,
+  resolveDesignVariation,
+  variationToOptionPatch,
+} from "@/lib/site-design";
 
 type DraftData = {
   company: string;
@@ -51,6 +58,7 @@ type DesignOptions = {
   conversionGoal: string;
   layout: string;
   prompt: string;
+  variation: string;
 };
 
 type Option = {
@@ -188,6 +196,7 @@ function buildPreviewSearch(data: DraftData, options: DesignOptions) {
     contentDepth: options.contentDepth,
     conversionGoal: options.conversionGoal,
     layout: options.layout,
+    variation: options.variation,
   });
 
   if (data.website) params.set("website", data.website);
@@ -318,6 +327,77 @@ function OptionGrid({
   );
 }
 
+function VariationPicker({
+  value,
+  onChange,
+  onShuffle,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onShuffle: () => void;
+}) {
+  const selected = resolveDesignVariation({ variationId: value });
+
+  return (
+    <section className="rounded-3xl border border-primary/25 bg-primary/10 p-5 sm:p-6">
+      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl border border-primary/25 bg-background/60 text-primary-light">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-foreground">Design feel</h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              Choose from 50 prompt-ready directions. The prompt can pick this automatically, or you can force a style here.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onShuffle}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/35 bg-background/60 px-4 py-3 text-sm font-black text-primary-light transition hover:border-primary/60 hover:bg-primary/15"
+        >
+          <Shuffle className="h-4 w-4" />
+          Surprise me
+        </button>
+      </div>
+
+      <select
+        value={value}
+        onChange={event => onChange(event.target.value)}
+        className="w-full rounded-2xl border border-border bg-background/75 px-4 py-3 text-base font-bold text-foreground outline-none transition focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+      >
+        {DESIGN_VARIATIONS.map(variationOption => (
+          <option key={variationOption.id} value={variationOption.id}>
+            {variationOption.label}
+          </option>
+        ))}
+      </select>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_0.7fr]">
+        <div className="rounded-2xl border border-border bg-surface/70 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-light">{selected.badge}</p>
+          <h3 className="mt-2 text-lg font-black text-foreground">{selected.label}</h3>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{selected.summary}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-surface/70 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">Palette</p>
+          <div className="mt-3 flex gap-2">
+            {[selected.palette.accent, selected.palette.accent2, selected.palette.previewBackground, selected.palette.previewSurface].map(color => (
+              <span
+                key={color}
+                className="h-10 flex-1 rounded-xl border border-white/10"
+                style={{ background: color }}
+              />
+            ))}
+          </div>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">{selected.texture}</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function WebDesignBuilderContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
@@ -343,6 +423,13 @@ function WebDesignBuilderContent() {
   const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, "quotes"));
   const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, "conversion"));
   const [designPrompt, setDesignPrompt] = useState(() => cleanPrompt(searchParams.get("prompt")));
+  const [variation, setVariation] = useState(() => resolveDesignVariation({
+    variationId: clean(searchParams.get("variation")),
+    prompt: cleanPrompt(searchParams.get("prompt")),
+    company: data.company,
+    category: data.category,
+    location: data.location,
+  }).id);
 
   const options = useMemo<DesignOptions>(() => ({
     style,
@@ -353,11 +440,28 @@ function WebDesignBuilderContent() {
     conversionGoal,
     layout,
     prompt: designPrompt,
-  }), [contentDepth, conversionGoal, designPrompt, images, layout, sections, style, theme]);
+    variation,
+  }), [contentDepth, conversionGoal, designPrompt, images, layout, sections, style, theme, variation]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data, options)}`;
+  const clientPreviewHref = `${previewHref}&client=1`;
   const pdfHref = `${previewHref}&print=1`;
-  const identity = useMemo(() => getSiteDraftIdentity(data), [data]);
+  const selectedVariation = useMemo(() => resolveDesignVariation({
+    variationId: variation,
+    prompt: designPrompt,
+    company: data.company,
+    category: data.category,
+    location: data.location,
+  }), [data.category, data.company, data.location, designPrompt, variation]);
+  const identity = useMemo(() => {
+    const base = getSiteDraftIdentity(data);
+    return {
+      ...base,
+      accent: selectedVariation.palette.accent,
+      accent2: selectedVariation.palette.accent2,
+      accentSoft: selectedVariation.palette.accentSoft,
+    };
+  }, [data, selectedVariation]);
   const initials = businessInitials(data.company);
   const activeStepData = BUILDER_STEPS[activeStep] ?? BUILDER_STEPS[0]!;
   const ActiveIcon = activeStepData.icon;
@@ -365,6 +469,7 @@ function WebDesignBuilderContent() {
   const canGoNext = activeStep < BUILDER_STEPS.length - 1;
   const selectedSummary = [
     designPrompt ? "Prompt-led" : null,
+    selectedVariation.badge,
     optionLabel(STYLE_OPTIONS, style),
     optionLabel(THEME_OPTIONS, theme),
     `${sections} sections`,
@@ -381,15 +486,44 @@ function WebDesignBuilderContent() {
   }).toString()}`;
 
   async function copyPreviewLink() {
-    const absoluteUrl = `${window.location.origin}${previewHref}`;
+    const absoluteUrl = `${window.location.origin}${clientPreviewHref}`;
     await navigator.clipboard.writeText(absoluteUrl);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }
 
+  function applyVariation(nextVariationId: string) {
+    const nextVariation = resolveDesignVariation({ variationId: nextVariationId });
+    const patch = variationToOptionPatch(nextVariation);
+    setVariation(nextVariation.id);
+    setStyle(patch.style);
+    setTheme(patch.theme);
+    setSections(patch.sections);
+    setImages(patch.images);
+    setContentDepth(patch.contentDepth);
+    setConversionGoal(patch.conversionGoal);
+    setLayout(patch.layout);
+  }
+
+  function shuffleVariation() {
+    applyVariation(nextDesignVariationId(variation, `${data.company}-${data.category}-${Date.now()}`));
+  }
+
   function applyDesignPrompt() {
-    const inferred = inferDesignOptionsFromPrompt(designPrompt, options);
+    const promptedVariation = resolveDesignVariation({
+      prompt: designPrompt,
+      company: data.company,
+      category: data.category,
+      location: data.location,
+    });
+    const variationPatch = variationToOptionPatch(promptedVariation);
+    const inferred = inferDesignOptionsFromPrompt(designPrompt, {
+      ...options,
+      ...variationPatch,
+      variation: promptedVariation.id,
+    });
     setDesignPrompt(inferred.prompt);
+    setVariation(promptedVariation.id);
     setStyle(inferred.style);
     setTheme(inferred.theme);
     setSections(inferred.sections);
@@ -419,13 +553,13 @@ function WebDesignBuilderContent() {
 
           <div className="flex flex-wrap gap-2">
             <a
-              href={previewHref}
+              href={clientPreviewHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/15"
             >
               <ExternalLink className="h-4 w-4" />
-              Open preview
+              Open client preview
             </a>
             <a
               href={pdfHref}
@@ -442,7 +576,7 @@ function WebDesignBuilderContent() {
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-hero px-4 py-2 text-sm font-bold text-white shadow-glow transition hover:opacity-90"
             >
               {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copied" : "Copy link"}
+              {copied ? "Client link copied" : "Share with client"}
             </button>
           </div>
         </div>
@@ -642,6 +776,11 @@ function WebDesignBuilderContent() {
 
             {activeStepData.key === "style" && (
               <div className="space-y-5">
+                <VariationPicker
+                  value={variation}
+                  onChange={applyVariation}
+                  onShuffle={shuffleVariation}
+                />
                 <OptionGrid
                   title="Visual direction"
                   description="Choose the first impression the prospect should feel when they open the website preview."
@@ -717,9 +856,9 @@ function WebDesignBuilderContent() {
               <div className="grid gap-5 lg:grid-cols-3">
                 {[
                   {
-                    title: "Open website preview",
-                    copy: "See the full client-facing concept in a clean standalone page.",
-                    href: previewHref,
+                    title: "Open client preview",
+                    copy: "See the exact shareable concept your prospect can open from a message.",
+                    href: clientPreviewHref,
                     icon: ExternalLink,
                     className: "border-accent/30 bg-accent/10 text-accent",
                   },
@@ -782,7 +921,7 @@ function WebDesignBuilderContent() {
               </button>
               <button
                 type="button"
-                onClick={() => canGoNext ? setActiveStep(activeStep + 1) : window.open(previewHref, "_blank", "noopener,noreferrer")}
+                onClick={() => canGoNext ? setActiveStep(activeStep + 1) : window.open(clientPreviewHref, "_blank", "noopener,noreferrer")}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-hero px-5 py-3 text-sm font-black text-white shadow-glow transition hover:opacity-90"
               >
                 {canGoNext ? "Continue" : "Open final preview"}
@@ -847,13 +986,13 @@ function WebDesignBuilderContent() {
 
                 <div className="mt-4 grid gap-2">
                   <a
-                    href={previewHref}
+                    href={clientPreviewHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-black text-accent transition hover:bg-accent/15"
                   >
                     <Eye className="h-4 w-4" />
-                    Preview
+                    Client preview
                   </a>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -862,7 +1001,7 @@ function WebDesignBuilderContent() {
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background/55 px-4 py-3 text-sm font-bold text-muted-foreground transition hover:text-foreground"
                     >
                       {copied ? <CheckCircle className="h-4 w-4 text-accent" /> : <Copy className="h-4 w-4" />}
-                      {copied ? "Copied" : "Copy"}
+                      {copied ? "Copied" : "Share"}
                     </button>
                     <a
                       href={pdfHref}
@@ -888,6 +1027,7 @@ function WebDesignBuilderContent() {
                   </div>
                 )}
                 {[
+                  ["Design feel", selectedVariation.label],
                   ["Direction", optionLabel(STYLE_OPTIONS, style)],
                   ["Theme", optionLabel(THEME_OPTIONS, theme)],
                   ["Layout", optionLabel(LAYOUT_OPTIONS, layout)],

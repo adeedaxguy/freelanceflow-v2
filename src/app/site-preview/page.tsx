@@ -19,6 +19,10 @@ import {
   getSiteDraftIdentity,
   marketFromLocation,
 } from "@/lib/site-draft";
+import {
+  resolveDesignVariation,
+  variationToOptionPatch,
+} from "@/lib/site-design";
 import SitePreviewPdfActions from "@/components/SitePreviewPdfActions";
 
 export const metadata: Metadata = {
@@ -48,6 +52,8 @@ type SearchParams = {
   conversionGoal?: string | string[];
   layout?: string | string[];
   prompt?: string | string[];
+  variation?: string | string[];
+  client?: string | string[];
   print?: string | string[];
 };
 
@@ -208,10 +214,15 @@ function option<T extends string>(value: string | string[] | undefined, allowed:
   return allowed.includes(next) ? next : fallback;
 }
 
-function sectionCount(value: string | string[] | undefined) {
+function sectionCount(value: string | string[] | undefined, fallback = 7) {
   const next = Number.parseInt(clean(value), 10);
-  if (!Number.isFinite(next)) return 7;
+  if (!Number.isFinite(next)) return fallback;
   return Math.max(5, Math.min(11, next));
+}
+
+function hasExplicitParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value.some(item => item.trim().length > 0);
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 function safeHttpUrl(value: string | string[] | undefined) {
@@ -293,13 +304,19 @@ function imageBackground(segment: string, index: number, overlay: string) {
 function printStyles(isLight: boolean) {
   return `
     @page {
-      size: A4;
-      margin: 10mm;
+      size: 1440px 11200px;
+      margin: 0;
     }
 
     @media print {
+      * {
+        box-sizing: border-box !important;
+      }
+
       html {
         background: ${isLight ? "#f8fafc" : "#070b12"} !important;
+        width: 1440px !important;
+        min-width: 1440px !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -308,6 +325,8 @@ function printStyles(isLight: boolean) {
         background: ${isLight ? "#f8fafc" : "#070b12"} !important;
         margin: 0 !important;
         overflow: visible !important;
+        width: 1440px !important;
+        min-width: 1440px !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
@@ -319,7 +338,9 @@ function printStyles(isLight: boolean) {
       .site-preview-root {
         display: block !important;
         min-height: auto !important;
-        width: 100% !important;
+        width: 1440px !important;
+        min-width: 1440px !important;
+        max-width: 1440px !important;
         overflow: visible !important;
         padding-bottom: 0 !important;
         -webkit-print-color-adjust: exact;
@@ -346,32 +367,31 @@ function printStyles(isLight: boolean) {
       }
 
       .site-preview-root .max-w-7xl {
-        max-width: 1080px !important;
+        max-width: 1240px !important;
       }
 
       .site-preview-hero {
-        display: block !important;
-        min-height: auto !important;
-        padding-top: 18px !important;
-        padding-bottom: 22px !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
+        min-height: 760px !important;
+        padding-top: 32px !important;
+        padding-bottom: 44px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
       }
 
       .site-preview-hero-grid {
         display: grid !important;
         flex: none !important;
-        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-columns: minmax(0, 1.04fr) minmax(420px, 0.96fr) !important;
         align-items: start !important;
-        gap: 18px !important;
-        padding-top: 28px !important;
-        padding-bottom: 24px !important;
-        break-inside: auto !important;
-        page-break-inside: auto !important;
+        gap: 44px !important;
+        padding-top: 54px !important;
+        padding-bottom: 44px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
       }
 
       .site-preview-hero-grid h1 {
-        font-size: 46px !important;
+        font-size: 66px !important;
         line-height: 1.04 !important;
         letter-spacing: 0 !important;
       }
@@ -382,7 +402,7 @@ function printStyles(isLight: boolean) {
       }
 
       .site-preview-hero-visual {
-        display: none !important;
+        display: block !important;
       }
 
       .site-preview-signal-grid {
@@ -390,21 +410,17 @@ function printStyles(isLight: boolean) {
       }
 
       .site-preview-root section > .mx-auto:not(.site-preview-hero) {
-        padding-top: 30px !important;
-        padding-bottom: 30px !important;
+        padding-top: 44px !important;
+        padding-bottom: 44px !important;
       }
 
       .site-preview-root h2 {
-        font-size: 34px !important;
+        font-size: 42px !important;
         line-height: 1.08 !important;
       }
 
       .site-preview-root h3 {
         line-height: 1.16 !important;
-      }
-
-      .site-preview-root [class*="shadow-"] {
-        box-shadow: none !important;
       }
 
       .site-preview-root article,
@@ -597,6 +613,14 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   const website = safeHttpUrl(searchParams?.website);
   const pitch = clean(searchParams?.pitch);
   const designPrompt = clean(searchParams?.prompt);
+  const variation = resolveDesignVariation({
+    variationId: clean(searchParams?.variation),
+    prompt: designPrompt,
+    company,
+    category,
+    location,
+  });
+  const variationPatch = variationToOptionPatch(variation);
   const data: PreviewData = {
     company,
     category,
@@ -610,17 +634,34 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
   };
 
   const baseOptions: PreviewOptions = {
-    style: option(searchParams?.style, ["professional", "premium", "bold", "friendly", "minimal", "creative"] as const, "professional"),
-    theme: option(searchParams?.theme, ["dark", "light"] as const, "dark"),
-    sections: sectionCount(searchParams?.sections),
-    images: option(searchParams?.images, ["abstract", "gallery", "before-after", "none"] as const, "gallery"),
-    contentDepth: option(searchParams?.contentDepth, ["short", "balanced", "detailed"] as const, "balanced"),
-    conversionGoal: option(searchParams?.conversionGoal, ["calls", "quotes", "bookings", "visits"] as const, "quotes"),
-    layout: option(searchParams?.layout, ["conversion", "editorial", "showcase"] as const, "conversion"),
+    style: option(searchParams?.style, ["professional", "premium", "bold", "friendly", "minimal", "creative"] as const, variationPatch.style),
+    theme: option(searchParams?.theme, ["dark", "light"] as const, variationPatch.theme),
+    sections: sectionCount(searchParams?.sections, Number.parseInt(variationPatch.sections, 10)),
+    images: option(searchParams?.images, ["abstract", "gallery", "before-after", "none"] as const, variationPatch.images),
+    contentDepth: option(searchParams?.contentDepth, ["short", "balanced", "detailed"] as const, variationPatch.contentDepth),
+    conversionGoal: option(searchParams?.conversionGoal, ["calls", "quotes", "bookings", "visits"] as const, variationPatch.conversionGoal),
+    layout: option(searchParams?.layout, ["conversion", "editorial", "showcase"] as const, variationPatch.layout),
   };
-  const options = inferPreviewOptionsFromPrompt(designPrompt, baseOptions);
+  const inferredOptions = inferPreviewOptionsFromPrompt(designPrompt, baseOptions);
+  const options: PreviewOptions = {
+    ...inferredOptions,
+    style: hasExplicitParam(searchParams?.style) ? baseOptions.style : inferredOptions.style,
+    theme: hasExplicitParam(searchParams?.theme) ? baseOptions.theme : inferredOptions.theme,
+    sections: hasExplicitParam(searchParams?.sections) ? baseOptions.sections : inferredOptions.sections,
+    images: hasExplicitParam(searchParams?.images) ? baseOptions.images : inferredOptions.images,
+    contentDepth: hasExplicitParam(searchParams?.contentDepth) ? baseOptions.contentDepth : inferredOptions.contentDepth,
+    conversionGoal: hasExplicitParam(searchParams?.conversionGoal) ? baseOptions.conversionGoal : inferredOptions.conversionGoal,
+    layout: hasExplicitParam(searchParams?.layout) ? baseOptions.layout : inferredOptions.layout,
+  };
 
-  const identity = getSiteDraftIdentity(data);
+  const baseIdentity = getSiteDraftIdentity(data);
+  const identity = {
+    ...baseIdentity,
+    accent: variation.palette.accent,
+    accent2: variation.palette.accent2,
+    accentSoft: variation.palette.accentSoft,
+    surface: `linear-gradient(135deg, ${variation.palette.previewSurface}, ${variation.palette.previewBackground})`,
+  };
   const initials = businessInitials(company);
   const market = marketFromLocation(location);
   const callLink = telHref(phone);
@@ -642,6 +683,8 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     "--site-accent": identity.accent,
     "--site-accent-2": identity.accent2,
     "--site-accent-soft": identity.accentSoft,
+    "--site-preview-bg": variation.palette.previewBackground,
+    "--site-preview-surface": variation.palette.previewSurface,
   } as CSSProperties;
 
   const middleSections: ReactNode[] = [
@@ -772,6 +815,27 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         </p>
       </div>
     </section>,
+
+    <section key="questions" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
+      <HeadingBlock
+        eyebrow="Decision support"
+        title="Answer the questions that slow down enquiries"
+        copy={`A stronger ${data.category.toLowerCase()} homepage can answer practical buying questions before the customer reaches the phone.`}
+        isLight={isLight}
+      />
+      <div className="grid gap-4 lg:grid-cols-3">
+        {[
+          ["How quickly can someone get help?", goalCopy.section],
+          ["What should customers ask for?", `${identity.pages.slice(0, 3).join(", ")} are easy starting points for a clear first conversation.`],
+          ["Why trust this business?", `${identity.trustBadges.slice(0, 2).join(" and ")} give customers confidence before they call.`],
+        ].map(([question, answer]) => (
+          <div key={question} className={`min-h-[210px] rounded-3xl border p-5 ${panelClass(isLight)}`}>
+            <h3 className="text-xl font-black">{question}</h3>
+            <p className={`mt-3 text-sm leading-7 ${mutedClass(isLight)}`}>{answer}</p>
+          </div>
+        ))}
+      </div>
+    </section>,
   ];
 
   return (
@@ -824,9 +888,15 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
 
           <div className={`site-preview-hero-grid grid flex-1 items-center gap-8 py-8 sm:py-10 lg:gap-12 lg:py-12 ${heroGrid}`}>
             <div>
-              <div className={`mb-6 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
-                <MapPin className="h-4 w-4" style={{ color: identity.accent }} />
-                Serving {market}
+              <div className="mb-6 flex flex-wrap gap-2">
+                <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
+                  <MapPin className="h-4 w-4" style={{ color: identity.accent }} />
+                  Serving {market}
+                </span>
+                <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
+                  <Star className="h-4 w-4 fill-current" style={{ color: identity.accent2 }} />
+                  {variation.badge}
+                </span>
               </div>
               <h1 className="max-w-4xl break-words text-4xl font-black leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
                 {identity.headline}

@@ -1148,21 +1148,7 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
 
 // ── Main Component ────────────────────────────────────────────────────
 export default function HomepageClient() {
-  const heroRef = useRef<HTMLElement>(null);
   const [showEarlyAccess, setShowEarlyAccess] = useState(true);
-
-  // Force dark mode on homepage regardless of user preference.
-  // On unmount (navigation away), restore the saved class.
-  useEffect(() => {
-    const html     = document.documentElement;
-    const savedCls = html.className; // e.g. "light" or ""
-    html.classList.remove("light");
-    html.style.colorScheme = "dark";
-    return () => {
-      html.className = savedCls;
-      html.style.colorScheme = "";
-    };
-  }, []);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-background">
@@ -1175,8 +1161,7 @@ export default function HomepageClient() {
           HERO
       ════════════════════════════════════════════ */}
       <section
-        ref={heroRef}
-        className={`relative overflow-hidden border-b border-border/70 ${showEarlyAccess ? "pt-9 sm:pt-14" : "pt-12 sm:pt-16"} pb-14 sm:pb-16 lg:pt-20 lg:pb-20`}
+        className={`homepage-dark-surface relative overflow-hidden border-b border-border/70 ${showEarlyAccess ? "pt-9 sm:pt-14" : "pt-12 sm:pt-16"} pb-14 sm:pb-16 lg:pt-20 lg:pb-20`}
       >
 
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#090915_0%,#0c0c1e_48%,#090915_100%)]" />

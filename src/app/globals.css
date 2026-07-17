@@ -42,7 +42,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background-color: #090915;
+    background-color: hsl(var(--background));
   }
 
   ::selection {
@@ -416,6 +416,14 @@ html.light .bg-white\/\[0\.05\] { background-color: rgba(0,0,0,0.03) !important;
 html.light .bg-black\/60  { background-color: rgba(255,255,255,0.85) !important; }
 html.light .bg-black\/40  { background-color: rgba(255,255,255,0.7) !important; }
 html.light .bg-black\/20  { background-color: rgba(0,0,0,0.05) !important; }
+html.light [class*="bg-[#071014]"] .text-white,
+html.light [class*="bg-[#0b1220]"] .text-white,
+html.light [class*="bg-slate-950"] .text-white,
+html.light [class*="bg-slate-950"] .text-white\/70,
+html.light [class*="bg-slate-950"] .text-white\/75,
+html.light [class*="bg-slate-950"] .text-white\/80 {
+  color: #ffffff !important;
+}
 
 /* ── Hero gradient — keep purple→green ───────────────────── */
 html.light .bg-gradient-hero {
@@ -547,7 +555,41 @@ html.light [class*="bg-gradient-hero"],
 html.light [class*="from-primary"][class*="to-accent"],
 html.light [class*="from-primary"][class*="to-accent"] *,
 html.light button.bg-primary,
-html.light a.bg-primary { color: #ffffff !important; }
+html.light a.bg-primary,
+html.light .site-preview-root.text-white,
+html.light .site-preview-root[class*="bg-[#070b12]"],
+html.light .site-preview-root[class*="bg-[#070b12]"] *,
+html.light .site-preview-root [class*="bg-slate-950"] *,
+html.light .site-preview-root [class*="bg-[#071014]"] *,
+html.light .site-preview-root [class*="bg-[#0b1220]"] * { color: #ffffff !important; }
+html.light .site-preview-root[class*="bg-[#070b12]"] {
+  background-color: #070b12 !important;
+}
+
+/* Intentional dark marketing surfaces stay readable when the page shell is light. */
+html.light .homepage-dark-surface {
+  background-color: #090915 !important;
+  border-color: rgba(124, 58, 237, 0.22) !important;
+  color: #f8f7ff !important;
+}
+html.light .homepage-dark-surface h1,
+html.light .homepage-dark-surface h2,
+html.light .homepage-dark-surface h3,
+html.light .homepage-dark-surface h4,
+html.light .homepage-dark-surface h5,
+html.light .homepage-dark-surface h6,
+html.light .homepage-dark-surface .text-foreground,
+html.light .homepage-dark-surface strong {
+  color: #f8f7ff !important;
+}
+html.light .homepage-dark-surface p,
+html.light .homepage-dark-surface .text-muted-foreground {
+  color: #b8b5d6 !important;
+}
+html.light .homepage-dark-surface .gradient-text,
+html.light .homepage-dark-surface .text-transparent {
+  color: transparent !important;
+}
 
 /* ── Navbar in light mode ────────────────────────────────────── */
 html.light header,
@@ -697,3 +739,19 @@ html.light aside [class*="text-yellow-400"] { color: #6D28D9 !important; }
 /* ── Hover states in sidebar bottom panel ────────────────────── */
 html.light aside [class*="hover:bg-white\/5"]:hover { background-color: rgba(0,0,0,0.04) !important; }
 html.light aside [class*="hover:bg-red-500\/10"]:hover { background-color: rgba(239,68,68,0.07) !important; }
+
+/* ── Dark homepage hero cards inside light mode ──────────────── */
+html.light .homepage-dark-surface [class*="rounded-2xl"],
+html.light .homepage-dark-surface [class*="rounded-xl"] {
+  border-color: rgba(159, 103, 255, 0.24) !important;
+}
+html.light .homepage-dark-surface [class*="bg-[linear-gradient"],
+html.light .homepage-dark-surface [class*="bg-background"],
+html.light .homepage-dark-surface [class*="bg-surface"],
+html.light .homepage-dark-surface .bg-gradient-card {
+  background: linear-gradient(180deg, rgba(24, 24, 54, 0.96), rgba(11, 11, 31, 0.96)) !important;
+  background-color: #111126 !important;
+}
+html.light .homepage-dark-surface .bg-primary {
+  background-color: hsl(var(--primary) / 1) !important;
+}
