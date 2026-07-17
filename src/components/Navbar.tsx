@@ -9,6 +9,7 @@ import {
   Zap, Globe, Target, Star, Users, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthStatus } from "@/lib/use-auth-status";
 import Logo from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -90,6 +91,8 @@ export default function Navbar() {
   const [megaOpen,     setMegaOpen]     = useState(false);
   const megaRef  = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const authStatus = useAuthStatus();
+  const isAuthenticated = authStatus === "authenticated";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -191,9 +194,9 @@ export default function Navbar() {
                           </span>
                         ))}
                       </div>
-                      <Link href="/auth?mode=signup&intent=nav-first-search&source=mega-menu" prefetch={false} onClick={() => setMegaOpen(false)}
+                      <Link href={isAuthenticated ? "/dashboard/local-leads" : "/auth?mode=signup&intent=nav-first-search&source=mega-menu"} prefetch={false} onClick={() => setMegaOpen(false)}
                         className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-light text-white text-xs font-semibold transition-colors">
-                        Find Leads Free <ArrowRight className="w-3 h-3" />
+                        {isAuthenticated ? "Open Lead Search" : "Find Leads Free"} <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
                 </div>
@@ -215,13 +218,29 @@ export default function Navbar() {
           {/* Right: Theme + CTA + User */}
           <div className="hidden md:flex items-center gap-2">
             <ThemeToggle size="sm" />
-            <Link href="/auth" prefetch={false} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Sign In
-            </Link>
-            <Link href="/auth?mode=signup&intent=nav-first-search&source=desktop-nav" prefetch={false}
-              className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
-              Find Leads Free
-            </Link>
+            {authStatus === "loading" ? (
+              <div className="h-10 w-40 rounded-xl border border-border/70 bg-surface/60" aria-hidden="true" />
+            ) : isAuthenticated ? (
+              <>
+                <Link href="/dashboard" prefetch={false} className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                  Dashboard
+                </Link>
+                <Link href="/dashboard/local-leads" prefetch={false}
+                  className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
+                  Find Leads
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth" prefetch={false} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/auth?mode=signup&intent=nav-first-search&source=desktop-nav" prefetch={false}
+                  className="px-5 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-semibold transition-all shadow-glow-primary/50">
+                  Find Leads Free
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile: theme + hamburger */}
@@ -254,12 +273,27 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="pt-2 border-t border-border space-y-2">
-                <Link href="/auth" prefetch={false} onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
-                <Link href="/auth?mode=signup&intent=nav-first-search&source=mobile-nav" prefetch={false} onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
-                  Find Leads Free
-                </Link>
+                {authStatus === "loading" ? (
+                  <div className="h-20 rounded-xl border border-border/70 bg-background/60" aria-hidden="true" />
+                ) : isAuthenticated ? (
+                  <>
+                    <Link href="/dashboard" prefetch={false} onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Dashboard</Link>
+                    <Link href="/dashboard/local-leads" prefetch={false} onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
+                      Find Leads
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth" prefetch={false} onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2.5 rounded-lg text-sm text-foreground hover:bg-white/5 transition-colors">Sign In</Link>
+                    <Link href="/auth?mode=signup&intent=nav-first-search&source=mobile-nav" prefetch={false} onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold text-center">
+                      Find Leads Free
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
         </div>

@@ -25,6 +25,7 @@ import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import TestimonialCard from "@/components/TestimonialCard";
 import { PRICING_TIERS, TESTIMONIALS, type Testimonial } from "@/data/marketing";
+import { useAuthStatus } from "@/lib/use-auth-status";
 
 type MotionExtras = {
   initial?: unknown;
@@ -1105,8 +1106,11 @@ function FirstSearchPreview() {
 }
 
 // ── Early Access Banner (dismissible) ────────────────────────────────────────
-function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) {
+function EarlyAccessBanner({ visible, onDismiss, isAuthenticated }: { visible: boolean; onDismiss: () => void; isAuthenticated: boolean }) {
   if (!visible) return null;
+  const bannerHref = isAuthenticated ? "/dashboard/local-leads" : signupHref("banner-first-search", "early-access-banner");
+  const bannerLabel = isAuthenticated ? "Open dashboard" : "Run a free search";
+
   return (
     <motion.div
       initial={false}
@@ -1121,17 +1125,17 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
             ✦ FREE
           </span>
           <span className="text-white/80">
-            <strong className="text-white">Early Access</strong> — core lead tools free, no credit card.
+            <strong className="text-white">Early Access</strong> — {isAuthenticated ? "your lead workspace is ready." : "core lead tools free, no credit card."}
           </span>
           <span className="text-white/40 hidden sm:inline">·</span>
           <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
           <Link
-            href={signupHref("banner-first-search", "early-access-banner")}
+            href={bannerHref}
             prefetch={false}
-            onClick={() => trackMarketingEvent("homepage_cta_click", { location: "early_access_banner", intent: "first_search" })}
+            onClick={() => trackMarketingEvent("homepage_cta_click", { location: "early_access_banner", intent: isAuthenticated ? "dashboard" : "first_search" })}
             className="ml-1 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/20 hover:bg-primary/30 text-primary-light text-xs font-semibold border border-primary/25 transition-all"
           >
-            Run a free search <ArrowRight className="w-3 h-3" />
+            {bannerLabel} <ArrowRight className="w-3 h-3" />
           </Link>
         </span>
         <button
@@ -1149,13 +1153,15 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
 // ── Main Component ────────────────────────────────────────────────────
 export default function HomepageClient() {
   const [showEarlyAccess, setShowEarlyAccess] = useState(true);
+  const authStatus = useAuthStatus();
+  const isAuthenticated = authStatus === "authenticated";
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-background">
       <Navbar />
 
       {/* ── Early Access Banner ── */}
-      <EarlyAccessBanner visible={showEarlyAccess} onDismiss={() => setShowEarlyAccess(false)} />
+      <EarlyAccessBanner visible={showEarlyAccess} isAuthenticated={isAuthenticated} onDismiss={() => setShowEarlyAccess(false)} />
 
       {/* ════════════════════════════════════════════
           HERO
