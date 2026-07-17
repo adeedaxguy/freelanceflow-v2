@@ -361,7 +361,7 @@ export default function Sidebar() {
     <>
       {/* ── Desktop sidebar ── */}
       <aside
-        className={`hidden lg:flex flex-col h-screen sticky top-0 overflow-hidden bg-surface border-r border-border transition-all duration-200 ${
+        className={`relative z-40 hidden h-screen flex-shrink-0 flex-col overflow-hidden border-r border-border bg-surface transition-all duration-200 lg:sticky lg:top-0 lg:flex ${
           collapsed ? "w-14" : "w-64"
         }`}
       >
@@ -444,7 +444,7 @@ export default function Sidebar() {
       {/* Mobile drawer */}
       <aside
         aria-hidden={!mobileOpen}
-        className={`lg:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-surface border-r border-border flex flex-col transition-[transform,opacity,visibility] duration-300 ease-in-out ${
+        className={`fixed bottom-0 left-0 top-0 z-[60] flex w-72 flex-col border-r border-border bg-surface transition-[transform,opacity,visibility] duration-300 ease-in-out lg:hidden ${
           mobileOpen ? "translate-x-0 opacity-100 visible pointer-events-auto" : "-translate-x-full opacity-0 invisible pointer-events-none"
         }`}
       >

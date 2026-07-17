@@ -158,6 +158,10 @@ function clean(value: string | null, fallback = "") {
   return (next || fallback).slice(0, 240);
 }
 
+function promptInputValue(value: string | null | undefined) {
+  return (value ?? "").replace(/\r\n/g, "\n").slice(0, 720);
+}
+
 function cleanPrompt(value: string | null | undefined) {
   return (value ?? "").replace(/\s+/g, " ").trim().slice(0, 720);
 }
@@ -422,7 +426,7 @@ function WebDesignBuilderContent() {
   const [contentDepth, setContentDepth] = useState(() => optionValue(searchParams.get("contentDepth"), CONTENT_OPTIONS, "balanced"));
   const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, "quotes"));
   const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, "conversion"));
-  const [designPrompt, setDesignPrompt] = useState(() => cleanPrompt(searchParams.get("prompt")));
+  const [designPrompt, setDesignPrompt] = useState(() => promptInputValue(searchParams.get("prompt")));
   const [variation, setVariation] = useState(() => resolveDesignVariation({
     variationId: clean(searchParams.get("variation")),
     prompt: cleanPrompt(searchParams.get("prompt")),
@@ -727,7 +731,7 @@ function WebDesignBuilderContent() {
                   </div>
                   <textarea
                     value={designPrompt}
-                    onChange={event => setDesignPrompt(cleanPrompt(event.target.value))}
+                    onChange={event => setDesignPrompt(promptInputValue(event.target.value))}
                     rows={5}
                     placeholder="Example: Create a premium but friendly auto repair website with before-and-after proof, strong local trust, quote requests as the main CTA, detailed service sections, and a clean dark visual style."
                     className="mt-5 min-h-[150px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
