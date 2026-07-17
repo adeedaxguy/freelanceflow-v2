@@ -1115,7 +1115,7 @@ function EarlyAccessBanner({ visible, onDismiss }: { visible: boolean; onDismiss
       transition={{ duration: 0.4 }}
       className="relative z-40 mt-16 overflow-hidden"
     >
-      <div className="bg-[#0d0d1f] border-b border-primary/20 text-center py-2 px-10 text-sm">
+      <div className="homepage-early-access-banner bg-[#0d0d1f] border-b border-primary/20 text-center py-2 px-10 text-sm">
         <span className="inline-flex items-center gap-2 flex-wrap justify-center">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/15 text-accent text-xs font-bold border border-accent/25">
             ✦ FREE

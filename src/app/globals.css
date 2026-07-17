@@ -755,3 +755,14 @@ html.light .homepage-dark-surface .bg-gradient-card {
 html.light .homepage-dark-surface .bg-primary {
   background-color: hsl(var(--primary) / 1) !important;
 }
+
+html.light .homepage-early-access-banner {
+  background-color: #0d0d1f !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+html.light .homepage-early-access-banner strong,
+html.light .homepage-early-access-banner .text-white,
+html.light .homepage-early-access-banner .text-white\/80,
+html.light .homepage-early-access-banner .text-white\/50 {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
