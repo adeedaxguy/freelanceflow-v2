@@ -1,13 +1,16 @@
+/** @jest-environment node */
+
 jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
-jest.mock("@/lib/openai", () => ({ generateProposal: jest.fn() }));
 jest.mock("@/lib/prisma", () => ({
-  prisma: { user: { findUnique: jest.fn() } }
+  prisma: {
+    user: { findUnique: jest.fn() },
+    platformSetting: { findUnique: jest.fn() },
+  }
 }));
 
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import { generateProposal } from "@/lib/openai";
 import { prisma } from "@/lib/prisma";
 
 const mockSession = { user: { id: "user-1", email: "test@example.com", role: "USER" as const } };
@@ -29,24 +32,29 @@ describe("POST /api/proposal/generate", () => {
   it("generates a proposal successfully", async () => {
     (getServerSession as jest.Mock).mockResolvedValue(mockSession);
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
-      name: "John Doe", niche: "web-development", bio: "Full-stack developer", rate: 100, portfolio: "https://john.dev"
+      name: "John Doe",
+      expertise: JSON.stringify(["web-development"]),
+      portfolioLinks: "[]",
     });
-    (generateProposal as jest.Mock).mockResolvedValue({
-      subject: "Quick idea for Stripe's developer experience",
-      body: "Hi there,\n\nI noticed Stripe has been expanding...",
-    });
+    (prisma.platformSetting.findUnique as jest.Mock).mockResolvedValue(null);
 
     const { POST } = await import("@/app/api/proposal/generate/route");
     const req = new NextRequest("http://localhost/api/proposal/generate", {
       method: "POST",
-      body: JSON.stringify({ targetCompany: "Stripe", targetDomain: "stripe.com" }),
+      body: JSON.stringify({
+        jobTitle: "Webflow landing page build",
+        company: "Stripe",
+        description: "Need a conversion-focused landing page for developer tools.",
+        niche: "web-development",
+      }),
     });
     const res = await POST(req);
-    const data = await res.json() as { proposal: { subject: string; body: string } };
+    const data = await res.json() as { subject: string; body: string; source: string };
 
     expect(res.status).toBe(200);
-    expect(data.proposal.subject).toBeTruthy();
-    expect(data.proposal.body).toBeTruthy();
+    expect(data.subject).toBeTruthy();
+    expect(data.body).toContain("Stripe");
+    expect(data.source).toBe("template");
   });
 
   it("returns 400 when required fields missing", async () => {
@@ -60,17 +68,19 @@ describe("POST /api/proposal/generate", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns 503 when OpenAI key missing", async () => {
+  it("falls back to a template when no Groq key is available", async () => {
     (getServerSession as jest.Mock).mockResolvedValue(mockSession);
-    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ name: "John", niche: "dev" });
-    (generateProposal as jest.Mock).mockRejectedValue(new Error("OPENAI_API_KEY is not configured"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ name: "John", expertise: null, portfolioLinks: null });
+    (prisma.platformSetting.findUnique as jest.Mock).mockResolvedValue(null);
 
     const { POST } = await import("@/app/api/proposal/generate/route");
     const req = new NextRequest("http://localhost/api/proposal/generate", {
       method: "POST",
-      body: JSON.stringify({ targetCompany: "Acme", targetDomain: "acme.com" }),
+      body: JSON.stringify({ jobTitle: "Website redesign", company: "Acme", niche: "design" }),
     });
     const res = await POST(req);
-    expect(res.status).toBe(503);
+    const data = await res.json() as { source: string };
+    expect(res.status).toBe(200);
+    expect(data.source).toBe("template");
   });
 });

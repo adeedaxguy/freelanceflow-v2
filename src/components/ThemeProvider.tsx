@@ -17,10 +17,7 @@ const ThemeContext = createContext<ThemeContextValue>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document === "undefined") return "dark";
-    return document.documentElement.classList.contains("light") ? "light" : "dark";
-  });
+  const [theme, setThemeState] = useState<Theme>("dark");
 
   // Dark is the product default. Light only applies after the user explicitly chooses it.
   useEffect(() => {

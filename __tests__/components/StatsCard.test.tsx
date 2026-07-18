@@ -5,8 +5,10 @@ import StatsCard from "@/components/StatsCard";
 // Mock framer-motion to avoid animation issues in tests
 jest.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) =>
-      React.createElement("div", props, children),
+    div: ({ children, ...props }: any) => {
+      const React = require("react");
+      return React.createElement("div", props, children);
+    },
   },
 }));
 

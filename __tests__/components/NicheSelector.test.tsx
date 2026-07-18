@@ -6,6 +6,8 @@ import { NICHES } from "@/types";
 describe("NicheSelector", () => {
   it("renders all niches", () => {
     render(<NicheSelector onChange={() => undefined} />);
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
+
     NICHES.forEach((niche) => {
       expect(screen.getByText(niche.label)).toBeInTheDocument();
     });
@@ -14,44 +16,50 @@ describe("NicheSelector", () => {
   it("calls onChange with the correct niche id when clicked", () => {
     const handleChange = jest.fn();
     render(<NicheSelector onChange={handleChange} />);
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
 
     const webDevButton = screen.getByText("Web Development");
     fireEvent.click(webDevButton);
 
-    expect(handleChange).toHaveBeenCalledWith("web-development");
+    expect(handleChange).toHaveBeenCalledWith(["web-development"]);
     expect(handleChange).toHaveBeenCalledTimes(1);
   });
 
-  it("marks the selected niche with aria-checked=true", () => {
-    render(<NicheSelector selected="ui-ux-design" onChange={() => undefined} />);
+  it("marks the selected niche with aria-selected=true", () => {
+    render(<NicheSelector selected={["ui-ux-design"]} onChange={() => undefined} />);
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
 
-    const radioGroup = screen.getByRole("radiogroup");
-    const checkedButtons = radioGroup.querySelectorAll('[aria-checked="true"]');
-    expect(checkedButtons).toHaveLength(1);
+    const listbox = screen.getByRole("listbox");
+    const selectedOptions = listbox.querySelectorAll('[aria-selected="true"]');
+    expect(selectedOptions).toHaveLength(1);
   });
 
-  it("marks non-selected niches with aria-checked=false", () => {
-    render(<NicheSelector selected="web-development" onChange={() => undefined} />);
+  it("marks non-selected niches with aria-selected=false", () => {
+    render(<NicheSelector selected={["web-development"]} onChange={() => undefined} />);
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
 
-    const radioGroup = screen.getByRole("radiogroup");
-    const uncheckedButtons = radioGroup.querySelectorAll('[aria-checked="false"]');
-    expect(uncheckedButtons).toHaveLength(NICHES.length - 1);
+    const listbox = screen.getByRole("listbox");
+    const unselectedOptions = listbox.querySelectorAll('[aria-selected="false"]');
+    expect(unselectedOptions).toHaveLength(NICHES.length - 1);
   });
 
   it("renders no selected niche when selected is undefined", () => {
     render(<NicheSelector onChange={() => undefined} />);
-    const checkedButtons = screen.queryAllByRole("radio", { checked: true });
-    expect(checkedButtons).toHaveLength(0);
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
+
+    const selectedOptions = screen.queryAllByRole("option", { selected: true });
+    expect(selectedOptions).toHaveLength(0);
   });
 
   it("updates selection on repeated clicks", () => {
     const handleChange = jest.fn();
     render(<NicheSelector onChange={handleChange} />);
 
+    fireEvent.click(screen.getByRole("button", { name: "Select niches" }));
     fireEvent.click(screen.getByText("SEO & Content"));
     fireEvent.click(screen.getByText("Copywriting"));
 
-    expect(handleChange).toHaveBeenNthCalledWith(1, "seo");
-    expect(handleChange).toHaveBeenNthCalledWith(2, "copywriting");
+    expect(handleChange).toHaveBeenNthCalledWith(1, ["seo"]);
+    expect(handleChange).toHaveBeenNthCalledWith(2, ["copywriting"]);
   });
 });

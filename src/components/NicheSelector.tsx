@@ -11,7 +11,7 @@ import { Search, X, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NicheSelectorProps {
-  selected: string[];
+  selected?: string[] | string;
   onChange: (ids: string[]) => void;
   className?: string;
   maxSelect?: number;
@@ -27,6 +27,7 @@ export default function NicheSelector({
   const [query,  setQuery]  = useState("");
   const containerRef        = useRef<HTMLDivElement>(null);
   const inputRef            = useRef<HTMLInputElement>(null);
+  const selectedIds         = Array.isArray(selected) ? selected : selected ? [selected] : [];
 
   // Close on outside click
   useEffect(() => {
@@ -53,18 +54,18 @@ export default function NicheSelector({
     : NICHES;
 
   const toggle = useCallback((id: string) => {
-    if (selected.includes(id)) {
-      onChange(selected.filter(s => s !== id));
-    } else if (selected.length < maxSelect) {
-      onChange([...selected, id]);
+    if (selectedIds.includes(id)) {
+      onChange(selectedIds.filter(s => s !== id));
+    } else if (selectedIds.length < maxSelect) {
+      onChange([...selectedIds, id]);
     }
-  }, [selected, onChange, maxSelect]);
+  }, [selectedIds, onChange, maxSelect]);
 
   const remove = useCallback((id: string) => {
-    onChange(selected.filter(s => s !== id));
-  }, [selected, onChange]);
+    onChange(selectedIds.filter(s => s !== id));
+  }, [selectedIds, onChange]);
 
-  const selectedNiches = NICHES.filter(n => selected.includes(n.id));
+  const selectedNiches = NICHES.filter(n => selectedIds.includes(n.id));
 
   return (
     <div ref={containerRef} className={cn("relative w-full", className)}>
@@ -72,6 +73,9 @@ export default function NicheSelector({
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Select niches"
         className={cn(
           "w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition-all text-left",
           open
@@ -104,7 +108,7 @@ export default function NicheSelector({
           )}
         </div>
 
-        {selected.length > 0 && (
+        {selectedIds.length > 0 && (
           <button
             type="button"
             onClick={e => { e.stopPropagation(); onChange([]); }}
@@ -119,9 +123,9 @@ export default function NicheSelector({
       </button>
 
       {/* Count badge */}
-      {selected.length > 0 && (
+      {selectedIds.length > 0 && (
         <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center z-10">
-          {selected.length}
+          {selectedIds.length}
         </span>
       )}
 
@@ -149,23 +153,25 @@ export default function NicheSelector({
                 </button>
               )}
             </div>
-            {selected.length >= maxSelect && (
+            {selectedIds.length >= maxSelect && (
               <p className="text-xs text-amber-400 mt-2 text-center">Max {maxSelect} niches selected</p>
             )}
           </div>
 
           {/* List */}
-          <div className="max-h-64 overflow-y-auto py-1.5">
+          <div className="max-h-64 overflow-y-auto py-1.5" role="listbox" aria-multiselectable="true">
             {filtered.length === 0 ? (
               <p className="text-center text-sm text-muted-foreground py-6">No niches match "{query}"</p>
             ) : (
               filtered.map(n => {
-                const isSelected = selected.includes(n.id);
-                const disabled   = !isSelected && selected.length >= maxSelect;
+                const isSelected = selectedIds.includes(n.id);
+                const disabled   = !isSelected && selectedIds.length >= maxSelect;
                 return (
                   <button
                     key={n.id}
                     type="button"
+                    role="option"
+                    aria-selected={isSelected}
                     disabled={disabled}
                     onClick={() => toggle(n.id)}
                     className={cn(
@@ -192,9 +198,9 @@ export default function NicheSelector({
           </div>
 
           {/* Footer */}
-          {selected.length > 0 && (
+          {selectedIds.length > 0 && (
             <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-background/50">
-              <span className="text-xs text-muted-foreground">{selected.length} / {maxSelect} selected</span>
+              <span className="text-xs text-muted-foreground">{selectedIds.length} / {maxSelect} selected</span>
               <button
                 type="button"
                 onClick={() => { setOpen(false); setQuery(""); }}
