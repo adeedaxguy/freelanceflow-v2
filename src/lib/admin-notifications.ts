@@ -1,7 +1,8 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 
-const DEFAULT_ADMIN_NOTIFICATION_EMAIL = "adnan@technodigg.com";
+export const ADMIN_NOTIFICATION_RECIPIENT = "adnan.toprated@gmail.com";
+const DEFAULT_ADMIN_NOTIFICATION_EMAIL = ADMIN_NOTIFICATION_RECIPIENT;
 
 interface PlatformEmailConfig {
   apiKey: string;
@@ -112,5 +113,38 @@ export async function notifyNewUserSignup(user: {
       `<strong>Referral source:</strong> ${escapeHtml(referralSource)}`,
       `<strong>User ID:</strong> ${escapeHtml(user.id)}`,
     ],
+    recipient: ADMIN_NOTIFICATION_RECIPIENT,
+  });
+}
+
+export async function notifyMoreLeadsRequest(request: {
+  userId: string;
+  name: string | null;
+  email: string;
+  plan: string | null;
+  source: string;
+  message?: string | null;
+  weeklyLeads?: number | null;
+  bonusLeads?: number | null;
+  claimSummary?: string[];
+}) {
+  const claimSummary = request.claimSummary?.length ? request.claimSummary.join(", ") : "No claim metadata found";
+  const message = request.message?.trim() || "No extra message provided";
+
+  return sendAdminNotification({
+    subject: `More leads requested: ${request.email}`,
+    title: "Free user requested more leads",
+    lines: [
+      `<strong>Name:</strong> ${escapeHtml(request.name || "Not provided")}`,
+      `<strong>Email:</strong> ${escapeHtml(request.email)}`,
+      `<strong>Plan:</strong> ${escapeHtml(request.plan || "free")}`,
+      `<strong>Lead tool:</strong> ${escapeHtml(request.source)}`,
+      `<strong>Used leads:</strong> ${escapeHtml(String(request.weeklyLeads ?? 0))}`,
+      `<strong>Bonus leads:</strong> ${escapeHtml(String(request.bonusLeads ?? 0))}`,
+      `<strong>Bonus claims:</strong> ${escapeHtml(claimSummary)}`,
+      `<strong>Message:</strong> ${escapeHtml(message)}`,
+      `<strong>User ID:</strong> ${escapeHtml(request.userId)}`,
+    ],
+    recipient: ADMIN_NOTIFICATION_RECIPIENT,
   });
 }

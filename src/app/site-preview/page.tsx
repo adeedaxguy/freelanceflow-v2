@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { isValidElement, type CSSProperties, type ReactNode } from "react";
 import type { Metadata } from "next";
 import {
   ArrowRight,
@@ -21,6 +21,7 @@ import {
 } from "@/lib/site-draft";
 import {
   resolveDesignVariation,
+  type DesignTemplate,
   variationToOptionPatch,
 } from "@/lib/site-design";
 import SitePreviewPdfActions from "@/components/SitePreviewPdfActions";
@@ -200,6 +201,251 @@ const STYLE_MOOD: Record<PreviewOptions["style"], { rhythm: string; detail: stri
   },
 };
 
+type PreviewBlueprint = {
+  id: string;
+  sourceTemplate: DesignTemplate;
+  label: string;
+  heroVisual: "estimate" | "menu" | "booking" | "credentials" | "portfolio" | "checklist" | "packages";
+  serviceTitle: string;
+  serviceCopy: string;
+  visualEyebrow: string;
+  trustTitle: string;
+  processTitle: string;
+  pagesTitle: string;
+  ctaTitle: string;
+  order: Array<"services" | "visual" | "trust" | "process" | "pages" | "local" | "details" | "questions" | "expanded-copy">;
+};
+
+function templateFromBusiness(text: string, fallback: DesignTemplate): PreviewBlueprint["id"] {
+  const value = text.toLowerCase();
+  if (/\b(auto|car|body|collision|mechanic|garage|repair|tire|tyre|detailing|mot)\b/.test(value)) return "auto-estimate";
+  if (/\b(clean|maid|janitorial|housekeeping|carpet|pressure washing)\b/.test(value)) return "cleaning-plan";
+  if (/\b(cafe|coffee|restaurant|bakery|food|pizza|bar|grill|diner|catering|takeaway|takeout)\b/.test(value)) return "menu-visit";
+  if (/\b(salon|barber|spa|nail|beauty|massage|stylist|lashes|brows|makeup)\b/.test(value)) return "beauty-booking";
+  if (/\b(plumb|electric|roof|handyman|hvac|landscap|painter|locksmith|contractor|builder|construction)\b/.test(value)) return "trade-emergency";
+  if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet)\b/.test(value)) return "clinic-trust";
+  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|real estate|estate agent|advisor|financial)\b/.test(value)) return "professional-consult";
+  if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio)\b/.test(value)) return "fitness-membership";
+  if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion)\b/.test(value)) return "retail-showcase";
+  if (/\b(photo|photography|creative|design|agency|marketing|tattoo|artist|portfolio)\b/.test(value)) return "creative-portfolio";
+
+  if (fallback === "boutique-booking") return "beauty-booking";
+  if (fallback === "urgent-repair") return "trade-emergency";
+  if (fallback === "neighborhood-commerce") return "menu-visit";
+  if (fallback === "visual-proof") return "creative-portfolio";
+  if (fallback === "consult-authority") return "professional-consult";
+  if (fallback === "modern-productized") return "retail-showcase";
+  if (fallback === "minimal-direct") return "minimal-direct";
+  if (fallback === "founder-story") return "founder-story";
+  if (fallback === "editorial-craft") return "editorial-craft";
+  return "local-authority";
+}
+
+function getPreviewBlueprint(data: PreviewData, prompt: string, template: DesignTemplate): PreviewBlueprint {
+  const id = templateFromBusiness(`${data.company} ${data.category} ${prompt}`, template);
+  const market = marketFromLocation(data.location);
+  const base: Record<string, PreviewBlueprint> = {
+    "auto-estimate": {
+      id,
+      sourceTemplate: "urgent-repair",
+      label: "Estimate-first auto layout",
+      heroVisual: "estimate",
+      serviceTitle: "Estimate, repair, and visit paths built for drivers",
+      serviceCopy: `${data.company} should make photos, estimates, insurance questions, directions, and urgent phone calls easy to start from mobile.`,
+      visualEyebrow: "Repair proof",
+      trustTitle: "Confidence before the vehicle comes in",
+      processTitle: "From damage photo to booked repair",
+      pagesTitle: "Repair pages customers already search",
+      ctaTitle: `Ready to make ${data.company} easier to call?`,
+      order: ["services", "visual", "process", "trust", "details", "pages", "questions", "local", "expanded-copy"],
+    },
+    "cleaning-plan": {
+      id,
+      sourceTemplate: "founder-story",
+      label: "Recurring-service cleaning layout",
+      heroVisual: "checklist",
+      serviceTitle: "Turn one cleaning enquiry into repeat work",
+      serviceCopy: `${data.company} needs service packages, rooms or property types, recurring plans, reviews, and quote requests close together.`,
+      visualEyebrow: "Cleaning plan",
+      trustTitle: "Proof that makes inviting the team easier",
+      processTitle: "From property details to booked clean",
+      pagesTitle: "Cleaning services and service areas",
+      ctaTitle: `Help ${market} customers request a cleaner quote`,
+      order: ["services", "process", "visual", "trust", "pages", "details", "questions", "local", "expanded-copy"],
+    },
+    "menu-visit": {
+      id,
+      sourceTemplate: "neighborhood-commerce",
+      label: "Menu and visit layout",
+      heroVisual: "menu",
+      serviceTitle: "Menu, hours, photos, and visit intent in one flow",
+      serviceCopy: `${data.company} should help guests see what to order, when to visit, where to go, and what makes the place worth choosing.`,
+      visualEyebrow: "Menu-led discovery",
+      trustTitle: "Make the visit feel worth it",
+      processTitle: "From menu browse to directions",
+      pagesTitle: "Food, events, menu, and location pages",
+      ctaTitle: `Bring more local guests to ${data.company}`,
+      order: ["visual", "services", "local", "trust", "process", "pages", "questions", "details", "expanded-copy"],
+    },
+    "beauty-booking": {
+      id,
+      sourceTemplate: "boutique-booking",
+      label: "Appointment and gallery layout",
+      heroVisual: "booking",
+      serviceTitle: "Services, style proof, and bookings without friction",
+      serviceCopy: `${data.company} should make treatments, portfolio proof, timing, reviews, and appointment CTAs feel polished and easy.`,
+      visualEyebrow: "Booking experience",
+      trustTitle: "Style proof before the appointment",
+      processTitle: "From service choice to booked slot",
+      pagesTitle: "Treatment, team, gallery, and booking pages",
+      ctaTitle: `Make ${data.company} feel easier to book`,
+      order: ["visual", "services", "trust", "process", "pages", "details", "questions", "local", "expanded-copy"],
+    },
+    "trade-emergency": {
+      id,
+      sourceTemplate: "urgent-repair",
+      label: "Emergency trade layout",
+      heroVisual: "estimate",
+      serviceTitle: "Urgent calls and quote requests for high-intent jobs",
+      serviceCopy: `${data.company} should make emergency help, service areas, licence proof, job photos, and phone actions visible immediately.`,
+      visualEyebrow: "Urgent job flow",
+      trustTitle: "Trust signals before someone opens the door",
+      processTitle: "From problem to booked work",
+      pagesTitle: "Emergency, repair, installation, and area pages",
+      ctaTitle: `Make ${data.company} the obvious call in ${market}`,
+      order: ["services", "process", "trust", "visual", "pages", "details", "questions", "local", "expanded-copy"],
+    },
+    "clinic-trust": {
+      id,
+      sourceTemplate: "consult-authority",
+      label: "Clinic trust layout",
+      heroVisual: "credentials",
+      serviceTitle: "Care, credentials, and booking confidence",
+      serviceCopy: `${data.company} should show services, practitioner trust, insurance or eligibility cues, reviews, and booking routes without clutter.`,
+      visualEyebrow: "Care pathway",
+      trustTitle: "Credentials and reassurance before booking",
+      processTitle: "From symptom or need to appointment",
+      pagesTitle: "Care, treatments, practitioners, and location pages",
+      ctaTitle: `Help patients choose ${data.company} with confidence`,
+      order: ["trust", "services", "process", "details", "visual", "pages", "questions", "local", "expanded-copy"],
+    },
+    "professional-consult": {
+      id,
+      sourceTemplate: "consult-authority",
+      label: "Consultation authority layout",
+      heroVisual: "credentials",
+      serviceTitle: "Expertise, outcomes, and consultation paths",
+      serviceCopy: `${data.company} needs a calm authority page with credentials, service fit, proof, and a consultation CTA that feels serious.`,
+      visualEyebrow: "Consultation-ready",
+      trustTitle: "Authority before the enquiry",
+      processTitle: "From problem to qualified consultation",
+      pagesTitle: "Services, industries, proof, and contact pages",
+      ctaTitle: `Position ${data.company} as the safer expert choice`,
+      order: ["trust", "services", "expanded-copy", "process", "pages", "details", "questions", "visual", "local"],
+    },
+    "fitness-membership": {
+      id,
+      sourceTemplate: "modern-productized",
+      label: "Membership and schedule layout",
+      heroVisual: "packages",
+      serviceTitle: "Programs, schedule, and membership paths",
+      serviceCopy: `${data.company} should make classes, trainers, membership options, timetable cues, and first-session CTAs easy to scan.`,
+      visualEyebrow: "Program paths",
+      trustTitle: "Motivation before the first visit",
+      processTitle: "From goal to first session",
+      pagesTitle: "Programs, classes, pricing, and trainer pages",
+      ctaTitle: `Help ${market} customers start with ${data.company}`,
+      order: ["services", "visual", "process", "local", "trust", "pages", "questions", "details", "expanded-copy"],
+    },
+    "retail-showcase": {
+      id,
+      sourceTemplate: "modern-productized",
+      label: "Product showcase layout",
+      heroVisual: "portfolio",
+      serviceTitle: "Products, categories, visits, and local shopping intent",
+      serviceCopy: `${data.company} should highlight what is available, why customers should visit, how to enquire, and what makes the shop different.`,
+      visualEyebrow: "Product story",
+      trustTitle: "Reasons to choose the shop",
+      processTitle: "From browse to visit or enquiry",
+      pagesTitle: "Collections, services, offers, and location pages",
+      ctaTitle: `Turn more local browsers into ${data.company} customers`,
+      order: ["visual", "services", "local", "pages", "trust", "process", "questions", "details", "expanded-copy"],
+    },
+    "creative-portfolio": {
+      id,
+      sourceTemplate: "visual-proof",
+      label: "Portfolio proof layout",
+      heroVisual: "portfolio",
+      serviceTitle: "Work proof, packages, and enquiry clarity",
+      serviceCopy: `${data.company} should lead with taste, outcomes, portfolio proof, packages, and an enquiry CTA that feels intentional.`,
+      visualEyebrow: "Portfolio proof",
+      trustTitle: "Proof before the enquiry",
+      processTitle: "From creative fit to project enquiry",
+      pagesTitle: "Portfolio, packages, process, and contact pages",
+      ctaTitle: `Make ${data.company} easier to trust creatively`,
+      order: ["visual", "trust", "services", "process", "pages", "expanded-copy", "questions", "details", "local"],
+    },
+    "minimal-direct": {
+      id,
+      sourceTemplate: "minimal-direct",
+      label: "Minimal direct layout",
+      heroVisual: "checklist",
+      serviceTitle: "Only the details customers need to act",
+      serviceCopy: `${data.company} can use a stripped-back structure that makes service fit, proof, phone, and quote path obvious.`,
+      visualEyebrow: "Fast scan",
+      trustTitle: "Small proof, clear action",
+      processTitle: "From first screen to next step",
+      pagesTitle: "Service, proof, location, and contact",
+      ctaTitle: `Make ${data.company} faster to understand`,
+      order: ["services", "details", "trust", "process", "questions", "local", "visual", "pages", "expanded-copy"],
+    },
+    "founder-story": {
+      id,
+      sourceTemplate: "founder-story",
+      label: "Owner-led story layout",
+      heroVisual: "credentials",
+      serviceTitle: "Human trust with clear service paths",
+      serviceCopy: `${data.company} should feel local, reachable, and owner-led while still making the service and CTA clear.`,
+      visualEyebrow: "Owner-led trust",
+      trustTitle: "A more human reason to call",
+      processTitle: "From local story to enquiry",
+      pagesTitle: "About, services, proof, and contact",
+      ctaTitle: `Help customers feel they know ${data.company}`,
+      order: ["trust", "services", "visual", "process", "details", "pages", "questions", "local", "expanded-copy"],
+    },
+    "editorial-craft": {
+      id,
+      sourceTemplate: "editorial-craft",
+      label: "Editorial craft layout",
+      heroVisual: "portfolio",
+      serviceTitle: "A story-led page with enough structure to sell",
+      serviceCopy: `${data.company} can feel more crafted and memorable without hiding the services, proof, or enquiry path.`,
+      visualEyebrow: "Craft and story",
+      trustTitle: "A sharper reason to remember the business",
+      processTitle: "From brand story to enquiry",
+      pagesTitle: "Story, services, work, and contact",
+      ctaTitle: `Make ${data.company} feel distinctive`,
+      order: ["visual", "expanded-copy", "services", "trust", "process", "pages", "questions", "details", "local"],
+    },
+    "local-authority": {
+      id,
+      sourceTemplate: "local-authority",
+      label: "Local authority layout",
+      heroVisual: "checklist",
+      serviceTitle: "Services, trust, and contact paths customers can scan",
+      serviceCopy: `${data.company} should make the offer obvious, prove trust quickly, and help local customers take the next step.`,
+      visualEyebrow: "Local proof",
+      trustTitle: "Confidence before contact",
+      processTitle: "From local search to enquiry",
+      pagesTitle: "Services, proof, location, and contact",
+      ctaTitle: `Make ${data.company} easier to choose`,
+      order: ["services", "trust", "visual", "process", "pages", "details", "questions", "local", "expanded-copy"],
+    },
+  };
+
+  return base[id] ?? base["local-authority"]!;
+}
+
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -279,6 +525,36 @@ const SEGMENT_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80",
+  ],
+  clinic: [
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=1000&q=80",
+  ],
+  professional: [
+    "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1000&q=80",
+  ],
+  fitness: [
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=1000&q=80",
+  ],
+  retail: [
+    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1000&q=80",
+  ],
+  creative: [
+    "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
   ],
   local: [
     "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80",
@@ -466,27 +742,76 @@ function HeadingBlock({
   );
 }
 
+function visualStoryText(
+  blueprint: PreviewBlueprint,
+  data: PreviewData,
+  identity: ReturnType<typeof getSiteDraftIdentity>,
+) {
+  switch (blueprint.heroVisual) {
+    case "estimate":
+      return {
+        title: "Proof, estimates, and next steps in one view",
+        copy: `${data.company} can show urgent service fit, repair proof, quote paths, and contact details before customers start comparing alternatives.`,
+      };
+    case "menu":
+      return {
+        title: "Menu, atmosphere, hours, and directions working together",
+        copy: `${data.company} should let guests see what is worth trying, when to visit, and how to get there without digging through separate pages.`,
+      };
+    case "booking":
+      return {
+        title: "A visual booking path customers can trust",
+        copy: `${data.company} can pair service menus with result proof, reviews, and booking prompts so appointments feel easy to choose.`,
+      };
+    case "credentials":
+      return {
+        title: "Credentials and proof before the enquiry",
+        copy: `${data.company} should make expertise, service fit, reviews, and consultation or appointment routes feel calm and credible.`,
+      };
+    case "portfolio":
+      return {
+        title: "Work examples that make the offer tangible",
+        copy: `${data.company} can use visual proof, categories, packages, and outcome-led copy to help customers understand the value quickly.`,
+      };
+    case "packages":
+      return {
+        title: "Packages customers can compare before enquiring",
+        copy: `${data.company} should make programs, plans, or service tiers easy to understand before someone books or asks a question.`,
+      };
+    case "checklist":
+    default:
+      return {
+        title: "A simple proof path for quick decisions",
+        copy: `${data.company} should make services, trust proof, local details, and the next action clear enough to understand in seconds.`,
+      };
+  }
+}
+
 function VisualStory({
   data,
   options,
   identity,
   initials,
   isLight,
+  blueprint,
 }: {
   data: PreviewData;
   options: PreviewOptions;
   identity: ReturnType<typeof getSiteDraftIdentity>;
   initials: string;
   isLight: boolean;
+  blueprint: PreviewBlueprint;
 }) {
+  const story = visualStoryText(blueprint, data, identity);
+
   if (options.images === "none") {
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <div className={`rounded-[2rem] border p-7 sm:p-9 ${panelClass(isLight)}`}>
           <ImageIcon className="mb-4 h-8 w-8" style={{ color: identity.accent }} />
-          <h2 className="text-3xl font-black">A clean page focused on the next call</h2>
+          <h2 className="text-3xl font-black">{story.title}</h2>
           <p className={`mt-3 max-w-3xl text-lg leading-8 ${mutedClass(isLight)}`}>
-            This version keeps attention on the services, trust proof, location, and contact path so customers can act quickly.
+            {story.copy}
           </p>
         </div>
       </section>
@@ -497,9 +822,9 @@ function VisualStory({
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
-          eyebrow="Before and after"
-          title="Make the choice feel obvious before customers call"
-          copy={`${data.company} should make services, proof, location, and the next step clear before a customer compares another business.`}
+          eyebrow={blueprint.visualEyebrow}
+          title={story.title}
+          copy={story.copy}
           isLight={isLight}
         />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -529,9 +854,9 @@ function VisualStory({
     return (
       <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
-          eyebrow="Service gallery"
-          title="Show the work customers are already trying to understand"
-          copy={`${data.company} can use service photos, repair examples, and proof blocks to help local customers feel safer before they call.`}
+          eyebrow={blueprint.visualEyebrow}
+          title={story.title}
+          copy={story.copy}
           isLight={isLight}
         />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -563,10 +888,10 @@ function VisualStory({
       <div className={`grid gap-6 overflow-hidden rounded-[2rem] border p-5 sm:p-7 lg:grid-cols-[0.95fr_1.05fr] ${panelClass(isLight)}`}>
         <div className="p-2 sm:p-4">
           <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: identity.accent }}>
-            Customer view
+            {blueprint.visualEyebrow}
           </p>
-          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">{identity.visualTitle}</h2>
-          <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{identity.visualSubtitle}</p>
+          <h2 className="mt-3 text-3xl font-black leading-tight sm:text-5xl">{story.title}</h2>
+          <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{story.copy}</p>
           <div className="mt-6 flex flex-wrap gap-2">
             {identity.trustBadges.map(badge => (
               <span key={badge} className={`rounded-full border px-3 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-slate-50 text-slate-700" : "border-white/10 bg-white/[0.05] text-white/70"}`}>
@@ -600,6 +925,153 @@ function VisualStory({
         </div>
       </div>
     </section>
+  );
+}
+
+function HeroPreviewVisual({
+  data,
+  identity,
+  initials,
+  isLight,
+  blueprint,
+  variationBadge,
+}: {
+  data: PreviewData;
+  identity: ReturnType<typeof getSiteDraftIdentity> & {
+    accent: string;
+    accent2: string;
+    accentSoft: string;
+    surface: string;
+  };
+  initials: string;
+  isLight: boolean;
+  blueprint: PreviewBlueprint;
+  variationBadge: string;
+}) {
+  const visualCards: Record<PreviewBlueprint["heroVisual"], Array<{ label: string; value: string }>> = {
+    estimate: [
+      { label: "Fast start", value: "Photo / job details" },
+      { label: "Proof", value: identity.trustBadges[0] ?? "Local proof" },
+      { label: "Next step", value: "Call or request quote" },
+    ],
+    menu: [
+      { label: "Menu", value: identity.pages[0] ?? "Best sellers" },
+      { label: "Visit", value: marketFromLocation(data.location) },
+      { label: "Guests", value: "Hours + directions" },
+    ],
+    booking: [
+      { label: "Choose", value: identity.pages[0] ?? "Service" },
+      { label: "Trust", value: "Gallery + reviews" },
+      { label: "Book", value: "Appointment CTA" },
+    ],
+    credentials: [
+      { label: "Fit", value: identity.pages[0] ?? "Services" },
+      { label: "Authority", value: identity.trustBadges[0] ?? "Credentials" },
+      { label: "Enquiry", value: "Consultation path" },
+    ],
+    portfolio: [
+      { label: "Work", value: identity.pages[0] ?? "Portfolio" },
+      { label: "Style", value: variationBadge },
+      { label: "Enquiry", value: "Project fit" },
+    ],
+    checklist: [
+      { label: "Service", value: identity.pages[0] ?? "Services" },
+      { label: "Proof", value: identity.trustBadges[0] ?? "Trust" },
+      { label: "Action", value: "Clear next step" },
+    ],
+    packages: [
+      { label: "Option 1", value: identity.pages[0] ?? "Starter" },
+      { label: "Option 2", value: identity.pages[1] ?? "Growth" },
+      { label: "Action", value: "Book / enquire" },
+    ],
+  };
+
+  const cards = visualCards[blueprint.heroVisual];
+  const showMosaic = blueprint.heroVisual === "portfolio" || blueprint.heroVisual === "menu";
+
+  return (
+    <div className="site-preview-hero-visual relative block">
+      <div
+        className="absolute -inset-5 rounded-[2.5rem] opacity-60 blur-2xl"
+        style={{ background: `linear-gradient(135deg, ${identity.accentSoft}, ${identity.accent2}22)` }}
+      />
+      <div className={`relative overflow-hidden rounded-[2rem] border shadow-2xl ${isLight ? "border-slate-200 bg-white" : "border-white/10 bg-[#0b1220]"}`}>
+        <div
+          className="relative min-h-[340px] bg-cover bg-center p-4 sm:min-h-[440px] sm:p-5"
+          style={{
+            backgroundImage: imageBackground(
+              identity.segment,
+              0,
+              "linear-gradient(180deg, rgba(2,6,23,0.08), rgba(2,6,23,0.84))",
+            ),
+          }}
+        >
+          <div className={`flex h-full min-h-[310px] flex-col sm:min-h-[400px] ${showMosaic ? "justify-between" : "justify-end"}`}>
+            <div className="flex items-start justify-between gap-3">
+              <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-black text-slate-950">
+                {blueprint.label}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-950/65 px-3 py-2 text-sm font-black text-white backdrop-blur">
+                <Star className="h-4 w-4 fill-current" style={{ color: identity.accent2 }} />
+                {variationBadge}
+              </span>
+            </div>
+
+            {showMosaic && (
+              <div className="grid grid-cols-3 gap-2">
+                {[1, 2, 3].map(index => (
+                  <div
+                    key={index}
+                    className="h-24 rounded-2xl border border-white/15 bg-cover bg-center shadow-xl"
+                    style={{
+                      backgroundImage: imageBackground(
+                        identity.segment,
+                        index,
+                        "linear-gradient(180deg, rgba(2,6,23,0.05), rgba(2,6,23,0.42))",
+                      ),
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-4 text-white backdrop-blur-md sm:p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-white/50">{blueprint.visualEyebrow}</p>
+                  <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">{data.company}</h2>
+                </div>
+                <div
+                  className="hidden h-14 w-14 place-items-center rounded-2xl text-base font-black text-slate-950 sm:grid"
+                  style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
+                >
+                  {initials}
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                {cards.map(card => (
+                  <div key={card.label} className="rounded-2xl border border-white/10 bg-white/[0.08] p-3">
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/45">{card.label}</p>
+                    <p className="mt-1 text-sm font-black leading-5 text-white">{card.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={`grid gap-3 p-4 ${isLight ? "bg-white" : "bg-[#0b1220]"}`}>
+          {identity.services.slice(0, 3).map(service => (
+            <div key={service.title} className={`flex items-start gap-3 rounded-2xl border p-3 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-white/[0.04]"}`}>
+              <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: identity.accent }} />
+              <div>
+                <h3 className="font-black">{service.title}</h3>
+                <p className={`mt-1 text-sm leading-6 ${mutedClass(isLight)}`}>{service.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -662,6 +1134,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     accentSoft: variation.palette.accentSoft,
     surface: `linear-gradient(135deg, ${variation.palette.previewSurface}, ${variation.palette.previewBackground})`,
   };
+  const blueprint = getPreviewBlueprint(data, designPrompt, variation.template);
   const initials = businessInitials(company);
   const market = marketFromLocation(location);
   const callLink = telHref(phone);
@@ -692,8 +1165,8 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
         <HeadingBlock
           eyebrow="Services made clear"
-          title="What customers should understand in seconds"
-          copy={`${company} should make the right service, phone number, location, and reason to trust the business obvious before customers keep searching.`}
+          title={blueprint.serviceTitle}
+          copy={blueprint.serviceCopy}
           isLight={isLight}
         />
         <div className="grid gap-4 lg:grid-cols-4">
@@ -717,6 +1190,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       identity={identity}
       initials={initials}
       isLight={isLight}
+      blueprint={blueprint}
     />,
 
     <section key="trust" className="mx-auto grid max-w-7xl gap-6 px-5 py-14 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
@@ -732,9 +1206,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       </div>
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: identity.accent }}>
-          {identity.visualTitle}
+          {blueprint.visualEyebrow}
         </p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Confidence before the first call</h2>
+        <h2 className="mt-3 text-3xl font-black sm:text-5xl">{blueprint.trustTitle}</h2>
         <p className={`mt-4 text-lg leading-8 ${mutedClass(isLight)}`}>{identity.visualSubtitle}</p>
         <div className="mt-8 flex flex-wrap gap-2">
           {[...identity.trustBadges, goalCopy.secondary].map(badge => (
@@ -749,7 +1223,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
     <section key="process" className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-10">
       <HeadingBlock
         eyebrow="Simple conversion path"
-        title="How customers move from search to call"
+        title={blueprint.processTitle}
         copy={`A cleaner path helps ${company} turn local attention into action without making customers hunt for the next step.`}
         isLight={isLight}
       />
@@ -770,7 +1244,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         <p className={`text-sm font-black uppercase tracking-[0.18em] ${isLight ? "text-slate-500" : "text-white/45"}`}>
           Service shortcuts
         </p>
-        <h2 className="mt-3 text-3xl font-black sm:text-5xl">Find the right service faster</h2>
+        <h2 className="mt-3 text-3xl font-black sm:text-5xl">{blueprint.pagesTitle}</h2>
         <div className="mt-6 flex flex-wrap gap-2">
           {identity.pages.map(page => (
             <span key={page} className="rounded-full px-4 py-2 text-sm font-black text-slate-950" style={{ background: identity.accent }}>
@@ -837,6 +1311,9 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
       </div>
     </section>,
   ];
+  const orderedMiddleSections = blueprint.order
+    .map(sectionKey => middleSections.find(section => isValidElement(section) && section.key === sectionKey))
+    .filter(Boolean);
 
   return (
     <>
@@ -895,7 +1372,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
                 </span>
                 <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${isLight ? "border-slate-200 bg-white text-slate-700" : "border-white/10 bg-white/[0.07] text-white/75"}`}>
                   <Star className="h-4 w-4 fill-current" style={{ color: identity.accent2 }} />
-                  {variation.badge}
+                  {blueprint.label}
                 </span>
               </div>
               <h1 className="max-w-4xl break-words text-4xl font-black leading-[1.03] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
@@ -939,52 +1416,14 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
               </div>
             </div>
 
-            <div className="site-preview-hero-visual relative block">
-              <div
-                className="absolute -inset-5 rounded-[2.5rem] opacity-60 blur-2xl"
-                style={{ background: `linear-gradient(135deg, ${identity.accentSoft}, ${identity.accent2}22)` }}
-              />
-              <div className={`relative overflow-hidden rounded-[2rem] border shadow-2xl ${isLight ? "border-slate-200 bg-white" : "border-white/10 bg-[#0b1220]"}`}>
-                <div
-                  className="relative min-h-[330px] bg-cover bg-center p-4 sm:min-h-[430px] sm:p-5"
-                  style={{
-                    backgroundImage: imageBackground(
-                      identity.segment,
-                      0,
-                      "linear-gradient(180deg, rgba(2,6,23,0.10), rgba(2,6,23,0.86))",
-                    ),
-                  }}
-                >
-                  <div className="flex h-full min-h-[300px] flex-col justify-between sm:min-h-[390px]">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-black text-slate-950">
-                        {identity.trustBadges[0] ?? "Trusted local service"}
-                      </span>
-                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-950/65 px-3 py-2 text-sm font-black text-white backdrop-blur">
-                        <Star className="h-4 w-4 fill-current" style={{ color: identity.accent2 }} />
-                        Local choice
-                      </span>
-                    </div>
-                    <div className="rounded-[1.5rem] border border-white/15 bg-slate-950/72 p-4 text-white backdrop-blur-md sm:p-5">
-                      <p className="text-xs font-black uppercase tracking-[0.18em] text-white/50">{identity.visualTitle}</p>
-                      <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">{company}</h2>
-                      <p className="mt-3 text-base leading-7 text-white/76">{identity.visualSubtitle}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className={`grid gap-3 p-4 ${isLight ? "bg-white" : "bg-[#0b1220]"}`}>
-                  {identity.services.slice(0, 3).map(service => (
-                    <div key={service.title} className={`flex items-start gap-3 rounded-2xl border p-3 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-white/[0.04]"}`}>
-                      <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0" style={{ color: identity.accent }} />
-                      <div>
-                        <h3 className="font-black">{service.title}</h3>
-                        <p className={`mt-1 text-sm leading-6 ${mutedClass(isLight)}`}>{service.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <HeroPreviewVisual
+              data={data}
+              identity={identity}
+              initials={initials}
+              isLight={isLight}
+              blueprint={blueprint}
+              variationBadge={variation.badge}
+            />
           </div>
 
           <div className={`site-preview-signal-grid mb-8 grid gap-3 rounded-[2rem] border p-3 sm:grid-cols-3 ${isLight ? "border-slate-200 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]" : "border-white/10 bg-white/[0.055]"}`}>
@@ -1005,7 +1444,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
         </div>
       </section>
 
-      {middleSections.slice(0, middleBudget)}
+      {orderedMiddleSections.slice(0, middleBudget)}
 
       <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-8 lg:px-10">
         <div
@@ -1013,7 +1452,7 @@ export default function SitePreviewPage({ searchParams }: { searchParams?: Searc
           style={{ background: isLight ? "white" : `linear-gradient(135deg, ${identity.accentSoft}, rgba(255,255,255,0.045))` }}
         >
           <Clock className="mx-auto mb-5 h-8 w-8" style={{ color: identity.accent }} />
-          <h2 className="text-3xl font-black sm:text-5xl">Need {data.category.toLowerCase()} in {market}?</h2>
+          <h2 className="text-3xl font-black sm:text-5xl">{blueprint.ctaTitle}</h2>
           <p className={`mx-auto mt-4 max-w-2xl text-lg leading-8 ${mutedClass(isLight)}`}>
             {company} is easy to reach, easy to understand, and ready for customers who want a clear next step.
           </p>

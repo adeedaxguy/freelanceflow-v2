@@ -9,6 +9,7 @@ import {
   Gift,
   Link as LinkIcon,
   Loader2,
+  MessageSquare,
   Share2,
   ShieldCheck,
   Sparkles,
@@ -124,6 +125,10 @@ export default function BonusLeadsModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [leadRequestMessage, setLeadRequestMessage] = useState("");
+  const [requestingMore, setRequestingMore] = useState(false);
+  const [requestMoreSuccess, setRequestMoreSuccess] = useState("");
+  const [requestMoreError, setRequestMoreError] = useState("");
   const [copiedPost, setCopiedPost] = useState(false);
   const [copyFallback, setCopyFallback] = useState(false);
   const shareTextRef = useRef<HTMLTextAreaElement>(null);
@@ -137,6 +142,10 @@ export default function BonusLeadsModal({
     setSubmitting(false);
     setError("");
     setSuccess("");
+    setLeadRequestMessage("");
+    setRequestingMore(false);
+    setRequestMoreSuccess("");
+    setRequestMoreError("");
     setCopiedPost(false);
     setCopyFallback(false);
   }, [isOpen, source]);
@@ -166,7 +175,7 @@ export default function BonusLeadsModal({
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(sharePostText)}`;
   const linkedInValid = isLinkedInProfile(linkedInUrl);
   const facebookValid = isFacebookProfile(facebookUrl);
-  const canClaim = openedLinkedIn && openedFacebook && linkedInValid && facebookValid && !submitting;
+  const canClaim = openedLinkedIn && openedFacebook && linkedInValid && facebookValid && !submitting && !success;
 
   const copyShareText = async () => {
     try {
@@ -220,6 +229,33 @@ export default function BonusLeadsModal({
       setError(claimError instanceof Error ? claimError.message : "Could not validate your share.");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const requestMoreLeads = async () => {
+    setRequestingMore(true);
+    setRequestMoreError("");
+    setRequestMoreSuccess("");
+    try {
+      const response = await fetch("/api/leads/request-more", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source,
+          currentPlan,
+          message: leadRequestMessage.trim(),
+        }),
+      });
+      const data = (await response.json()) as { message?: string; error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not send your request.");
+      }
+      setRequestMoreSuccess(data.message ?? "Request sent. We will review it and reach out.");
+      setLeadRequestMessage("");
+    } catch (requestError) {
+      setRequestMoreError(requestError instanceof Error ? requestError.message : "Could not send your request.");
+    } finally {
+      setRequestingMore(false);
     }
   };
 
@@ -390,6 +426,43 @@ export default function BonusLeadsModal({
             </div>
           )}
 
+          {success && (
+            <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <div className="mb-3 flex items-start gap-2">
+                <MessageSquare className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-light" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Need more leads?</p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Tell us your niche, target country, and rough volume. Your request goes straight to the iCloseLeads team.
+                  </p>
+                </div>
+              </div>
+              <textarea
+                value={leadRequestMessage}
+                onChange={(event) => setLeadRequestMessage(event.target.value)}
+                rows={3}
+                maxLength={1000}
+                placeholder="Example: I need more local cleaning and roofing leads in Texas this week."
+                className="mb-2 w-full resize-none rounded-xl border border-border bg-background p-3 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/10"
+              />
+              {requestMoreError && (
+                <p className="mb-2 text-xs font-medium text-destructive">{requestMoreError}</p>
+              )}
+              {requestMoreSuccess && (
+                <p className="mb-2 text-xs font-medium text-accent">{requestMoreSuccess}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => void requestMoreLeads()}
+                disabled={requestingMore}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary-light transition-all hover:border-primary/45 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {requestingMore ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageSquare className="h-4 w-4" />}
+                {requestingMore ? "Sending request..." : "Request more leads"}
+              </button>
+            </div>
+          )}
+
           <div className="space-y-2.5">
             <button
               type="button"
@@ -398,7 +471,7 @@ export default function BonusLeadsModal({
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-hero py-3.5 text-sm font-bold text-white shadow-glow-primary transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-              {submitting ? "Validating..." : "Validate & Unlock Leads"}
+              {success ? "Bonus unlocked" : submitting ? "Validating..." : "Validate & Unlock Leads"}
             </button>
             <button
               type="button"

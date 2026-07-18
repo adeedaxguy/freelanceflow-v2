@@ -1867,7 +1867,6 @@ export default function LocalLeadsPage() {
         onClose={() => setShowBonus(false)}
         onBonusClaimed={(_newBonus, _claim) => {
           setLimitNotice("");
-          setShowBonus(false);
           fetch("/api/usage")
             .then(r => r.ok ? r.json() as Promise<UsageStats> : null)
             .then(syncUsage)

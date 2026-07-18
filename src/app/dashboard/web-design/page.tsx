@@ -292,13 +292,13 @@ function OptionGrid({
   columns?: string;
 }) {
   return (
-    <section className="rounded-3xl border border-border bg-background/45 p-5 sm:p-6">
+    <section className="rounded-2xl border border-border bg-background/45 p-4 sm:p-5">
       <div className="mb-4 flex items-start gap-3">
-        <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/10 text-primary-light">
+        <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary-light">
           <Icon className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-xl font-black text-foreground">{title}</h2>
+          <h2 className="text-lg font-black text-foreground">{title}</h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
         </div>
       </div>
@@ -311,13 +311,13 @@ function OptionGrid({
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`min-h-[112px] rounded-2xl border p-4 text-left transition ${
+              className={`min-h-[96px] rounded-2xl border p-3.5 text-left transition ${
                 active
                   ? "border-primary/60 bg-primary/15 shadow-glow"
                   : "border-border bg-surface/70 hover:border-primary/35 hover:bg-primary/8"
               }`}
             >
-              <span className={`text-base font-black ${active ? "text-primary-light" : "text-foreground"}`}>
+              <span className={`text-sm font-black ${active ? "text-primary-light" : "text-foreground"}`}>
                 {option.label}
               </span>
               <span className="mt-2 block text-sm leading-6 text-muted-foreground">
@@ -343,16 +343,16 @@ function VariationPicker({
   const selected = resolveDesignVariation({ variationId: value });
 
   return (
-    <section className="rounded-3xl border border-primary/25 bg-primary/10 p-5 sm:p-6">
-      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <section className="rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
+      <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3">
-          <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl border border-primary/25 bg-background/60 text-primary-light">
+          <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-background/60 text-primary-light">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-xl font-black text-foreground">Design feel</h2>
+            <h2 className="text-lg font-black text-foreground">Design feel</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Choose from 50 prompt-ready directions. The prompt can pick this automatically, or you can force a style here.
+              Choose one of 50 directions, or let the prompt pick it automatically.
             </p>
           </div>
         </div>
@@ -378,7 +378,7 @@ function VariationPicker({
         ))}
       </select>
 
-      <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_0.7fr]">
+      <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-light">{selected.badge}</p>
           <h3 className="mt-2 text-lg font-black text-foreground">{selected.label}</h3>
@@ -395,7 +395,7 @@ function VariationPicker({
               />
             ))}
           </div>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">{selected.texture}</p>
+          <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted-foreground">{selected.texture}</p>
         </div>
       </div>
     </section>
@@ -539,19 +539,22 @@ function WebDesignBuilderContent() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mb-4 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
             <Link
               href="/dashboard/local-leads"
-              className="inline-flex w-fit items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+              className="inline-flex w-fit items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
               Local leads
             </Link>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Web design studio</p>
-              <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">Build a sellable local website concept</h1>
+              <h1 className="mt-1 text-2xl font-black text-foreground sm:text-3xl">Create a client-ready website concept</h1>
+              <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                Brief it, shape the direction, preview it, then share the concept without hunting through a crowded builder.
+              </p>
             </div>
           </div>
 
@@ -560,19 +563,19 @@ function WebDesignBuilderContent() {
               href={clientPreviewHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-4 py-2 text-sm font-semibold text-accent transition hover:bg-accent/15"
+              className="inline-flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-semibold text-accent transition hover:bg-accent/15"
             >
               <ExternalLink className="h-4 w-4" />
-              Open client preview
+              Preview
             </a>
             <a
               href={pdfHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/15"
+              className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-400/15"
             >
               <Download className="h-4 w-4" />
-              Full homepage PDF
+              PDF
             </a>
             <button
               type="button"
@@ -585,138 +588,91 @@ function WebDesignBuilderContent() {
           </div>
         </div>
 
-        <section className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-gradient-card shadow-card">
-          <div className="absolute inset-0 bg-grid-pattern bg-grid-sm opacity-20" />
-          <div
-            className="absolute -right-24 -top-24 h-80 w-80 rounded-full blur-3xl"
-            style={{ background: identity.accentSoft }}
-          />
-          <div className="relative grid gap-0 lg:grid-cols-[1fr_410px]">
-            <div className="p-6 sm:p-8">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-                <div
-                  className="grid h-20 w-20 flex-shrink-0 place-items-center rounded-3xl text-2xl font-black text-slate-950 shadow-glow"
-                  style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
-                >
-                  {initials}
-                </div>
-                <div>
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-cyan-200">
-                      {identity.logoLabel} website preview
-                    </span>
-                    <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary-light">
-                      Guided setup
-                    </span>
-                  </div>
-                  <h2 className="max-w-3xl text-3xl font-black leading-tight text-foreground sm:text-5xl">
-                    Create a real-looking homepage for {data.company}.
-                  </h2>
-                  <p className="mt-4 max-w-2xl text-lg leading-8 text-muted-foreground">
-                    Choose the style, sections, images, and conversion goal, then export a link or PDF that feels specific enough to start a real sales conversation.
-                  </p>
-                </div>
+        <section className="rounded-2xl border border-border bg-surface/85 p-4 shadow-card">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+              <div
+                className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-2xl text-lg font-black text-slate-950 shadow-glow"
+                style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
+              >
+                {initials}
               </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-border bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Business type</p>
-                  <p className="mt-1 font-bold text-foreground">{data.category}</p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-cyan-200">
+                    {identity.logoLabel} preview
+                  </span>
+                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
+                    {data.category}
+                  </span>
+                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
+                    {data.location}
+                  </span>
                 </div>
-                <div className="rounded-2xl border border-border bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Market</p>
-                  <p className="mt-1 font-bold text-foreground">{data.location}</p>
-                </div>
-                <div className="rounded-2xl border border-border bg-background/60 p-4">
-                  <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Pitch angle</p>
-                  <p className="mt-1 font-bold text-foreground">{identity.pitchHook}</p>
-                </div>
+                <h2 className="mt-2 truncate text-xl font-black text-foreground sm:text-2xl">{data.company}</h2>
+                <p className="mt-1 line-clamp-2 max-w-3xl text-sm leading-6 text-muted-foreground">{identity.pitchHook}</p>
               </div>
             </div>
 
-            <aside className="border-t border-border bg-background/55 p-6 sm:p-8 lg:border-l lg:border-t-0">
-              <h2 className="text-xl font-black text-foreground">Studio flow</h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Move from business brief to finished homepage preview without scrolling through every control at once.
-              </p>
-              <div className="mt-5 space-y-3">
-                {BUILDER_STEPS.map((step, index) => {
-                  const StepIcon = step.icon;
-                  const active = index === activeStep;
-                  const complete = index < activeStep;
-                  return (
-                    <button
-                      key={step.key}
-                      type="button"
-                      onClick={() => setActiveStep(index)}
-                      className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                        active
-                          ? "border-primary/60 bg-primary/15 text-foreground shadow-glow"
-                          : complete
-                            ? "border-accent/25 bg-accent/10 text-foreground"
-                            : "border-border bg-surface/65 text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                      }`}
-                    >
-                      <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-white/10 bg-background/70">
-                        {complete ? <CheckCircle className="h-5 w-5 text-accent" /> : <StepIcon className="h-5 w-5" />}
-                      </span>
-                      <span>
-                        <span className="block text-sm font-black">{index + 1}. {step.label}</span>
-                        <span className="mt-0.5 block text-xs leading-5 opacity-75">{step.title}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </aside>
-          </div>
-        </section>
-
-        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_430px]">
-          <div className="rounded-[2rem] border border-border bg-surface p-4 shadow-card sm:p-6">
-            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/10 text-primary-light">
-                  <ActiveIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                    Step {activeStep + 1} of {BUILDER_STEPS.length}
-                  </p>
-                  <h2 className="mt-1 text-2xl font-black text-foreground sm:text-3xl">{activeStepData.title}</h2>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{activeStepData.description}</p>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {BUILDER_STEPS.map((step, index) => (
+            <div className="grid gap-2 sm:grid-cols-4">
+              {BUILDER_STEPS.map((step, index) => {
+                const StepIcon = step.icon;
+                const active = index === activeStep;
+                const complete = index < activeStep;
+                return (
                   <button
                     key={step.key}
                     type="button"
                     onClick={() => setActiveStep(index)}
-                    className={`rounded-full border px-3 py-2 text-xs font-black transition ${
-                      index === activeStep
-                        ? "border-primary/60 bg-primary/20 text-primary-light"
-                        : "border-border bg-background/50 text-muted-foreground hover:text-foreground"
+                    className={`flex min-h-[78px] items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                      active
+                        ? "border-primary/60 bg-primary/15 text-foreground shadow-glow"
+                        : complete
+                          ? "border-accent/25 bg-accent/10 text-foreground"
+                          : "border-border bg-background/55 text-muted-foreground hover:border-primary/30 hover:text-foreground"
                     }`}
                   >
-                    {step.label}
+                    <span className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-xl border border-white/10 bg-background/70">
+                      {complete ? <CheckCircle className="h-4 w-4 text-accent" /> : <StepIcon className="h-4 w-4" />}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-sm font-black">{step.label}</span>
+                      <span className="mt-0.5 block truncate text-xs opacity-75">{step.title}</span>
+                    </span>
                   </button>
-                ))}
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
+          <div className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-card sm:p-5">
+            <div className="mb-5 flex items-start gap-3">
+              <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary-light">
+                <ActiveIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Step {activeStep + 1} of {BUILDER_STEPS.length}
+                </p>
+                <h2 className="mt-1 text-2xl font-black text-foreground">{activeStepData.title}</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{activeStepData.description}</p>
               </div>
             </div>
 
             {activeStepData.key === "brief" && (
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-primary/25 bg-primary/10 p-5">
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_0.85fr]">
+                <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
                         <Wand2 className="h-5 w-5 text-primary-light" />
-                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Prompt the website direction</p>
+                        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Prompt</p>
                       </div>
-                      <h3 className="mt-3 text-2xl font-black text-foreground">Tell iCloseLeads what kind of site should sell this business.</h3>
-                      <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                        Write the direction like you would brief a designer. The builder will convert it into style, theme, sections, imagery, copy depth, and CTA focus.
+                      <h3 className="mt-2 text-xl font-black text-foreground">Describe the site you want to sell.</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                        Write it like a designer brief. Spaces and line breaks are preserved while you type.
                       </p>
                     </div>
                     <button
@@ -726,31 +682,31 @@ function WebDesignBuilderContent() {
                       className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-hero px-4 py-3 text-sm font-black text-white shadow-glow transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       <Sparkles className="h-4 w-4" />
-                      Apply prompt
+                      Apply
                     </button>
                   </div>
                   <textarea
                     value={designPrompt}
                     onChange={event => setDesignPrompt(promptInputValue(event.target.value))}
-                    rows={5}
+                    rows={7}
                     placeholder="Example: Create a premium but friendly auto repair website with before-and-after proof, strong local trust, quote requests as the main CTA, detailed service sections, and a clean dark visual style."
-                    className="mt-5 min-h-[150px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                    className="mt-4 min-h-[230px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr]">
-                  <div className="rounded-3xl border border-border bg-background/55 p-5">
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-border bg-background/55 p-4">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Client brief</p>
-                    <h3 className="mt-3 text-3xl font-black text-foreground">{data.company}</h3>
-                    <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.subheadline}</p>
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    <h3 className="mt-2 text-2xl font-black text-foreground">{data.company}</h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{identity.subheadline}</p>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                       {[
                         ["Category", data.category],
                         ["Market", data.location],
                         ["Phone", data.phone || "Not provided"],
                         ["Website status", data.status || "Unknown"],
                       ].map(([label, value]) => (
-                        <div key={label} className="rounded-2xl border border-border bg-surface/65 p-4">
+                        <div key={label} className="rounded-xl border border-border bg-surface/65 px-3 py-2.5">
                           <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
                           <p className="mt-1 break-words font-bold text-foreground">{value}</p>
                         </div>
@@ -758,17 +714,19 @@ function WebDesignBuilderContent() {
                     </div>
                   </div>
 
-                  <div className="rounded-3xl border border-accent/25 bg-accent/10 p-5">
-                    <Sparkles className="h-7 w-7 text-accent" />
-                    <h3 className="mt-4 text-2xl font-black text-foreground">Recommended sales angle</h3>
-                    <p className="mt-3 text-base leading-7 text-muted-foreground">{identity.pitchHook}</p>
-                    <div className="mt-5 space-y-3">
-                      {identity.services.slice(0, 3).map(service => (
-                        <div key={service.title} className="flex items-start gap-3 rounded-2xl border border-accent/20 bg-background/40 p-3">
+                  <div className="rounded-2xl border border-accent/25 bg-accent/10 p-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-accent" />
+                      <p className="text-sm font-black text-foreground">Sales angle</p>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{identity.pitchHook}</p>
+                    <div className="mt-4 space-y-2">
+                      {identity.services.slice(0, 2).map(service => (
+                        <div key={service.title} className="flex items-start gap-3 rounded-xl border border-accent/20 bg-background/40 p-3">
                           <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" />
                           <div>
-                            <p className="font-black text-foreground">{service.title}</p>
-                            <p className="mt-1 text-sm leading-5 text-muted-foreground">{service.description}</p>
+                            <p className="text-sm font-black text-foreground">{service.title}</p>
+                            <p className="mt-1 line-clamp-2 text-sm leading-5 text-muted-foreground">{service.description}</p>
                           </div>
                         </div>
                       ))}
@@ -934,8 +892,8 @@ function WebDesignBuilderContent() {
             </div>
           </div>
 
-          <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
-            <div className="overflow-hidden rounded-[2rem] border border-border bg-surface shadow-card">
+          <aside className="space-y-4 xl:sticky xl:top-5 xl:self-start">
+            <div className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-card">
               <div className="border-b border-border bg-background/65 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-full bg-red-400" />
@@ -944,18 +902,18 @@ function WebDesignBuilderContent() {
                   <span className="ml-2 truncate text-xs text-muted-foreground">website preview</span>
                 </div>
               </div>
-              <div className="p-5">
-                <div className="relative min-h-[420px] overflow-hidden rounded-3xl border border-white/10 bg-[#071014] p-5">
+              <div className="p-4">
+                <div className="relative min-h-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#071014] p-4">
                   <div
                     className="absolute inset-0 opacity-80"
                     style={{
                       background: `radial-gradient(circle at 18% 15%, ${identity.accentSoft}, transparent 34%), radial-gradient(circle at 82% 8%, ${identity.accent2}33, transparent 28%)`,
                     }}
                   />
-                  <div className="relative flex min-h-[380px] flex-col">
+                  <div className="relative flex min-h-[318px] flex-col">
                     <div className="flex items-center justify-between gap-3">
                       <div
-                        className="grid h-14 w-14 place-items-center rounded-2xl text-lg font-black text-slate-950"
+                        className="grid h-12 w-12 place-items-center rounded-2xl text-base font-black text-slate-950"
                         style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
                       >
                         {initials}
@@ -964,21 +922,21 @@ function WebDesignBuilderContent() {
                         {optionLabel(STYLE_OPTIONS, style)}
                       </span>
                     </div>
-                    <div className="mt-10">
+                    <div className="mt-7">
                       <p className="text-xs font-black uppercase tracking-[0.2em] text-white/45">{data.category}</p>
-                      <h3 className="mt-3 text-3xl font-black leading-tight text-white">{identity.headline}</h3>
-                      <p className="mt-4 text-sm leading-6 text-white/68">{identity.subheadline}</p>
+                      <h3 className="mt-3 line-clamp-3 text-2xl font-black leading-tight text-white">{identity.headline}</h3>
+                      <p className="mt-4 line-clamp-4 text-sm leading-6 text-white/68">{identity.subheadline}</p>
                     </div>
-                    <div className="mt-auto pt-7">
+                    <div className="mt-auto pt-5">
                       <div className="flex flex-wrap gap-2">
-                        {selectedSummary.map(item => (
+                        {selectedSummary.slice(0, 4).map(item => (
                           <span key={item} className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-bold text-white/70">
                             {item}
                           </span>
                         ))}
                       </div>
-                      <div className="mt-5 grid gap-2">
-                        {identity.services.slice(0, 2).map(service => (
+                      <div className="mt-4 grid gap-2">
+                        {identity.services.slice(0, 1).map(service => (
                           <div key={service.title} className="rounded-2xl border border-white/10 bg-white/[0.045] p-3">
                             <p className="font-black text-white">{service.title}</p>
                           </div>
@@ -1021,29 +979,30 @@ function WebDesignBuilderContent() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-border bg-surface p-5 shadow-card">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Current build recipe</p>
-              <div className="mt-4 space-y-3">
+            <div className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-card">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Current recipe</p>
+              <div className="mt-3 space-y-3">
                 {designPrompt && (
-                  <div className="rounded-2xl border border-primary/25 bg-primary/10 px-4 py-3">
+                  <div className="rounded-2xl border border-primary/25 bg-primary/10 px-3 py-2.5">
                     <span className="text-sm font-black text-primary-light">Prompt brief</span>
-                    <p className="mt-1 line-clamp-4 text-sm leading-6 text-muted-foreground">{designPrompt}</p>
+                    <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">{designPrompt}</p>
                   </div>
                 )}
-                {[
-                  ["Design feel", selectedVariation.label],
-                  ["Direction", optionLabel(STYLE_OPTIONS, style)],
-                  ["Theme", optionLabel(THEME_OPTIONS, theme)],
-                  ["Layout", optionLabel(LAYOUT_OPTIONS, layout)],
-                  ["Sections", optionLabel(SECTION_OPTIONS, sections)],
-                  ["Images", optionLabel(IMAGE_OPTIONS, images)],
-                  ["Goal", optionLabel(GOAL_OPTIONS, conversionGoal)],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-background/55 px-4 py-3">
-                    <span className="text-sm text-muted-foreground">{label}</span>
-                    <span className="text-right text-sm font-black text-foreground">{value}</span>
-                  </div>
-                ))}
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    selectedVariation.label,
+                    optionLabel(STYLE_OPTIONS, style),
+                    optionLabel(THEME_OPTIONS, theme),
+                    optionLabel(LAYOUT_OPTIONS, layout),
+                    optionLabel(SECTION_OPTIONS, sections),
+                    optionLabel(IMAGE_OPTIONS, images),
+                    optionLabel(GOAL_OPTIONS, conversionGoal),
+                  ].map(value => (
+                    <span key={value} className="rounded-full border border-border bg-background/55 px-3 py-1.5 text-xs font-bold text-foreground">
+                      {value}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>

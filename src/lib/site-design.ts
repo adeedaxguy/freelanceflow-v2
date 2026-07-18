@@ -5,6 +5,17 @@ export type DesignDepth = "short" | "balanced" | "detailed";
 export type DesignGoal = "calls" | "quotes" | "bookings" | "visits";
 export type DesignLayout = "conversion" | "editorial" | "showcase";
 export type DesignSections = "5" | "7" | "9" | "11";
+export type DesignTemplate =
+  | "local-authority"
+  | "boutique-booking"
+  | "urgent-repair"
+  | "neighborhood-commerce"
+  | "editorial-craft"
+  | "minimal-direct"
+  | "visual-proof"
+  | "consult-authority"
+  | "founder-story"
+  | "modern-productized";
 
 export type SiteDesignVariation = {
   id: string;
@@ -21,6 +32,7 @@ export type SiteDesignVariation = {
   contentDepth: DesignDepth;
   conversionGoal: DesignGoal;
   layout: DesignLayout;
+  template: DesignTemplate;
   palette: {
     accent: string;
     accent2: string;
@@ -44,6 +56,7 @@ type Archetype = {
   contentDepth: DesignDepth;
   conversionGoal: DesignGoal;
   layout: DesignLayout;
+  template: DesignTemplate;
 };
 
 type Motif = {
@@ -70,6 +83,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "quotes",
     layout: "conversion",
+    template: "local-authority",
   },
   {
     id: "boutique-studio",
@@ -85,6 +99,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "detailed",
     conversionGoal: "bookings",
     layout: "showcase",
+    template: "boutique-booking",
   },
   {
     id: "urgent-response",
@@ -100,6 +115,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "calls",
     layout: "conversion",
+    template: "urgent-repair",
   },
   {
     id: "neighborhood-warmth",
@@ -115,6 +131,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "bookings",
     layout: "conversion",
+    template: "neighborhood-commerce",
   },
   {
     id: "editorial-craft",
@@ -130,6 +147,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "detailed",
     conversionGoal: "quotes",
     layout: "editorial",
+    template: "editorial-craft",
   },
   {
     id: "minimal-signal",
@@ -145,6 +163,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "short",
     conversionGoal: "quotes",
     layout: "conversion",
+    template: "minimal-direct",
   },
   {
     id: "visual-portfolio",
@@ -160,6 +179,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "quotes",
     layout: "showcase",
+    template: "visual-proof",
   },
   {
     id: "high-ticket-consult",
@@ -175,6 +195,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "detailed",
     conversionGoal: "quotes",
     layout: "editorial",
+    template: "consult-authority",
   },
   {
     id: "founder-led",
@@ -190,6 +211,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "calls",
     layout: "editorial",
+    template: "founder-story",
   },
   {
     id: "modern-service-app",
@@ -205,6 +227,7 @@ const ARCHETYPES: Archetype[] = [
     contentDepth: "balanced",
     conversionGoal: "bookings",
     layout: "showcase",
+    template: "modern-productized",
   },
 ];
 
@@ -310,6 +333,7 @@ export const DESIGN_VARIATIONS: SiteDesignVariation[] = ARCHETYPES.flatMap(arche
     contentDepth: archetype.contentDepth,
     conversionGoal: archetype.conversionGoal,
     layout: archetype.layout,
+    template: archetype.template,
     palette: motif.palette,
   })),
 );

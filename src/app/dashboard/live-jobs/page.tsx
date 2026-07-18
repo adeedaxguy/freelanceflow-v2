@@ -931,7 +931,6 @@ export default function LiveJobsPage() {
         isOpen={showBonus}
         onClose={() => setShowBonus(false)}
         onBonusClaimed={async () => {
-          setShowBonus(false);
           setLimitHit(null);
           await refreshUsage();
         }}
