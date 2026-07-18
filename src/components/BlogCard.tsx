@@ -23,10 +23,10 @@ export default function BlogCard({ post }: BlogCardProps) {
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-card-hover flex flex-col"
+      className="group flex h-full min-h-[480px] flex-col overflow-hidden rounded-2xl border border-border bg-gradient-card transition-all duration-300 hover:border-primary/30 hover:shadow-card-hover"
     >
       {/* Cover Image */}
-      <div className="h-48 bg-gradient-to-br from-primary/20 via-surface to-accent/10 relative overflow-hidden">
+      <div className="relative h-48 flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary/20 via-surface to-accent/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={coverImage}
@@ -48,16 +48,16 @@ export default function BlogCard({ post }: BlogCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-1">
+      <div className="flex min-h-0 flex-1 flex-col p-6">
         <h3 className="text-foreground font-semibold text-lg leading-snug mb-2 group-hover:text-primary-light transition-colors line-clamp-2">
           {post.title}
         </h3>
         {post.excerpt && (
-          <p className="text-muted-foreground text-sm leading-relaxed flex-1 mb-4 line-clamp-3">
+          <p className="mb-4 min-h-[5rem] flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-3">
             {post.excerpt}
           </p>
         )}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground mt-auto">
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <Calendar className="w-3 h-3" />
             {formatDate(post.createdAt)}

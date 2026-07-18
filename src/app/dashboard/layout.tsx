@@ -13,14 +13,14 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   if (!session) redirect("/auth");
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="dashboard-shell flex min-h-screen bg-background">
       {/* Sidebar: desktop aside + mobile top-bar + mobile slide drawer */}
       <Sidebar />
 
       {/* Main content
           pt-14 = offset for the fixed mobile top-bar (h-14)
           pb-20 lg:pb-0 = clearance for the mobile bottom nav (h-16 + safe area) */}
-      <main className="flex-1 min-w-0 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0">
+      <main className="dashboard-content flex-1 min-w-0 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0">
         <ErrorBoundary section="Dashboard">
           {children}
         </ErrorBoundary>

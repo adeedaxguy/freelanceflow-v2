@@ -1046,3 +1046,251 @@ html.light ::selection {
 html.light ::-webkit-scrollbar-track { background: #f6f7fb; }
 html.light ::-webkit-scrollbar-thumb { background: #c8cedd; }
 html.light ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+
+/* ════════════════════════════════════════════════════════════════
+   LIGHT MODE POLISH — v4
+   Premium, readable light surfaces across dashboard + public UI.
+   This intentionally replaces the old broad gray panel guard.
+   ════════════════════════════════════════════════════════════════ */
+
+html.light {
+  --background: 225 35% 97%;
+  --foreground: 235 27% 11%;
+  --muted-foreground: 235 13% 43%;
+  --border: 225 25% 87%;
+}
+
+html.light body {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(124, 58, 237, 0.055), transparent 30rem),
+    radial-gradient(circle at 94% 12%, rgba(13, 148, 136, 0.055), transparent 28rem),
+    #f7f8fc !important;
+  color: #17182f !important;
+}
+
+html.light .dashboard-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 248, 252, 0.92)),
+    radial-gradient(circle at 26% 0%, rgba(124, 58, 237, 0.08), transparent 34rem),
+    radial-gradient(circle at 88% 8%, rgba(14, 165, 164, 0.065), transparent 30rem),
+    #f7f8fc !important;
+}
+
+html.light .dashboard-content,
+html.light .dashboard-content .min-h-screen {
+  background: transparent !important;
+}
+
+html.light .bg-background {
+  background-color: #f7f8fc !important;
+}
+
+html.light .bg-surface,
+html.light .bg-card,
+html.light .bg-popover {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #dde3ef !important;
+}
+
+html.light .dashboard-content [class*="bg-background/"],
+html.light .dashboard-content [class*="bg-background\\/"] {
+  background-color: rgba(248, 250, 255, 0.84) !important;
+  border-color: #e1e6f2 !important;
+}
+
+html.light .dashboard-content [class*="bg-surface/"],
+html.light .dashboard-content [class*="bg-surface\\/"] {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  border-color: #dde3ef !important;
+}
+
+html.light .dashboard-content .bg-gradient-card,
+html.light .dashboard-content [class*="bg-gradient-card"] {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 255, 0.96)) !important;
+  border-color: #dde3ef !important;
+  box-shadow: 0 18px 46px rgba(32, 38, 76, 0.075) !important;
+}
+
+html.light .dashboard-content .rounded-3xl,
+html.light .dashboard-content .rounded-\[1\.5rem\],
+html.light .dashboard-content .rounded-2xl,
+html.light .dashboard-content .rounded-xl {
+  box-shadow: none;
+}
+
+html.light .dashboard-content .shadow-card,
+html.light .dashboard-content .shadow-card-hover,
+html.light .dashboard-content .shadow-xl,
+html.light .dashboard-content .shadow-2xl {
+  box-shadow: 0 18px 46px rgba(32, 38, 76, 0.08) !important;
+}
+
+html.light .dashboard-content h1,
+html.light .dashboard-content h2,
+html.light .dashboard-content h3,
+html.light .dashboard-content h4,
+html.light .dashboard-content h5,
+html.light .dashboard-content h6,
+html.light .dashboard-content .text-foreground,
+html.light .dashboard-content strong {
+  color: #17182f !important;
+}
+
+html.light .dashboard-content p,
+html.light .dashboard-content label,
+html.light .dashboard-content .text-muted-foreground,
+html.light .dashboard-content [class*="text-muted-foreground/"] {
+  color: #62677d !important;
+}
+
+html.light .dashboard-content input,
+html.light .dashboard-content textarea,
+html.light .dashboard-content select {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #d8dfea !important;
+  color: #17182f !important;
+}
+
+html.light .dashboard-content .text-white:not(.bg-gradient-hero *):not(.bg-primary *) {
+  color: #17182f !important;
+}
+
+html.light .dashboard-content .bg-gradient-hero,
+html.light .dashboard-content .bg-gradient-hero *,
+html.light .dashboard-content .bg-primary,
+html.light .dashboard-content .bg-primary * {
+  color: #ffffff !important;
+}
+
+html.light .dashboard-content aside {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: #dde3ef !important;
+}
+
+html.light .dashboard-content [class*="bg-black/"] {
+  background-color: rgba(15, 23, 42, 0.34) !important;
+}
+
+html.light .beta-feature-page .bg-gradient-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f6f8ff 100%) !important;
+  border-color: #dfe5f1 !important;
+}
+
+html.light .beta-feature-page .bg-surface,
+html.light .beta-feature-page [class*="bg-surface/"] {
+  background: #ffffff !important;
+  border-color: #dce3ef !important;
+  box-shadow: 0 10px 28px rgba(31, 38, 76, 0.065) !important;
+}
+
+html.light .beta-feature-page [class*="bg-background/"] {
+  background: #f8faff !important;
+  border-color: #dce3ef !important;
+}
+
+html.light .web-design-studio-page {
+  background:
+    radial-gradient(circle at 10% -5%, rgba(124, 58, 237, 0.09), transparent 32rem),
+    radial-gradient(circle at 96% 4%, rgba(20, 184, 166, 0.08), transparent 30rem),
+    linear-gradient(180deg, #fbfcff 0%, #f4f6fb 100%) !important;
+}
+
+html.light .web-design-hero-card,
+html.light .web-design-shell,
+html.light .web-design-preview-shell,
+html.light .web-design-recipe-shell,
+html.light .web-design-option-card,
+html.light .web-design-variation-card,
+html.light .web-design-brief-card,
+html.light .web-design-checklist-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: #dbe2ef !important;
+  box-shadow: 0 22px 62px rgba(28, 34, 78, 0.085) !important;
+}
+
+html.light .web-design-prompt-panel {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.11), transparent 18rem),
+    radial-gradient(circle at 100% 0%, rgba(20, 184, 166, 0.10), transparent 18rem),
+    #ffffff !important;
+  border-color: rgba(124, 58, 237, 0.22) !important;
+}
+
+html.light .web-design-prompt-input {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(124, 58, 237, 0.22) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 8px 22px rgba(31, 38, 76, 0.045) !important;
+}
+
+html.light .web-design-option-button,
+html.light .web-design-step-button,
+html.light .web-design-recipe-card,
+html.light .web-design-mini-card {
+  background: #ffffff !important;
+  border-color: #dfe5f1 !important;
+}
+
+html.light .web-design-option-button.is-active,
+html.light .web-design-step-button.is-active {
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.11), rgba(20, 184, 166, 0.055)) !important;
+  border-color: rgba(124, 58, 237, 0.35) !important;
+  box-shadow: 0 14px 34px rgba(124, 58, 237, 0.10) !important;
+}
+
+html.light .web-design-step-button.is-complete,
+html.light .web-design-angle-card {
+  background: linear-gradient(145deg, rgba(4, 120, 87, 0.095), rgba(255, 255, 255, 0.94)) !important;
+  border-color: rgba(4, 120, 87, 0.20) !important;
+}
+
+html.light .web-design-window-bar {
+  background: rgba(248, 250, 255, 0.94) !important;
+}
+
+html.light .web-design-mini-preview {
+  background:
+    radial-gradient(circle at 20% 10%, rgba(124, 58, 237, 0.14), transparent 15rem),
+    radial-gradient(circle at 88% 12%, rgba(20, 184, 166, 0.13), transparent 14rem),
+    linear-gradient(180deg, #ffffff 0%, #f3f6ff 100%) !important;
+  border-color: #dce3ef !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 20px 48px rgba(31, 38, 76, 0.11) !important;
+}
+
+html.light .web-design-mini-preview .text-white,
+html.light .web-design-mini-preview h3,
+html.light .web-design-mini-preview strong {
+  color: #16172f !important;
+}
+
+html.light .web-design-mini-preview .text-white\/70,
+html.light .web-design-mini-preview .text-white\/68,
+html.light .web-design-mini-preview .text-white\/60,
+html.light .web-design-mini-preview .text-white\/45 {
+  color: #62677d !important;
+}
+
+html.light .web-design-mini-preview [class*="border-white/"] {
+  border-color: #dfe5f1 !important;
+}
+
+html.light .web-design-mini-preview [class*="bg-white/"] {
+  background-color: rgba(235, 239, 249, 0.82) !important;
+}
+
+html.light .site-preview-root [class*="bg-[#071014]"],
+html.light .site-preview-root [class*="bg-[#0b1220]"],
+html.light .site-preview-root [class*="bg-slate-950"],
+html.light .homepage-dark-surface [class*="bg-[#071014]"],
+html.light .homepage-dark-surface [class*="bg-[#0b1220]"],
+html.light .homepage-dark-surface [class*="bg-slate-950"] {
+  background-color: rgba(2, 6, 23, 0.86) !important;
+}
+
+html.light .site-preview-root [class*="bg-[#071014]"] *,
+html.light .site-preview-root [class*="bg-[#0b1220]"] *,
+html.light .site-preview-root [class*="bg-slate-950"] *,
+html.light .homepage-dark-surface [class*="bg-[#071014]"] *,
+html.light .homepage-dark-surface [class*="bg-[#0b1220]"] *,
+html.light .homepage-dark-surface [class*="bg-slate-950"] * {
+  color: #ffffff !important;
+}

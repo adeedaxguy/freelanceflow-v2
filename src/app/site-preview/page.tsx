@@ -224,10 +224,15 @@ function templateFromBusiness(text: string, fallback: DesignTemplate): PreviewBl
   if (/\b(salon|barber|spa|nail|beauty|massage|stylist|lashes|brows|makeup)\b/.test(value)) return "beauty-booking";
   if (/\b(plumb|electric|roof|handyman|hvac|landscap|painter|locksmith|contractor|builder|construction)\b/.test(value)) return "trade-emergency";
   if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet)\b/.test(value)) return "clinic-trust";
-  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|real estate|estate agent|advisor|financial)\b/.test(value)) return "professional-consult";
+  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|advisor|financial)\b/.test(value)) return "professional-consult";
   if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio)\b/.test(value)) return "fitness-membership";
   if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion)\b/.test(value)) return "retail-showcase";
   if (/\b(photo|photography|creative|design|agency|marketing|tattoo|artist|portfolio)\b/.test(value)) return "creative-portfolio";
+  if (/\b(real estate|estate agent|realtor|property|homes|apartment|lettings|rental|valuation)\b/.test(value)) return "real-estate-listings";
+  if (/\b(ecommerce|e-commerce|online store|shopify|product|collection|catalogue|catalog)\b/.test(value)) return "ecommerce-showroom";
+  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning)\b/.test(value)) return "education-course";
+  if (/\b(event|wedding|venue|party|entertainment|music|photobooth|conference|birthday)\b/.test(value)) return "event-booking";
+  if (/\b(hotel|travel|tour|tourism|stay|guesthouse|airbnb|holiday|vacation)\b/.test(value)) return "travel-booking";
 
   if (fallback === "boutique-booking") return "beauty-booking";
   if (fallback === "urgent-repair") return "trade-emergency";
@@ -235,6 +240,15 @@ function templateFromBusiness(text: string, fallback: DesignTemplate): PreviewBl
   if (fallback === "visual-proof") return "creative-portfolio";
   if (fallback === "consult-authority") return "professional-consult";
   if (fallback === "modern-productized") return "retail-showcase";
+  if (fallback === "restaurant-menu") return "menu-visit";
+  if (fallback === "clinic-care") return "clinic-trust";
+  if (fallback === "real-estate-listings") return "real-estate-listings";
+  if (fallback === "ecommerce-showroom") return "ecommerce-showroom";
+  if (fallback === "education-course") return "education-course";
+  if (fallback === "event-booking") return "event-booking";
+  if (fallback === "fitness-membership") return "fitness-membership";
+  if (fallback === "legal-trust") return "professional-consult";
+  if (fallback === "finance-advisory") return "professional-consult";
   if (fallback === "minimal-direct") return "minimal-direct";
   if (fallback === "founder-story") return "founder-story";
   if (fallback === "editorial-craft") return "editorial-craft";
@@ -370,6 +384,76 @@ function getPreviewBlueprint(data: PreviewData, prompt: string, template: Design
       pagesTitle: "Collections, services, offers, and location pages",
       ctaTitle: `Turn more local browsers into ${data.company} customers`,
       order: ["visual", "services", "local", "pages", "trust", "process", "questions", "details", "expanded-copy"],
+    },
+    "real-estate-listings": {
+      id,
+      sourceTemplate: "real-estate-listings",
+      label: "Listing and valuation layout",
+      heroVisual: "portfolio",
+      serviceTitle: "Listings, valuations, neighbourhood trust, and enquiry paths",
+      serviceCopy: `${data.company} should make available properties, valuation requests, local market knowledge, and consultation routes feel clear from the first screen.`,
+      visualEyebrow: "Property proof",
+      trustTitle: "Local property confidence before the enquiry",
+      processTitle: "From neighbourhood search to qualified viewing",
+      pagesTitle: "Listings, valuations, areas, and advice pages",
+      ctaTitle: `Help ${market} property searches turn into enquiries`,
+      order: ["visual", "local", "services", "trust", "process", "pages", "questions", "details", "expanded-copy"],
+    },
+    "ecommerce-showroom": {
+      id,
+      sourceTemplate: "ecommerce-showroom",
+      label: "Collection showroom layout",
+      heroVisual: "portfolio",
+      serviceTitle: "Collections, product proof, offers, and buying intent",
+      serviceCopy: `${data.company} should show what is available, why it is worth choosing, how to enquire or buy, and what makes the product range different.`,
+      visualEyebrow: "Product discovery",
+      trustTitle: "Reasons to buy before the basket",
+      processTitle: "From browse to buy or enquire",
+      pagesTitle: "Collections, best sellers, offers, and policies",
+      ctaTitle: `Make ${data.company} easier to browse and buy from`,
+      order: ["visual", "services", "trust", "pages", "process", "questions", "details", "expanded-copy", "local"],
+    },
+    "education-course": {
+      id,
+      sourceTemplate: "education-course",
+      label: "Course enrolment layout",
+      heroVisual: "packages",
+      serviceTitle: "Programmes, outcomes, dates, and enrolment actions",
+      serviceCopy: `${data.company} should make courses, outcomes, schedules, who each programme fits, and enrolment routes easy for students or parents to compare.`,
+      visualEyebrow: "Learning paths",
+      trustTitle: "Proof before someone enrols",
+      processTitle: "From course fit to enrolment",
+      pagesTitle: "Courses, outcomes, tutors, and enrolment pages",
+      ctaTitle: `Help learners choose ${data.company} with confidence`,
+      order: ["services", "process", "trust", "visual", "pages", "questions", "details", "local", "expanded-copy"],
+    },
+    "event-booking": {
+      id,
+      sourceTemplate: "event-booking",
+      label: "Event booking layout",
+      heroVisual: "booking",
+      serviceTitle: "Packages, dates, gallery proof, and booking prompts",
+      serviceCopy: `${data.company} should make event packages, availability cues, visual proof, guest experience, and enquiry routes feel exciting but easy to act on.`,
+      visualEyebrow: "Event proof",
+      trustTitle: "Confidence before the date is booked",
+      processTitle: "From occasion to confirmed enquiry",
+      pagesTitle: "Packages, gallery, venues, and booking pages",
+      ctaTitle: `Make ${data.company} easier to book for the next event`,
+      order: ["visual", "services", "process", "trust", "pages", "questions", "details", "expanded-copy", "local"],
+    },
+    "travel-booking": {
+      id,
+      sourceTemplate: "visual-proof",
+      label: "Travel and stay layout",
+      heroVisual: "portfolio",
+      serviceTitle: "Rooms, experiences, trust, and booking paths",
+      serviceCopy: `${data.company} should make the place or trip feel real through visuals, location cues, availability prompts, reviews, and clear booking actions.`,
+      visualEyebrow: "Stay and experience",
+      trustTitle: "Trust before someone books the trip",
+      processTitle: "From destination interest to booking enquiry",
+      pagesTitle: "Rooms, experiences, offers, and location pages",
+      ctaTitle: `Help travellers choose ${data.company}`,
+      order: ["visual", "local", "services", "trust", "process", "pages", "questions", "details", "expanded-copy"],
     },
     "creative-portfolio": {
       id,
@@ -538,6 +622,12 @@ const SEGMENT_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1000&q=80",
   ],
+  property: [
+    "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80",
+  ],
   fitness: [
     "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1000&q=80",
@@ -549,6 +639,24 @@ const SEGMENT_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1000&q=80",
+  ],
+  education: [
+    "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1000&q=80",
+  ],
+  events: [
+    "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=1000&q=80",
+  ],
+  travel: [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1000&q=80",
   ],
   creative: [
     "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1400&q=80",

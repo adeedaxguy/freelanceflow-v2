@@ -319,7 +319,46 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
     };
   }
 
-  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|real estate|estate agent|advisor|financial)\b/.test(text)) {
+  if (/\b(real estate|estate agent|realtor|property|homes|apartments|lettings|rentals|valuation)\b/.test(text)) {
+    return {
+      ...common,
+      segment: "property",
+      logoLabel: "PROPERTY",
+      accent: "#0ea5e9",
+      accent2: "#f59e0b",
+      accentSoft: "rgba(14,165,233,0.18)",
+      surface: "linear-gradient(135deg, rgba(15,23,42,0.96), rgba(30,64,175,0.7))",
+      headline: `${data.company} made easier to trust for local property decisions.`,
+      subheadline: `Listings, valuations, area knowledge, viewing paths, and consultation routes help ${market} buyers, sellers, and landlords take the next step.`,
+      visualTitle: "Listings, valuation requests, and local market proof",
+      visualSubtitle: "A stronger property page can connect search intent to listings, advice, and a qualified enquiry.",
+      pitchHook: "Sell listing pages, valuation CTAs, area guides, and property enquiry capture.",
+      services: [
+        { title: "Listing highlights", description: "Show featured homes, property types, viewing routes, and next steps clearly." },
+        { title: "Valuation requests", description: "Capture seller or landlord enquiries with a focused valuation CTA." },
+        { title: "Area guides", description: `Target neighbourhood and property searches around ${market}.` },
+        { title: "Trust proof", description: "Use reviews, local knowledge, sale or letting process, and advisor proof." },
+      ],
+      proof: [
+        { value: "Listings", label: "first proof" },
+        { value: "Valuation", label: "lead path" },
+        { value: market, label: "local market" },
+      ],
+      process: [
+        { step: "01", title: "Browse or value", description: "Visitors choose between properties, valuations, or local advice." },
+        { step: "02", title: "Check local proof", description: "Area knowledge and testimonials build confidence." },
+        { step: "03", title: "Book enquiry", description: "The CTA captures the right context for a useful follow-up." },
+      ],
+      pages: ["Listings", "Valuations", "Area guides", "Contact"],
+      trustBadges: ["Valuation ready", "Area-guide SEO", "Qualified enquiries"],
+      testimonial: {
+        quote: "The local advice and valuation path made the next step obvious.",
+        name: "Local homeowner",
+      },
+    };
+  }
+
+  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|advisor|financial)\b/.test(text)) {
     return {
       ...common,
       segment: "professional",
@@ -354,6 +393,45 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
       testimonial: {
         quote: "The page made the firm feel serious and easy to contact.",
         name: "Local client",
+      },
+    };
+  }
+
+  if (/\b(ecommerce|e-commerce|online store|shopify|product|collection|catalogue|catalog)\b/.test(text)) {
+    return {
+      ...common,
+      segment: "retail",
+      logoLabel: "SHOP",
+      accent: "#fb7185",
+      accent2: "#22d3ee",
+      accentSoft: "rgba(251,113,133,0.18)",
+      surface: "linear-gradient(135deg, rgba(76,5,25,0.94), rgba(8,47,73,0.72))",
+      headline: `${data.company} made easier to browse, trust, and buy from.`,
+      subheadline: `Collections, best sellers, product proof, offers, delivery cues, and enquiry paths help shoppers choose faster.`,
+      visualTitle: "Collections and product proof customers can compare",
+      visualSubtitle: "The page turns product interest into a buying, enquiry, or store-visit path.",
+      pitchHook: "Sell collection structure, product-led SEO, trust proof, and conversion-focused buying paths.",
+      services: [
+        { title: "Collection architecture", description: "Present categories, best sellers, seasonal offers, and popular requests." },
+        { title: "Product proof", description: "Use visual cards, reviews, guarantees, and delivery or pickup details." },
+        { title: "Buying path", description: "Make buy, enquire, visit, or WhatsApp actions clear from mobile." },
+        { title: "Search-ready pages", description: "Shape product and local-intent pages customers can actually find." },
+      ],
+      proof: [
+        { value: "Products", label: "first story" },
+        { value: "Trust", label: "buying proof" },
+        { value: "Fast", label: "shopping path" },
+      ],
+      process: [
+        { step: "01", title: "Browse collection", description: "Shoppers understand the range and best options quickly." },
+        { step: "02", title: "Check trust", description: "Reviews, policies, and product proof reduce hesitation." },
+        { step: "03", title: "Buy or enquire", description: "The page keeps the conversion route easy to use." },
+      ],
+      pages: ["Collections", "Best sellers", "Offers", "Contact"],
+      trustBadges: ["Product-led", "Conversion ready", "Search structured"],
+      testimonial: {
+        quote: "I could see the products, trust the store, and ask before buying.",
+        name: "Local shopper",
       },
     };
   }
@@ -393,6 +471,123 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
       testimonial: {
         quote: "I could see the right class and how to start before visiting.",
         name: "Local member",
+      },
+    };
+  }
+
+  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning)\b/.test(text)) {
+    return {
+      ...common,
+      segment: "education",
+      logoLabel: "LEARN",
+      accent: "#6366f1",
+      accent2: "#22c55e",
+      accentSoft: "rgba(99,102,241,0.18)",
+      surface: "linear-gradient(135deg, rgba(30,27,75,0.96), rgba(20,83,45,0.68))",
+      headline: `${data.company} made easier to understand, compare, and enrol in.`,
+      subheadline: `Programmes, outcomes, schedules, tutor proof, and enrolment CTAs help learners or parents choose with confidence.`,
+      visualTitle: "Courses, outcomes, and enrolment in one path",
+      visualSubtitle: "A clear education page helps visitors understand fit before they enquire.",
+      pitchHook: "Sell programme pages, outcome proof, schedule clarity, and enrolment conversion.",
+      services: [
+        { title: "Programme cards", description: "Show courses, levels, outcomes, dates, and who each option is for." },
+        { title: "Outcome proof", description: "Use testimonials, student results, tutor credentials, and learning goals." },
+        { title: "Enrolment CTA", description: "Keep enquiry, trial class, and application actions visible." },
+        { title: "Course SEO", description: `Target class, tutor, and training searches around ${market}.` },
+      ],
+      proof: [
+        { value: "Courses", label: "clear options" },
+        { value: "Outcomes", label: "proof path" },
+        { value: market, label: "learning market" },
+      ],
+      process: [
+        { step: "01", title: "Choose programme", description: "Visitors compare the right course or class quickly." },
+        { step: "02", title: "Check outcomes", description: "Proof and credentials answer the trust question." },
+        { step: "03", title: "Enrol or enquire", description: "The next step is visible without extra searching." },
+      ],
+      pages: ["Courses", "Outcomes", "Tutors", "Enrol"],
+      trustBadges: ["Enrolment ready", "Outcome proof", "Course SEO"],
+      testimonial: {
+        quote: "The course options and next step were clear from the first page.",
+        name: "Local learner",
+      },
+    };
+  }
+
+  if (/\b(event|events|wedding|venue|party|entertainment|music|photobooth|conference|birthday)\b/.test(text)) {
+    return {
+      ...common,
+      segment: "events",
+      logoLabel: "EVENT",
+      accent: "#c084fc",
+      accent2: "#f472b6",
+      accentSoft: "rgba(192,132,252,0.18)",
+      surface: "linear-gradient(135deg, rgba(49,46,129,0.96), rgba(131,24,67,0.72))",
+      headline: `${data.company} made easier to book for the next big moment.`,
+      subheadline: `Packages, gallery proof, dates, venue or service details, and booking prompts help event customers enquire faster.`,
+      visualTitle: "Packages, photos, and booking confidence",
+      visualSubtitle: "The page turns event interest into a clearer enquiry with fewer questions.",
+      pitchHook: "Sell package clarity, event gallery proof, date-led CTAs, and booking enquiry capture.",
+      services: [
+        { title: "Package cards", description: "Show event types, inclusions, guest fit, and starting options clearly." },
+        { title: "Gallery proof", description: "Use visuals, testimonials, and previous event cues to build confidence." },
+        { title: "Availability path", description: "Make date checks, calls, and enquiry forms easy to start." },
+        { title: "Event SEO", description: `Target event, venue, and booking searches around ${market}.` },
+      ],
+      proof: [
+        { value: "Packages", label: "easy compare" },
+        { value: "Gallery", label: "event proof" },
+        { value: market, label: "booking market" },
+      ],
+      process: [
+        { step: "01", title: "Pick event type", description: "Visitors find the package or occasion that matches their need." },
+        { step: "02", title: "Check proof", description: "Visual proof and reviews make the booking feel safer." },
+        { step: "03", title: "Request date", description: "The page collects event date, location, and contact details." },
+      ],
+      pages: ["Packages", "Gallery", "Availability", "Book"],
+      trustBadges: ["Booking ready", "Gallery proof", "Date-led CTA"],
+      testimonial: {
+        quote: "The packages made it easy to ask about our date.",
+        name: "Event customer",
+      },
+    };
+  }
+
+  if (/\b(hotel|travel|tour|tourism|stay|guesthouse|airbnb|holiday|vacation)\b/.test(text)) {
+    return {
+      ...common,
+      segment: "travel",
+      logoLabel: "STAY",
+      accent: "#38bdf8",
+      accent2: "#34d399",
+      accentSoft: "rgba(56,189,248,0.18)",
+      surface: "linear-gradient(135deg, rgba(8,47,73,0.96), rgba(20,83,45,0.7))",
+      headline: `${data.company} made easier to imagine, trust, and book.`,
+      subheadline: `Rooms, experiences, location cues, reviews, offers, and booking routes help travellers choose with less uncertainty.`,
+      visualTitle: "The stay, experience, and booking path in one place",
+      visualSubtitle: "A stronger travel page shows the feeling and the practical details together.",
+      pitchHook: "Sell visual storytelling, booking prompts, local experience pages, and trust-led travel SEO.",
+      services: [
+        { title: "Experience sections", description: "Show rooms, stays, tours, offers, or local highlights with clear context." },
+        { title: "Booking prompts", description: "Make availability, calls, and enquiry routes easy to find." },
+        { title: "Location proof", description: "Use maps, nearby attractions, reviews, and practical visit details." },
+        { title: "Travel SEO", description: `Target stay, tour, and destination searches around ${market}.` },
+      ],
+      proof: [
+        { value: "Visuals", label: "first impression" },
+        { value: "Book", label: "clear path" },
+        { value: market, label: "destination cue" },
+      ],
+      process: [
+        { step: "01", title: "See the stay", description: "Visitors understand the experience visually and practically." },
+        { step: "02", title: "Check details", description: "Location, reviews, and options reduce uncertainty." },
+        { step: "03", title: "Book or ask", description: "The CTA starts the right travel enquiry quickly." },
+      ],
+      pages: ["Rooms", "Experiences", "Location", "Book"],
+      trustBadges: ["Booking ready", "Location proof", "Travel SEO"],
+      testimonial: {
+        quote: "I could picture the stay and knew how to ask about dates.",
+        name: "Traveller",
       },
     };
   }

@@ -65,7 +65,7 @@ export default function BetaFeaturePage({
   const readyCount = adminChecks.filter(check => check.ready).length;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl space-y-6">
+    <div className="beta-feature-page p-4 sm:p-6 lg:p-8 max-w-6xl space-y-6">
       <section className="overflow-hidden rounded-3xl border border-border bg-gradient-card">
         <div className="relative p-6 sm:p-8 lg:p-10">
           <div className="absolute inset-0 bg-grid-pattern bg-grid-sm opacity-20" />
@@ -88,7 +88,7 @@ export default function BetaFeaturePage({
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-background/70 p-4 lg:w-72">
+            <div className="rounded-2xl border border-border bg-surface p-4 lg:w-72">
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                 {isAdmin ? (
                   <ShieldCheck className="h-4 w-4 text-accent" />
@@ -123,7 +123,7 @@ export default function BetaFeaturePage({
           {isAdmin ? (
             <div className="grid gap-3 sm:grid-cols-2">
               {adminSteps.map((step, index) => (
-                <div key={step} className="rounded-xl border border-border bg-background/60 p-4">
+                <div key={step} className="rounded-xl border border-border bg-surface p-4">
                   <span className="text-xs font-bold uppercase tracking-widest text-primary-light">
                     Step {index + 1}
                   </span>
@@ -134,7 +134,7 @@ export default function BetaFeaturePage({
           ) : (
             <div className="space-y-3">
               {userHighlights.map(highlight => (
-                <div key={highlight} className="flex items-start gap-3 rounded-xl border border-border bg-background/60 p-4">
+                <div key={highlight} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-4">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
                   <p className="text-sm leading-6 text-muted-foreground">{highlight}</p>
                 </div>
@@ -152,7 +152,7 @@ export default function BetaFeaturePage({
               </h2>
             </div>
             {isAdmin && adminChecks.length > 0 && (
-              <span className="rounded-full border border-border bg-background/60 px-2.5 py-1 text-xs font-semibold text-muted-foreground">
+              <span className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs font-semibold text-muted-foreground">
                 {readyCount}/{adminChecks.length} ready
               </span>
             )}
@@ -161,7 +161,7 @@ export default function BetaFeaturePage({
           {isAdmin && adminChecks.length > 0 ? (
             <div className="space-y-3">
               {adminChecks.map(check => (
-                <div key={check.label} className="rounded-xl border border-border bg-background/60 p-4">
+                <div key={check.label} className="rounded-xl border border-border bg-surface p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-semibold text-foreground">{check.label}</p>
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${

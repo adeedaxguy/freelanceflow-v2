@@ -37,6 +37,35 @@ function parsePage(value: string | string[] | undefined) {
   return Number.isFinite(page) && page > 0 ? page : 1;
 }
 
+function toPostTime(value: Date | string | null | undefined) {
+  if (!value) return 0;
+  const time = value instanceof Date ? value.getTime() : new Date(value).getTime();
+  return Number.isFinite(time) ? time : 0;
+}
+
+function sortPostsNewestFirst(posts: BlogPost[]) {
+  return [...posts].sort((a, b) => {
+    const publishedDiff = toPostTime(b.createdAt) - toPostTime(a.createdAt);
+    if (publishedDiff !== 0) return publishedDiff;
+
+    const updatedDiff = toPostTime(b.updatedAt) - toPostTime(a.updatedAt);
+    if (updatedDiff !== 0) return updatedDiff;
+
+    return a.title.localeCompare(b.title);
+  });
+}
+
+function dedupePostsByTitle(posts: BlogPost[]) {
+  const seenTitles = new Set<string>();
+
+  return posts.filter(post => {
+    const key = post.title.trim().toLowerCase();
+    if (seenTitles.has(key)) return false;
+    seenTitles.add(key);
+    return true;
+  });
+}
+
 function getPaginationItems(currentPage: number, totalPages: number) {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -86,15 +115,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const staticOnly = STATIC_POSTS
     .filter(post => post.published && !dbSlugs.has(post.slug) && !isHiddenBlogSlug(post.slug))
     .map(post => ({ ...post, coverImage: getBlogCoverImage(post.slug, post.coverImage) }));
-  const seenTitles = new Set<string>();
-  const publishedPosts = [...dbPosts, ...staticOnly]
-    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .filter(post => {
-      const key = post.title.trim().toLowerCase();
-      if (seenTitles.has(key)) return false;
-      seenTitles.add(key);
-      return true;
-    });
+  const publishedPosts = sortPostsNewestFirst(dedupePostsByTitle(sortPostsNewestFirst([...dbPosts, ...staticOnly])));
   const categories = [
     "All",
     ...Array.from(new Set(publishedPosts.map(post => post.category).filter(Boolean))),
@@ -189,7 +210,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               </details>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
               {paginatedPosts.map((post) => (
                 <BlogCard key={post.id ?? post.slug} post={post} />
               ))}

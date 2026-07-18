@@ -292,7 +292,7 @@ function OptionGrid({
   columns?: string;
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-background/45 p-4 sm:p-5">
+    <section className="web-design-option-card rounded-2xl border border-border bg-background/45 p-4 sm:p-5">
       <div className="mb-4 flex items-start gap-3">
         <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary-light">
           <Icon className="h-5 w-5" />
@@ -311,9 +311,9 @@ function OptionGrid({
               key={option.value}
               type="button"
               onClick={() => onChange(option.value)}
-              className={`min-h-[96px] rounded-2xl border p-3.5 text-left transition ${
+              className={`web-design-option-button min-h-[96px] rounded-2xl border p-3.5 text-left transition ${
                 active
-                  ? "border-primary/60 bg-primary/15 shadow-glow"
+                  ? "is-active border-primary/60 bg-primary/15 shadow-glow"
                   : "border-border bg-surface/70 hover:border-primary/35 hover:bg-primary/8"
               }`}
             >
@@ -343,7 +343,7 @@ function VariationPicker({
   const selected = resolveDesignVariation({ variationId: value });
 
   return (
-    <section className="rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
+    <section className="web-design-variation-card rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-3">
           <div className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-background/60 text-primary-light">
@@ -352,7 +352,7 @@ function VariationPicker({
           <div>
             <h2 className="text-lg font-black text-foreground">Design feel</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Choose one of 50 directions, or let the prompt pick it automatically.
+              Choose one of 125 category-aware directions, or let the prompt pick it automatically.
             </p>
           </div>
         </div>
@@ -379,12 +379,12 @@ function VariationPicker({
       </select>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
-        <div className="rounded-2xl border border-border bg-surface/70 p-4">
+        <div className="web-design-recipe-card rounded-2xl border border-border bg-surface/70 p-4">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-light">{selected.badge}</p>
           <h3 className="mt-2 text-lg font-black text-foreground">{selected.label}</h3>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">{selected.summary}</p>
         </div>
-        <div className="rounded-2xl border border-border bg-surface/70 p-4">
+        <div className="web-design-recipe-card rounded-2xl border border-border bg-surface/70 p-4">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-muted-foreground">Palette</p>
           <div className="mt-3 flex gap-2">
             {[selected.palette.accent, selected.palette.accent2, selected.palette.previewBackground, selected.palette.previewSurface].map(color => (
@@ -538,7 +538,7 @@ function WebDesignBuilderContent() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="web-design-studio-page min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex flex-col gap-3 md:flex-row md:items-center">
@@ -588,7 +588,7 @@ function WebDesignBuilderContent() {
           </div>
         </div>
 
-        <section className="rounded-2xl border border-border bg-surface/85 p-4 shadow-card">
+        <section className="web-design-hero-card rounded-2xl border border-border bg-surface/85 p-4 shadow-card">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div
@@ -624,11 +624,11 @@ function WebDesignBuilderContent() {
                     key={step.key}
                     type="button"
                     onClick={() => setActiveStep(index)}
-                    className={`flex min-h-[78px] items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                    className={`web-design-step-button flex min-h-[78px] items-center gap-3 rounded-2xl border p-3 text-left transition ${
                       active
-                        ? "border-primary/60 bg-primary/15 text-foreground shadow-glow"
+                        ? "is-active border-primary/60 bg-primary/15 text-foreground shadow-glow"
                         : complete
-                          ? "border-accent/25 bg-accent/10 text-foreground"
+                          ? "is-complete border-accent/25 bg-accent/10 text-foreground"
                           : "border-border bg-background/55 text-muted-foreground hover:border-primary/30 hover:text-foreground"
                     }`}
                   >
@@ -647,7 +647,7 @@ function WebDesignBuilderContent() {
         </section>
 
         <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
-          <div className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-card sm:p-5">
+          <div className="web-design-shell rounded-[1.5rem] border border-border bg-surface p-4 shadow-card sm:p-5">
             <div className="mb-5 flex items-start gap-3">
               <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary-light">
                 <ActiveIcon className="h-5 w-5" />
@@ -663,7 +663,7 @@ function WebDesignBuilderContent() {
 
             {activeStepData.key === "brief" && (
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_0.85fr]">
-                <div className="rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
+                <div className="web-design-prompt-panel rounded-2xl border border-primary/25 bg-primary/10 p-4 sm:p-5">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div>
                       <div className="flex items-center gap-2">
@@ -690,12 +690,12 @@ function WebDesignBuilderContent() {
                     onChange={event => setDesignPrompt(promptInputValue(event.target.value))}
                     rows={7}
                     placeholder="Example: Create a premium but friendly auto repair website with before-and-after proof, strong local trust, quote requests as the main CTA, detailed service sections, and a clean dark visual style."
-                    className="mt-4 min-h-[230px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                    className="web-design-prompt-input mt-4 min-h-[230px] w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
                 <div className="space-y-4">
-                  <div className="rounded-2xl border border-border bg-background/55 p-4">
+                  <div className="web-design-brief-card rounded-2xl border border-border bg-background/55 p-4">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Client brief</p>
                     <h3 className="mt-2 text-2xl font-black text-foreground">{data.company}</h3>
                     <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{identity.subheadline}</p>
@@ -706,7 +706,7 @@ function WebDesignBuilderContent() {
                         ["Phone", data.phone || "Not provided"],
                         ["Website status", data.status || "Unknown"],
                       ].map(([label, value]) => (
-                        <div key={label} className="rounded-xl border border-border bg-surface/65 px-3 py-2.5">
+                        <div key={label} className="web-design-mini-card rounded-xl border border-border bg-surface/65 px-3 py-2.5">
                           <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
                           <p className="mt-1 break-words font-bold text-foreground">{value}</p>
                         </div>
@@ -714,7 +714,7 @@ function WebDesignBuilderContent() {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-accent/25 bg-accent/10 p-4">
+                  <div className="web-design-angle-card rounded-2xl border border-accent/25 bg-accent/10 p-4">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-accent" />
                       <p className="text-sm font-black text-foreground">Sales angle</p>
@@ -722,7 +722,7 @@ function WebDesignBuilderContent() {
                     <p className="mt-3 text-sm leading-6 text-muted-foreground">{identity.pitchHook}</p>
                     <div className="mt-4 space-y-2">
                       {identity.services.slice(0, 2).map(service => (
-                        <div key={service.title} className="flex items-start gap-3 rounded-xl border border-accent/20 bg-background/40 p-3">
+                          <div key={service.title} className="web-design-mini-card flex items-start gap-3 rounded-xl border border-accent/20 bg-background/40 p-3">
                           <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent" />
                           <div>
                             <p className="text-sm font-black text-foreground">{service.title}</p>
@@ -857,11 +857,11 @@ function WebDesignBuilderContent() {
                   );
                 })}
 
-                <div className="rounded-3xl border border-border bg-background/55 p-5 lg:col-span-3">
+                <div className="web-design-checklist-card rounded-3xl border border-border bg-background/55 p-5 lg:col-span-3">
                   <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Share checklist</p>
                   <div className="mt-4 grid gap-3 md:grid-cols-3">
                     {["Open the page on mobile", "Confirm phone and maps link", "Send preview with one clear ask"].map(item => (
-                      <div key={item} className="flex items-center gap-3 rounded-2xl border border-border bg-surface/65 p-4">
+                      <div key={item} className="web-design-mini-card flex items-center gap-3 rounded-2xl border border-border bg-surface/65 p-4">
                         <CheckCircle className="h-5 w-5 flex-shrink-0 text-accent" />
                         <span className="font-bold text-foreground">{item}</span>
                       </div>
@@ -893,8 +893,8 @@ function WebDesignBuilderContent() {
           </div>
 
           <aside className="space-y-4 xl:sticky xl:top-5 xl:self-start">
-            <div className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-card">
-              <div className="border-b border-border bg-background/65 px-4 py-3">
+            <div className="web-design-preview-shell overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-card">
+              <div className="web-design-window-bar border-b border-border bg-background/65 px-4 py-3">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-full bg-red-400" />
                   <span className="h-3 w-3 rounded-full bg-yellow-400" />
@@ -903,7 +903,7 @@ function WebDesignBuilderContent() {
                 </div>
               </div>
               <div className="p-4">
-                <div className="relative min-h-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#071014] p-4">
+                <div className="web-design-mini-preview relative min-h-[350px] overflow-hidden rounded-2xl border border-white/10 bg-[#071014] p-4">
                   <div
                     className="absolute inset-0 opacity-80"
                     style={{
@@ -979,7 +979,7 @@ function WebDesignBuilderContent() {
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-card">
+            <div className="web-design-recipe-shell rounded-[1.5rem] border border-border bg-surface p-4 shadow-card">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Current recipe</p>
               <div className="mt-3 space-y-3">
                 {designPrompt && (
