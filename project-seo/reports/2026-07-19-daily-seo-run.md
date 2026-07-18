@@ -106,7 +106,19 @@ Shipped count: `2`
 - `npm run type-check` passed.
 - `npm run build` passed.
 - Existing build warning persisted: static generation logs report missing `DATABASE_URL` for Prisma blog lookup, but the production build completed successfully.
-- Verify the live resource page title, meta description, related-search copy, FAQ schema, and canonical after deploy.
+- Vercel production deployment passed and aliased to `https://icloseleads.com`.
+- Deployment id: `dpl_7Vgfn7dG8vDzQLBheHjGX1ho6Axv`.
+- Production URL: `https://freelanceflow-v2-4dsb2ss1z-adnanaimanager-3376s-projects.vercel.app`.
+- Custom-domain live QA passed for:
+  - `https://icloseleads.com/resources/web-design-leads`
+  - `https://icloseleads.com/resources/freelance-cold-outreach`
+- Confirmed live items:
+  - Updated web-design-leads title and meta description.
+  - Canonical points to `https://icloseleads.com/resources/web-design-leads`.
+  - FAQPage schema includes the new lead-list and bad-lead questions.
+  - Related-search chips include `web design leads list`, `web design leads for sale`, `web design leads reddit`, `website leads`, and `web design lead generation`.
+  - Cold-outreach related-search chips include `freelance cold outreach examples`, `freelance cold outreach subject lines`, and `cold outreach for web designers`.
+- Note: direct fetch of the raw Vercel deployment URL redirects to Vercel login because deployment protection is enabled, but the production custom domain is live and verified.
 
 ## Next Actions
 
