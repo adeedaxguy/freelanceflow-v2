@@ -617,8 +617,6 @@ html.light [class*="divide-border"] > * { border-color: #E0E1EE !important; }
 /* ── Background surface variants ────────────────────────────── */
 html.light .bg-background\/95 { background-color: rgba(243,244,250,0.95) !important; }
 html.light .bg-surface\/95    { background-color: rgba(255,255,255,0.95) !important; }
-html.light [class*="bg-surface\/"] { background-color: rgba(255,255,255,0.9) !important; }
-
 /* ── Muted text colour ───────────────────────────────────────── */
 html.light [class*="text-muted"] { color: #6B6C8A !important; }
 html.light .text-muted-foreground\/60 { color: rgba(107,108,138,0.6) !important; }
@@ -654,12 +652,6 @@ html.light nav.fixed.bottom-0 {
   border-color: #E0E1EE !important;
 }
 
-/* ── Dropdowns / popovers ────────────────────────────────────── */
-html.light [class*="bg-surface"][class*="shadow"] {
-  background-color: #FFFFFF !important;
-  border-color: #E0E1EE !important;
-}
-
 /* ── Auth page ───────────────────────────────────────────────── */
 html.light .auth-panel,
 html.light form .bg-surface { background-color: #FFFFFF !important; }
@@ -667,8 +659,6 @@ html.light form .bg-surface { background-color: #FFFFFF !important; }
 /* ── Dashboard stat cards ────────────────────────────────────── */
 html.light .stat-card { background: #FFFFFF !important; }
 
-/* ── Kanban columns ──────────────────────────────────────────── */
-html.light [class*="bg-surface"] { background-color: #F8F9FF !important; }
 html.light [class*="bg-muted\/20"] { background-color: rgba(236,237,246,0.4) !important; }
 html.light [class*="bg-muted\/30"] { background-color: rgba(236,237,246,0.6) !important; }
 html.light [class*="bg-muted\/50"] { background-color: rgba(236,237,246,0.8) !important; }
@@ -717,7 +707,6 @@ html.light [role="dialog"] {
   background-color: #FFFFFF !important;
   border-color: #E0E1EE !important;
 }
-html.light [role="dialog"] * { color: #14142B; }
 
 /* ── Sidebar user panel — light mode fix ─────────────────────── */
 html.light aside .bg-surface { background-color: #FFFFFF !important; }
@@ -766,3 +755,294 @@ html.light .homepage-early-access-banner .text-white\/80,
 html.light .homepage-early-access-banner .text-white\/50 {
   color: rgba(255, 255, 255, 0.86) !important;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   LIGHT MODE STABILISER — v3
+   Final cascade layer for consistent public + dashboard light UI.
+   Keep this block last so it wins over older one-off overrides.
+   ════════════════════════════════════════════════════════════════ */
+
+html.light {
+  --background: 225 33% 97%;
+  --foreground: 235 25% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 235 25% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 235 25% 12%;
+  --secondary: 226 26% 93%;
+  --secondary-foreground: 235 25% 12%;
+  --muted: 226 26% 93%;
+  --muted-foreground: 235 13% 42%;
+  --border: 228 24% 87%;
+  --input: 228 24% 87%;
+  color-scheme: light;
+}
+
+html.light body,
+html.light .min-h-screen {
+  background-color: #f6f7fb !important;
+  color: #18192f !important;
+}
+
+html.light .bg-background {
+  background-color: #f6f7fb !important;
+}
+
+html.light .bg-surface,
+html.light .bg-card,
+html.light .bg-popover {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+}
+
+html.light .bg-muted,
+html.light .bg-secondary {
+  background-color: rgba(235, 238, 247, 0.88) !important;
+}
+
+html.light .border-border,
+html.light [class*="border-border"],
+html.light [class*="divide-border"] > * {
+  border-color: #dfe3ee !important;
+}
+
+html.light .text-foreground,
+html.light .text-card-foreground,
+html.light .text-popover-foreground,
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6,
+html.light strong {
+  color: #18192f !important;
+}
+
+html.light p,
+html.light label,
+html.light .text-muted-foreground,
+html.light [class*="text-muted-foreground/"] {
+  color: #62657c !important;
+}
+
+html.light .text-primary,
+html.light .text-primary-light {
+  color: #6d28d9 !important;
+}
+
+html.light .text-accent {
+  color: #047857 !important;
+}
+
+html.light .text-destructive {
+  color: #dc2626 !important;
+}
+
+html.light .text-white {
+  color: #ffffff !important;
+}
+
+html.light .text-white\/90 { color: rgba(255, 255, 255, 0.9) !important; }
+html.light .text-white\/80 { color: rgba(255, 255, 255, 0.8) !important; }
+html.light .text-white\/75 { color: rgba(255, 255, 255, 0.75) !important; }
+html.light .text-white\/70 { color: rgba(255, 255, 255, 0.7) !important; }
+html.light .text-white\/68 { color: rgba(255, 255, 255, 0.68) !important; }
+html.light .text-white\/64 { color: rgba(255, 255, 255, 0.64) !important; }
+html.light .text-white\/60 { color: rgba(255, 255, 255, 0.6) !important; }
+html.light .text-white\/50 { color: rgba(255, 255, 255, 0.5) !important; }
+html.light .text-white\/45 { color: rgba(255, 255, 255, 0.45) !important; }
+html.light .text-white\/42 { color: rgba(255, 255, 255, 0.42) !important; }
+html.light .text-white\/40 { color: rgba(255, 255, 255, 0.4) !important; }
+html.light .text-white\/30 { color: rgba(255, 255, 255, 0.3) !important; }
+
+html.light .bg-gradient-card,
+html.light [class*="bg-gradient-card"] {
+  background: linear-gradient(145deg, #ffffff 0%, #f2f4fb 100%) !important;
+}
+
+html.light .bg-gradient-card-hover,
+html.light [class*="bg-gradient-card-hover"] {
+  background: linear-gradient(145deg, #ffffff 0%, #eaedf7 100%) !important;
+}
+
+html.light .mesh-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 70%, rgba(0, 184, 122, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 10%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+    #f6f7fb !important;
+}
+
+html.light input,
+html.light textarea,
+html.light select {
+  background-color: #ffffff !important;
+  border-color: #d8ddea !important;
+  color: #18192f !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #8b90a8 !important;
+}
+
+html.light header,
+html.light [role="banner"],
+html.light nav.fixed,
+html.light aside,
+html.light footer {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #dfe3ee !important;
+}
+
+html.light .shadow-card-hover,
+html.light .shadow-xl,
+html.light .shadow-2xl {
+  box-shadow: 0 22px 60px rgba(50, 56, 96, 0.12) !important;
+}
+
+html.light .hover\:bg-white\/5:hover,
+html.light .hover\:bg-white\/10:hover,
+html.light [class*="hover:bg-white/"]:hover {
+  background-color: rgba(24, 25, 47, 0.05) !important;
+}
+
+html.light .bg-white\/5,
+html.light .bg-white\/10,
+html.light .bg-white\/20,
+html.light .bg-white\/30,
+html.light .bg-white\/40,
+html.light .bg-white\/50,
+html.light .bg-white\/60,
+html.light .bg-white\/70,
+html.light .bg-white\/80,
+html.light .bg-white\/90,
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/\[0\.035\],
+html.light .bg-white\/\[0\.04\],
+html.light .bg-white\/\[0\.045\],
+html.light .bg-white\/\[0\.05\],
+html.light .bg-white\/\[0\.055\],
+html.light .bg-white\/\[0\.06\],
+html.light .bg-white\/\[0\.07\],
+html.light .bg-white\/\[0\.08\] {
+  background-color: rgba(24, 25, 47, 0.04) !important;
+}
+
+html.light .bg-primary,
+html.light .hover\:bg-primary:hover,
+html.light .bg-gradient-hero,
+html.light [class*="bg-gradient-hero"] {
+  color: #ffffff !important;
+}
+
+html.light .bg-primary *,
+html.light .bg-gradient-hero *,
+html.light [class*="bg-gradient-hero"] * {
+  color: #ffffff !important;
+}
+
+html.light [role="dialog"] {
+  background-color: #ffffff !important;
+  border-color: #dfe3ee !important;
+  color: #18192f !important;
+}
+
+html.light [role="dialog"] .text-foreground,
+html.light [role="dialog"] strong {
+  color: #18192f !important;
+}
+
+html.light [role="dialog"] .text-muted-foreground,
+html.light [role="dialog"] [class*="text-muted-foreground/"] {
+  color: #62657c !important;
+}
+
+html.light [role="dialog"] .text-primary-light,
+html.light [role="dialog"] .text-primary {
+  color: #6d28d9 !important;
+}
+
+html.light [role="dialog"] .text-accent {
+  color: #047857 !important;
+}
+
+html.light [role="dialog"] .text-white,
+html.light [role="dialog"] .bg-primary *,
+html.light [role="dialog"] .bg-gradient-hero * {
+  color: #ffffff !important;
+}
+
+/* Preserve deliberately dark product/preview surfaces while the app shell is light. */
+html.light .homepage-dark-surface,
+html.light .homepage-early-access-banner {
+  background-color: #090915 !important;
+  border-color: rgba(124, 58, 237, 0.22) !important;
+  color: #f8f7ff !important;
+}
+
+html.light .homepage-dark-surface .bg-background,
+html.light .homepage-dark-surface .bg-surface {
+  background-color: rgba(17, 17, 38, 0.92) !important;
+}
+
+html.light .homepage-dark-surface h1,
+html.light .homepage-dark-surface h2,
+html.light .homepage-dark-surface h3,
+html.light .homepage-dark-surface h4,
+html.light .homepage-dark-surface h5,
+html.light .homepage-dark-surface h6,
+html.light .homepage-dark-surface .text-foreground,
+html.light .homepage-dark-surface strong,
+html.light .homepage-early-access-banner strong {
+  color: #f8f7ff !important;
+}
+
+html.light .homepage-dark-surface p,
+html.light .homepage-dark-surface .text-muted-foreground,
+html.light .homepage-dark-surface [class*="text-muted-foreground/"],
+html.light .homepage-early-access-banner {
+  color: #b8b5d6 !important;
+}
+
+html.light .homepage-dark-surface .text-white {
+  color: #ffffff !important;
+}
+
+html.light .homepage-dark-surface .gradient-text,
+html.light .homepage-dark-surface .text-transparent {
+  color: transparent !important;
+}
+
+html.light .site-preview-root {
+  background-color: #f8fafc !important;
+}
+
+html.light .site-preview-root[class*="bg-[#070b12]"],
+html.light .site-preview-root[class*="bg-[#070b12]"] * {
+  color: #ffffff !important;
+}
+
+html.light .site-preview-root[class*="bg-[#070b12]"] {
+  background-color: #070b12 !important;
+}
+
+html.light .site-preview-root [class*="bg-[#071014]"],
+html.light .site-preview-root [class*="bg-slate-950"] {
+  background-color: rgba(2, 6, 23, 0.82) !important;
+}
+
+html.light .site-preview-root [class*="bg-[#071014]"] *,
+html.light .site-preview-root [class*="bg-slate-950"] * {
+  color: #ffffff !important;
+}
+
+html.light ::selection {
+  background-color: rgba(124, 58, 237, 0.18);
+  color: #2e1065;
+}
+
+html.light ::-webkit-scrollbar-track { background: #f6f7fb; }
+html.light ::-webkit-scrollbar-thumb { background: #c8cedd; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
