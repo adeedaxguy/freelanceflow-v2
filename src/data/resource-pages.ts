@@ -21,26 +21,31 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
     slug: "web-design-leads",
     title: "Web design leads that are worth pitching",
-    metaTitle: "Web Design Leads: Find Better-Fit Clients and Pitch With Real Context",
+    metaTitle: "Web Design Leads: Find, Verify, and Pitch Better Local Website Prospects",
     metaDescription:
-      "Find web design leads from businesses without websites, outdated sites, local search gaps, and owner-path signals, then turn each lead into a focused first pitch.",
+      "Find web design leads without buying blind lists. Use website gaps, local demand, owner paths, and proof links to qualify better prospects before outreach.",
     keyword: "web design leads",
     relatedSearches: [
       "web design leads for free",
+      "web design leads list",
+      "web design leads for sale",
+      "web design leads reddit",
       "website leads",
+      "web design lead generation",
       "best web design leads",
       "verified web design leads",
     ],
     audience: "Web designers, WordPress developers, Webflow freelancers, and small agencies",
     intent: "The searcher wants a repeatable way to find businesses that may pay for website work.",
     summary:
-      "The best web design leads are not random companies. They show a visible reason to talk: no website, a dated site, weak local search presence, missing booking flow, public phone route, or a business profile that depends on trust and bookings.",
+      "The best web design leads are not recycled contact records. They show a visible reason to talk: no website, a dated site, weak local search presence, missing booking flow, public phone route, owner path, or a business profile that depends on trust and bookings.",
     leadIn:
-      "Start with businesses where the website problem is obvious enough that your first message can be specific. iCloseLeads helps you search by niche and location, verify the business profile, save the lead, and draft a proposal while the context is still clear enough to turn into a real signup and first workflow run.",
+      "Start with businesses where the website problem is obvious enough that your first message can be specific. SERPs are full of web design lead lists and lead sellers, but the useful edge is verification. iCloseLeads helps you search by niche and location, verify the business profile, save the lead, and draft a proposal while the context is still clear enough to turn into a real signup and first workflow run.",
     steps: [
       "Pick one local category such as auto repair, cleaners, dentists, roofers, restaurants, salons, or trades.",
       "Search one city or postcode area at a time so the pitch can mention a real market.",
       "Prioritize no-website, outdated-site, phone-visible, and small-operator signals.",
+      "Compare any list-style source against your own proof: site gap, local demand, phone path, and owner route.",
       "Open the map/profile proof before saving the lead.",
       "Use the pitch to sell calls, bookings, quotes, and trust, not just a prettier website.",
     ],
@@ -60,10 +65,15 @@ export const RESOURCE_PAGES: ResourcePage[] = [
         whyItMatters: "The lead is stronger when you know how to reach the person who can approve the work.",
         nextMove: "Move the lead into decision-maker research before opening Gmail.",
       },
+      {
+        signal: "Generic lead-list or resale language",
+        whyItMatters: "A list that cannot show fit, recency, exclusivity, or proof can waste more time than it saves.",
+        nextMove: "Treat it as unqualified until you can verify the business need and contact route yourself.",
+      },
     ],
     proofPoints: [
       "GSC is still surfacing web design leads and leads for web design as one of the clearest acquisition clusters for iCloseLeads.",
-      "Live US SERPs reward practical businesses-without-websites positioning, prospecting tools, and comparison-style pages instead of generic agency branding.",
+      "Live US SERPs reward practical businesses-without-websites positioning, prospecting tools, Reddit comparisons, and list-vendor alternatives instead of generic agency branding.",
       "iCloseLeads already connects local discovery, owner-path checks, proposal drafting, and CRM follow-up for this workflow.",
     ],
     pitch:
@@ -82,6 +92,14 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         q: "Should I buy web design leads?",
         a: "Only if you can verify the business, the need, and the contact route. A smaller verified list usually beats a large generic list.",
+      },
+      {
+        q: "What is the difference between a lead list and a qualified web design lead?",
+        a: "A lead list gives you names. A qualified web design lead gives you a visible business problem, a reason to pitch, a reachable contact path, and context you can use in the first message.",
+      },
+      {
+        q: "How do I avoid bad web design leads?",
+        a: "Reject leads that only offer volume, secret databases, or vague exclusivity. Keep leads where the website gap, local demand, and outreach route are easy to verify.",
       },
     ],
   },
@@ -205,15 +223,18 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     relatedSearches: [
       "cold outreach for freelancers",
       "freelance cold email",
+      "freelance cold outreach examples",
+      "freelance cold outreach subject lines",
+      "cold outreach for web designers",
       "freelance outreach tool",
       "freelance cold outreach templates",
     ],
     audience: "Freelancers and solo agencies selling services directly",
     intent: "The searcher wants clients without relying only on job boards, marketplaces, or referrals.",
     summary:
-      "Cold outreach works best when the first line proves why you are reaching out. The signal can be a job post, website gap, local listing issue, hiring cue, or recent business change that gives your email a reason to exist.",
+      "Cold outreach works best when the first line proves why you are reaching out. The signal can be a job post, website gap, local listing issue, hiring cue, Reddit discussion, or recent business change that gives your email a reason to exist.",
     leadIn:
-      "Do not start with a spreadsheet of names. Start with a reason. iCloseLeads helps you find the signal, save the prospect, and prepare a concise Gmail-ready draft that can be reviewed before sending.",
+      "Do not start with a spreadsheet of names. Start with a reason, then keep the batch small enough to review. iCloseLeads helps you find the signal, save the prospect, and prepare a concise Gmail-ready draft that can be checked before sending.",
     steps: [
       "Choose one offer and one buyer type for the week.",
       "Find leads where the problem is visible in public context.",
@@ -239,7 +260,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       },
     ],
     proofPoints: [
-      "GSC continues to show freelance cold outreach as an early but recurring query cluster for the site.",
+      "GSC continues to show freelance cold outreach as an early recurring query cluster for the site.",
       "Live US SERPs reward practical templates, examples, and workflow pages over vague cold-email advice.",
       "GA4 shows engagement and form-start activity on outreach-related pages even though key-event tracking is still incomplete.",
       "iCloseLeads connects discovery, proposal writing, Gmail preparation, and CRM follow-up in one product path.",
