@@ -1277,6 +1277,11 @@ html.light .web-design-mini-preview [class*="bg-white/"] {
   background-color: rgba(235, 239, 249, 0.82) !important;
 }
 
+html.light .site-footer-panel {
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 24px 70px rgba(31, 38, 76, 0.08) !important;
+}
+
 html.light .site-preview-root [class*="bg-[#071014]"],
 html.light .site-preview-root [class*="bg-[#0b1220]"],
 html.light .site-preview-root [class*="bg-slate-950"],
