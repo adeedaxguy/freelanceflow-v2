@@ -1120,16 +1120,44 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "metaTitle": "Email Lookup for Freelance Outreach | Find Better Contact Paths",
     "metaDescription": "Use email lookup for freelance outreach without guessing: qualify the lead, check the domain, choose a contact path, and prepare a focused first message.",
     "keyword": "email lookup",
+    "relatedSearches": [
+      "email lookup tool",
+      "email address lookup",
+      "find email address",
+      "professional email lookup",
+      "email checker",
+      "email format",
+      "email finder",
+      "reverse email lookup"
+    ],
     "audience": "Freelancers and small agencies who already know which company they want to pitch",
     "intent": "The searcher wants to find a professional contact path before sending outreach.",
-    "summary": "Email lookup is useful only after the lead is worth contacting. Start with the business signal, confirm the company domain, choose the most relevant role, and write the outreach around why that person should care.",
-    "leadIn": "Do not treat email lookup as a list-building shortcut. Use iCloseLeads to save the lead context first, then use the contact route to support a specific pitch instead of sending a generic message to every address you can find.",
+    "summary": "Email lookup is useful only after the lead is worth contacting. Start with the business signal, confirm the company domain, check the email format, choose the most relevant role, and write the outreach around why that person should care.",
+    "leadIn": "Do not treat email lookup as a list-building shortcut. Use iCloseLeads to save the lead context first, then use the contact route, email checker step, or public domain pattern to support a specific pitch instead of sending a generic message to every address you can find.",
     "steps": [
       "Confirm the company is a good fit for your offer before looking for an email.",
       "Check the website, job post, local profile, or public signal that created the outreach reason.",
       "Look for the role most likely to own the problem you solve.",
+      "Check the likely email format against public company pages before trusting a guessed address.",
       "Save the contact path with notes about why the pitch is relevant.",
       "Prepare a short email that references the signal and one next step."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Company fit before contact hunting",
+        "whyItMatters": "Email lookup traffic often starts with a tool search, but iCloseLeads only benefits when the company is already a real prospect.",
+        "nextMove": "Save the lead reason first, then look up the email route."
+      },
+      {
+        "signal": "Public domain and email format evidence",
+        "whyItMatters": "A guessed email format can create bounces and trust risk when there is no public support for it.",
+        "nextMove": "Use public website, profile, or inbox clues before adding the address to outreach."
+      },
+      {
+        "signal": "Role ownership",
+        "whyItMatters": "A valid address is still low-quality if the person cannot own the problem you solve.",
+        "nextMove": "Tie the contact route to owner, founder, marketing, operations, or hiring context."
+      }
     ],
     "proofPoints": [
       "Round 1 Ahrefs Content Gap research surfaced email lookup as a high-fit competitor gap for iCloseLeads.",
@@ -1163,6 +1191,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "Should freelancers look up emails before qualifying leads?",
         "a": "No. Qualify the company and pitch angle first. Email lookup is a contact step, not a substitute for lead research."
+      },
+      {
+        "q": "How should I use an email checker in outreach?",
+        "a": "Use an email checker after you have a qualified lead, a public company domain, and a clear reason to contact that role."
       }
     ]
   },
@@ -1172,16 +1204,44 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "metaTitle": "Email Finder for Freelancers | Turn Qualified Leads Into Outreach",
     "metaDescription": "A freelancer-friendly email finder workflow for turning qualified leads into specific outreach without losing context or spamming generic lists.",
     "keyword": "email finder",
+    "relatedSearches": [
+      "email finder tool",
+      "find email address",
+      "email checker",
+      "professional email",
+      "email format",
+      "email lookup",
+      "email verifier",
+      "email validator"
+    ],
     "audience": "Freelancers who need a contact route after finding a relevant company",
     "intent": "The searcher wants a tool or process for finding a business email address.",
-    "summary": "An email finder should help you reach the right person, not replace your judgment. The best workflow starts with a qualified lead, then finds the cleanest route to a person who owns the problem.",
-    "leadIn": "iCloseLeads keeps the lead, source, notes, and pitch in one workflow so the email finder step does not become disconnected data collection.",
+    "summary": "An email finder should help you reach the right person, not replace your judgment. The best workflow starts with a qualified lead, checks the safest contact route, then finds the cleanest path to a person who owns the problem.",
+    "leadIn": "iCloseLeads keeps the lead, source, notes, and pitch in one workflow so the email finder step does not become disconnected data collection. Search intent around email finder, email checker, and email format belongs in a responsible outreach workflow, not a scraped-list habit.",
     "steps": [
       "Start from a saved lead or company profile.",
       "Identify the decision area: marketing, operations, owner, founder, hiring manager, or partnerships.",
       "Check whether a public contact route already exists.",
       "Use the email finder step only for qualified leads.",
+      "Confirm the address, domain, or email format before sending.",
       "Draft the first message from the original signal, not from the email address."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Qualified lead record",
+        "whyItMatters": "The finder step should support outreach to a known opportunity, not create a cold list with no reason to pitch.",
+        "nextMove": "Create or update the lead record before searching for the address."
+      },
+      {
+        "signal": "Cleaner route exists",
+        "whyItMatters": "A public contact form, shared inbox, or profile route can be safer than guessing a personal address.",
+        "nextMove": "Choose the clearest public route when the direct address is uncertain."
+      },
+      {
+        "signal": "Verification before volume",
+        "whyItMatters": "Finding more emails does not help if bounces and generic copy damage deliverability.",
+        "nextMove": "Verify only the best-fit contacts and send smaller, specific batches."
+      }
     ],
     "proofPoints": [
       "Ahrefs gap research showed email finder terms overlapping with lead-generation competitors.",
@@ -1215,6 +1275,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "What should I do after finding an email?",
         "a": "Save the lead, write a message around the business signal, and schedule follow-up before moving to the next prospect."
+      },
+      {
+        "q": "Should I guess an email format?",
+        "a": "Only use an email format when public evidence supports it and the lead is qualified enough to justify the check."
       }
     ]
   },
@@ -1224,16 +1288,44 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "metaTitle": "Email Verifier for Cold Outreach | Reduce Risk Before You Send",
     "metaDescription": "Use an email verifier workflow before cold outreach: qualify the prospect, check the contact route, keep the pitch specific, and avoid risky volume sending.",
     "keyword": "email verifier",
+    "relatedSearches": [
+      "email verification",
+      "email checker",
+      "email validator",
+      "verify email address",
+      "email deliverability",
+      "cold email verifier",
+      "email finder",
+      "email lookup"
+    ],
     "audience": "Freelancers preparing cold outreach to qualified prospects",
     "intent": "The searcher wants to reduce bounce risk and send outreach more responsibly.",
     "summary": "Email verification should protect a qualified outreach workflow. It cannot make a weak lead good, but it can reduce avoidable risk before you send a specific, relevant message.",
-    "leadIn": "In iCloseLeads, verification should sit after qualification and before outreach. The goal is safer sending, not permission to mass-email poor-fit prospects.",
+    "leadIn": "In iCloseLeads, verification should sit after qualification and before outreach. The goal is safer sending, not permission to mass-email poor-fit prospects. Treat email checker and verifier searches as a final confidence step after the lead, role, and pitch reason already make sense.",
     "steps": [
       "Confirm that the prospect matches your offer and audience.",
       "Check whether the contact path belongs to the right role.",
       "Avoid sending when the source, domain, or address looks uncertain.",
+      "Use verification to protect deliverability, not to justify mass outreach.",
       "Write a short message tied to the original lead signal.",
       "Track the lead and follow-up result so the pipeline stays clean."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Lead already qualified",
+        "whyItMatters": "Verification only reduces bounce risk; it does not create buyer intent or relevance.",
+        "nextMove": "Keep unqualified contacts out of the sending queue even if an address looks valid."
+      },
+      {
+        "signal": "Role and domain match",
+        "whyItMatters": "A technically valid email can still be the wrong inbox or a risky catch-all route.",
+        "nextMove": "Confirm the company domain and likely role ownership before sending."
+      },
+      {
+        "signal": "Small-batch follow-up plan",
+        "whyItMatters": "Responsible outreach depends on cadence and relevance as much as verification.",
+        "nextMove": "Schedule one respectful follow-up and track the result in the CRM."
+      }
     ],
     "proofPoints": [
       "Email verifier appeared in the Ahrefs competitor gap set as a clear adjacent intent.",
@@ -1267,6 +1359,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "When should freelancers verify an email?",
         "a": "After the lead is qualified and before sending the first message or adding the contact to a follow-up workflow."
+      },
+      {
+        "q": "Is an email checker enough for cold outreach?",
+        "a": "No. An email checker can reduce bounce risk, but you still need a relevant prospect, a clear business reason, and careful follow-up."
       }
     ]
   },
@@ -1276,16 +1372,44 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "metaTitle": "Email Validator Checklist for Freelance Leads | iCloseLeads",
     "metaDescription": "A practical email validator checklist for freelance leads: confirm the company, role, contact path, pitch reason, and follow-up plan before outreach.",
     "keyword": "email validator",
+    "relatedSearches": [
+      "email checker",
+      "email validation",
+      "email verification",
+      "validate email address",
+      "email format",
+      "email verifier",
+      "email finder",
+      "cold outreach email validation"
+    ],
     "audience": "Freelancers cleaning up prospect lists before outreach",
     "intent": "The searcher wants to validate an email address or contact path before sending.",
-    "summary": "An email validator is most useful when it is part of a wider lead-quality check. Validate the address, but also validate the company fit, role fit, timing, and pitch reason.",
-    "leadIn": "Use this checklist before outreach so your pipeline does not fill with contacts you cannot confidently explain or follow up with.",
+    "summary": "An email validator is most useful when it is part of a wider lead-quality check. Validate the address, but also validate the company fit, role fit, timing, email format evidence, and pitch reason.",
+    "leadIn": "Use this checklist before outreach so your pipeline does not fill with contacts you cannot confidently explain or follow up with. Email validation should be the last cleanup step after the business signal is already strong.",
     "steps": [
       "Validate that the company fits your niche.",
       "Validate the public signal that makes the outreach timely.",
       "Validate that the role or inbox can reasonably own the problem.",
       "Validate the email route only after the first three checks pass.",
+      "Validate that the message references the lead signal instead of the email source.",
       "Validate the follow-up date before you send."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Address validity",
+        "whyItMatters": "Invalid or uncertain addresses create bounce risk and can hide weak targeting.",
+        "nextMove": "Remove uncertain contacts before they enter an outreach batch."
+      },
+      {
+        "signal": "Business relevance",
+        "whyItMatters": "A valid address has little value when the company does not match your offer.",
+        "nextMove": "Keep only prospects where the company, timing, and service fit are clear."
+      },
+      {
+        "signal": "Message and follow-up readiness",
+        "whyItMatters": "Validation should leave you with a real next action, not just a cleaner spreadsheet.",
+        "nextMove": "Save the pitch angle and next follow-up date in iCloseLeads."
+      }
     ],
     "proofPoints": [
       "Email validator terms appeared alongside email verifier and email finder in Round 1 gap research.",
@@ -1319,6 +1443,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "What should I validate before sending outreach?",
         "a": "Validate company fit, role fit, contact route, pitch reason, and follow-up plan."
+      },
+      {
+        "q": "When should I remove an email from a prospect list?",
+        "a": "Remove it when the domain, role, source, or business reason is uncertain enough that you cannot write a truthful first message."
       }
     ]
   },

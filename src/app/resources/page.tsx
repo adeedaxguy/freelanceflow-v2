@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     "reverse email lookup",
     "email validator",
     "email verifier",
+    "email checker",
+    "email verification",
+    "email format",
     "email finder",
     "email lookup",
     "lead list builder",
@@ -48,6 +51,7 @@ export const metadata: Metadata = {
     "agency client acquisition software",
     "freelancer CRM with email follow up",
     "lead enrichment for freelance prospecting",
+    "responsible email verification workflow",
     "outbound sales workflow",
     "freelance prospecting tool",
     "sales leads for web designers",
@@ -108,12 +112,12 @@ export default function ResourcesPage() {
               Lead generation resources for freelancers who need web design leads, local business prospects, and outreach workflows that convert
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to compare lead generation tools, build a cold outreach CRM workflow, find decision-maker paths, qualify web design leads, write proposals, and follow up in a way that moves a visitor toward a real account and workflow run.
+              Guides for freelancers and agencies who need clients, not vague motivation. Learn how to compare lead generation tools, build a cold outreach CRM workflow, find decision-maker paths, qualify web design leads, check email routes responsibly, write proposals, and follow up in a way that moves a visitor toward a real account and workflow run.
             </p>
             <div className="mt-6 max-w-3xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
               <p className="mt-3 text-base leading-7 text-foreground">
-                These resources help freelancers turn lead-generation searches into a practical next step: qualify a better prospect, understand why the lead matters, and move into iCloseLeads for the search, saved lead, proposal draft, and follow-up workflow.
+                These resources help freelancers turn lead-generation searches into a practical next step: qualify a better prospect, understand why the lead matters, validate the contact path when needed, and move into iCloseLeads for the search, saved lead, proposal draft, and follow-up workflow.
               </p>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -149,7 +153,7 @@ export default function ResourcesPage() {
             {[
               "Every guide points to a product workflow, not a dead-end article.",
               "Each topic is tied to GSC, GA4, live SERP, competitor, or product evidence.",
-              "Internal links connect resources to signup-intent use cases, proposal paths, and feature pages.",
+              "Internal links connect resources to signup-intent use cases, contact validation, proposal paths, and feature pages.",
             ].map((item) => (
               <div key={item} className="rounded-lg border border-border bg-background p-5 text-sm leading-6 text-muted-foreground">
                 <CheckCircle2 className="mb-3 h-5 w-5 text-accent" />
