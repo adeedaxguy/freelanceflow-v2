@@ -61,20 +61,31 @@ const trustNotes = [
   { icon: ShieldCheck, label: "Review-first outreach, no risky auto-send" },
 ];
 
+const mobileFooterLinks = [
+  { label: "Local leads", href: "/lead-generation/local-business-leads" },
+  { label: "Remote jobs", href: "/lead-generation/remote-freelance-jobs" },
+  { label: "Live jobs", href: "/use-cases/live-job-leads" },
+  { label: "Decision makers", href: "/features/lead-discovery#capabilities" },
+  { label: "Web design leads", href: "/lead-generation/web-design-leads" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-background/95" aria-label="Site footer">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <div className="site-footer-panel overflow-hidden border border-border bg-surface/90">
           <div className="grid gap-0 lg:grid-cols-[0.92fr_1.58fr]">
-            <div className="border-b border-border p-6 lg:border-b-0 lg:border-r">
+            <div className="border-b border-border p-5 sm:p-6 lg:border-b-0 lg:border-r">
               <Logo size="md" href="/" />
               <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
                 iCloseLeads helps freelancers find real buying signals, qualify the right prospects,
                 and turn each opportunity into a sharper pitch.
               </p>
 
-              <div className="mt-5 grid gap-2.5">
+              <div className="mt-5 hidden gap-2.5 sm:grid">
                 {trustNotes.map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-accent/20 bg-accent/10 text-accent">
@@ -103,8 +114,8 @@ export default function Footer() {
               </div>
             </div>
 
-            <div className="p-6">
-              <div className="mb-6 flex flex-col gap-3 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="p-5 sm:p-6">
+              <div className="mb-5 flex flex-col gap-3 border-b border-border pb-5 sm:mb-6 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-light">
                     Client acquisition OS
@@ -122,7 +133,19 @@ export default function Footer() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-7 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-2 sm:hidden">
+                {mobileFooterLinks.map(link => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="rounded-lg border border-border bg-background/60 px-3 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="hidden grid-cols-2 gap-x-7 gap-y-7 sm:grid sm:grid-cols-3 lg:grid-cols-5">
                 {footerGroups.map(group => (
                   <div key={group.title} className="min-w-0">
                     <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-foreground">

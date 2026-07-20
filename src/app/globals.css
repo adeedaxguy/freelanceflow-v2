@@ -1566,3 +1566,198 @@ html.light .site-footer-panel {
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,248,252,0.96)) !important;
   box-shadow: 0 18px 44px rgba(20, 35, 70, 0.08) !important;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   iCloseLeads Theme Consistency — v6
+   This final layer keeps light mode intentional across dashboard
+   pages while preserving the dark product default and modal overlays.
+   ════════════════════════════════════════════════════════════════ */
+
+html.light {
+  --background: 220 33% 98%;
+  --foreground: 224 24% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 24% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 24% 11%;
+  --primary: 217 86% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 24% 93%;
+  --secondary-foreground: 224 24% 11%;
+  --muted: 220 24% 93%;
+  --muted-foreground: 224 12% 41%;
+  --accent: 174 76% 38%;
+  --accent-foreground: 0 0% 100%;
+  --border: 220 22% 86%;
+  --input: 220 22% 86%;
+  --ring: 217 86% 53%;
+}
+
+html.light body {
+  background:
+    radial-gradient(circle at 14% -8%, rgba(37, 99, 235, 0.07), transparent 34rem),
+    radial-gradient(circle at 94% 0%, rgba(18, 184, 166, 0.065), transparent 30rem),
+    linear-gradient(180deg, #fbfcff 0%, #f3f6fb 100%) !important;
+  color: #17182f !important;
+}
+
+html.dark body,
+html.dark .dashboard-shell {
+  background: linear-gradient(180deg, #070a12 0%, #090d18 44%, #070a12 100%) !important;
+}
+
+html.light .dashboard-shell {
+  background:
+    radial-gradient(circle at 16% -10%, rgba(37, 99, 235, 0.075), transparent 34rem),
+    radial-gradient(circle at 92% 0%, rgba(18, 184, 166, 0.065), transparent 30rem),
+    linear-gradient(180deg, #fbfcff 0%, #f3f6fb 100%) !important;
+  color: #17182f !important;
+}
+
+html.light .dashboard-content,
+html.light .dashboard-content .min-h-screen {
+  background: transparent !important;
+  color: #17182f !important;
+}
+
+html.light .dashboard-content .bg-background,
+html.light .dashboard-content [class*="bg-background/"],
+html.light .dashboard-content [class*="bg-background\\/"] {
+  background-color: rgba(248, 250, 255, 0.88) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light .dashboard-content .bg-surface,
+html.light .dashboard-content .bg-card,
+html.light .dashboard-content .bg-popover,
+html.light .dashboard-content [class*="bg-surface/"],
+html.light .dashboard-content [class*="bg-surface\\/"],
+html.light .dashboard-content [class*="bg-card/"],
+html.light .dashboard-content [class*="bg-card\\/"] {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light .dashboard-content .bg-gradient-card,
+html.light .dashboard-content [class*="bg-gradient-card"] {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(246, 248, 252, 0.96)) !important;
+  border-color: #dce3ee !important;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.075) !important;
+}
+
+html.light .dashboard-content [class*="bg-white/"],
+html.light .dashboard-content [class*="bg-white\\/"],
+html.light .dashboard-content [class*="bg-white\\["] {
+  background-color: rgba(15, 23, 42, 0.045) !important;
+}
+
+html.light .dashboard-content [class*="hover:bg-white/"]:hover,
+html.light .dashboard-content [class*="hover:bg-white\\/"]:hover {
+  background-color: rgba(37, 99, 235, 0.065) !important;
+}
+
+html.light .dashboard-content [class*="bg-black/"]:not([class*="fixed"]),
+html.light .dashboard-content [class*="bg-black\\/"]:not([class*="fixed"]) {
+  background-color: rgba(255, 255, 255, 0.74) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light .dashboard-content [class*="fixed"][class*="bg-black/"],
+html.light .dashboard-content [class*="fixed"][class*="bg-black\\/"] {
+  background-color: rgba(2, 6, 23, 0.62) !important;
+}
+
+html.light .dashboard-content h1,
+html.light .dashboard-content h2,
+html.light .dashboard-content h3,
+html.light .dashboard-content h4,
+html.light .dashboard-content h5,
+html.light .dashboard-content h6,
+html.light .dashboard-content .text-foreground,
+html.light .dashboard-content .text-card-foreground,
+html.light .dashboard-content strong {
+  color: #17182f !important;
+}
+
+html.light .dashboard-content p,
+html.light .dashboard-content label,
+html.light .dashboard-content .text-muted-foreground,
+html.light .dashboard-content [class*="text-muted-foreground/"],
+html.light .dashboard-content [class*="text-muted-foreground\\/"] {
+  color: #62677d !important;
+}
+
+html.light .dashboard-content input,
+html.light .dashboard-content textarea,
+html.light .dashboard-content select {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #d8dfea !important;
+  color: #17182f !important;
+}
+
+html.light .dashboard-content ::placeholder {
+  color: #7a8094 !important;
+  opacity: 1;
+}
+
+html.light .dashboard-content .bg-gradient-hero,
+html.light .dashboard-content .bg-gradient-hero *,
+html.light .dashboard-content [class*="bg-gradient-hero"],
+html.light .dashboard-content [class*="bg-gradient-hero"] *,
+html.light .dashboard-content .bg-primary,
+html.light .dashboard-content .bg-primary *,
+html.light .dashboard-content .bg-accent,
+html.light .dashboard-content .bg-accent * {
+  color: #ffffff !important;
+}
+
+html.light .dashboard-content .text-primary,
+html.light .dashboard-content .text-primary-light {
+  color: #2563eb !important;
+}
+
+html.light .dashboard-content .text-accent {
+  color: #0f9488 !important;
+}
+
+html.light .dashboard-content aside,
+html.light aside.bg-surface,
+html.light aside {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fd 100%) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light .beta-feature-page [class*="bg-black/"]:not([class*="fixed"]),
+html.light .beta-feature-page [class*="bg-black\\/"]:not([class*="fixed"]) {
+  background: rgba(248, 250, 255, 0.92) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 10px 28px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light .web-design-mini-preview,
+html.light .homepage-dark-surface,
+html.light .homepage-early-access-banner {
+  background:
+    linear-gradient(hsl(220 24% 24% / 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(220 24% 24% / 0.14) 1px, transparent 1px),
+    linear-gradient(180deg, #08101d 0%, #070a12 100%) !important;
+  background-size: 52px 52px, 52px 52px, auto !important;
+  color: #ffffff !important;
+}
+
+html.light .web-design-mini-preview *,
+html.light .homepage-dark-surface *,
+html.light .homepage-early-access-banner * {
+  color: inherit;
+}
+
+html.light .web-design-mini-preview .text-muted-foreground,
+html.light .homepage-dark-surface .text-muted-foreground,
+html.light .homepage-early-access-banner .text-muted-foreground {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
+
+html.light .site-footer-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 248, 252, 0.96)) !important;
+  border-color: #dce3ee !important;
+  box-shadow: 0 18px 44px rgba(20, 35, 70, 0.08) !important;
+}
