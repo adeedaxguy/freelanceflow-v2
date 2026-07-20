@@ -1151,7 +1151,7 @@ html.light .dashboard-content select {
   color: #17182f !important;
 }
 
-html.light .dashboard-content .text-white:not(.bg-gradient-hero *):not(.bg-primary *) {
+html.light .dashboard-content .text-white:not(.bg-gradient-hero):not(.bg-gradient-hero *):not(.bg-primary):not(.bg-primary *) {
   color: #17182f !important;
 }
 
@@ -1777,5 +1777,11 @@ html.light .dashboard-content [class*="from-blue"][class*="to-teal"] * {
 html.light .dashboard-content a.bg-gradient-hero *,
 html.light .dashboard-content button.bg-gradient-hero *,
 html.light .dashboard-content .bg-gradient-hero.text-white * {
+  color: #ffffff !important;
+}
+
+html.light body .dashboard-shell .dashboard-content.dashboard-content a.bg-gradient-hero.bg-gradient-hero.text-white.text-white,
+html.light body .dashboard-shell .dashboard-content.dashboard-content button.bg-gradient-hero.bg-gradient-hero.text-white.text-white,
+html.light body .dashboard-shell .dashboard-content.dashboard-content [class*="bg-gradient-hero"][class*="text-white"] {
   color: #ffffff !important;
 }
