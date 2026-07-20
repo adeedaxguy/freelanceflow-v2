@@ -19,7 +19,7 @@ export default function ThemeToggle({ className = "", size = "md" }: Props) {
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
       title={theme === "dark" ? "Light mode" : "Dark mode"}
-      className={`${dim} flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-white/5 transition-all flex-shrink-0 ${className}`}
+      className={`${dim} flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-accent/40 hover:bg-white/5 transition-all flex-shrink-0 ${className}`}
     >
       {theme === "dark"
         ? <Sun className={icon} />

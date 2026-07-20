@@ -11,9 +11,9 @@ interface LogoProps {
 /**
  * iCloseLeads — Premium brand mark
  *
- * The icon: a hexagonal shield with a bold ">" arrow cut-out,
- * symbolising closing deals and forward momentum.
- * Gradient: deep violet → electric cyan (matches the app's primary palette).
+ * The icon: a compact app mark with a bold ">" arrow,
+ * symbolising closing deals and forward motion.
+ * Gradient: deep blue -> teal, with restrained product-system contrast.
  *
  * Wordmark: "i" + "Close" + "Leads" with the "i" and "Leads"
  * in the gradient colour so the eye reads "iClose · Leads" as two ideas.
@@ -30,11 +30,7 @@ export default function Logo({
   // ── Icon mark ────────────────────────────────────────────────────────────────
   const mark = (
     <div className={cn("relative flex-shrink-0", iconSize)}>
-      {/* Ambient glow */}
-      <div className="absolute inset-0 rounded-xl bg-violet-600/40 blur-md scale-110 pointer-events-none" />
-
-      {/* Shield container */}
-      <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg shadow-violet-900/40">
+      <div className="relative h-full w-full overflow-hidden rounded-lg border border-white/10 shadow-[0_10px_28px_rgba(2,8,23,0.24)]">
         <svg
           viewBox="0 0 40 40"
           fill="none"
@@ -45,13 +41,13 @@ export default function Logo({
           <defs>
             {/* Main brand gradient */}
             <linearGradient id="icl-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#6D28D9" />
-              <stop offset="55%"  stopColor="#7C3AED" />
-              <stop offset="100%" stopColor="#06B6D4" />
+              <stop offset="0%"   stopColor="#1D4ED8" />
+              <stop offset="58%"  stopColor="#2563EB" />
+              <stop offset="100%" stopColor="#13B8A6" />
             </linearGradient>
             {/* Top-left shine */}
             <linearGradient id="icl-shine" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.18" />
+              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.16" />
               <stop offset="100%" stopColor="#ffffff" stopOpacity="0"    />
             </linearGradient>
           </defs>
@@ -65,7 +61,7 @@ export default function Logo({
           {/* Subtle grid texture */}
           <path
             d="M0 13.3h40M0 26.7h40M13.3 0v40M26.7 0v40"
-            stroke="white" strokeOpacity="0.06" strokeWidth="0.6"
+            stroke="white" strokeOpacity="0.05" strokeWidth="0.6"
           />
 
           {/*
@@ -96,14 +92,11 @@ export default function Logo({
         textSize,
       )}
     >
-      {/* "i" — accent colour */}
-      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
+      <span className="text-primary-light">
         i
       </span>
-      {/* "Close" — foreground */}
       <span className="text-foreground">Close</span>
-      {/* "Leads" — accent colour */}
-      <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
+      <span className="text-primary-light">
         Leads
       </span>
     </span>
@@ -120,7 +113,7 @@ export default function Logo({
   return href ? (
     <Link
       href={href}
-      className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500/50 rounded-xl"
+      className="flex items-center rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/45"
     >
       {inner}
     </Link>

@@ -15,14 +15,14 @@ const config: Config = {
         border: "hsl(var(--border) / <alpha-value>)",
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
-          light: "#9F67FF",
+          light: "#4AA3FF",
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
         },
         accent: {
           DEFAULT: "hsl(var(--accent) / <alpha-value>)",
           foreground: "hsl(var(--accent-foreground) / <alpha-value>)",
         },
-        gold: "#FFD166",
+        gold: "#F5B84B",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
         muted: {
           DEFAULT: "hsl(var(--muted) / <alpha-value>)",
@@ -51,12 +51,12 @@ const config: Config = {
         sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
       },
       fontSize: {
-        hero: ["72px", { lineHeight: "1.1", letterSpacing: "-2px", fontWeight: "700" }],
+        hero: ["72px", { lineHeight: "1.1", letterSpacing: "0", fontWeight: "700" }],
       },
       backgroundImage: {
-        "gradient-hero": "linear-gradient(135deg, #7C3AED 0%, #00E5A0 100%)",
-        "gradient-card": "linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)))",
-        "gradient-card-hover": "linear-gradient(145deg, hsl(var(--card)), hsl(var(--secondary)))",
+        "gradient-hero": "linear-gradient(135deg, #2563EB 0%, #12B8A6 100%)",
+        "gradient-card": "linear-gradient(180deg, hsl(var(--card)), hsl(var(--muted) / 0.58))",
+        "gradient-card-hover": "linear-gradient(180deg, hsl(var(--card)), hsl(var(--secondary) / 0.72))",
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "dot-pattern": "radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px)",
         "grid-pattern": "linear-gradient(hsl(var(--border)) 1px, transparent 1px), linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px)",
@@ -66,10 +66,11 @@ const config: Config = {
         "grid-sm": "40px 40px",
       },
       boxShadow: {
-        "glow-primary": "0 0 30px rgba(124,58,237,0.4)",
-        "glow-accent": "0 0 30px rgba(0,229,160,0.3)",
-        "glow-gold": "0 0 20px rgba(255,209,102,0.3)",
-        "card-hover": "0 20px 60px rgba(0,0,0,0.5)",
+        "card": "0 18px 50px rgba(2,8,23,0.18)",
+        "glow-primary": "0 18px 44px rgba(37,99,235,0.24)",
+        "glow-accent": "0 18px 44px rgba(18,184,166,0.20)",
+        "glow-gold": "0 16px 36px rgba(245,184,75,0.22)",
+        "card-hover": "0 24px 70px rgba(2,8,23,0.34)",
       },
       animation: {
         "gradient-shift":  "gradient-shift 3s ease infinite",
@@ -93,8 +94,8 @@ const config: Config = {
           "50%": { transform: "translateY(-20px)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(124,58,237,0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(124,58,237,0.7)" },
+          "0%, 100%": { boxShadow: "0 16px 38px rgba(37,99,235,0.20)" },
+          "50%": { boxShadow: "0 20px 48px rgba(18,184,166,0.22)" },
         },
         "fade-in-up": {
           from: { opacity: "0", transform: "translateY(20px)" },

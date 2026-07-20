@@ -18,13 +18,12 @@ const footerGroups = [
     links: [
       { label: "Features", href: "/features" },
       { label: "Pricing", href: "/pricing" },
-      { label: "Use Cases", href: "/use-cases" },
+      { label: "Use cases", href: "/use-cases" },
       { label: "Resources", href: "/resources" },
-      { label: "Blog", href: "/blog" },
     ],
   },
   {
-    title: "Lead Engines",
+    title: "Lead engines",
     links: primaryLinks,
   },
   {
@@ -34,7 +33,6 @@ const footerGroups = [
       { label: "CRM Pipeline", href: "/features/crm-pipeline" },
       { label: "Email Outreach", href: "/features/email-outreach" },
       { label: "Lead Calculator", href: "/tools/lead-calculator" },
-      { label: "Lead Scoring", href: "/blog/the-complete-guide-to-freelance-lead-scoring" },
     ],
   },
   {
@@ -42,19 +40,17 @@ const footerGroups = [
     links: [
       { label: "About", href: "/about" },
       { label: "Contact", href: "/contact" },
-      { label: "Affiliate", href: "/affiliate" },
-      { label: "Press", href: "/press" },
-      { label: "Careers", href: "/careers" },
+      { label: "Blog", href: "/blog" },
+      { label: "Status", href: "/status" },
     ],
   },
   {
-    title: "Help",
+    title: "Legal",
     links: [
       { label: "Help Center", href: "/help" },
-      { label: "Status", href: "/status" },
-      { label: "Changelog", href: "/changelog" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
+      { label: "Cookies", href: "/cookie-policy" },
     ],
   },
 ];
@@ -68,20 +64,20 @@ const trustNotes = [
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-background/95" aria-label="Site footer">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-        <div className="site-footer-panel overflow-hidden rounded-3xl border border-border bg-white/90 shadow-card dark:bg-card/90">
-          <div className="grid gap-0 lg:grid-cols-[1.05fr_1.45fr]">
-            <div className="border-b border-border p-6 sm:p-8 lg:border-b-0 lg:border-r">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="site-footer-panel overflow-hidden border border-border bg-surface/90">
+          <div className="grid gap-0 lg:grid-cols-[0.92fr_1.58fr]">
+            <div className="border-b border-border p-6 lg:border-b-0 lg:border-r">
               <Logo size="md" href="/" />
-              <p className="mt-5 max-w-md text-sm leading-6 text-muted-foreground">
+              <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
                 iCloseLeads helps freelancers find real buying signals, qualify the right prospects,
                 and turn each opportunity into a sharper pitch.
               </p>
 
-              <div className="mt-6 hidden gap-3 sm:grid">
+              <div className="mt-5 grid gap-2.5">
                 {trustNotes.map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary-light">
+                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border border-accent/20 bg-accent/10 text-accent">
                       <Icon className="h-4 w-4" />
                     </span>
                     <span>{label}</span>
@@ -89,17 +85,17 @@ export default function Footer() {
                 ))}
               </div>
 
-              <div className="mt-6 flex flex-col gap-3 sm:mt-7 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/auth?mode=signup"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-hero px-4 py-3 text-sm font-semibold text-white shadow-glow-primary transition-transform hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-hero px-4 py-2.5 text-sm font-semibold text-white shadow-glow-primary transition-transform hover:-translate-y-0.5"
                 >
                   Start free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a
                   href="mailto:hello@icloseleads.com"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background/70 px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary-light"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary-light"
                 >
                   <Mail className="h-4 w-4" />
                   Contact
@@ -107,13 +103,13 @@ export default function Footer() {
               </div>
             </div>
 
-            <div className="p-6 sm:p-8">
-              <div className="mb-7 flex flex-col gap-3 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div className="p-6">
+              <div className="mb-6 flex flex-col gap-3 border-b border-border pb-5 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-light">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary-light">
                     Client acquisition OS
                   </p>
-                  <h2 className="mt-2 text-xl font-bold text-foreground">
+                  <h2 className="mt-2 text-lg font-bold text-foreground">
                     Find leads, verify intent, pitch faster.
                   </h2>
                 </div>
@@ -126,13 +122,13 @@ export default function Footer() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-x-7 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
                 {footerGroups.map(group => (
                   <div key={group.title} className="min-w-0">
-                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-foreground">
+                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
                       {group.title}
                     </h3>
-                    <ul className="space-y-2.5">
+                    <ul className="space-y-2">
                       {group.links.map(link => (
                         <li key={`${group.title}-${link.label}`}>
                           <Link
@@ -151,7 +147,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="hidden flex-col gap-4 border-b border-border px-1 py-6 text-sm text-muted-foreground sm:flex sm:flex-row sm:items-center sm:justify-between">
+        <div className="hidden flex-col gap-4 border-b border-border px-1 py-5 text-sm text-muted-foreground sm:flex sm:flex-row sm:items-center sm:justify-between">
           <p>Built for freelancers, consultants, and lean agencies who need better timing.</p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {primaryLinks.slice(0, 3).map(link => (
@@ -162,7 +158,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-1 pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 px-1 pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} iCloseLeads. All rights reserved.</p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <Link href="/privacy" className="hover:text-foreground">Privacy</Link>

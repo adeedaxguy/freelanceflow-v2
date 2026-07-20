@@ -66,9 +66,9 @@ type PlanCfg = {
 };
 const PLAN_CONFIG: Record<string, PlanCfg> = {
   // Launch phase: all features free, no upgrade pressure
-  free:   { label: "Free",   color: "text-primary-light",   bg: "bg-primary/8",        border: "border-primary/20",      icon: Sparkles, leadsPerWeek: "All features free",   showUpgrade: false },
-  pro:    { label: "Pro",    color: "text-primary-light",   bg: "bg-primary/10",        border: "border-primary/30",      icon: Crown,    leadsPerWeek: "500 leads / week",   showUpgrade: false },
-  agency: { label: "Agency", color: "text-primary-light",   bg: "bg-primary/10",        border: "border-primary/30",      icon: Shield,   leadsPerWeek: "Unlimited leads",    showUpgrade: false },
+  free:   { label: "Free",   color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "All features free", showUpgrade: false },
+  pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "500 leads / week", showUpgrade: false },
+  agency: { label: "Agency", color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Shield, leadsPerWeek: "Unlimited leads", showUpgrade: false },
 };
 
 // ─── Tooltip for collapsed state ─────────────────────────────────────────────
@@ -103,15 +103,15 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${
+      className={`flex items-center gap-3 rounded-lg text-sm font-medium transition-all ${
         collapsed ? "px-2.5 py-2.5 justify-center" : "px-3 py-2.5"
       } ${
         active
-          ? "bg-primary/15 text-primary-light"
+          ? "bg-accent/10 text-foreground shadow-[inset_3px_0_0_hsl(var(--accent))]"
           : "text-muted-foreground hover:text-foreground hover:bg-white/5"
       }`}
     >
-      <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-primary-light" : ""}`} />
+      <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-accent" : ""}`} />
       {!collapsed && (
         <>
           <span className="flex-1">{label}</span>
@@ -250,7 +250,7 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
         <Link
           href="/auth"
           onClick={onLinkClick}
-          className={`flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-primary hover:bg-primary-light text-white rounded-xl font-semibold text-sm transition-colors ${collapsed ? "px-2.5" : ""}`}
+          className={`flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-hero text-white rounded-lg font-semibold text-sm transition-opacity hover:opacity-90 ${collapsed ? "px-2.5" : ""}`}
         >
           {collapsed ? <User className="w-4 h-4" /> : "Sign In"}
         </Link>
@@ -285,7 +285,7 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
   return (
     <div className="p-3 border-t border-border space-y-2">
       {/* User card */}
-      <div className={`rounded-xl border ${plan.border} bg-surface overflow-hidden`}>
+      <div className={`rounded-lg border ${plan.border} bg-surface overflow-hidden`}>
         <div className={`flex items-center gap-2 px-3 py-1.5 ${plan.bg} border-b ${plan.border}`}>
           <PlanIcon className={`w-3 h-3 ${plan.color}`} />
           <span className={`text-[11px] font-bold tracking-wide ${plan.color}`}>{plan.label} Plan</span>
@@ -376,7 +376,7 @@ export default function Sidebar() {
           <div className="px-3 pt-2">
             <button
               onClick={() => (window as unknown as Record<string, (() => void) | undefined>).__openCommandPalette?.()}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl border border-border text-muted-foreground text-xs hover:border-primary/40 hover:text-foreground transition-all"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-muted-foreground text-xs hover:border-accent/40 hover:text-foreground transition-all"
             >
               <Command className="w-3.5 h-3.5" />
               <span className="flex-1 text-left">Search or jump to...</span>
@@ -389,7 +389,7 @@ export default function Sidebar() {
             <CollapseTooltip label="Search (⌘K)">
               <button
                 onClick={() => (window as unknown as Record<string, (() => void) | undefined>).__openCommandPalette?.()}
-                className="w-10 h-10 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+                className="w-10 h-10 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-accent/40 transition-all"
               >
                 <Command className="w-4 h-4" />
               </button>
@@ -423,7 +423,7 @@ export default function Sidebar() {
           <button
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+            className="w-9 h-9 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-accent/40 transition-all"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -453,7 +453,7 @@ export default function Sidebar() {
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="Close menu"
-            className="w-8 h-8 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground transition-all"
           >
             <X className="w-4 h-4" />
           </button>

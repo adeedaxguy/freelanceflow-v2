@@ -1299,3 +1299,270 @@ html.light .homepage-dark-surface [class*="bg-[#0b1220]"] *,
 html.light .homepage-dark-surface [class*="bg-slate-950"] * {
   color: #ffffff !important;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   iCloseLeads Brand System — v5
+   A calmer proprietary product language: graphite, ink, blue, teal.
+   Keep this block last so older migration fixes cannot reintroduce
+   the stock purple/glass dashboard look.
+   ════════════════════════════════════════════════════════════════ */
+
+html {
+  --radius: 0.625rem;
+}
+
+html.dark {
+  --background: 226 41% 5%;
+  --foreground: 222 35% 96%;
+  --card: 224 32% 9%;
+  --card-foreground: 222 35% 96%;
+  --popover: 224 32% 9%;
+  --popover-foreground: 222 35% 96%;
+  --primary: 217 91% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 224 25% 13%;
+  --secondary-foreground: 222 35% 96%;
+  --muted: 224 25% 13%;
+  --muted-foreground: 226 14% 66%;
+  --accent: 174 79% 43%;
+  --accent-foreground: 224 41% 7%;
+  --border: 224 23% 17%;
+  --input: 224 23% 17%;
+  --ring: 217 91% 58%;
+}
+
+html.light {
+  --background: 220 33% 98%;
+  --foreground: 224 24% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 24% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 24% 11%;
+  --primary: 217 86% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 24% 93%;
+  --secondary-foreground: 224 24% 11%;
+  --muted: 220 24% 93%;
+  --muted-foreground: 224 12% 41%;
+  --accent: 174 76% 38%;
+  --accent-foreground: 0 0% 100%;
+  --border: 220 22% 86%;
+  --input: 220 22% 86%;
+  --ring: 217 86% 53%;
+}
+
+body {
+  background:
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%),
+    hsl(var(--background));
+}
+
+html.dark body {
+  background:
+    linear-gradient(180deg, #070a12 0%, #090d18 44%, #070a12 100%) !important;
+}
+
+html.light body {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 248, 252, 0.98)),
+    #f7f9fc !important;
+}
+
+::selection {
+  background-color: hsl(var(--primary) / 0.22);
+  color: hsl(var(--foreground));
+}
+
+::-webkit-scrollbar-track { background: hsl(var(--background)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.66); }
+
+.gradient-text {
+  background-image: linear-gradient(135deg, #4aa3ff 0%, #18c6b5 100%) !important;
+}
+
+.gradient-text-warm {
+  background-image: linear-gradient(135deg, #f5b84b 0%, #ef6f6c 100%) !important;
+}
+
+.bg-gradient-hero,
+[class*="bg-gradient-hero"] {
+  background-image: linear-gradient(135deg, #2563eb 0%, #12b8a6 100%) !important;
+}
+
+.bg-gradient-card,
+[class*="bg-gradient-card"] {
+  background: linear-gradient(180deg, hsl(var(--card) / 0.98) 0%, hsl(var(--muted) / 0.54) 100%) !important;
+}
+
+.bg-gradient-card-hover,
+[class*="bg-gradient-card-hover"] {
+  background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--secondary) / 0.70) 100%) !important;
+}
+
+.mesh-gradient {
+  background:
+    linear-gradient(hsl(var(--border) / 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.12) 1px, transparent 1px),
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--card) / 0.42) 100%) !important;
+  background-size: 48px 48px, 48px 48px, auto !important;
+}
+
+.glass-card,
+.glass-card-light {
+  background: hsl(var(--card) / 0.88) !important;
+  border-color: hsl(var(--border) / 0.86) !important;
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.glow-border::before,
+.border-glow-animated::before,
+.gradient-border-animated::before {
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.55), hsl(var(--accent) / 0.42)) !important;
+  animation-duration: 8s !important;
+}
+
+.card-hover-lift:hover {
+  box-shadow: 0 20px 50px hsl(224 45% 3% / 0.28) !important;
+}
+
+.shadow-glow-primary,
+[class*="shadow-glow-primary"] {
+  box-shadow: 0 18px 44px hsl(var(--primary) / 0.22) !important;
+}
+
+.shadow-glow-accent,
+[class*="shadow-glow-accent"] {
+  box-shadow: 0 18px 44px hsl(var(--accent) / 0.18) !important;
+}
+
+.shadow-glow,
+[class*="shadow-glow"] {
+  box-shadow: 0 18px 46px hsl(var(--primary) / 0.16) !important;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--secondary)) 50%, hsl(var(--muted)) 75%) !important;
+}
+
+.cta-glow {
+  animation: none !important;
+  box-shadow: 0 20px 46px hsl(var(--primary) / 0.22) !important;
+}
+
+html.dark .bg-surface,
+html.dark .bg-card,
+html.dark .bg-popover,
+html.dark .site-footer-panel {
+  background-color: hsl(var(--card) / 0.94) !important;
+  border-color: hsl(var(--border) / 0.9) !important;
+}
+
+html.dark aside.bg-surface,
+html.dark aside {
+  background: linear-gradient(180deg, #090d17 0%, #070a12 100%) !important;
+  border-color: hsl(var(--border) / 0.96) !important;
+}
+
+html.dark nav {
+  background-color: hsl(var(--background) / 0.88) !important;
+  border-color: hsl(var(--border) / 0.88) !important;
+}
+
+html.light .bg-surface,
+html.light .bg-card,
+html.light .bg-popover,
+html.light .site-footer-panel {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light aside.bg-surface,
+html.light aside,
+html.light header,
+html.light nav.fixed,
+html.light footer {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: #dce3ee !important;
+}
+
+html.light .text-primary,
+html.light .text-primary-light {
+  color: #2563eb !important;
+}
+
+html.light .text-accent {
+  color: #0f9488 !important;
+}
+
+html.light .bg-primary\/10,
+html.light [class*="bg-primary/10"],
+html.light [class*="bg-primary\\/10"],
+html.light [class*="bg-primary/15"],
+html.light [class*="bg-primary\\/15"],
+html.light [class*="bg-primary/20"],
+html.light [class*="bg-primary\\/20"] {
+  background-color: rgba(37, 99, 235, 0.09) !important;
+}
+
+html.light .border-primary\/20,
+html.light [class*="border-primary/"],
+html.light [class*="border-primary\\/"] {
+  border-color: rgba(37, 99, 235, 0.22) !important;
+}
+
+html.light .bg-accent\/10,
+html.light [class*="bg-accent/10"],
+html.light [class*="bg-accent\\/10"],
+html.light [class*="bg-accent/20"],
+html.light [class*="bg-accent\\/20"] {
+  background-color: rgba(15, 148, 136, 0.10) !important;
+}
+
+html.light .border-accent\/20,
+html.light [class*="border-accent/"],
+html.light [class*="border-accent\\/"] {
+  border-color: rgba(15, 148, 136, 0.22) !important;
+}
+
+html.light .shadow-card,
+html.light .shadow-card-hover,
+html.light .shadow-xl,
+html.light .shadow-2xl {
+  box-shadow: 0 18px 54px rgba(20, 35, 70, 0.09) !important;
+}
+
+html.light .shadow-glow,
+html.light [class*="shadow-glow"] {
+  box-shadow: 0 18px 42px rgba(37, 99, 235, 0.12) !important;
+}
+
+html.light .homepage-dark-surface {
+  background:
+    linear-gradient(hsl(220 24% 24% / 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(220 24% 24% / 0.14) 1px, transparent 1px),
+    linear-gradient(180deg, #08101d 0%, #070a12 100%) !important;
+  background-size: 52px 52px, 52px 52px, auto !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+
+html.light .homepage-early-access-banner {
+  background-color: #08101d !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
+}
+
+.site-footer-panel {
+  border-radius: 1rem !important;
+}
+
+html.dark .site-footer-panel {
+  background:
+    linear-gradient(180deg, hsl(224 32% 10% / 0.96), hsl(226 40% 7% / 0.98)) !important;
+  box-shadow: none !important;
+}
+
+html.light .site-footer-panel {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,248,252,0.96)) !important;
+  box-shadow: 0 18px 44px rgba(20, 35, 70, 0.08) !important;
+}
