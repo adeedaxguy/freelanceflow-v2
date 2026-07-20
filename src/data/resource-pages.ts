@@ -13,6 +13,7 @@ export type ResourcePage = {
   qualificationChecks?: { signal: string; whyItMatters: string; nextMove: string }[];
   proofPoints: string[];
   pitch: string;
+  activationPlan?: { trigger: string; firstRun: string; savedLead: string; followUp: string };
   internalLinks: { label: string; href: string }[];
   faqs: { q: string; a: string }[];
 };
@@ -41,6 +42,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "The best web design leads are not recycled contact records. They show a visible reason to talk: no website, a dated site, weak local search presence, missing booking flow, public phone route, owner path, or a business profile that depends on trust and bookings.",
     leadIn:
       "Start with businesses where the website problem is obvious enough that your first message can be specific. SERPs are full of web design lead lists and lead sellers, but the useful edge is verification. iCloseLeads helps you search by niche and location, verify the business profile, save the lead, and draft a proposal while the context is still clear enough to turn into a real signup and first workflow run.",
+    activationPlan: {
+      trigger: "Use this when you need website project prospects but do not want to buy blind lead lists.",
+      firstRun: "Search one niche and city, then filter for no-site, outdated-site, weak booking, or poor local presence signals.",
+      savedLead: "Save one prospect with the website gap, local proof, public contact route, and the business outcome you would pitch.",
+      followUp: "Generate a short web design proposal angle, then put the lead into CRM follow-up before opening the next search.",
+    },
     steps: [
       "Pick one local category such as auto repair, cleaners, dentists, roofers, restaurants, salons, or trades.",
       "Search one city or postcode area at a time so the pitch can mention a real market.",
@@ -165,6 +172,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "A business without a website is not automatically a buyer. The opportunity is strongest when the company has active local demand, a working phone number, recent reviews, and a service where trust or bookings matter.",
     leadIn:
       "Use no-website status as the starting point, then qualify the business before outreach. The message should connect a website to calls, bookings, quote requests, reviews, or missed local search demand.",
+    activationPlan: {
+      trigger: "Use this when a business has local demand but no dedicated site or only a social/profile page.",
+      firstRun: "Run one category/location search and review active map listings with phone, reviews, and service fit.",
+      savedLead: "Save only businesses where a website could clearly improve calls, trust, quotes, bookings, or service explanation.",
+      followUp: "Draft a first message around the missing owned website, then schedule a respectful follow-up if the route is public.",
+    },
     steps: [
       "Search high-value local categories where customers research before calling.",
       "Check whether the listing uses no website, only social media, or an unverified web presence.",
@@ -235,6 +248,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Cold outreach works best when the first line proves why you are reaching out. The signal can be a job post, website gap, local listing issue, hiring cue, Reddit discussion, or recent business change that gives your email a reason to exist.",
     leadIn:
       "Do not start with a spreadsheet of names. Start with a reason, then keep the batch small enough to review. iCloseLeads helps you find the signal, save the prospect, and prepare a concise Gmail-ready draft that can be checked before sending.",
+    activationPlan: {
+      trigger: "Use this when you have an offer but need a small, signal-led outreach batch instead of generic cold email volume.",
+      firstRun: "Pick one offer and buyer type, then search for visible signals such as website gaps, hiring cues, or local demand.",
+      savedLead: "Save the prospect with the exact reason for outreach and the small next step you want them to take.",
+      followUp: "Create a Gmail-ready opener and one follow-up date so the lead does not disappear after the first send.",
+    },
     steps: [
       "Choose one offer and one buyer type for the week.",
       "Find leads where the problem is visible in public context.",
@@ -303,6 +322,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "The strongest local leads usually combine category fit, local demand, website weakness, contact visibility, and a simple business improvement story.",
     leadIn:
       "A local lead should be more than a name. Before pitching, confirm the profile, the business type, the website gap, and the contact route. Then write around the outcome the owner cares about.",
+    activationPlan: {
+      trigger: "Use this when you sell websites to local operators and need prospects with reachable, practical business problems.",
+      firstRun: "Search a local category where calls, bookings, quotes, or trust decide the sale.",
+      savedLead: "Save a lead only after the website gap and public proof are strong enough to personalize one sentence.",
+      followUp: "Turn the saved notes into a proposal draft tied to calls, booking flow, speed, or trust.",
+    },
     steps: [
       "Search categories where a better website can directly influence calls or bookings.",
       "Use city-level searches to keep the pitch grounded.",
@@ -370,6 +395,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Exclusive should not mean mysterious. A useful lead feels exclusive because you found a real signal early, verified it, and wrote a pitch that is specific to the business.",
     leadIn:
       "Many sellers use the word exclusive without showing how the lead was qualified. A better approach is to build a workflow where each prospect has a reason, proof link, contact route, and follow-up plan before you send the first email.",
+    activationPlan: {
+      trigger: "Use this when the searcher is comparing exclusive lead claims and needs a safer verification workflow.",
+      firstRun: "Check whether each lead has recency, fit, visible need, and a contact path rather than accepting exclusivity language.",
+      savedLead: "Save the prospect with a note explaining why it is not just a resold list record.",
+      followUp: "Draft outreach around the verified business need and mark any vendor-style source as untrusted until checked.",
+    },
     steps: [
       "Avoid generic lists that cannot explain why the business is a fit.",
       "Check whether the lead has a visible problem you can solve.",
@@ -431,6 +462,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "An outdated website lead is strongest when the site creates measurable friction: hard-to-read mobile layout, slow load, unclear services, weak trust signals, missing forms, or poor local search context.",
     leadIn:
       "Do not pitch a redesign just because a site looks old. Pitch the business impact. Explain how a cleaner website could improve quote requests, calls, bookings, credibility, or local search conversion.",
+    activationPlan: {
+      trigger: "Use this when old mobile design, slow pages, broken trust, or weak local SEO creates a visible pitch angle.",
+      firstRun: "Search one service category and open sites with dated layouts, unclear CTAs, or poor mobile experiences.",
+      savedLead: "Save the before-state, the likely business impact, and the page or profile that proves the issue.",
+      followUp: "Generate a redesign pitch that starts with the risk or missed lead path, not a generic design compliment.",
+    },
     steps: [
       "Open the website on mobile before judging it.",
       "Check whether the main service and call button are obvious.",
@@ -562,6 +599,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "The best lead generation tool for a freelancer is the one that helps you find a relevant buyer signal, save the lead, write a specific first message, and follow up without building a separate sales stack.",
     leadIn:
       "Generic B2B tools can be too heavy when you only need a focused weekly client pipeline. Compare tools by what happens after the lead appears: can you qualify it, save it, draft a pitch, prepare outreach, and remember the follow-up? iCloseLeads is built around that freelancer workflow.",
+    activationPlan: {
+      trigger: "Use this when a freelancer is comparing tools and needs to understand the first useful workflow after signup.",
+      firstRun: "Run a narrow lead search instead of trying every feature at once.",
+      savedLead: "Save one qualified lead with context, proof, and a pitch reason so the tool immediately has a real record.",
+      followUp: "Draft the proposal or email from that record, then use CRM follow-up to judge whether the tool fits the work.",
+    },
     steps: [
       "Decide whether you need remote job signals, local business leads, decision-maker checks, or all three.",
       "Check whether the tool helps you qualify leads before exporting them.",
@@ -605,6 +648,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "A cold outreach CRM for freelancers should remember why each lead matters. The useful record is not just a name and email; it is the buyer signal, pitch angle, proposal draft, outreach status, and next follow-up.",
     leadIn:
       "Many CRM results are either generic templates or sales-team platforms. Freelancers need a smaller loop: find the lead, save the reason, write a specific first message, send from a familiar inbox, and follow up while the context is still visible. iCloseLeads connects those steps around client acquisition.",
+    activationPlan: {
+      trigger: "Use this when leads are spread across notes, spreadsheets, Gmail, and memory.",
+      firstRun: "Import or create one small batch of qualified prospects tied to one offer.",
+      savedLead: "Save each lead with stage, reason, contact route, and the next promised action.",
+      followUp: "Move one lead through first message, follow-up, response, and proposal so the CRM proves its value.",
+    },
     steps: [
       "Save the lead only after the buyer signal is clear.",
       "Track the source, problem, pitch angle, and current stage.",
@@ -648,6 +697,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Small businesses do not always publish a direct owner email. A safer workflow is to verify the business, check public owner or manager signals, use the website or phone route when appropriate, and save proof before writing outreach.",
     leadIn:
       "Decision-maker research should improve relevance without crossing privacy or trust lines. Start with public business data, then look for official contact pages, owner mentions, social profiles, professional profiles, and local registry clues. iCloseLeads helps keep the proof and pitch context attached to the lead.",
+    activationPlan: {
+      trigger: "Use this after the business itself looks worth pitching and you need the right public decision-maker route.",
+      firstRun: "Start from the saved company profile, then check owner, founder, manager, or official contact clues.",
+      savedLead: "Attach the contact route to the business reason instead of saving an email address without context.",
+      followUp: "Draft the first message for the person likely to own the problem and verify the route before outreach.",
+    },
     steps: [
       "Confirm the business website, map profile, category, and location first.",
       "Look for owner, founder, manager, director, or marketing contact mentions on official pages.",
@@ -691,6 +746,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Freelance client acquisition software should turn scattered prospecting into one repeatable loop: find leads, qualify fit, draft the pitch, send or prepare outreach, and track the next action.",
     leadIn:
       "The SERP for client acquisition is heavy with videos and broad advice. That leaves a clear gap for a software-led workflow page that shows what to do inside the product. iCloseLeads gives freelancers a practical path from search to saved lead to proposal to follow-up.",
+    activationPlan: {
+      trigger: "Use this when the buyer wants a repeatable client acquisition system, not isolated lead tips.",
+      firstRun: "Search one ideal-client niche and define what a good lead must prove before it enters the pipeline.",
+      savedLead: "Save the prospect with source, qualification notes, outreach angle, and expected next action.",
+      followUp: "Generate a proposal or email, then track the outcome so the acquisition loop can improve.",
+    },
     steps: [
       "Pick one service offer and one audience segment.",
       "Run a focused lead search instead of browsing every possible source.",
@@ -734,6 +795,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Independent contractors need lead generation that fits a small operator: focused searches, visible buyer signals, simple qualification, personal proposals, and follow-up they can actually maintain.",
     leadIn:
       "A contractor does not need a bloated sales department. The useful system is smaller and sharper: choose the service, find active demand, save the prospects that fit, write a specific pitch, and keep track of what happens next. iCloseLeads is built around that working rhythm.",
+    activationPlan: {
+      trigger: "Use this when an independent contractor needs local or niche prospects without agency overhead.",
+      firstRun: "Search one service area or buyer type where your work solves a visible problem.",
+      savedLead: "Save the lead with the job type, contact route, proof source, and one reason the buyer may care.",
+      followUp: "Draft a practical pitch and schedule the next action so lead generation becomes a weekly habit.",
+    },
     steps: [
       "Choose one service or package to sell this week.",
       "Search remote, live, or local leads based on where the buyer signal is strongest.",
@@ -821,6 +888,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "For small businesses, the public phone number or business profile may be the best contact path. The goal is to verify the owner or manager route without pretending every business publishes a direct email.",
     leadIn:
       "Use the decision-maker workflow after a local lead looks worth pitching. Start with the business profile, then check owner mentions, professional profiles, social links, phone/email routes, and registry references where appropriate.",
+    activationPlan: {
+      trigger: "Use this when a company is qualified but the outreach route is unclear.",
+      firstRun: "Open the company record and check public owner, founder, manager, hiring, and website clues.",
+      savedLead: "Save the most likely decision-maker route with the confidence level and source.",
+      followUp: "Write the message to the role that owns the problem, then avoid contacting unrelated people.",
+    },
     steps: [
       "Start from a verified business profile or website.",
       "Search owner, founder, manager, director, and contact mentions.",
@@ -951,6 +1024,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Client acquisition gets easier when discovery, qualification, proposal writing, and follow-up are one workflow instead of separate habits.",
     leadIn:
       "A repeatable freelance acquisition system starts with a narrow offer, one lead source at a time, clear qualification rules, and consistent follow-up. iCloseLeads gives that system a single workspace.",
+    activationPlan: {
+      trigger: "Use this when the freelancer needs a system for getting clients instead of another one-off tactic.",
+      firstRun: "Choose one offer, one audience, and one search source for the week.",
+      savedLead: "Save only prospects that match the offer and include a visible reason to contact them.",
+      followUp: "Draft outreach, set a follow-up, and review replies before expanding the next batch.",
+    },
     steps: [
       "Choose one offer and one audience.",
       "Search remote, local, or live leads based on that offer.",
@@ -1039,6 +1118,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Live job leads are useful because timing is part of the opportunity. When a company is actively asking for help, a relevant pitch can beat a polished message sent too late.",
     leadIn:
       "Use live lead feeds for fast-moving searches where urgency matters: launches, repairs, overflow work, campaign support, or immediate hiring. Then save the strongest opportunities before drafting.",
+    activationPlan: {
+      trigger: "Use this when current job or project posts can reveal who is actively buying right now.",
+      firstRun: "Search one live-job source and filter for posts that match your service, timing, and budget fit.",
+      savedLead: "Save the job signal, company context, and a response angle before applying or pitching.",
+      followUp: "Draft a response that references the live need and track whether it moves to a conversation.",
+    },
     steps: [
       "Search one service niche at a time.",
       "Prioritize urgent, recent, budget-mentioned, or contact-ready signals.",
@@ -1083,6 +1168,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Website design prospecting should move from research to qualification to pitch. If you cannot explain why a business needs your help, it is not ready for outreach.",
     leadIn:
       "Use category, city, website status, contact route, and business model to decide whether a lead deserves attention. Then write the pitch around the improvement, not the design trend.",
+    activationPlan: {
+      trigger: "Use this when you want to turn website research into qualified opportunities instead of a loose lead list.",
+      firstRun: "Search by category and market, then check site quality, contact path, local profile, and business model.",
+      savedLead: "Save the prospect with the exact website issue and likely outcome, such as calls, quote requests, or bookings.",
+      followUp: "Create a short first pitch and move the prospect into a proposal or next-check stage.",
+    },
     steps: [
       "Choose a market and category.",
       "Find businesses with no website, outdated website, or weak conversion path.",
@@ -1772,6 +1863,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "intent": "The searcher wants software or a process for building a targeted prospect list.",
     "summary": "A lead list builder is useful when it helps you choose better prospects, not just more rows. The strongest lists start with one offer, one buyer type, a visible business signal, and a clear follow-up path.",
     "leadIn": "iCloseLeads helps freelancers turn lead-list building into a real workflow: search one niche, qualify the signal, save the lead, draft the pitch, and track the next step before moving to another prospect.",
+    activationPlan: {
+      trigger: "Use this when you need a lead list that is small, current, and explainable.",
+      firstRun: "Build one list around a single offer, niche, and location rather than mixing unrelated prospects.",
+      savedLead: "Save only records with source, fit, reason, and a valid next step.",
+      followUp: "Review the list inside CRM and remove weak records before outreach starts.",
+    },
     "steps": [
       "Choose one service offer and one buyer segment for the list.",
       "Search for leads with public signals that match the offer.",
@@ -1824,6 +1921,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "intent": "The searcher wants a tool that helps with proactive sales prospecting.",
     "summary": "A sales prospecting tool should help you move from a real business signal to a relevant conversation. For freelancers, the key is context: who the prospect is, why now, and what first step makes sense.",
     "leadIn": "Use iCloseLeads as a prospecting workspace instead of a disconnected search tab. Find the lead, save the reason, draft the message, and keep the follow-up tied to the original signal.",
+    activationPlan: {
+      trigger: "Use this when prospecting needs to connect search, qualification, and outreach in one place.",
+      firstRun: "Use the tool to find one buyer segment and score each lead by fit, signal, and reachability.",
+      savedLead: "Save the top prospect with notes that can become the first email line.",
+      followUp: "Generate the outreach draft and track the next action so prospecting does not end at research.",
+    },
     "steps": [
       "Start with a niche and offer instead of a broad company search.",
       "Look for timing or need signals that make outreach relevant.",
@@ -1876,6 +1979,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "intent": "The searcher wants software for finding and qualifying B2B prospects.",
     "summary": "A B2B prospecting tool is strongest when it helps you identify fit before outreach. The best prospects have a matching business type, visible need, contact route, and reason to reply.",
     "leadIn": "iCloseLeads gives B2B prospecting a freelancer-friendly path: search a defined segment, save company context, prepare the proposal or email, and track the opportunity from first contact to follow-up.",
+    activationPlan: {
+      trigger: "Use this when you need B2B prospects with context, not anonymous contacts.",
+      firstRun: "Search one B2B segment and look for firmographic fit, active need, and public contact routes.",
+      savedLead: "Save the company, role path, need signal, and one business result you can help with.",
+      followUp: "Draft a role-specific message and move the lead into follow-up only if the fit remains clear.",
+    },
     "steps": [
       "Define the B2B segment and problem you solve.",
       "Search for companies with public signals related to that problem.",
@@ -2136,6 +2245,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "intent": "The searcher wants software for finding local business prospects.",
     "summary": "Local business lead generation works when the lead has context: category, location, website status, phone route, reviews, and a business reason to improve.",
     "leadIn": "iCloseLeads helps freelancers search local niches, save the business context, prepare a pitch, and follow up from one workflow instead of juggling search tabs and spreadsheets.",
+    activationPlan: {
+      trigger: "Use this when the lead source is local search and the goal is calls, bookings, quotes, or store visits.",
+      firstRun: "Search one local category and review website, profile, review, and service-area signals.",
+      savedLead: "Save the business with the local problem, proof link, contact route, and service angle.",
+      followUp: "Create a message tied to the local outcome and track the lead through first reply or no-response.",
+    },
     "steps": [
       "Pick one local category and service offer.",
       "Search one city, suburb, or region at a time.",
@@ -2188,6 +2303,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "intent": "The searcher wants to use map listings as a source of local leads.",
     "summary": "Google Maps lead generation is not about scraping every listing. It works when you use public profile signals to identify businesses where your service can improve calls, bookings, trust, or visibility.",
     "leadIn": "iCloseLeads helps turn local map-style research into a cleaner workflow: qualify the business, save the reason, draft the outreach, and track follow-up instead of collecting unqualified names.",
+    activationPlan: {
+      trigger: "Use this when public map listings reveal businesses that may need help, but the workflow must stay responsible.",
+      firstRun: "Search a focused category and region, then avoid mass scraping or unclear-fit records.",
+      savedLead: "Save only businesses with a public profile signal, clear service fit, and a respectful contact route.",
+      followUp: "Draft one specific pitch from the public signal and pause any lead that lacks a legitimate reason.",
+    },
     "steps": [
       "Search one local category and region at a time.",
       "Look for profile, website, review, and service clues.",

@@ -178,6 +178,32 @@ export default function ResourcePage({ params }: Props) {
                   </div>
                 </section>
 
+                {page.activationPlan ? (
+                  <section data-resource-activation-plan className="rounded-lg border border-accent/25 bg-accent/10 p-6 sm:p-8">
+                    <h2 className="text-2xl font-extrabold text-foreground">First 10-minute run inside iCloseLeads</h2>
+                    <p className="mt-4 text-base leading-7 text-muted-foreground">{page.activationPlan.trigger}</p>
+                    <div className="mt-6 grid gap-3">
+                      {[
+                        ["1", "Run the search", page.activationPlan.firstRun],
+                        ["2", "Save the right lead", page.activationPlan.savedLead],
+                        ["3", "Draft and follow up", page.activationPlan.followUp],
+                      ].map(([num, title, body]) => (
+                        <div key={title} className="rounded-lg border border-border bg-background p-4">
+                          <div className="flex items-center gap-3">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-sm font-bold text-accent">{num}</span>
+                            <h3 className="text-base font-bold text-foreground">{title}</h3>
+                          </div>
+                          <p className="mt-3 text-sm leading-6 text-muted-foreground">{body}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-activation-plan`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-accent">
+                      Start free with this plan
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </section>
+                ) : null}
+
                 {page.qualificationChecks?.length ? (
                   <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
                     <h2 className="text-2xl font-extrabold text-foreground">Qualify the lead before you pitch</h2>
