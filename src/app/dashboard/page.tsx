@@ -5,8 +5,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import {
-  Search, Sparkles, Send, BarChart2,
+  Search, Sparkles, Send,
   Users, Mail, Bookmark, CheckCircle,
+  MapPin, Radio, AlertTriangle,
 } from "lucide-react";
 import EmailChart from "@/components/charts/EmailChart";
 import DashboardStats from "@/components/DashboardStats";
@@ -16,6 +17,17 @@ import { formatRelativeTime } from "@/lib/utils";
 
 const DIRECT_EMAIL_STATUSES = ["SENT", "DELIVERED", "OPENED", "BOUNCED", "FAILED"];
 const OUTREACH_STATUSES = [...DIRECT_EMAIL_STATUSES, "READY_TO_SEND"];
+
+function buildEmptyChartData(now = new Date()) {
+  return Array.from({ length: 30 }, (_, index) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - (29 - index));
+    return {
+      date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      count: 0,
+    };
+  });
+}
 
 // ─── Data fetching ─────────────────────────────────────────────────────────────
 async function getDashboardData(userId: string) {
@@ -85,12 +97,32 @@ async function getDashboardData(userId: string) {
   };
 }
 
+type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
+
+function getEmptyDashboardData(): DashboardData {
+  return {
+    leadsFound: 0,
+    emailsSent: 0,
+    openRate: 0,
+    responses: 0,
+    recentLeads: [],
+    recentEmails: [],
+    chartData: buildEmptyChartData(),
+    trends: {
+      leads: null,
+      emails: null,
+      openRate: null,
+      responses: null,
+    },
+  };
+}
+
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { label: "Find Leads",  href: "/dashboard/leads",     icon: Search,   color: "bg-primary/10 text-primary-light border-primary/20 hover:bg-primary/20" },
-  { label: "AI Proposal", href: "/dashboard/leads",     icon: Sparkles, color: "bg-accent/10 text-accent border-accent/20 hover:bg-accent/20" },
-  { label: "Outreach", href: "/dashboard/sent",         icon: Send,     color: "bg-gold/10 text-gold border-gold/20 hover:bg-gold/20" },
-  { label: "Analytics",   href: "/dashboard/analytics", icon: BarChart2,color: "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20" },
+  { label: "Local Leads", href: "/dashboard/local-leads", icon: MapPin,   color: "bg-accent/10 text-accent border-accent/20 hover:bg-accent/20" },
+  { label: "Remote Jobs", href: "/dashboard/leads",       icon: Search,   color: "bg-primary/10 text-primary-light border-primary/20 hover:bg-primary/20" },
+  { label: "Live Jobs",   href: "/dashboard/live-jobs",   icon: Radio,    color: "bg-gold/10 text-gold border-gold/20 hover:bg-gold/20" },
+  { label: "Saved Leads", href: "/dashboard/saved-leads", icon: Bookmark, color: "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20" },
 ];
 
 // ─── Empty state component ─────────────────────────────────────────────────────
@@ -129,7 +161,17 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
-  const data      = await getDashboardData(session.user.id);
+  let data: DashboardData;
+  let dashboardDataError = false;
+
+  try {
+    data = await getDashboardData(session.user.id);
+  } catch (error) {
+    dashboardDataError = true;
+    data = getEmptyDashboardData();
+    console.error("[dashboard] Failed to load overview data", error);
+  }
+
   const firstName = session.user.name?.split(" ")[0] ?? "there";
   const isPro     = session.user.plan && session.user.plan !== "free";
 
@@ -157,13 +199,27 @@ export default async function DashboardPage() {
           {/* Cmd+K hint — client component (server page can't have onClick) */}
           <CmdKButton />
           <Link
-            href="/dashboard/leads"
+            href="/dashboard/local-leads"
             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-medium transition-all shadow-glow-primary"
           >
-            <Search className="w-4 h-4" /> Find Leads
+            <MapPin className="w-4 h-4" /> Find Local Leads
           </Link>
         </div>
       </div>
+
+      {dashboardDataError && (
+        <div className="rounded-2xl border border-gold/30 bg-gold/10 p-4">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-gold" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Dashboard stats are refreshing</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                The lead engines, saved leads, and outreach tools are still available. This page will keep working even if one stats feed is delayed.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Animated stat cards ── */}
       <DashboardStats stats={{
@@ -227,7 +283,7 @@ export default async function DashboardPage() {
               title="No leads yet"
               desc="Search for your first lead to get started"
               cta="Find leads"
-              ctaHref="/dashboard/leads"
+              ctaHref="/dashboard/local-leads"
             />
           ) : (
             <div className="divide-y divide-border/50">
@@ -268,7 +324,7 @@ export default async function DashboardPage() {
               title="No outreach yet"
               desc="Find leads and prepare AI-powered proposals"
               cta="Find leads"
-              ctaHref="/dashboard/leads"
+              ctaHref="/dashboard/local-leads"
             />
           ) : (
             <div className="divide-y divide-border/50">
@@ -306,8 +362,8 @@ export default async function DashboardPage() {
               </p>
               <div className="mt-4 grid sm:grid-cols-3 gap-3">
                 {[
-                  { step: "1", title: "Find Leads",     desc: "Search by niche to find real clients looking to hire",   href: "/dashboard/leads",     color: "border-primary/30 bg-primary/5" },
-                  { step: "2", title: "AI Proposal",    desc: "Let AI write a personalised outreach email in seconds",  href: "/dashboard/leads",     color: "border-accent/30 bg-accent/5" },
+                  { step: "1", title: "Find Local Leads", desc: "Start with nearby businesses that need a clearer site, contact path, or offer", href: "/dashboard/local-leads", color: "border-primary/30 bg-primary/5" },
+                  { step: "2", title: "Prepare Pitch",    desc: "Open the lead, find the owner path, and draft a researched outreach angle",      href: "/dashboard/local-leads", color: "border-accent/30 bg-accent/5" },
                   { step: "3", title: "Track Replies",  desc: "Manage follow-ups and close deals in your CRM pipeline", href: "/dashboard/pipeline",  color: "border-gold/30 bg-gold/5" },
                 ].map(({ step, title, desc, href, color }) => (
                   <Link
