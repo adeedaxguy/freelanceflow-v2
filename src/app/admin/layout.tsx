@@ -19,7 +19,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <div className="flex min-h-screen bg-background">
       {/* AdminSidebar handles desktop aside + mobile drawer + mobile top bar */}
       <AdminSidebar />
-      <main className="flex-1 min-w-0 overflow-auto">
+      <main className="flex-1 min-w-0 overflow-x-hidden overflow-y-auto">
         {children}
       </main>
     </div>

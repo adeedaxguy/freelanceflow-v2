@@ -123,11 +123,11 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8">
+    <div className="w-full max-w-full overflow-hidden p-4 sm:p-6 lg:p-8 space-y-8">
 
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <Shield className="w-5 h-5 text-primary-light" />
             <span className="text-xs font-bold uppercase tracking-wider text-primary-light">Master Admin Panel</span>
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
             Welcome, {session?.user?.name ?? "Admin"}. Full platform control.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end sm:gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg">
             <Activity className="w-3.5 h-3.5 text-green-400" />
             <span className="text-xs font-medium text-green-400">System Online</span>
@@ -150,14 +150,14 @@ export default async function AdminDashboard() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4">
         {kpis.map(c => {
           const Icon = c.icon;
           return (
             <Link key={c.label} href={c.href}
-              className="bg-gradient-card border border-border rounded-2xl p-5 space-y-3 hover:border-primary/30 transition-all group">
+              className="min-w-0 bg-gradient-card border border-border rounded-2xl p-5 space-y-3 hover:border-primary/30 transition-all group">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{c.label}</span>
+                <span className="min-w-0 truncate text-xs font-medium text-muted-foreground uppercase tracking-wider">{c.label}</span>
                 <div className={`w-8 h-8 rounded-lg ${c.bg} flex items-center justify-center`}>
                   <Icon className={`w-4 h-4 ${c.color}`} />
                 </div>
@@ -173,7 +173,7 @@ export default async function AdminDashboard() {
 
       {/* Plan distribution bar */}
       <div className="bg-gradient-card border border-border rounded-2xl p-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h3 className="text-foreground font-semibold">Plan Distribution</h3>
           <Link href="/admin/revenue" className="text-xs text-primary-light hover:underline flex items-center gap-1">
             Revenue details <ArrowUpRight className="w-3 h-3" />
@@ -188,7 +188,7 @@ export default async function AdminDashboard() {
             </>
           )}
         </div>
-        <div className="flex items-center gap-6 mt-3 text-xs">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-3 text-xs">
           {[
             { label: "Free",   count: s.freeUsers,   color: "bg-slate-500" },
             { label: "Pro",    count: s.proUsers,    color: "bg-primary" },
@@ -199,7 +199,7 @@ export default async function AdminDashboard() {
               {label} <strong className="text-foreground">{count}</strong>
             </span>
           ))}
-          <span className="ml-auto text-muted-foreground">
+          <span className="w-full text-muted-foreground sm:ml-auto sm:w-auto">
             Conversion: <strong className="text-accent">{s.convRate}%</strong>
           </span>
         </div>
@@ -241,12 +241,12 @@ export default async function AdminDashboard() {
           </div>
           <div className="divide-y divide-border/40">
             {s.recentUsers.map(u => (
-              <div key={u.id} className="flex items-center justify-between px-5 py-3 hover:bg-primary/5 transition-colors">
+              <div key={u.id} className="flex flex-col gap-2 px-5 py-3 hover:bg-primary/5 transition-colors sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground truncate">{u.name ?? "—"}</p>
                   <p className="text-xs text-muted-foreground truncate">{u.email}</p>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                <div className="flex flex-wrap items-center gap-2 sm:ml-4 sm:flex-shrink-0 sm:justify-end">
                   {u.niche && (
                     <span className="hidden sm:block text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full truncate max-w-[80px]">
                       {u.niche.replace(/-/g, " ")}
