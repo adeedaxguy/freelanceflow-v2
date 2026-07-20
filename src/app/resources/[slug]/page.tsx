@@ -12,6 +12,28 @@ interface Props {
   params: { slug: string };
 }
 
+type ResourcePageData = NonNullable<ReturnType<typeof getResourcePage>>;
+
+function getResourceSignalScorecard(page: ResourcePageData) {
+  return [
+    {
+      label: "Fit signal",
+      detail: `The lead should match the ${page.keyword} intent and make sense for ${page.audience.toLowerCase()}.`,
+      action: "Save it only when the business problem, buyer type, and service angle are clear enough to explain in one sentence.",
+    },
+    {
+      label: "Proof signal",
+      detail: `Look for public context that supports the page promise: ${page.intent.toLowerCase()}`,
+      action: "Attach the profile, site, job post, or contact-route proof before drafting outreach so the pitch stays specific.",
+    },
+    {
+      label: "Risk filter",
+      detail: "Reject blind lists, scraped records, fake exclusivity claims, spammy sources, and any lead that cannot be verified from public context.",
+      action: "Use iCloseLeads to keep the verified signal, draft, and follow-up together instead of chasing volume for its own sake.",
+    },
+  ];
+}
+
 export function generateStaticParams() {
   return RESOURCE_PAGES.map((page) => ({ slug: page.slug }));
 }
@@ -41,8 +63,9 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-function ResourceJsonLd({ page }: { page: NonNullable<ReturnType<typeof getResourcePage>> }) {
+function ResourceJsonLd({ page }: { page: ResourcePageData }) {
   const url = `${BASE_URL}/resources/${page.slug}`;
+  const scorecard = getResourceSignalScorecard(page);
   const graph = [
     {
       "@context": "https://schema.org",
@@ -69,6 +92,19 @@ function ResourceJsonLd({ page }: { page: NonNullable<ReturnType<typeof getResou
         "CRM follow-up tracking",
       ],
       description: `iCloseLeads helps ${page.audience.toLowerCase()} find leads, save context, draft proposals, prepare outreach, and track follow-up.`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: `How to qualify ${page.keyword} before outreach`,
+      description: `A practical scorecard for deciding whether a ${page.keyword} opportunity is worth saving, pitching, and following up inside iCloseLeads.`,
+      totalTime: "PT10M",
+      step: scorecard.map((item, index) => ({
+        "@type": "HowToStep",
+        position: index + 1,
+        name: item.label,
+        text: `${item.detail} ${item.action}`,
+      })),
     },
     {
       "@context": "https://schema.org",
@@ -102,6 +138,7 @@ export default function ResourcePage({ params }: Props) {
     "Save the best lead while the map, job, or website context is still open.",
     "Turn the saved lead into a proposal draft or Gmail-ready outreach before the reason goes stale.",
   ];
+  const signalScorecard = getResourceSignalScorecard(page);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -176,6 +213,28 @@ export default function ResourcePage({ params }: Props) {
                       </div>
                     ))}
                   </div>
+                </section>
+
+                <section data-resource-signal-scorecard className="rounded-lg border border-primary/25 bg-primary/10 p-6 sm:p-8">
+                  <h2 className="text-2xl font-extrabold text-foreground">Buying-signal scorecard before outreach</h2>
+                  <p className="mt-4 text-base leading-7 text-muted-foreground">
+                    Use this quick scorecard before you pitch from the {page.keyword} workflow. It keeps lead quality, proof, and follow-up tied to the same saved record.
+                  </p>
+                  <div className="mt-6 grid gap-4">
+                    {signalScorecard.map((item) => (
+                      <div key={item.label} className="rounded-lg border border-border bg-background p-5">
+                        <h3 className="text-base font-bold text-foreground">{item.label}</h3>
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+                        <p className="mt-3 rounded-lg border border-accent/20 bg-accent/10 p-3 text-sm leading-6 text-accent">
+                          Next action: {item.action}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-signal-scorecard`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-primary-light">
+                    Score a lead inside iCloseLeads
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </section>
 
                 {page.activationPlan ? (
