@@ -1761,3 +1761,21 @@ html.light .site-footer-panel {
   border-color: #dce3ee !important;
   box-shadow: 0 18px 44px rgba(20, 35, 70, 0.08) !important;
 }
+
+html.light .dashboard-content a.bg-gradient-hero,
+html.light .dashboard-content button.bg-gradient-hero,
+html.light .dashboard-content .text-white.bg-gradient-hero,
+html.light .dashboard-content .bg-gradient-hero.text-white,
+html.light .dashboard-content [class*="bg-gradient-hero"][class*="text-white"],
+html.light .dashboard-content [class*="from-primary"][class*="to-accent"],
+html.light .dashboard-content [class*="from-primary"][class*="to-accent"] *,
+html.light .dashboard-content [class*="from-blue"][class*="to-teal"],
+html.light .dashboard-content [class*="from-blue"][class*="to-teal"] * {
+  color: #ffffff !important;
+}
+
+html.light .dashboard-content a.bg-gradient-hero *,
+html.light .dashboard-content button.bg-gradient-hero *,
+html.light .dashboard-content .bg-gradient-hero.text-white * {
+  color: #ffffff !important;
+}
