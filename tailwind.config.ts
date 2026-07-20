@@ -15,7 +15,7 @@ const config: Config = {
         border: "hsl(var(--border) / <alpha-value>)",
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
-          light: "#4AA3FF",
+          light: "hsl(var(--primary-light) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
         },
         accent: {

@@ -1119,16 +1119,16 @@ function EarlyAccessBanner({ visible, onDismiss, isAuthenticated }: { visible: b
       transition={{ duration: 0.4 }}
       className="relative z-40 mt-16 overflow-hidden"
     >
-      <div className="homepage-early-access-banner bg-[#0d0d1f] border-b border-primary/20 text-center py-2 px-10 text-sm">
+      <div className="homepage-early-access-banner border-b border-border bg-card/95 px-10 py-2 text-center text-sm">
         <span className="inline-flex items-center gap-2 flex-wrap justify-center">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/15 text-accent text-xs font-bold border border-accent/25">
             ✦ FREE
           </span>
-          <span className="text-white/80">
-            <strong className="text-white">Early Access</strong> — {isAuthenticated ? "your lead workspace is ready." : "core lead tools free, no credit card."}
+          <span className="text-muted-foreground">
+            <strong className="text-foreground">Early Access</strong> — {isAuthenticated ? "your lead workspace is ready." : "core lead tools free, no credit card."}
           </span>
-          <span className="text-white/40 hidden sm:inline">·</span>
-          <span className="text-white/60 text-xs hidden sm:inline">Pro &amp; Agency launching soon</span>
+          <span className="hidden text-muted-foreground/50 sm:inline">·</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">Pro &amp; Agency launching soon</span>
           <Link
             href={bannerHref}
             prefetch={false}
@@ -1140,7 +1140,7 @@ function EarlyAccessBanner({ visible, onDismiss, isAuthenticated }: { visible: b
         </span>
         <button
           onClick={onDismiss}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors p-1"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground transition-colors hover:text-foreground"
           aria-label="Dismiss"
         >
           <X className="w-3.5 h-3.5" />
@@ -1170,10 +1170,8 @@ export default function HomepageClient() {
         className={`homepage-dark-surface relative overflow-hidden border-b border-border/70 ${showEarlyAccess ? "pt-9 sm:pt-14" : "pt-12 sm:pt-16"} pb-14 sm:pb-16 lg:pt-20 lg:pb-20`}
       >
 
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#090915_0%,#0c0c1e_48%,#090915_100%)]" />
-
-        <div className="absolute inset-0 opacity-[0.035]"
-          style={{ backgroundImage: "linear-gradient(rgba(159,103,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(159,103,255,1) 1px, transparent 1px)", backgroundSize: "72px 72px" }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-card/60 to-background" />
+        <div className="absolute inset-0 bg-grid-pattern bg-grid-sm opacity-25" />
 
         <motion.div className="relative z-10 mx-auto max-w-5xl px-4 text-center">
           <motion.div
