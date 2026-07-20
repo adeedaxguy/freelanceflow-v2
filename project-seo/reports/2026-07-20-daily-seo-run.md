@@ -28,7 +28,21 @@ Shipped count: `6`
 - `npm run type-check` passed.
 - `npm run build` passed.
 - Existing build warning persisted: static generation logs report missing `DATABASE_URL` for Prisma blog lookup, but the production build completed successfully.
-- Production deployment and live QA to be recorded after deploy completes.
+- Vercel production deployment passed and aliased to `https://icloseleads.com`.
+- Deployment id: `dpl_Hn22c6g5p7RMLvZ2jRqZQQUCCnhX`.
+- Production URL: `https://freelanceflow-v2-93ng5nm1y-adnanaimanager-3376s-projects.vercel.app`.
+- Custom-domain live QA passed for:
+  - `https://icloseleads.com/resources`
+  - `https://icloseleads.com/resources/email-lookup-for-freelance-outreach`
+  - `https://icloseleads.com/resources/email-finder-for-freelancers`
+  - `https://icloseleads.com/resources/email-verifier-for-cold-outreach`
+  - `https://icloseleads.com/resources/email-validator-for-freelance-leads`
+- Confirmed live items:
+  - Resource hub includes `responsible email verification workflow`, `check email routes responsibly`, and `validate the contact path`.
+  - Email lookup page includes `email checker`, `email format`, and `Company fit before contact hunting`.
+  - Email finder page includes the new `Qualified lead record` qualification section.
+  - Email verifier page includes the new `Is an email checker enough for cold outreach?` FAQ.
+  - Email validator page includes `Address validity` and `When should I remove an email from a prospect list?`.
 
 ## Next Actions
 
