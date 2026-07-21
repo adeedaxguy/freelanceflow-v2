@@ -36,6 +36,7 @@ import {
   resolveDesignVariation,
   variationToOptionPatch,
 } from "@/lib/site-design";
+import { copyText } from "@/lib/clipboard";
 
 type DraftData = {
   company: string;
@@ -491,7 +492,7 @@ function WebDesignBuilderContent() {
 
   async function copyPreviewLink() {
     const absoluteUrl = `${window.location.origin}${clientPreviewHref}`;
-    await navigator.clipboard.writeText(absoluteUrl);
+    await copyText(absoluteUrl);
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   }

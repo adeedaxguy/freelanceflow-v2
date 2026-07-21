@@ -6,6 +6,7 @@ import {
   Loader2, Sparkles, ArrowRight, Info, History, TrendingUp,
   BookOpen, Target, ChevronDown, ChevronUp, X, Plus,
 } from "lucide-react";
+import { copyText } from "@/lib/clipboard";
 
 interface ReplyResult {
   subject: string; body: string; source: "groq" | "template";
@@ -100,7 +101,7 @@ export default function DealCloserPage() {
 
   const handleCopy = (type: "subject" | "body" | "all") => {
     const text = type === "all" ? `Subject: ${subject}\n\n${body}` : type === "subject" ? subject : body;
-    void navigator.clipboard.writeText(text);
+    void copyText(text);
     setCopied(type);
     setTimeout(() => setCopied(null), 1800);
   };

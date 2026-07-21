@@ -7,6 +7,7 @@ import {
   FileText, Globe,
 } from "lucide-react";
 import Link from "next/link";
+import { copyText } from "@/lib/clipboard";
 
 interface PortfolioLink { label: string; url: string; }
 interface OutreachUsage {
@@ -151,7 +152,7 @@ function ProposalBuilder({ leadId }: { leadId: string }) {
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
+    await copyText(`Subject: ${subject}\n\n${body}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

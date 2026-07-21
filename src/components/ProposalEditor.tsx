@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Bold, Italic, Underline, AlignLeft, RotateCcw, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { copyText } from "@/lib/clipboard";
 
 interface ProposalEditorProps {
   value: string;
@@ -41,7 +42,7 @@ export default function ProposalEditor({
   }
 
   async function handleCopy() {
-    await navigator.clipboard.writeText(value);
+    await copyText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }

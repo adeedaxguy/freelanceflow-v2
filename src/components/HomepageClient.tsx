@@ -402,12 +402,12 @@ type LeadEngine = {
   keywords: string[];
 };
 
-const LEAD_ENGINES: LeadEngine[] = [
+const LEAD_ENGINE_CATALOG: LeadEngine[] = [
   {
     id: "remote-jobs",
     icon: <Briefcase className="w-5 h-5" />,
     label: "Remote Jobs",
-    eyebrow: "First priority",
+    eyebrow: "Second priority",
     title: "Remote job leads before the crowd floods the inbox",
     promise: "Track fresh remote freelance jobs, contract roles, and async hiring posts by niche, then turn the best matches into personal pitches.",
     seoLine: "Built for searches like remote freelance jobs, remote job leads, freelance job alerts, and work from home client opportunities.",
@@ -437,7 +437,7 @@ const LEAD_ENGINES: LeadEngine[] = [
     id: "local-business-leads",
     icon: <Building2 className="w-5 h-5" />,
     label: "Local Business Leads",
-    eyebrow: "Second priority",
+    eyebrow: "First priority",
     title: "Local businesses plus the owner/contact path",
     promise: "Find local business leads that need websites, SEO, booking flows, ads, content, or modernization, then move into owner and manager verification when the lead looks worth pitching.",
     seoLine: "Designed around high-intent searches like local business leads, businesses without websites, outdated website leads, business owner name finder, and web design clients.",
@@ -495,13 +495,19 @@ const LEAD_ENGINES: LeadEngine[] = [
   },
 ];
 
+const LEAD_ENGINES = [
+  LEAD_ENGINE_CATALOG[1]!,
+  LEAD_ENGINE_CATALOG[0]!,
+  LEAD_ENGINE_CATALOG[2]!,
+];
+
 const FEATURES = [
   {
     icon: <SlidersHorizontal className="w-5 h-5 text-primary-light" />,
     tag: "Lead Filters",
     tagColor: "#9F67FF",
     title: "Search by niche, signal, urgency, and contact fit",
-    desc: "Filter remote jobs, local businesses, and live job leads by skill, location, contact data, budget clues, freshness, and website status.",
+    desc: "Filter local businesses, remote jobs, and live job leads by skill, location, contact data, budget clues, freshness, and website status.",
     stat: "Cleaner search",
   },
   {
@@ -558,7 +564,7 @@ const HERO_PANELS = [
   {
     title: "Lead engines",
     value: "3",
-    detail: "Remote jobs, local businesses, and live demand in one workflow.",
+    detail: "Local businesses, remote jobs, and live demand in one workflow.",
   },
   {
     title: "Contact path",
@@ -576,7 +582,7 @@ const INTELLIGENCE_STEPS = [
   {
     label: "Find",
     title: "Surface demand",
-    desc: "Remote jobs, local business gaps, and urgent public requests enter one clean lead queue.",
+    desc: "Local business gaps, remote jobs, and urgent public requests enter one clean lead queue.",
   },
   {
     label: "Score",
@@ -604,7 +610,7 @@ const STATS = [
 
 const FAQS = [
   { q: "Is iCloseLeads the same as iClose or iCloser?", a: "No. iCloseLeads is an independent freelance lead generation and cold outreach platform for remote job leads, local business leads, decision-maker research, AI proposals, and CRM follow-up." },
-  { q: "What are the top three iCloseLeads features?", a: "The homepage focuses on the three lead engines freelancers use most: Remote Jobs for contract and freelance roles, Local Business Leads with Decision Maker checks for owner and manager paths, and Live Jobs for urgent public hiring signals." },
+  { q: "What are the top three iCloseLeads features?", a: "The homepage focuses on the three lead engines freelancers use most: Local Business Leads with Decision Maker checks for owner and manager paths, Remote Jobs for contract and freelance roles, and Live Jobs for urgent public hiring signals." },
   { q: "Can iCloseLeads help with freelance cold outreach?", a: "Yes. iCloseLeads helps you find fresh lead signals, save the best prospects, check the contact path, draft a personalized proposal, prepare Gmail outreach, and track follow-up in one workflow." },
   { q: "Is it really free to start?", a: "Yes. The Free plan gives you fresh lead discovery, AI-assisted proposals, local business search, live job signals, the CRM pipeline, and useful freelancer tools during early access. No credit card is required." },
   { q: "Can I use it to find remote freelance jobs?", a: "Yes. Remote Jobs is built for niche searches like WordPress, Meta ads, SEO, React, design, copywriting, and other freelance skills. It helps you find relevant remote job leads and draft a better first message." },
@@ -634,7 +640,7 @@ function LeadEngineShowcase() {
           badge="Lead Engines"
           badgeColor="gold"
           title={<>Three ways to find your<br />next serious client</>}
-          sub="Remote jobs first, local business leads second, live jobs third — with Decision Maker Finder built into the local business path so you can move from company name to owner or manager verification."
+          sub="Local business leads first, remote jobs second, live jobs third — with Decision Maker Finder built into the local business path so you can move from company name to owner or manager verification."
         />
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-[0.82fr_1.18fr] gap-6 items-stretch">
@@ -1199,7 +1205,7 @@ export default function HomepageClient() {
             transition={{ duration: 0.68, delay: 0.2 }}
             className="mx-auto mt-6 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8"
           >
-            iCloseLeads helps freelancers find <strong className="text-foreground">remote job leads</strong>, local business opportunities, and live client demand, then turns each signal into contact-path research, sharper proposals, Gmail-ready outreach, and a tracked pipeline.
+            iCloseLeads helps freelancers find <strong className="text-foreground">local business leads</strong>, remote job opportunities, and live client demand, then turns each signal into contact-path research, sharper proposals, Gmail-ready outreach, and a tracked pipeline.
           </motion.p>
 
           {/* CTAs */}
@@ -1223,7 +1229,7 @@ export default function HomepageClient() {
           </motion.div>
 
           <p className="mx-auto -mt-4 mb-8 max-w-xl text-xs leading-5 text-muted-foreground sm:text-sm">
-            No card required. Start with remote jobs, local businesses, or live job signals in under 60 seconds.
+            No card required. Start with local businesses, remote jobs, or live job signals in under 60 seconds.
           </p>
 
           <motion.div
@@ -1249,8 +1255,8 @@ export default function HomepageClient() {
           >
             {[
               { icon: <Shield className="w-4 h-4 text-accent" />, t: "Free early access" },
-              { icon: <Zap className="w-4 h-4 text-gold" />, t: "Remote jobs first" },
               { icon: <Globe className="w-4 h-4 text-primary-light" />, t: "Local business plus owner path" },
+              { icon: <Zap className="w-4 h-4 text-gold" />, t: "Remote job opportunities" },
               { icon: <TrendingUp className="w-4 h-4 text-blue-400" />, t: "Review-first Gmail outreach" },
             ].map(({ icon, t }) => (
               <div key={t} className="flex items-center gap-1.5">

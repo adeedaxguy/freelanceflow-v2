@@ -30,7 +30,7 @@ export default function Logo({
   // ── Icon mark ────────────────────────────────────────────────────────────────
   const mark = (
     <div className={cn("relative flex-shrink-0", iconSize)}>
-      <div className="relative h-full w-full overflow-hidden rounded-lg border border-white/10 shadow-[0_10px_28px_rgba(2,8,23,0.24)]">
+      <div className="relative h-full w-full overflow-hidden rounded-lg border border-white/10 bg-gradient-to-br from-blue-700 via-blue-600 to-teal-500 shadow-[0_10px_28px_rgba(2,8,23,0.24)]">
         <svg
           viewBox="0 0 40 40"
           fill="none"
@@ -38,25 +38,7 @@ export default function Logo({
           className="w-full h-full"
           aria-hidden="true"
         >
-          <defs>
-            {/* Main brand gradient */}
-            <linearGradient id="icl-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#1D4ED8" />
-              <stop offset="58%"  stopColor="#2563EB" />
-              <stop offset="100%" stopColor="#13B8A6" />
-            </linearGradient>
-            {/* Top-left shine */}
-            <linearGradient id="icl-shine" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.16" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0"    />
-            </linearGradient>
-          </defs>
-
-          {/* Background fill */}
-          <rect width="40" height="40" fill="url(#icl-bg)" />
-
-          {/* Subtle shine overlay */}
-          <rect width="40" height="40" fill="url(#icl-shine)" />
+          <path d="M0 0h40v40H0z" fill="white" fillOpacity="0.06" />
 
           {/* Subtle grid texture */}
           <path

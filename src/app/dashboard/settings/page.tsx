@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import ConfirmModal from "@/components/ConfirmModal";
+import { copyText } from "@/lib/clipboard";
 
 type Tab = "notifications" | "ai-models" | "security" | "integrations" | "danger";
 
@@ -193,7 +194,7 @@ function IntegrationCard({
             <button onClick={() => setShowKey(v => !v)} className="text-muted-foreground hover:text-foreground flex-shrink-0">
               {showKey ? <EyeOff className="w-3.5 h-3.5"/> : <Eye className="w-3.5 h-3.5"/>}
             </button>
-            <button onClick={() => void navigator.clipboard.writeText(savedValue)}
+            <button onClick={() => void copyText(savedValue)}
               className="text-muted-foreground hover:text-foreground flex-shrink-0">
               <Copy className="w-3.5 h-3.5"/>
             </button>

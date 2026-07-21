@@ -15,6 +15,7 @@ import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
 import { NICHES } from "@/types";
+import { copyText } from "@/lib/clipboard";
 
 const HOUR_OPTIONS = [
   { label: "12h", value: 12 },
@@ -195,7 +196,7 @@ function leadNextStep(lead: AggregatedLead) {
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <button onClick={() => { void navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1800); }); }}
+    <button onClick={() => { void copyText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1800); }); }}
       className="ml-1 p-0.5 rounded text-muted-foreground hover:text-accent transition-colors">
       {copied ? <CheckCircle className="w-3 h-3 text-accent" /> : <Copy className="w-3 h-3" />}
     </button>

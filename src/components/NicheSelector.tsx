@@ -70,9 +70,16 @@ export default function NicheSelector({
   return (
     <div ref={containerRef} className={cn("relative w-full", className)}>
       {/* Trigger */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(v => !v)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setOpen(value => !value);
+          }
+        }}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Select niches"
@@ -120,7 +127,7 @@ export default function NicheSelector({
         )}
 
         <ChevronDown className={cn("w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform", open && "rotate-180")} />
-      </button>
+      </div>
 
       {/* Count badge */}
       {selectedIds.length > 0 && (

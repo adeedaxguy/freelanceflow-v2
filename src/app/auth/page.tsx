@@ -59,7 +59,7 @@ const SIGNUP_INTENT_COPY = {
   default: {
     badge: "First search ready",
     title: "Run your first lead search",
-    body: "Create your free account, then choose remote jobs, local businesses, or live job signals from the dashboard.",
+    body: "Create your free account, then choose local businesses, remote jobs, or live job signals from the dashboard.",
   },
 };
 
@@ -370,7 +370,7 @@ function AuthForm() {
             {[
               "Free plan includes 20 leads per week",
               "Free plan includes 10 proposals per month",
-              "Search remote jobs, local businesses, and live signals",
+              "Search local businesses, remote jobs, and live signals",
               "Save leads and track follow-up in one CRM pipeline",
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm text-muted-foreground">

@@ -51,6 +51,13 @@ describe("NicheSelector", () => {
     expect(selectedOptions).toHaveLength(0);
   });
 
+  it("opens from the keyboard", () => {
+    render(<NicheSelector onChange={() => undefined} />);
+    fireEvent.keyDown(screen.getByRole("button", { name: "Select niches" }), { key: "Enter" });
+
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+  });
+
   it("updates selection on repeated clicks", () => {
     const handleChange = jest.fn();
     render(<NicheSelector onChange={handleChange} />);

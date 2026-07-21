@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import type { LocalLead } from "@/app/api/local-leads/search/route";
 import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/phone-type";
+import { copyText } from "@/lib/clipboard";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
@@ -488,7 +489,7 @@ function CopyBtn({ text }: { text: string }) {
   const [ok, setOk] = useState(false);
   return (
     <button
-      onClick={() => void navigator.clipboard.writeText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); })}
+      onClick={() => void copyText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); })}
       className="flex items-center gap-1 text-xs text-muted-foreground hover:text-accent transition-colors ml-1"
     >
       {ok ? <CheckCircle className="w-3 h-3 text-accent"/> : <Copy className="w-3 h-3"/>}
@@ -900,7 +901,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
               <Target className="w-4 h-4 text-primary-light"/> Ready-to-Send Cold Pitch
             </h4>
             <button
-              onClick={() => { void navigator.clipboard.writeText(fullPitch).then(() => { setCopiedPitch(true); setTimeout(() => setCopiedPitch(false), 2000); }); }}
+              onClick={() => { void copyText(fullPitch).then(() => { setCopiedPitch(true); setTimeout(() => setCopiedPitch(false), 2000); }); }}
               className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all font-medium ${copiedPitch ? "bg-accent/10 text-accent border-accent/30" : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"}`}>
               {copiedPitch ? <><CheckCircle className="w-3 h-3"/> Copied!</> : <><Copy className="w-3 h-3"/> Copy Pitch</>}
             </button>
@@ -934,7 +935,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
                 <PhoneCall className="h-4 w-4 text-accent"/> 30-Second Call Script
               </h5>
               <button
-                onClick={() => { void navigator.clipboard.writeText(callScript).then(() => { setCopiedCallScript(true); setTimeout(() => setCopiedCallScript(false), 2000); }); }}
+                onClick={() => { void copyText(callScript).then(() => { setCopiedCallScript(true); setTimeout(() => setCopiedCallScript(false), 2000); }); }}
                 className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${copiedCallScript ? "border-accent/30 bg-accent/10 text-accent" : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
                 {copiedCallScript ? <><CheckCircle className="h-3 w-3"/> Copied!</> : <><Copy className="h-3 w-3"/> Copy Script</>}
               </button>

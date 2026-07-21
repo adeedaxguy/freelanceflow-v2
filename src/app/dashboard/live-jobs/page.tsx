@@ -11,6 +11,7 @@ import Link from "next/link";
 import type { AggregatedLead } from "@/lib/leads-aggregator";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
+import { copyText } from "@/lib/clipboard";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
@@ -125,7 +126,7 @@ function formatExact(iso: string) {
 function CopyButton({ text }: { text: string }) {
   const [ok, setOk] = useState(false);
   return (
-    <button onClick={() => void navigator.clipboard.writeText(text).then(()=>{setOk(true);setTimeout(()=>setOk(false),1500);})}
+    <button onClick={() => void copyText(text).then(()=>{setOk(true);setTimeout(()=>setOk(false),1500);})}
       className="ml-1 p-0.5 rounded text-muted-foreground hover:text-accent transition-colors">
       {ok ? <CheckCircle className="w-3 h-3 text-accent"/> : <Copy className="w-3 h-3"/>}
     </button>

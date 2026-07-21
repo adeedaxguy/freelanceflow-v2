@@ -9,6 +9,7 @@ import {
   Copy, AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
+import { copyText } from "@/lib/clipboard";
 
 interface ProposalResult { subject: string; body: string; source: string; }
 interface PortfolioLink { label: string; url: string; }
@@ -46,7 +47,7 @@ function CopyButton({ text, label = "Copy Proposal" }: { text: string; label?: s
   const [ok, setOk] = useState(false);
   return (
     <button
-      onClick={() => { void navigator.clipboard.writeText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }); }}
+      onClick={() => { void copyText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }); }}
       className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 text-xs font-medium transition-all"
     >
       {ok ? <><CheckCircle className="w-3.5 h-3.5 text-accent" /> Copied!</> : <><Copy className="w-3.5 h-3.5" /> {label}</>}

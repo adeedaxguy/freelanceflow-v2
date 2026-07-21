@@ -6,12 +6,13 @@ import {
   Loader2, Copy, RefreshCw, Target, TrendingUp, FileText,
   AlertCircle, ShieldCheck, BarChart2, Sparkles,
 } from "lucide-react";
+import { copyText } from "@/lib/clipboard";
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 function useCopy() {
   const [copied, setCopied] = useState<string | null>(null);
   const copy = (text: string, key: string) => {
-    navigator.clipboard.writeText(text).catch(() => {});
+    void copyText(text).catch(() => {});
     setCopied(key);
     setTimeout(() => setCopied(null), 1800);
   };
