@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 };
 
 const billingFAQ = [
-  { q: "Can I change plans anytime?", a: "Yes. You can upgrade or downgrade at any time. Upgrades take effect immediately; downgrades at the next billing cycle." },
-  { q: "What payment methods do you accept?", a: "We accept all major credit cards (Visa, Mastercard, Amex) and PayPal via our Stripe-powered checkout." },
-  { q: "Is there a free trial for paid plans?", a: "Pro and Agency plans come with a 14-day free trial. No credit card required to start the trial." },
+  { q: "Can I change plans anytime?", a: "Yes. Once paid plans launch, subscription changes and cancellations will be available through the secure customer billing portal." },
+  { q: "How will payments be handled?", a: "Paid subscriptions will use Lemon Squeezy's secure hosted checkout. It acts as merchant of record and handles payment processing and applicable sales tax or VAT." },
+  { q: "Is there a free trial for paid plans?", a: "Paid-plan launch terms will be shown clearly before checkout. Free early access requires no card and remains the best way to try iCloseLeads today." },
   { q: "What happens when I hit my monthly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
-  { q: "Do you offer annual billing?", a: "Yes! Annual billing saves you 20%. Contact us or select annual billing during signup." },
+  { q: "Do you offer annual billing?", a: "Monthly and annual subscriptions are being prepared. Final annual savings will be displayed before purchase." },
 ];
 
 export default function PricingPage() {
@@ -39,14 +39,14 @@ export default function PricingPage() {
               {PRICING_TIERS.map((tier, i) => <PricingCard key={tier.name} tier={tier} index={i} />)}
             </div>
 
-            {/* Guarantee */}
+            {/* Launch assurance */}
             <div className="flex items-center justify-center gap-4 p-6 bg-gradient-card border border-accent/20 rounded-2xl max-w-lg mx-auto mb-24">
               <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Shield className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <div className="text-foreground font-semibold">14-Day Money-Back Guarantee</div>
-                <div className="text-muted-foreground text-sm">Not satisfied? Get a full refund within 14 days, no questions asked.</div>
+                <div className="text-foreground font-semibold">Free early access, no card required</div>
+                <div className="text-muted-foreground text-sm">Try the core workflow now. Paid checkout stays closed until billing verification is complete.</div>
               </div>
             </div>
 

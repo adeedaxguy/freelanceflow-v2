@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Zap, Crown, Loader2, ArrowRight, Shield } from "lucide-react";
+import { Check, Zap, Crown, Loader2, ArrowRight, Shield, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
   currentPlan: string;
-  userName: string;
   userEmail: string;
+  billingReady: boolean;
+  billingTestMode: boolean;
+  canCheckout: boolean;
+  hasBillingSubscription: boolean;
+  checkoutReturned: boolean;
   pricing: {
     proPrice: string;
     agencyPrice: string;
@@ -17,10 +21,23 @@ interface Props {
   };
 }
 
-export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props) {
+export default function UpgradeClient({
+  currentPlan,
+  userEmail,
+  pricing,
+  billingReady,
+  billingTestMode,
+  canCheckout,
+  hasBillingSubscription,
+  checkoutReturned,
+}: Props) {
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [loading, setLoading] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    checkoutReturned
+      ? "Checkout completed. Your plan activates after the signed payment confirmation arrives. This normally takes a few seconds."
+      : "",
+  );
 
   const proMonthly    = parseInt(pricing.proPrice);
   const agencyMonthly = parseInt(pricing.agencyPrice);
@@ -38,7 +55,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       });
       const data = await res.json() as { url?: string; error?: string };
       if (data.url) {
-        window.location.href = data.url; // Stripe checkout redirect
+        window.location.href = data.url;
       } else if (data.error) {
         setMessage(data.error);
       } else {
@@ -46,6 +63,21 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       }
     } catch {
       setMessage("Failed to initiate upgrade. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function openBillingPortal() {
+    setLoading("portal");
+    setMessage("");
+    try {
+      const res = await fetch("/api/billing/portal", { method: "POST" });
+      const data = await res.json() as { url?: string; error?: string };
+      if (!res.ok || !data.url) throw new Error(data.error || "Billing portal is unavailable.");
+      window.location.href = data.url;
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not open billing settings.");
     } finally {
       setLoading(null);
     }
@@ -116,13 +148,41 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-foreground">Upgrade Your Plan</h1>
-        <p className="text-muted-foreground mt-2">
-          You&apos;re currently on the <span className="text-foreground font-semibold capitalize">{currentPlan}</span> plan.
-          Unlock more leads, better AI, and premium features.
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">Account: {userEmail}</p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold text-foreground">Plans and billing</h1>
+            <p className="text-muted-foreground mt-2">
+              You&apos;re currently on the <span className="text-foreground font-semibold capitalize">{currentPlan}</span> plan.
+              Unlock more leads, stronger automation, and higher limits.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">Account: {userEmail}</p>
+          </div>
+          {hasBillingSubscription && (
+            <button
+              type="button"
+              onClick={() => void openBillingPortal()}
+              disabled={loading === "portal"}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground hover:border-primary/40 disabled:opacity-60"
+            >
+              {loading === "portal" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+              Manage billing
+            </button>
+          )}
+        </div>
       </div>
+
+      {!canCheckout && (
+        <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+          {billingReady && billingTestMode
+            ? "Paid plans are in private checkout testing. Free early access remains fully available while we finish verification."
+            : "Paid plans are being prepared. You can keep using free early access without a card."}
+        </div>
+      )}
+      {canCheckout && billingTestMode && (
+        <div className="mb-6 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-sm text-muted-foreground">
+          Admin test mode is active. These checkouts do not change production plan access.
+        </div>
+      )}
 
       {/* Billing toggle */}
       <div className="flex items-center gap-3 mb-8">
@@ -149,8 +209,6 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
         {plans.map((plan, i) => {
           const price = billing === "monthly" ? plan.price.monthly : plan.price.annual;
           const isCurrentPlan = currentPlan === plan.id;
-          const canUpgrade = !isCurrentPlan && plan.id !== "free";
-
           return (
             <motion.div
               key={plan.id}
@@ -214,7 +272,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
               ) : (
                 <button
                   onClick={() => void handleUpgrade(plan.id)}
-                  disabled={!!loading}
+                  disabled={!!loading || !canCheckout}
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60 ${
                     plan.id === "pro" ? "bg-primary hover:bg-primary-light shadow-glow-primary" : "bg-gradient-to-r from-gold/80 to-amber-500 hover:from-gold hover:to-amber-400 shadow-lg shadow-gold/20"
                   }`}
@@ -224,7 +282,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
                   ) : (
                     <ArrowRight className="w-4 h-4" />
                   )}
-                  {plan.cta}
+                  {canCheckout ? (billingTestMode ? `Test ${plan.name} checkout` : plan.cta) : "Coming soon"}
                 </button>
               )}
             </motion.div>
@@ -236,7 +294,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
       <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Shield className="w-4 h-4 text-accent" />
-          Secure payment processing
+          Secure Lemon Squeezy checkout
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
@@ -244,7 +302,7 @@ export default function UpgradeClient({ currentPlan, userEmail, pricing }: Props
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
-          14-day money-back guarantee
+          Tax handled at checkout
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />

@@ -1,128 +1,111 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import {
+  getLemonSqueezyConfig,
+  getVariantId,
+  lemonSqueezyRequest,
+  type BillingInterval,
+  type PaidPlan,
+} from "@/lib/lemonsqueezy";
 
-interface StripeSessionResponse {
-  id: string;
-  url: string;
-}
-
-interface StripeErrorResponse {
-  error?: { message?: string };
-}
-
-async function createStripeCheckoutSession(params: {
-  stripeKey: string;
-  priceId: string;
-  customerEmail: string;
-  userId: string;
-  plan: string;
-  billing: string;
-  appUrl: string;
-}): Promise<{ url?: string; error?: string }> {
-  const { stripeKey, priceId, customerEmail, userId, plan, billing, appUrl } = params;
-
-  try {
-    const body = new URLSearchParams({
-      mode: "subscription",
-      "payment_method_types[0]": "card",
-      customer_email: customerEmail,
-      "line_items[0][price]": priceId,
-      "line_items[0][quantity]": "1",
-      "metadata[userId]": userId,
-      "metadata[plan]": plan,
-      "metadata[billing]": billing,
-      "subscription_data[metadata][userId]": userId,
-      "subscription_data[metadata][plan]": plan,
-      success_url: `${appUrl}/dashboard?upgraded=1`,
-      cancel_url: `${appUrl}/dashboard/upgrade?cancelled=1`,
-    });
-
-    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: body.toString(),
-    });
-
-    if (!res.ok) {
-      const err = await res.json() as StripeErrorResponse;
-      return { error: err.error?.message ?? "Stripe checkout failed" };
-    }
-
-    const session = await res.json() as StripeSessionResponse;
-    return { url: session.url };
-  } catch (err) {
-    console.error("Stripe fetch error:", err);
-    return { error: "Failed to connect to payment provider" };
-  }
+interface CheckoutResponse {
+  data: {
+    attributes: { url: string };
+  };
 }
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  let body: { plan?: string; billing?: string };
-  try { body = await req.json() as { plan?: string; billing?: string }; }
-  catch { body = {}; }
+  const body = await req.json().catch(() => ({})) as {
+    plan?: PaidPlan;
+    billing?: BillingInterval;
+  };
+  const plan = body.plan;
+  const billing = body.billing || "monthly";
 
-  const { plan, billing = "monthly" } = body;
-
-  if (!plan || !["pro", "agency"].includes(plan)) {
-    return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  if (!plan || !["pro", "agency"].includes(plan) || !["monthly", "annual"].includes(billing)) {
+    return NextResponse.json({ error: "Invalid plan or billing interval." }, { status: 400 });
   }
 
   try {
-    // Load Stripe settings from DB
-    const settings = await prisma.platformSetting.findMany({
-      where: { key: { in: ["stripe_secret_key", "pro_price_id", "agency_price_id"] } },
-    });
-    const cfg: Record<string, string> = {};
-    for (const s of settings) cfg[s.key] = s.value;
+    const [config, user] = await Promise.all([
+      getLemonSqueezyConfig(),
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { email: true, name: true, role: true },
+      }),
+    ]);
+    const variantId = getVariantId(config, plan, billing);
 
-    const stripeKey    = (cfg["stripe_secret_key"] ?? process.env.STRIPE_SECRET_KEY ?? "").trim();
-    const proPriceId   = (cfg["pro_price_id"]    ?? process.env.STRIPE_PRO_PRICE_ID    ?? "").trim();
-    const agencyPriceId= (cfg["agency_price_id"] ?? process.env.STRIPE_AGENCY_PRICE_ID ?? "").trim();
-
-    if (!stripeKey || stripeKey.length < 20) {
+    if (!config.apiKey || !/^\d+$/.test(config.storeId) || !/^\d+$/.test(variantId)) {
       return NextResponse.json({
-        error: "Payment gateway not configured yet. Please contact support, or the admin needs to add Stripe keys in Admin → Settings.",
+        error: "Paid plans are not open yet. The secure checkout is still being configured.",
       }, { status: 503 });
     }
 
-    const priceId = plan === "pro" ? proPriceId : agencyPriceId;
-    if (!priceId) {
+    if (config.testMode && user?.role !== "ADMIN") {
       return NextResponse.json({
-        error: `Price ID for ${plan} plan is not configured. Admin needs to set it in Admin → Settings → Payment Gateway.`,
+        error: "Paid plans are still in private testing. Your free early-access account remains active.",
       }, { status: 503 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { email: true },
+    const appUrl = (
+      process.env.NEXT_PUBLIC_APP_URL
+      || process.env.NEXTAUTH_URL
+      || req.nextUrl.origin
+    ).replace(/\/$/, "");
+
+    const checkout = await lemonSqueezyRequest<CheckoutResponse>(config, "/checkouts", {
+      method: "POST",
+      body: JSON.stringify({
+        data: {
+          type: "checkouts",
+          attributes: {
+            product_options: {
+              redirect_url: `${appUrl}/dashboard/upgrade?checkout=success`,
+              enabled_variants: [Number(variantId)],
+            },
+            checkout_options: {
+              embed: false,
+              media: true,
+              logo: true,
+              desc: true,
+              discount: true,
+              subscription_preview: true,
+              button_color: "#7c3aed",
+            },
+            checkout_data: {
+              email: user?.email || undefined,
+              name: user?.name || undefined,
+              custom: {
+                user_id: session.user.id,
+                requested_plan: plan,
+                billing_interval: billing,
+              },
+            },
+            test_mode: config.testMode,
+          },
+          relationships: {
+            store: { data: { type: "stores", id: config.storeId } },
+            variant: { data: { type: "variants", id: variantId } },
+          },
+        },
+      }),
     });
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-    const result = await createStripeCheckoutSession({
-      stripeKey,
-      priceId,
-      customerEmail: user?.email ?? "",
-      userId: session.user.id,
-      plan,
-      billing,
-      appUrl,
-    });
-
-    if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
-    return NextResponse.json({ url: result.url });
-  } catch (err) {
-    console.error("Upgrade error:", err);
-    return NextResponse.json({ error: "Failed to create checkout session. Please try again." }, { status: 500 });
+    return NextResponse.json({ url: checkout.data.attributes.url });
+  } catch (error) {
+    console.error("Lemon Squeezy checkout error:", error);
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : "Could not start secure checkout.",
+    }, { status: 502 });
   }
 }

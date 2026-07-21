@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -40,12 +40,97 @@ const TABLE_MIGRATIONS = [
       CONSTRAINT "LeadApplication_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
     )`,
   },
+  {
+    name: "BillingSubscription",
+    sql: `CREATE TABLE IF NOT EXISTS "BillingSubscription" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "provider" TEXT NOT NULL DEFAULT 'LEMONSQUEEZY',
+      "externalSubscriptionId" TEXT NOT NULL,
+      "externalCustomerId" TEXT,
+      "externalOrderId" TEXT,
+      "plan" TEXT NOT NULL,
+      "variantId" TEXT NOT NULL,
+      "status" TEXT NOT NULL,
+      "testMode" BOOLEAN NOT NULL DEFAULT false,
+      "renewsAt" TIMESTAMP(3),
+      "endsAt" TIMESTAMP(3),
+      "trialEndsAt" TIMESTAMP(3),
+      "cardBrand" TEXT,
+      "cardLastFour" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "BillingSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+  },
+  {
+    name: "TelephonyWorkspace",
+    sql: `CREATE TABLE IF NOT EXISTS "TelephonyWorkspace" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'PENDING',
+      "twilioAccountSid" TEXT,
+      "twilioAuthTokenEncrypted" TEXT,
+      "twilioApiKeySid" TEXT,
+      "twilioApiKeySecretEncrypted" TEXT,
+      "twimlAppSid" TEXT,
+      "phoneNumberSid" TEXT,
+      "phoneNumber" TEXT,
+      "phoneCountry" TEXT,
+      "monthlyPriceCents" INTEGER,
+      "priceCurrency" TEXT,
+      "consentAcceptedAt" TIMESTAMP(3),
+      "lastError" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "TelephonyWorkspace_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+  },
+  {
+    name: "VoiceCall",
+    sql: `CREATE TABLE IF NOT EXISTS "VoiceCall" (
+      "id" TEXT PRIMARY KEY,
+      "workspaceId" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "leadId" TEXT,
+      "twilioCallSid" TEXT,
+      "direction" TEXT NOT NULL DEFAULT 'OUTBOUND',
+      "from" TEXT NOT NULL,
+      "to" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'QUEUED',
+      "durationSeconds" INTEGER,
+      "costCents" INTEGER,
+      "costCurrency" TEXT,
+      "outcome" TEXT,
+      "notes" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "answeredAt" TIMESTAMP(3),
+      "endedAt" TIMESTAMP(3),
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "VoiceCall_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "TelephonyWorkspace"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "VoiceCall_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "VoiceCall_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE SET NULL ON UPDATE CASCADE
+    )`,
+  },
   { name: "Template.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_userId_idx" ON "Template"("userId")` },
   { name: "Template.isDefault_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_isDefault_idx" ON "Template"("isDefault")` },
   { name: "ContactSubmission.resolved_idx", sql: `CREATE INDEX IF NOT EXISTS "ContactSubmission_resolved_idx" ON "ContactSubmission"("resolved")` },
   { name: "LeadApplication.userId_leadUrl_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "LeadApplication_userId_leadUrl_key" ON "LeadApplication"("userId", "leadUrl")` },
   { name: "LeadApplication.leadUrl_idx", sql: `CREATE INDEX IF NOT EXISTS "LeadApplication_leadUrl_idx" ON "LeadApplication"("leadUrl")` },
   { name: "LeadApplication.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "LeadApplication_userId_idx" ON "LeadApplication"("userId")` },
+  { name: "BillingSubscription.externalSubscriptionId_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "BillingSubscription_externalSubscriptionId_key" ON "BillingSubscription"("externalSubscriptionId")` },
+  { name: "BillingSubscription.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "BillingSubscription_userId_idx" ON "BillingSubscription"("userId")` },
+  { name: "BillingSubscription.status_idx", sql: `CREATE INDEX IF NOT EXISTS "BillingSubscription_status_idx" ON "BillingSubscription"("status")` },
+  { name: "BillingSubscription.externalCustomerId_idx", sql: `CREATE INDEX IF NOT EXISTS "BillingSubscription_externalCustomerId_idx" ON "BillingSubscription"("externalCustomerId")` },
+  { name: "TelephonyWorkspace.userId_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyWorkspace_userId_key" ON "TelephonyWorkspace"("userId")` },
+  { name: "TelephonyWorkspace.twilioAccountSid_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyWorkspace_twilioAccountSid_key" ON "TelephonyWorkspace"("twilioAccountSid")` },
+  { name: "TelephonyWorkspace.status_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyWorkspace_status_idx" ON "TelephonyWorkspace"("status")` },
+  { name: "TelephonyWorkspace.phoneNumber_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyWorkspace_phoneNumber_idx" ON "TelephonyWorkspace"("phoneNumber")` },
+  { name: "VoiceCall.twilioCallSid_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "VoiceCall_twilioCallSid_key" ON "VoiceCall"("twilioCallSid")` },
+  { name: "VoiceCall.workspaceId_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_workspaceId_idx" ON "VoiceCall"("workspaceId")` },
+  { name: "VoiceCall.userId_createdAt_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_userId_createdAt_idx" ON "VoiceCall"("userId", "createdAt")` },
+  { name: "VoiceCall.leadId_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_leadId_idx" ON "VoiceCall"("leadId")` },
+  { name: "VoiceCall.status_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_status_idx" ON "VoiceCall"("status")` },
 ];
 
 const MIGRATIONS = [
@@ -74,7 +159,13 @@ const MIGRATIONS = [
   { table: "Lead", name: "isManual",        sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "isManual" BOOLEAN DEFAULT false` },
 ];
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const secret = process.env.MIGRATE_SECRET;
+  const supplied = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || req.nextUrl.searchParams.get("secret");
+  if (!secret || supplied !== secret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const results: { col: string; status: "added" | "exists" | "error"; detail?: string }[] = [];
   for (const m of TABLE_MIGRATIONS) {
     try {

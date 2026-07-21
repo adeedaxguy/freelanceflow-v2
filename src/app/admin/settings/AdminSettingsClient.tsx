@@ -9,6 +9,10 @@ import {
 
 interface Props {
   initialSettings: Record<string, string>;
+  lemonEnvironment: {
+    apiKey: boolean;
+    webhookSecret: boolean;
+  };
 }
 
 function Field({
@@ -57,7 +61,7 @@ function Section({ title, icon, children, color = "primary" }: {
   );
 }
 
-export default function AdminSettingsClient({ initialSettings }: Props) {
+export default function AdminSettingsClient({ initialSettings, lemonEnvironment }: Props) {
   const [s, setS] = useState<Record<string, string>>({ ...initialSettings });
   const [saving, setSaving] = useState<string | null>(null);
   const [savedSections, setSavedSections] = useState<Set<string>>(new Set());
@@ -148,49 +152,60 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
         </form>
       </Section>
 
-      {/* ── Stripe / Payment Gateway ── */}
-      <Section title="Payment Gateway (Stripe)" icon={<CreditCard className="w-4 h-4 text-accent" />} color="primary">
-        <div className="px-3 py-2 rounded-lg bg-accent/5 border border-accent/20 text-xs text-muted-foreground mb-2">
-          💳 Get your keys at{" "}
-          <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noreferrer" className="text-primary-light hover:underline">
-            dashboard.stripe.com/apikeys
-          </a>
-          . Use <strong className="text-foreground">test keys</strong> during development, live keys in production.
+      <Section title="Payment Gateway (Lemon Squeezy)" icon={<CreditCard className="w-4 h-4 text-accent" />} color="primary">
+        <div className="rounded-lg border border-accent/20 bg-accent/5 px-3 py-3 text-xs text-muted-foreground">
+          Store and variant IDs are safe to configure here. API and webhook secrets are accepted only through Vercel environment variables and are never stored in the platform database.
         </div>
-        <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("stripe", ["stripe_mode", "stripe_public_key", "stripe_secret_key", "stripe_webhook_secret", "pro_price_id", "agency_price_id"]); }}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+            <span className="text-muted-foreground">API key</span>
+            <span className={lemonEnvironment.apiKey ? "text-accent" : "text-gold"}>{lemonEnvironment.apiKey ? "Configured" : "Missing in Vercel"}</span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+            <span className="text-muted-foreground">Webhook secret</span>
+            <span className={lemonEnvironment.webhookSecret ? "text-accent" : "text-gold"}>{lemonEnvironment.webhookSecret ? "Configured" : "Missing in Vercel"}</span>
+          </div>
+        </div>
+        <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("lemonsqueezy", [
+          "lemonsqueezy_test_mode",
+          "lemonsqueezy_store_id",
+          "lemonsqueezy_pro_monthly_variant_id",
+          "lemonsqueezy_pro_annual_variant_id",
+          "lemonsqueezy_agency_monthly_variant_id",
+          "lemonsqueezy_agency_annual_variant_id",
+        ]); }}
           className="space-y-4">
 
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-foreground">Mode</label>
+            <label className="block text-sm font-medium text-foreground">Checkout mode</label>
             <div className="flex gap-2">
-              {["test", "live"].map(m => (
-                <button key={m} type="button" onClick={() => set("stripe_mode", m)}
-                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all capitalize ${get("stripe_mode") === m ? "bg-primary/15 border-primary/50 text-primary-light" : "bg-surface border-border text-muted-foreground"}`}>
-                  {m}
+              {[{ label: "Test", value: "true" }, { label: "Live", value: "false" }].map(mode => (
+                <button key={mode.value} type="button" onClick={() => set("lemonsqueezy_test_mode", mode.value)}
+                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${get("lemonsqueezy_test_mode") === mode.value ? "bg-primary/15 border-primary/50 text-primary-light" : "bg-surface border-border text-muted-foreground"}`}>
+                  {mode.label}
                 </button>
               ))}
             </div>
           </div>
-
-          <Field label="Publishable Key (pk_...)" value={get("stripe_public_key")} onChange={v => set("stripe_public_key", v)}
-            placeholder="pk_test_..." sensitive
-            hint="Used on the frontend. Safe to expose." />
-          <Field label="Secret Key (sk_...)" value={get("stripe_secret_key")} onChange={v => set("stripe_secret_key", v)}
-            placeholder="sk_test_..." sensitive
-            hint="⚠ Never expose this publicly. Server-side only." />
-          <Field label="Webhook Secret (whsec_...)" value={get("stripe_webhook_secret")} onChange={v => set("stripe_webhook_secret", v)}
-            placeholder="whsec_..." sensitive
-            hint="From Stripe Dashboard → Webhooks → your endpoint → Signing secret." />
-
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Pro Plan Price ID" value={get("pro_price_id")} onChange={v => set("pro_price_id", v)}
-              placeholder="price_..." hint="From Stripe Products." />
-            <Field label="Agency Plan Price ID" value={get("agency_price_id")} onChange={v => set("agency_price_id", v)}
-              placeholder="price_..." hint="From Stripe Products." />
+          <Field label="Store ID" value={get("lemonsqueezy_store_id")} onChange={v => set("lemonsqueezy_store_id", v)}
+            placeholder="12345" hint="The numeric store ID from Lemon Squeezy." />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label="Pro monthly variant" value={get("lemonsqueezy_pro_monthly_variant_id")} onChange={v => set("lemonsqueezy_pro_monthly_variant_id", v)} placeholder="123456" />
+            <Field label="Pro annual variant" value={get("lemonsqueezy_pro_annual_variant_id")} onChange={v => set("lemonsqueezy_pro_annual_variant_id", v)} placeholder="123457" />
+            <Field label="Agency monthly variant" value={get("lemonsqueezy_agency_monthly_variant_id")} onChange={v => set("lemonsqueezy_agency_monthly_variant_id", v)} placeholder="123458" />
+            <Field label="Agency annual variant" value={get("lemonsqueezy_agency_annual_variant_id")} onChange={v => set("lemonsqueezy_agency_annual_variant_id", v)} placeholder="123459" />
           </div>
-
-          <SaveBtn sectionKey="stripe" />
+          <div className="rounded-lg border border-border bg-surface px-3 py-3 text-xs text-muted-foreground">
+            Webhook URL: <span className="font-mono text-foreground">https://icloseleads.com/api/webhooks/lemonsqueezy</span>
+          </div>
+          <SaveBtn sectionKey="lemonsqueezy" />
         </form>
+      </Section>
+
+      <Section title="Legacy Stripe settings" icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}>
+        <p className="text-sm text-muted-foreground">
+          Existing Stripe values are preserved for rollback, but new iCloseLeads checkouts use Lemon Squeezy. The legacy webhook now rejects unsigned requests.
+        </p>
       </Section>
 
       {/* ── Pricing Config ── */}
@@ -302,7 +317,7 @@ export default function AdminSettingsClient({ initialSettings }: Props) {
 
       <div className="flex items-center gap-2 text-xs text-muted-foreground pt-4 border-t border-border">
         <Zap className="w-3.5 h-3.5 text-primary-light" />
-        Settings are stored encrypted in the database and take effect immediately without a redeploy.
+        Non-sensitive settings are stored server-side. Payment secrets are read only from protected environment variables.
       </div>
     </div>
   );

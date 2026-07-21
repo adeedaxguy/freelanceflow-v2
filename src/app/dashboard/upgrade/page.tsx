@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getLemonSqueezyConfig, isCheckoutConfigured } from "@/lib/lemonsqueezy";
 import UpgradeClient from "./UpgradeClient";
 
 async function getPlatformPricing() {
@@ -26,24 +27,45 @@ async function getPlatformPricing() {
   }
 }
 
-export default async function UpgradePage() {
+export default async function UpgradePage({
+  searchParams,
+}: {
+  searchParams?: { checkout?: string };
+}) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { plan: true, name: true, email: true },
+    select: {
+      plan: true,
+      email: true,
+      role: true,
+    },
   });
 
-  const pricing = await getPlatformPricing();
+  const [pricing, billingConfig, hasBillingSubscription] = await Promise.all([
+    getPlatformPricing(),
+    getLemonSqueezyConfig(),
+    prisma.billingSubscription.findFirst({
+      where: { userId: session.user.id, provider: "LEMONSQUEEZY" },
+      select: { id: true },
+    }).then(Boolean).catch(() => false),
+  ]);
   const currentPlan = (user?.plan ?? "free") as string;
+  const billingReady = isCheckoutConfigured(billingConfig) && Boolean(billingConfig.webhookSecret);
+  const canCheckout = billingReady && (!billingConfig.testMode || user?.role === "ADMIN");
 
   return (
     <UpgradeClient
       currentPlan={currentPlan}
-      userName={user?.name ?? ""}
       userEmail={user?.email ?? ""}
       pricing={pricing}
+      billingReady={billingReady}
+      billingTestMode={billingConfig.testMode}
+      canCheckout={canCheckout}
+      hasBillingSubscription={hasBillingSubscription}
+      checkoutReturned={searchParams?.checkout === "success"}
     />
   );
 }

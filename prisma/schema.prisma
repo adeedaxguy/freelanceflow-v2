@@ -16,50 +16,79 @@ datasource db {
 // Valid values for status on SentEmail: "SENT" | "DELIVERED" | "OPENED" | "BOUNCED" | "FAILED"
 
 model User {
-  id          String    @id @default(cuid())
-  name        String?
-  email       String    @unique
-  password    String?
-  role        String    @default("USER")
-  niche       String?
-  bio         String?
-  rate        Float?
-  portfolio   String?
-  avatarUrl   String?
-  googleId     String?   @unique
-  suspended        Boolean   @default(false)
-  plan             String    @default("free")
-  expertise        String?
-  referralSource   String?
-  weeklyLeads      Int       @default(0)
-  weeklyLeadReset  DateTime  @default(now())
-  portfolioLinks   String?   // JSON array of { label, url }
-  gmailRefreshToken String?  // OAuth2 refresh token for Gmail send
-  gmailEmail       String?   // Gmail address connected via OAuth2
-  bonusLeads       Int       @default(0)
-  whatsapp         String?
-  marketingConsent Boolean   @default(false)
-  bonusClaimed     String?   // JSON array of claimed bonus types e.g. ["subscribe","share"]
-  referralCode     String?   @unique
-  referredBy       String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String   @id @default(cuid())
+  name              String?
+  email             String   @unique
+  password          String?
+  role              String   @default("USER")
+  niche             String?
+  bio               String?
+  rate              Float?
+  portfolio         String?
+  avatarUrl         String?
+  googleId          String?  @unique
+  suspended         Boolean  @default(false)
+  plan              String   @default("free")
+  expertise         String?
+  referralSource    String?
+  weeklyLeads       Int      @default(0)
+  weeklyLeadReset   DateTime @default(now())
+  portfolioLinks    String? // JSON array of { label, url }
+  gmailRefreshToken String? // OAuth2 refresh token for Gmail send
+  gmailEmail        String? // Gmail address connected via OAuth2
+  bonusLeads        Int      @default(0)
+  whatsapp          String?
+  marketingConsent  Boolean  @default(false)
+  bonusClaimed      String? // JSON array of claimed bonus types e.g. ["subscribe","share"]
+  referralCode      String?  @unique
+  referredBy        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  leads            Lead[]
-  sentEmails       SentEmail[]
-  campaigns        Campaign[]
-  templates        Template[]
-  supportTickets   SupportTicket[]
-  followUps        FollowUp[]
-  leadApplications LeadApplication[]
+  leads                Lead[]
+  sentEmails           SentEmail[]
+  campaigns            Campaign[]
+  templates            Template[]
+  supportTickets       SupportTicket[]
+  followUps            FollowUp[]
+  leadApplications     LeadApplication[]
+  billingSubscriptions BillingSubscription[]
+  telephonyWorkspace   TelephonyWorkspace?
+  voiceCalls           VoiceCall[]
 
   @@index([email])
   @@index([role])
   @@index([plan])
 }
 
+model BillingSubscription {
+  id                     String    @id @default(cuid())
+  userId                 String
+  provider               String    @default("LEMONSQUEEZY")
+  externalSubscriptionId String    @unique
+  externalCustomerId     String?
+  externalOrderId        String?
+  plan                   String
+  variantId              String
+  status                 String
+  testMode               Boolean   @default(false)
+  renewsAt               DateTime?
+  endsAt                 DateTime?
+  trialEndsAt            DateTime?
+  cardBrand              String?
+  cardLastFour           String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([externalCustomerId])
+}
+
 model Lead {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   userId         String
   company        String
   domain         String
@@ -74,14 +103,15 @@ model Lead {
   sourceUrl      String?
   source         String?
   notes          String?
-  isManual       Boolean   @default(false)
-  status         String    @default("NEW")
-  savedAt        DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  isManual       Boolean  @default(false)
+  status         String   @default("NEW")
+  savedAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sentEmails   SentEmail[]
-  followUps    FollowUp[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentEmails SentEmail[]
+  followUps  FollowUp[]
+  voiceCalls VoiceCall[]
 
   @@index([userId])
   @@index([niche])
@@ -89,17 +119,17 @@ model Lead {
 }
 
 model SentEmail {
-  id         String    @id @default(cuid())
-  userId     String
-  leadId     String?
-  subject    String
-  body       String
-  sentAt     DateTime  @default(now())
-  status     String    @default("SENT")
-  resendId   String?
+  id       String   @id @default(cuid())
+  userId   String
+  leadId   String?
+  subject  String
+  body     String
+  sentAt   DateTime @default(now())
+  status   String   @default("SENT")
+  resendId String?
 
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead Lead? @relation(fields: [leadId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([leadId])
@@ -107,33 +137,33 @@ model SentEmail {
 }
 
 model Campaign {
-  id          String    @id @default(cuid())
-  userId      String
-  name        String
-  niche       String?
-  status      String    @default("DRAFT")
-  emailCount  Int       @default(0)
-  templateId  String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  niche      String?
+  status     String   @default("DRAFT")
+  emailCount Int      @default(0)
+  templateId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Template {
-  id          String   @id @default(cuid())
-  userId      String?
-  name        String
-  niche       String?
-  subject     String
-  body        String
-  isDefault   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  userId    String?
+  name      String
+  niche     String?
+  subject   String
+  body      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([isDefault])
@@ -168,21 +198,21 @@ model BlogPost {
 }
 
 model ContactSubmission {
-  id          String   @id @default(cuid())
-  name        String
-  email       String
-  message     String
-  resolved    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
 
   @@index([resolved])
 }
 
 model PlatformSetting {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  value       String
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
 
   @@index([key])
 }
@@ -200,7 +230,7 @@ model SupportTicket {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
@@ -217,8 +247,8 @@ model BlogComment {
   ip          String?
   createdAt   DateTime @default(now())
 
-  parent      BlogComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies     BlogComment[] @relation("Replies")
+  parent  BlogComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies BlogComment[] @relation("Replies")
 
   @@index([postSlug])
   @@index([parentId])
@@ -235,19 +265,19 @@ model BlogCommentRateLimit {
 }
 
 model FollowUp {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
   leadId      String
-  step        Int      @default(1)
+  step        Int       @default(1)
   subject     String
   body        String
   scheduledAt DateTime
   sentAt      DateTime?
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
+  status      String    @default("PENDING")
+  createdAt   DateTime  @default(now())
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([leadId])
@@ -264,9 +294,65 @@ model LeadApplication {
   leadUrl   String
   appliedAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, leadUrl])
   @@index([leadUrl])
   @@index([userId])
+}
+
+model TelephonyWorkspace {
+  id                          String    @id @default(cuid())
+  userId                      String    @unique
+  status                      String    @default("PENDING")
+  twilioAccountSid            String?   @unique
+  twilioAuthTokenEncrypted    String?
+  twilioApiKeySid             String?
+  twilioApiKeySecretEncrypted String?
+  twimlAppSid                 String?
+  phoneNumberSid              String?
+  phoneNumber                 String?
+  phoneCountry                String?
+  monthlyPriceCents           Int?
+  priceCurrency               String?
+  consentAcceptedAt           DateTime?
+  lastError                   String?
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  calls VoiceCall[]
+
+  @@index([status])
+  @@index([phoneNumber])
+}
+
+model VoiceCall {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  userId          String
+  leadId          String?
+  twilioCallSid   String?   @unique
+  direction       String    @default("OUTBOUND")
+  from            String
+  to              String
+  status          String    @default("QUEUED")
+  durationSeconds Int?
+  costCents       Int?
+  costCurrency    String?
+  outcome         String?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  answeredAt      DateTime?
+  endedAt         DateTime?
+  updatedAt       DateTime  @updatedAt
+
+  workspace TelephonyWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead      Lead?              @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([userId, createdAt])
+  @@index([leadId])
+  @@index([status])
 }

@@ -75,11 +75,14 @@ export async function POST(req: NextRequest) {
     if (setting?.value && setting.value.length > 10) webhookSecret = setting.value;
   } catch { /* use env */ }
 
-  if (webhookSecret) {
-    const valid = await verifyStripeSignature(body, signature, webhookSecret);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
+  if (!webhookSecret) {
+    console.error("Legacy Stripe webhook rejected: signing secret is not configured.");
+    return NextResponse.json({ error: "Webhook is not configured" }, { status: 503 });
+  }
+
+  const valid = await verifyStripeSignature(body, signature, webhookSecret);
+  if (!valid) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
   let event: StripeEvent;

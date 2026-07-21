@@ -137,15 +137,15 @@ const faqs = [
     questions: [
       {
         q: "How does billing work?",
-        a: "Plans are billed monthly or annually. Annual billing saves 20%. You can upgrade, downgrade, or cancel at any time from Dashboard → Settings → Billing. Downgrades take effect at the end of your current billing period.",
+        a: "Free early access is available without a card. Monthly and annual paid plans are being prepared, and subscription changes will be managed from the secure billing portal after launch.",
       },
       {
         q: "What payment methods do you accept?",
-        a: "We accept all major credit and debit cards (Visa, Mastercard, American Express) via Stripe. We do not store your card details — all payment processing is handled securely by Stripe.",
+        a: "Paid subscriptions will use Lemon Squeezy's hosted checkout. Available payment methods are shown at checkout, and iCloseLeads does not store your card details.",
       },
       {
         q: "Do you offer refunds?",
-        a: "Yes, we offer a 14-day money-back guarantee on all paid plans. If you're not satisfied within the first 14 days, contact us at billing@icloseleads.com for a full refund. No questions asked.",
+        a: "The paid-plan refund policy will be shown before checkout and published when subscriptions launch. For billing support, contact support@icloseleads.com.",
       },
       {
         q: "What happens to my leads if I downgrade to Free?",

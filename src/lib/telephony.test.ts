@@ -1,0 +1,57 @@
+import {
+  createNumberQuote,
+  decryptTelephonySecret,
+  encryptTelephonySecret,
+  isSoftphoneAllowed,
+  normalizeDestination,
+  verifyNumberQuote,
+} from "@/lib/telephony";
+
+describe("telephony security helpers", () => {
+  beforeEach(() => {
+    process.env.TWILIO_ENCRYPTION_KEY = "test-encryption-key";
+    process.env.NEXTAUTH_SECRET = "test-signing-secret";
+    delete process.env.TWILIO_SOFTPHONE_ENABLED;
+  });
+
+  it("encrypts secrets and detects tampering", () => {
+    const encrypted = encryptTelephonySecret("subaccount-secret");
+    expect(encrypted).not.toContain("subaccount-secret");
+    expect(decryptTelephonySecret(encrypted)).toBe("subaccount-secret");
+    expect(() => decryptTelephonySecret(`${encrypted.slice(0, -1)}x`)).toThrow();
+  });
+
+  it("signs a short-lived number quote", () => {
+    const quote = createNumberQuote({
+      userId: "user-1",
+      workspaceId: "workspace-1",
+      phoneNumber: "+14155550123",
+      country: "US",
+      monthlyPriceCents: 115,
+      currency: "USD",
+    });
+
+    expect(verifyNumberQuote(quote)).toMatchObject({
+      userId: "user-1",
+      phoneNumber: "+14155550123",
+      monthlyPriceCents: 115,
+    });
+    expect(() => verifyNumberQuote(`${quote.slice(0, -1)}x`)).toThrow("Invalid purchase quote");
+  });
+
+  it("allows ordinary supported destinations and blocks premium routes", () => {
+    expect(normalizeDestination("+1 (415) 555-0123")).toBe("+14155550123");
+    expect(normalizeDestination("+44 20 7946 0958")).toBe("+442079460958");
+    expect(() => normalizeDestination("+1 900 555 0123")).toThrow("Premium-rate");
+    expect(() => normalizeDestination("+44 870 123 4567")).toThrow("Premium-rate");
+    expect(() => normalizeDestination("+92 300 1234567")).toThrow("US, Canada, or UK");
+  });
+
+  it("keeps the beta admin-only until explicitly released", () => {
+    expect(isSoftphoneAllowed("ADMIN", "free")).toBe(true);
+    expect(isSoftphoneAllowed("USER", "agency")).toBe(false);
+    process.env.TWILIO_SOFTPHONE_ENABLED = "true";
+    expect(isSoftphoneAllowed("USER", "agency")).toBe(true);
+    expect(isSoftphoneAllowed("USER", "free")).toBe(false);
+  });
+});

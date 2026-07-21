@@ -620,8 +620,8 @@ function Pagination({ page, total, perPage, onChange }: { page: number; total: n
 }
 
 // ─── Lead Card ────────────────────────────────────────────────────────────────
-function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
-  lead: LocalLead; onSave: (l: LocalLead) => void; isSaved: boolean; isSaving: boolean; searchLocation?: string;
+function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftphone }: {
+  lead: LocalLead; onSave: (l: LocalLead) => void; isSaved: boolean; isSaving: boolean; searchLocation?: string; canUseSoftphone?: boolean;
 }) {
   const [expanded,    setExpanded]    = useState(false);
   const [showPitch,   setShowPitch]   = useState(false);
@@ -709,6 +709,9 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
   if (mapsHref) siteBuilderParams.set("maps", mapsHref);
   if (proposalDomain) siteBuilderParams.set("domain", proposalDomain);
   const siteBuilderHref = `/dashboard/web-design?${siteBuilderParams.toString()}`;
+  const softphoneHref = lead.phone
+    ? `/dashboard/softphone?phone=${encodeURIComponent(lead.phone)}`
+    : "/dashboard/softphone";
 
   return (
     <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
@@ -879,6 +882,14 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-accent/25 bg-accent/10 text-accent text-xs font-medium hover:bg-accent/15 transition-all">
             <Users className="w-3.5 h-3.5"/> Find Owner
           </Link>
+          {canUseSoftphone && lead.phone && (
+            <Link
+              href={softphoneHref}
+              title="Call this business from the admin softphone"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-emerald-400/25 bg-emerald-400/10 text-emerald-300 text-xs font-semibold hover:bg-emerald-400/15 transition-all">
+              <PhoneCall className="w-3.5 h-3.5"/> Call
+            </Link>
+          )}
           <Link
             href={siteBuilderHref}
             title="Create a shareable website draft for this business"
@@ -953,7 +964,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation }: {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function LocalLeadsPage() {
-  const { status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const [keyword,    setKeyword]    = useState("");
   const [location,   setLocation]   = useState("");
   const [filter,     setFilter]     = useState<"all"|"no_website"|"outdated_website"|"has_website">("no_website");
@@ -1675,7 +1686,7 @@ export default function LocalLeadsPage() {
                 {pagedResults.map(lead => (
                   <LeadCard key={lead.id} lead={lead} onSave={handleSave}
                     isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}
-                    searchLocation={location}/>
+                    searchLocation={location} canUseSoftphone={session?.user?.role === "ADMIN"}/>
                 ))}
               </div>
             )}

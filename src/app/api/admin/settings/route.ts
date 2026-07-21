@@ -73,6 +73,8 @@ function isSensitiveKey(key: string): boolean {
   return [
     "stripe_secret_key",
     "stripe_webhook_secret",
+    "lemonsqueezy_api_key",
+    "lemonsqueezy_webhook_secret",
     "groq_api_key",
     "resend_api_key",
     "yelp_api_key",
