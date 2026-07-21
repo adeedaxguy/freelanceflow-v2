@@ -24,7 +24,7 @@ export default async function AdminSettingsPage() {
     <AdminSettingsClient
       initialSettings={settings}
       lemonEnvironment={{
-        apiKey: Boolean(process.env.LEMONSQUEEZY_API_KEY),
+        apiKey: Boolean(process.env.LEMONSQUEEZY_API_KEY || process.env.EMONSQUEEZY_API_KEY),
         webhookSecret: Boolean(process.env.LEMONSQUEEZY_WEBHOOK_SECRET),
       }}
     />

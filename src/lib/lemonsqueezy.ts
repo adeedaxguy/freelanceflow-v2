@@ -44,7 +44,7 @@ export async function getLemonSqueezyConfig(): Promise<LemonSqueezyConfig> {
   );
 
   return {
-    apiKey: (process.env.LEMONSQUEEZY_API_KEY || "").trim(),
+    apiKey: (process.env.LEMONSQUEEZY_API_KEY || process.env.EMONSQUEEZY_API_KEY || "").trim(),
     webhookSecret: (process.env.LEMONSQUEEZY_WEBHOOK_SECRET || "").trim(),
     storeId: configuredValue(process.env.LEMONSQUEEZY_STORE_ID, stored.lemonsqueezy_store_id),
     testMode: testModeValue === "" || testModeValue === "true" || testModeValue === "1",
