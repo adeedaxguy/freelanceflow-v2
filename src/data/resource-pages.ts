@@ -3027,6 +3027,1373 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       }
     ]
   },
+  {
+  slug: "web-design-leads-for-free-vs-verified",
+  title: "Web design leads for free vs verified leads",
+  metaTitle: "Web Design Leads for Free vs Verified Leads | iCloseLeads",
+  metaDescription: "Compare free web design lead research with verified lead workflows, proof checks, and outreach paths before pitching local website prospects.",
+  keyword: "web design leads for free",
+  relatedSearches: [
+    "verified web design leads",
+    "web design leads list",
+    "web design leads for sale",
+    "best web design leads"
+  ],
+  audience: "Web designers and freelancers comparing free prospecting with verified lead workflows",
+  intent: "The searcher wants to know whether free lead research can produce pitch-ready web design prospects.",
+  summary: "Free web design leads can work when they are verified from public proof, not scraped into a blind list. The useful workflow is to find a visible website gap, confirm local demand, save the context, and pitch only when the business problem is specific.",
+  leadIn: "Use free research as a qualification workflow, not a shortcut. iCloseLeads helps you turn a public business signal into a saved lead, proposal angle, and follow-up path without trusting a generic lead seller.",
+  steps: [
+    "Pick one local category and city.",
+    "Search for businesses with no website, weak mobile experience, or outdated conversion paths.",
+    "Verify phone, profile activity, reviews, and category fit.",
+    "Save only leads with a clear reason to contact them.",
+    "Draft the first message from the verified signal, not from a template alone."
+  ],
+  qualificationChecks: [
+    {
+      signal: "Visible website gap",
+      whyItMatters: "The first message needs a reason beyond selling web design.",
+      nextMove: "Capture the URL, missing page, or weak booking path before saving the lead."
+    },
+    {
+      signal: "Active local demand",
+      whyItMatters: "A business with reviews, calls, or service activity has a clearer website business case.",
+      nextMove: "Tie the pitch to calls, quotes, bookings, or trust."
+    },
+    {
+      signal: "List-seller language",
+      whyItMatters: "Claims about huge inventories or guaranteed exclusivity are not proof of lead quality.",
+      nextMove: "Reject the source unless the business need and route can be verified."
+    }
+  ],
+  proofPoints: [
+    "GSC surfaced web design leads, leads for web designers, and exclusive web design leads as live acquisition queries.",
+    "Google related searches include free, list, sale, verified, and best modifiers, showing the market is comparing lead source quality.",
+    "iCloseLeads supports the safer path: search, verify, save context, draft, and follow up."
+  ],
+  pitch: "Hi, I found your business while checking local website opportunities and noticed one public website gap that may be affecting calls or quote requests. I can send over the specific idea if useful.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Businesses without websites",
+      href: "/resources/businesses-without-websites"
+    },
+    {
+      label: "AI proposal generator",
+      href: "/features/ai-proposals"
+    }
+  ],
+  faqs: [
+    {
+      q: "Can free web design leads be useful?",
+      a: "Yes, if each lead is verified with a real business problem, public proof, and a reachable route before outreach."
+    },
+    {
+      q: "Are verified leads better than free leads?",
+      a: "Verified leads are better when verification means fresh context, visible need, and contact confidence, not just a paid list label."
+    }
+  ]
+},
+  {
+  slug: "web-design-leads-list",
+  title: "Web design leads list: what to verify before pitching",
+  metaTitle: "Web Design Leads List: Verify Website Prospects Before Outreach",
+  metaDescription: "Build or review a web design leads list with checks for website gaps, local demand, contact route, and pitch fit before outreach.",
+  keyword: "web design leads list",
+  relatedSearches: [
+    "web design leads for sale",
+    "verified web design leads",
+    "website leads",
+    "web design lead generation"
+  ],
+  audience: "Freelancers and small agencies reviewing web design lead lists",
+  intent: "The searcher wants a usable list of website prospects but needs to know which records are worth outreach.",
+  summary: "A web design leads list is only useful when every record has a business reason to pitch. Names and URLs are not enough; the list should preserve the website gap, demand signal, contact route, and next action.",
+  leadIn: "Before importing a list or building one manually, score the lead quality. iCloseLeads keeps the business signal attached to the saved lead so outreach can stay specific.",
+  steps: [
+    "Remove businesses with no obvious fit for your website offer.",
+    "Check the current site or missing-site status.",
+    "Confirm local activity, reviews, or service demand.",
+    "Add a one-line pitch angle to every saved lead.",
+    "Put only qualified leads into follow-up."
+  ],
+  proofPoints: [
+    "Google related searches show users comparing lead lists, sales pages, free sources, and verified lead claims.",
+    "SERPs include Reddit and tool discussions, which means trust and proof are part of the search intent.",
+    "A list becomes stronger when every row has a verified reason and next step."
+  ],
+  pitch: "Hi, I reviewed your current website presence while checking local businesses in your category. I noticed one improvement that could make it easier for customers to understand the service and request a quote.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Lead list builder",
+      href: "/resources/lead-list-builder-for-freelancers"
+    },
+    {
+      label: "CRM pipeline",
+      href: "/features/crm-pipeline"
+    }
+  ],
+  faqs: [
+    {
+      q: "What should be in a web design leads list?",
+      a: "Include business name, website status, local proof, category, contact route, pitch angle, and follow-up date."
+    },
+    {
+      q: "Should I buy a web design leads list?",
+      a: "Only if you can verify recency, fit, and the business need. A smaller verified list is safer than a large generic list."
+    }
+  ]
+},
+  {
+  slug: "freelance-cold-outreach-examples",
+  title: "Freelance cold outreach examples that start with proof",
+  metaTitle: "Freelance Cold Outreach Examples | Signal-Led Templates",
+  metaDescription: "Use freelance cold outreach examples built around visible buyer signals, short messages, and follow-up paths instead of generic blasts.",
+  keyword: "freelance cold outreach examples",
+  relatedSearches: [
+    "cold outreach examples",
+    "freelance cold email template",
+    "cold email freelance reddit",
+    "freelance cold outreach free"
+  ],
+  audience: "Freelancers who want outreach examples they can adapt without sounding generic",
+  intent: "The searcher wants practical cold outreach examples for getting clients.",
+  summary: "The best freelance cold outreach examples begin with a visible signal: a website gap, hiring cue, local profile issue, recent post, or business process problem. The message should prove why the freelancer is contacting that buyer now.",
+  leadIn: "Use examples as structure, not as copy-paste scripts. iCloseLeads helps you save the reason for outreach first, then draft a message that fits the lead.",
+  steps: [
+    "Name the signal in the first sentence.",
+    "Connect it to one business outcome.",
+    "Make the offer small and specific.",
+    "Ask for a low-friction next step.",
+    "Schedule one respectful follow-up."
+  ],
+  proofPoints: [
+    "GSC shows freelance cold outreach as a live query for iCloseLeads.",
+    "Google related searches include examples, templates, free, and Reddit modifiers.",
+    "This page routes advice into the product workflow: search, save, draft, and follow up."
+  ],
+  pitch: "Hi, I noticed [specific signal] while reviewing [company]. I help [buyer type] improve [outcome], and I had one practical idea that may be worth a quick look.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "Freelance proposal subject lines",
+      href: "/resources/freelance-proposal-subject-lines"
+    },
+    {
+      label: "Email outreach",
+      href: "/features/email-outreach"
+    }
+  ],
+  faqs: [
+    {
+      q: "What is a good freelance cold outreach example?",
+      a: "A good example names a specific public signal, explains the outcome, and asks for a simple next step."
+    },
+    {
+      q: "Should I personalize every cold outreach email?",
+      a: "Yes. Personalization should come from the lead signal and business problem, not from shallow compliments."
+    }
+  ]
+},
+  {
+  slug: "freelance-cold-email-template",
+  title: "Freelance cold email template for signal-led outreach",
+  metaTitle: "Freelance Cold Email Template | iCloseLeads Outreach Workflow",
+  metaDescription: "Use a concise freelance cold email template that connects a real prospect signal to a clear offer, CTA, and follow-up.",
+  keyword: "freelance cold email template",
+  relatedSearches: [
+    "cold email freelance reddit",
+    "freelance cold outreach examples",
+    "freelance cold outreach free",
+    "cold outreach strategy"
+  ],
+  audience: "Freelancers writing cold emails to prospects they found manually or inside iCloseLeads",
+  intent: "The searcher wants a ready structure for pitching without sounding mass-sent.",
+  summary: "A freelance cold email template should be short enough to read quickly and specific enough to show real research. Lead with the signal, connect it to the business outcome, offer one useful next step, and keep the follow-up attached.",
+  leadIn: "The template works best after a lead is qualified. iCloseLeads gives you the saved context, proposal angle, and follow-up path before you send.",
+  steps: [
+    "Subject: name the useful idea or business context.",
+    "Line 1: mention the verified signal.",
+    "Line 2: connect the signal to the outcome you help with.",
+    "Line 3: offer the smallest useful next step.",
+    "Follow-up: remind them of the same signal instead of starting over."
+  ],
+  proofPoints: [
+    "Related searches connect cold email templates with freelance cold outreach examples and Reddit validation.",
+    "Template pages compete heavily, so the outperformance angle is context-first workflow, not a longer script library.",
+    "iCloseLeads can turn a saved lead into a review-first outreach draft."
+  ],
+  pitch: "Subject: quick idea for [company] [outcome]. Hi [name], I noticed [specific signal]. I help [buyer type] improve [outcome], and I can send one short suggestion if useful.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "AI proposal generator",
+      href: "/resources/ai-proposal-generator-for-freelancers"
+    },
+    {
+      label: "Email outreach feature",
+      href: "/features/email-outreach"
+    }
+  ],
+  faqs: [
+    {
+      q: "How long should a freelance cold email be?",
+      a: "Keep the first email short: one signal, one outcome, one offer, and one next step."
+    },
+    {
+      q: "What should I avoid in a cold email template?",
+      a: "Avoid fake personalization, long agency bios, unsupported claims, and generic pitches that could be sent to anyone."
+    }
+  ]
+},
+  {
+  slug: "cold-outreach-strategy-for-freelancers",
+  title: "Cold outreach strategy for freelancers",
+  metaTitle: "Cold Outreach Strategy for Freelancers | Search, Save, Pitch, Follow Up",
+  metaDescription: "Build a cold outreach strategy for freelancers using focused lead sources, buyer signals, concise pitches, CRM follow-up, and weekly review.",
+  keyword: "cold outreach strategy",
+  relatedSearches: [
+    "freelance cold outreach",
+    "cold outreach examples",
+    "cold email freelance reddit",
+    "freelance cold outreach reviews"
+  ],
+  audience: "Freelancers who need a repeatable outbound system",
+  intent: "The searcher wants a strategy, not just a one-off email template.",
+  summary: "A strong cold outreach strategy chooses one buyer segment, one offer, and one signal source before writing any messages. The goal is not more emails; it is better reasons to contact the right prospects.",
+  leadIn: "Use iCloseLeads as the operating table for the strategy: search, qualify, save, draft, follow up, and review the small batch before expanding.",
+  steps: [
+    "Choose one offer and one buyer type.",
+    "Pick the signal source: local sites, job posts, profile gaps, or recent changes.",
+    "Save leads only when the reason is clear.",
+    "Draft messages from the saved signal.",
+    "Review replies and missed follow-ups weekly."
+  ],
+  proofPoints: [
+    "Google related searches show strategy, examples, templates, and Reddit proof as adjacent intents.",
+    "The GSC query set confirms iCloseLeads has visibility for freelance cold outreach.",
+    "A system page supports signup and activation better than a generic template post."
+  ],
+  pitch: "Hi, I noticed [signal] and thought it might connect to [business outcome]. I work with [buyer type] on [offer], and I can share one practical next step if helpful.",
+  internalLinks: [
+    {
+      label: "Lead generation workflow",
+      href: "/resources/lead-generation-workflow-for-freelancers"
+    },
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "CRM pipeline",
+      href: "/features/crm-pipeline"
+    }
+  ],
+  faqs: [
+    {
+      q: "What is the best cold outreach strategy for freelancers?",
+      a: "Pick one buyer, one offer, one signal source, and one follow-up system before increasing volume."
+    },
+    {
+      q: "How many cold emails should a freelancer send?",
+      a: "Send only as many as you can qualify and personalize properly. Small accurate batches usually beat large generic blasts."
+    }
+  ]
+},
+  {
+  slug: "website-leads",
+  title: "Website leads: find prospects with a real site problem",
+  metaTitle: "Website Leads: Find Prospects With Website Gaps Before Pitching",
+  metaDescription: "Find website leads by spotting missing sites, outdated pages, weak booking paths, local trust gaps, and decision-maker routes.",
+  keyword: "website leads",
+  relatedSearches: [
+    "web design leads",
+    "web design lead generation",
+    "how to get leads for website development",
+    "businesses without websites"
+  ],
+  audience: "Web designers, developers, and agencies selling website projects",
+  intent: "The searcher wants prospects for website design or development services.",
+  summary: "Website leads are strongest when the prospect has a visible site problem and a business reason to fix it. A useful lead connects the website gap to calls, bookings, quotes, trust, or speed to purchase.",
+  leadIn: "iCloseLeads turns website-lead research into a workflow: find the signal, save the proof, draft a pitch, and follow up with the same context.",
+  steps: [
+    "Search one buyer category.",
+    "Check the current website or missing-site state.",
+    "Identify the blocked customer action.",
+    "Save the lead with proof and pitch angle.",
+    "Draft a short offer tied to a measurable business outcome."
+  ],
+  proofPoints: [
+    "Google related searches include website leads and web design lead generation variants.",
+    "SERPs mix tools, lead sellers, and discussions, so proof and workflow are the differentiators.",
+    "This page supports the product path from search to saved lead to proposal."
+  ],
+  pitch: "Hi, I found your website while checking local businesses in your category. One part of the page may be making it harder for visitors to call or request a quote.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Website design prospecting",
+      href: "/resources/website-design-prospecting"
+    },
+    {
+      label: "Local business leads",
+      href: "/use-cases/local-business-leads"
+    }
+  ],
+  faqs: [
+    {
+      q: "What are website leads?",
+      a: "Website leads are businesses or buyers with a visible need for website design, redesign, development, conversion, or local trust improvements."
+    },
+    {
+      q: "How do I qualify website leads?",
+      a: "Check the website gap, business activity, contact route, buyer fit, and the outcome your offer can improve."
+    }
+  ]
+},
+  {
+  slug: "webleadr-alternative",
+  title: "Webleadr alternative for verified web design prospecting",
+  metaTitle: "Webleadr Alternative | Verify Web Design Leads Inside Your Workflow",
+  metaDescription: "Compare Webleadr-style lead sourcing with an iCloseLeads workflow for finding, verifying, saving, and pitching web design prospects.",
+  keyword: "webleadr alternative",
+  relatedSearches: [
+    "web design leads",
+    "verified web design leads",
+    "web design leads for free",
+    "web design lead generation"
+  ],
+  audience: "Freelancers comparing web design lead tools",
+  intent: "The searcher is evaluating a tool or vendor for web design prospects.",
+  summary: "A Webleadr alternative should be judged by the quality of the proof behind each lead, not only by how many businesses it finds. The workflow should help you verify the site gap, save context, and draft a pitch from the evidence.",
+  leadIn: "Use iCloseLeads when you want lead search, qualification notes, proposal drafting, and follow-up in the same place instead of treating lead sourcing as a separate list.",
+  steps: [
+    "Compare source transparency.",
+    "Check whether each lead has a visible website problem.",
+    "Confirm contact route and local demand.",
+    "Save the lead with notes before drafting.",
+    "Track the follow-up rather than exporting a cold list."
+  ],
+  proofPoints: [
+    "Webleadr appears in the web design leads SERP as a direct tool competitor.",
+    "The SERP also includes Reddit discussions, showing buyers care about practical lead quality.",
+    "iCloseLeads can compete by connecting discovery to outreach workflow."
+  ],
+  pitch: "Hi, I found one specific website issue while reviewing your business profile. I can share a short idea for turning more visitors into calls if useful.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Lead discovery",
+      href: "/features/lead-discovery"
+    },
+    {
+      label: "CRM pipeline",
+      href: "/features/crm-pipeline"
+    }
+  ],
+  faqs: [
+    {
+      q: "What should I look for in a Webleadr alternative?",
+      a: "Look for lead proof, qualification notes, outreach support, follow-up tracking, and a workflow that helps you avoid generic pitching."
+    },
+    {
+      q: "Is a lead tool better than manual research?",
+      a: "A tool is better when it saves time without hiding the source, reason, or contact-route quality of the lead."
+    }
+  ]
+},
+  {
+  slug: "leadsify-leadscampus-alternative",
+  title: "Leadsify and Leadscampus alternative for web design leads",
+  metaTitle: "Leadsify and Leadscampus Alternative | iCloseLeads",
+  metaDescription: "Compare exclusive web design lead vendors with an iCloseLeads workflow for verified local website prospects and outreach context.",
+  keyword: "Leadscampus alternative",
+  relatedSearches: [
+    "exclusive web design leads",
+    "best exclusive web design leads",
+    "buy web design leads",
+    "web design leads for sale"
+  ],
+  audience: "Freelancers and agencies comparing exclusive web design lead vendors",
+  intent: "The searcher is deciding whether to buy exclusive leads or build a verified pipeline.",
+  summary: "Lead vendors can be useful only when freshness, exclusivity, and business need are verifiable. An alternative workflow is to create your own qualified leads from public signals and keep the pitch context attached.",
+  leadIn: "iCloseLeads helps you avoid treating exclusivity as a magic word. Save the signal, verify the lead, draft from context, and follow up from the same record.",
+  steps: [
+    "Ask what makes the lead exclusive.",
+    "Check whether the business problem is visible.",
+    "Verify freshness and contact route.",
+    "Compare cost against your own prospecting workflow.",
+    "Pitch only when you can name the business outcome."
+  ],
+  proofPoints: [
+    "Leadscampus and Leadsify appear in the exclusive web design leads SERP.",
+    "Related searches show buyers comparing best, buy, free, and sale modifiers.",
+    "A verified self-built workflow reduces dependence on opaque resale claims."
+  ],
+  pitch: "Hi, I noticed a specific website opportunity for your business and wrote down the practical fix before reaching out. I can share the quick idea if you want it.",
+  internalLinks: [
+    {
+      label: "Exclusive web design leads",
+      href: "/resources/exclusive-web-design-leads"
+    },
+    {
+      label: "Web design leads for free",
+      href: "/resources/web-design-leads-for-free-vs-verified"
+    },
+    {
+      label: "Website leads",
+      href: "/resources/website-leads"
+    }
+  ],
+  faqs: [
+    {
+      q: "Are exclusive web design leads worth buying?",
+      a: "They can be only when exclusivity, recency, need, and contact route can be verified."
+    },
+    {
+      q: "What is the safer alternative to buying leads?",
+      a: "Build a smaller verified pipeline from public signals and keep proof attached to every pitch."
+    }
+  ]
+},
+  {
+  slug: "verified-web-design-leads",
+  title: "Verified web design leads: what verification should mean",
+  metaTitle: "Verified Web Design Leads | Qualification Checklist for Freelancers",
+  metaDescription: "Learn what verified web design leads should include: site gap, local demand, contact route, buyer fit, and pitch angle.",
+  keyword: "verified web design leads",
+  relatedSearches: [
+    "best web design leads",
+    "exclusive web design leads",
+    "web design leads list",
+    "web design leads for sale"
+  ],
+  audience: "Freelancers and small agencies who want better website prospects",
+  intent: "The searcher wants lead quality, not just volume.",
+  summary: "Verified web design leads should include more than contact data. Verification should prove a website problem, current business activity, a reachable route, and a reason your offer is relevant now.",
+  leadIn: "Use iCloseLeads to make verification part of the workflow before the pitch is drafted. Every saved lead should carry the signal that made it worth contacting.",
+  steps: [
+    "Confirm the website or missing-site gap.",
+    "Check the business is active.",
+    "Match the prospect to your service scope.",
+    "Find a public contact route.",
+    "Save the pitch angle and follow-up date."
+  ],
+  proofPoints: [
+    "Google related searches include verified and best lead modifiers.",
+    "This topic supports a quality-led alternative to lead resale pages.",
+    "The page strengthens iCloseLeads as a verification-first prospecting platform."
+  ],
+  pitch: "Hi, I noticed one website gap that looks relevant to how customers find and contact your business. I can send a short suggestion if you are open to it.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Find decision-maker email",
+      href: "/resources/find-decision-maker-email-small-business"
+    },
+    {
+      label: "Lead discovery",
+      href: "/features/lead-discovery"
+    }
+  ],
+  faqs: [
+    {
+      q: "What makes a web design lead verified?",
+      a: "A verified lead has a visible need, active business context, reachable route, and a clear pitch angle."
+    },
+    {
+      q: "Is verification the same as email validation?",
+      a: "No. Email validation checks contact reachability, while lead verification checks business fit and reason to pitch."
+    }
+  ]
+},
+  {
+  slug: "web-design-lead-generation",
+  title: "Web design lead generation workflow for freelancers",
+  metaTitle: "Web Design Lead Generation | Find, Qualify, and Pitch Better Prospects",
+  metaDescription: "Build a web design lead generation workflow around local proof, website gaps, saved lead context, proposal drafting, and CRM follow-up.",
+  keyword: "web design lead generation",
+  relatedSearches: [
+    "web design leads",
+    "how to get leads for website development",
+    "get leads for marketing agency",
+    "website leads"
+  ],
+  audience: "Web designers and agencies building a repeatable client acquisition workflow",
+  intent: "The searcher wants a system for getting web design clients.",
+  summary: "Web design lead generation works best when the workflow finds a visible business gap, qualifies the lead, writes from context, and follows up consistently. The page should point to a next action, not just advice.",
+  leadIn: "iCloseLeads gives web designers a focused workflow for finding local prospects, saving proof, generating a proposal angle, and keeping follow-up organized.",
+  steps: [
+    "Choose a niche and location.",
+    "Find website gaps or missing conversion paths.",
+    "Score the lead against business value and contact route.",
+    "Draft a proposal from the saved proof.",
+    "Review follow-ups and refine the target segment."
+  ],
+  proofPoints: [
+    "GSC includes web design leads and leads for web designers query variants.",
+    "Google related searches show users want lead generation and website development client paths.",
+    "This page bridges search intent into product activation."
+  ],
+  pitch: "Hi, I help businesses turn website traffic into clearer calls, quotes, and bookings. I noticed one gap on your current website presence that may be worth fixing first.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Website design prospecting",
+      href: "/resources/website-design-prospecting"
+    },
+    {
+      label: "AI proposals",
+      href: "/features/ai-proposals"
+    }
+  ],
+  faqs: [
+    {
+      q: "How do web designers generate leads?",
+      a: "They generate leads by choosing a segment, finding visible site or conversion gaps, qualifying contact routes, and pitching a specific outcome."
+    },
+    {
+      q: "What is the first step?",
+      a: "Pick one local category and one city so the search, pitch, and follow-up stay focused."
+    }
+  ]
+},
+  {
+  slug: "cold-email-freelance-reddit",
+  title: "Cold email freelance Reddit advice: what to keep and filter",
+  metaTitle: "Cold Email Freelance Reddit Advice | Practical Outreach Filter",
+  metaDescription: "Use Reddit-style cold email advice carefully: keep signal-led personalization, reject spam tactics, and build a trackable freelance outreach workflow.",
+  keyword: "cold email freelance reddit",
+  relatedSearches: [
+    "freelance cold outreach reddit",
+    "freelance cold outreach examples",
+    "freelance cold email template",
+    "cold outreach examples"
+  ],
+  audience: "Freelancers comparing community advice before doing outreach",
+  intent: "The searcher wants practical cold email guidance and social proof from real discussions.",
+  summary: "Reddit cold email advice is useful when it reinforces real signals, short messages, and respectful follow-up. It becomes risky when it pushes volume, fake personalization, scraped lists, or unsupported claims.",
+  leadIn: "Use community advice as a filter, then run your own verified workflow inside iCloseLeads. The lead signal should decide what the message says.",
+  steps: [
+    "Keep advice that starts from buyer context.",
+    "Reject advice based only on volume or automation.",
+    "Write one specific reason to contact the lead.",
+    "Use a short first email.",
+    "Track replies and follow-ups in the same lead record."
+  ],
+  proofPoints: [
+    "Google related searches include Reddit modifiers for freelance cold outreach and cold email.",
+    "Forum-heavy SERPs show users are checking trust and lived experience.",
+    "iCloseLeads can turn that advice into a disciplined workflow rather than a comment-thread tactic."
+  ],
+  pitch: "Hi, I found [specific signal] and thought it pointed to [outcome]. I have one short suggestion and can send it over if useful.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "Freelance cold email template",
+      href: "/resources/freelance-cold-email-template"
+    },
+    {
+      label: "Email outreach",
+      href: "/features/email-outreach"
+    }
+  ],
+  faqs: [
+    {
+      q: "Is Reddit cold email advice reliable?",
+      a: "It can be directional, but you should filter it through lead quality, relevance, consent, and brand safety."
+    },
+    {
+      q: "What Reddit advice should freelancers avoid?",
+      a: "Avoid advice that relies on spam volume, fake personalization, scraped lists, or pressure tactics."
+    }
+  ]
+},
+  {
+  slug: "cold-outreach-examples",
+  title: "Cold outreach examples for freelancers and web designers",
+  metaTitle: "Cold Outreach Examples | Freelance and Web Design Lead Templates",
+  metaDescription: "Adapt cold outreach examples for freelancers, web designers, and agencies using verified buyer signals and concise next steps.",
+  keyword: "cold outreach examples",
+  relatedSearches: [
+    "freelance cold outreach examples",
+    "freelance cold email template",
+    "cold outreach strategy",
+    "cold email freelance reddit"
+  ],
+  audience: "Freelancers and agencies adapting outreach examples to real prospects",
+  intent: "The searcher wants examples they can use without sending generic spam.",
+  summary: "Good cold outreach examples are built around the lead source. A website prospect, remote job post, local profile, and decision-maker route each need a different opening line and CTA.",
+  leadIn: "Save the lead context first, then choose the example. iCloseLeads keeps the proof and draft together so the message does not drift into generic copy.",
+  steps: [
+    "Choose the example type that matches the lead source.",
+    "Replace the first line with the verified signal.",
+    "Remove claims you cannot support.",
+    "Ask for one small next action.",
+    "Use the same context in the follow-up."
+  ],
+  proofPoints: [
+    "Google related searches cluster cold outreach examples with freelance templates and strategy terms.",
+    "Competitor pages often give lists; this page connects examples to lead workflow and risk filters.",
+    "The page supports conversion into saved leads and Gmail-ready drafts."
+  ],
+  pitch: "Hi, I noticed [specific signal] and had one idea for improving [outcome]. If helpful, I can send a quick two-step suggestion.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach examples",
+      href: "/resources/freelance-cold-outreach-examples"
+    },
+    {
+      label: "Proposal follow-up email",
+      href: "/resources/proposal-follow-up-email"
+    },
+    {
+      label: "AI proposal generator",
+      href: "/features/ai-proposals"
+    }
+  ],
+  faqs: [
+    {
+      q: "Can I copy cold outreach examples exactly?",
+      a: "No. Use examples as structure and replace the opening with the verified lead signal."
+    },
+    {
+      q: "What makes a cold outreach example safe?",
+      a: "It is safe when it is truthful, relevant, short, and tied to a public business context."
+    }
+  ]
+},
+  {
+  slug: "best-web-design-leads",
+  title: "Best web design leads: quality signals to prioritize",
+  metaTitle: "Best Web Design Leads | Quality Signals Before You Pitch",
+  metaDescription: "Find the best web design leads by prioritizing website gaps, buyer fit, active demand, reachable contacts, and proposal-ready context.",
+  keyword: "best web design leads",
+  relatedSearches: [
+    "verified web design leads",
+    "exclusive web design leads",
+    "web design leads for sale",
+    "web design leads list"
+  ],
+  audience: "Freelancers who want fewer but better website prospects",
+  intent: "The searcher wants to know which web design leads are worth time or money.",
+  summary: "The best web design leads have visible need, active business demand, clear buyer fit, and a pitch angle you can explain without exaggeration. Quality beats lead volume.",
+  leadIn: "iCloseLeads helps you choose better leads by keeping qualification, proposal angle, and follow-up tied to the same saved record.",
+  steps: [
+    "Reject leads with no visible reason to pitch.",
+    "Prioritize active local businesses with outdated or missing web paths.",
+    "Match your offer to the buyer category.",
+    "Find a reachable public route.",
+    "Draft a specific next step."
+  ],
+  proofPoints: [
+    "SERP related searches show best, verified, exclusive, sale, and list modifiers together.",
+    "This page positions iCloseLeads against generic lead sellers through quality scoring.",
+    "The internal workflow leads to signup, search, save, proposal, and follow-up."
+  ],
+  pitch: "Hi, I found your business while researching website opportunities in your category. One website gap stood out because it may affect how customers request quotes.",
+  internalLinks: [
+    {
+      label: "Verified web design leads",
+      href: "/resources/verified-web-design-leads"
+    },
+    {
+      label: "Web design leads list",
+      href: "/resources/web-design-leads-list"
+    },
+    {
+      label: "Local leads workflow",
+      href: "/use-cases/local-business-leads"
+    }
+  ],
+  faqs: [
+    {
+      q: "What are the best web design leads?",
+      a: "The best leads have a visible website problem, active business demand, buyer fit, and a reachable contact route."
+    },
+    {
+      q: "Are exclusive leads always best?",
+      a: "No. Exclusivity only matters when the lead is fresh, relevant, and verifiable."
+    }
+  ]
+},
+  {
+  slug: "buy-web-design-leads",
+  title: "Buy web design leads or build your own pipeline?",
+  metaTitle: "Buy Web Design Leads? Compare Paid Lists With Verified Prospecting",
+  metaDescription: "Before you buy web design leads, compare vendor claims with a verified prospecting workflow that preserves need, proof, and contact context.",
+  keyword: "buy web design leads",
+  relatedSearches: [
+    "web design leads for sale",
+    "exclusive web design leads",
+    "verified web design leads",
+    "best exclusive web design leads"
+  ],
+  audience: "Freelancers and agencies considering paid website lead sources",
+  intent: "The searcher is weighing whether to purchase web design prospects.",
+  summary: "Buying web design leads is risky when the source cannot prove recency, exclusivity, fit, and visible business need. Building a smaller verified pipeline can produce better first messages and safer follow-up.",
+  leadIn: "Use iCloseLeads to compare any purchased-lead idea against your own verified research. If a paid list cannot show the reason to pitch, it should not control your outreach.",
+  steps: [
+    "Ask for recency and exclusivity proof.",
+    "Verify the business need yourself.",
+    "Compare list cost against a focused search workflow.",
+    "Avoid sources with link-seller or scraped-list language.",
+    "Keep only leads with a clear pitch angle."
+  ],
+  proofPoints: [
+    "Google related searches include buy, sale, exclusive, best, and free modifiers.",
+    "This page supports buyer-intent searchers while steering them away from bad data risk.",
+    "iCloseLeads offers the conversion path into building verified leads directly."
+  ],
+  pitch: "Hi, I noticed one website issue while checking businesses in your category and wrote down a practical fix. I can share the quick idea if you are open to it.",
+  internalLinks: [
+    {
+      label: "Web design leads for sale",
+      href: "/resources/web-design-leads-for-sale"
+    },
+    {
+      label: "Verified web design leads",
+      href: "/resources/verified-web-design-leads"
+    },
+    {
+      label: "Web design leads for free",
+      href: "/resources/web-design-leads-for-free-vs-verified"
+    }
+  ],
+  faqs: [
+    {
+      q: "Should freelancers buy web design leads?",
+      a: "Only when the source is transparent and each lead can be verified for need, freshness, and contact route."
+    },
+    {
+      q: "What is the alternative?",
+      a: "Build a focused pipeline from public signals and save the proof before outreach."
+    }
+  ]
+},
+  {
+  slug: "how-to-get-leads-for-website-development",
+  title: "How to get leads for website development",
+  metaTitle: "How to Get Leads for Website Development | Practical Workflow",
+  metaDescription: "Learn how to get leads for website development by finding businesses with site gaps, local demand, and proposal-ready context.",
+  keyword: "how to get leads for website development",
+  relatedSearches: [
+    "web design lead generation",
+    "website leads",
+    "get leads for marketing agency",
+    "web design leads for free"
+  ],
+  audience: "Website developers and freelancers selling build, redesign, or conversion work",
+  intent: "The searcher wants a practical lead generation process for development services.",
+  summary: "To get leads for website development, choose one buyer category, find a visible web problem, confirm the business is active, and pitch a specific outcome rather than a generic build.",
+  leadIn: "iCloseLeads helps developers turn that process into a daily workflow with lead discovery, saved context, proposal drafting, and follow-up.",
+  steps: [
+    "Choose a niche where website quality affects revenue.",
+    "Find missing, outdated, slow, or confusing websites.",
+    "Confirm the business has active demand.",
+    "Save the lead with one development angle.",
+    "Draft a short proposal tied to calls, quotes, bookings, or trust."
+  ],
+  proofPoints: [
+    "Google related searches connect website development leads with web design lead generation and agency leads.",
+    "The keyword has clear commercial intent for freelancers and agencies.",
+    "This page routes readers into a product workflow rather than passive advice."
+  ],
+  pitch: "Hi, I noticed your website could make [customer action] easier. I build practical website improvements for [buyer type] and can send one focused suggestion if useful.",
+  internalLinks: [
+    {
+      label: "Website leads",
+      href: "/resources/website-leads"
+    },
+    {
+      label: "Website design prospecting",
+      href: "/resources/website-design-prospecting"
+    },
+    {
+      label: "Web design proposal template",
+      href: "/resources/web-design-proposal-template"
+    }
+  ],
+  faqs: [
+    {
+      q: "How do I get leads for website development?",
+      a: "Pick a buyer category, find visible site gaps, qualify demand, save the context, and pitch one specific outcome."
+    },
+    {
+      q: "Which businesses are good website development leads?",
+      a: "Businesses with active demand, reachable contacts, and website friction affecting calls, quotes, trust, or bookings are stronger leads."
+    }
+  ]
+},
+  {
+  slug: "get-leads-for-marketing-agency",
+  title: "How to get leads for a marketing agency",
+  metaTitle: "Get Leads for Marketing Agency | Verified Prospecting Workflow",
+  metaDescription: "Get leads for a marketing agency by choosing a segment, finding public demand signals, saving proof, and pitching a specific growth path.",
+  keyword: "get leads for marketing agency",
+  relatedSearches: [
+    "web design lead generation",
+    "website leads",
+    "agency client acquisition software",
+    "lead generation workflow for freelancers"
+  ],
+  audience: "Small agencies and freelancers selling marketing, websites, SEO, or outreach services",
+  intent: "The searcher wants agency lead generation tactics that can be repeated.",
+  summary: "Marketing agency leads improve when the agency narrows the buyer, finds a visible demand signal, and pitches one practical outcome. Broad agency messaging usually loses to specific context.",
+  leadIn: "iCloseLeads helps small agencies search by niche and location, save context, draft proposals, and keep follow-up from slipping.",
+  steps: [
+    "Choose one service and one buyer segment.",
+    "Find signals such as weak website, local SEO gaps, hiring cues, or campaign friction.",
+    "Save the proof and contact route.",
+    "Draft a service-specific pitch.",
+    "Track follow-up in the pipeline."
+  ],
+  proofPoints: [
+    "Google related searches from exclusive web design leads include get leads for marketing agency.",
+    "The topic fits iCloseLeads' agency and freelancer workflows.",
+    "A specific lead workflow gives the page more conversion value than broad advice."
+  ],
+  pitch: "Hi, I found one public signal that may point to a marketing opportunity for your business. I have a short idea focused on [outcome] if you want me to send it.",
+  internalLinks: [
+    {
+      label: "Agency client acquisition software",
+      href: "/resources/agency-client-acquisition-software"
+    },
+    {
+      label: "Lead generation workflow",
+      href: "/resources/lead-generation-workflow-for-freelancers"
+    },
+    {
+      label: "Lead discovery",
+      href: "/features/lead-discovery"
+    }
+  ],
+  faqs: [
+    {
+      q: "How can a marketing agency get better leads?",
+      a: "Pick a tight segment, find visible demand signals, save proof, and pitch one outcome instead of every service."
+    },
+    {
+      q: "Should agencies use lead lists?",
+      a: "Lead lists can help only when every record is verified and tied to a relevant service angle."
+    }
+  ]
+},
+  {
+  slug: "freelance-cold-outreach-free",
+  title: "Freelance cold outreach free workflow",
+  metaTitle: "Freelance Cold Outreach Free Workflow | iCloseLeads",
+  metaDescription: "Build a free freelance cold outreach workflow with public signals, focused lead batches, concise emails, and CRM follow-up.",
+  keyword: "freelance cold outreach free",
+  relatedSearches: [
+    "freelance cold outreach examples",
+    "freelance cold email template",
+    "cold outreach strategy",
+    "freelance cold outreach reddit"
+  ],
+  audience: "Freelancers starting outbound without paid lead lists",
+  intent: "The searcher wants a no-cost way to start cold outreach.",
+  summary: "A free freelance cold outreach workflow can work if the lead source is public, relevant, and small enough to personalize. The free path should still include qualification, saved proof, and follow-up.",
+  leadIn: "Use iCloseLeads to keep the free workflow disciplined: one segment, one source, one saved batch, one proposal angle, and one follow-up routine.",
+  steps: [
+    "Choose one free source such as local search, job posts, or public business profiles.",
+    "Collect only leads with a visible reason to contact them.",
+    "Write from the saved signal.",
+    "Track the first message and follow-up.",
+    "Review response quality before scaling."
+  ],
+  proofPoints: [
+    "Google related searches include free and Reddit modifiers for freelance outreach.",
+    "The user intent is practical and budget-conscious.",
+    "This page supports first activation for free account users."
+  ],
+  pitch: "Hi, I found [signal] while researching [buyer type]. I had one quick idea for [outcome] and can send it over if useful.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "Cold outreach examples",
+      href: "/resources/cold-outreach-examples"
+    },
+    {
+      label: "Start free",
+      href: "/auth?mode=signup"
+    }
+  ],
+  faqs: [
+    {
+      q: "Can I do freelance cold outreach for free?",
+      a: "Yes. Use public sources, qualify carefully, keep batches small, and track follow-up."
+    },
+    {
+      q: "What free source should I start with?",
+      a: "Start with the source that best fits your offer: local search for website work, job posts for project work, or public company pages for consulting."
+    }
+  ]
+},
+  {
+  slug: "freelance-cold-outreach-reddit",
+  title: "Freelance cold outreach Reddit lessons to use safely",
+  metaTitle: "Freelance Cold Outreach Reddit Lessons | Safe Outreach Workflow",
+  metaDescription: "Use freelance cold outreach Reddit lessons without copying risky tactics: verify lead signals, write concise messages, and track follow-up.",
+  keyword: "freelance cold outreach reddit",
+  relatedSearches: [
+    "cold email freelance reddit",
+    "freelance cold outreach examples",
+    "freelance cold outreach reviews",
+    "freelance cold outreach free"
+  ],
+  audience: "Freelancers checking community feedback before outreach",
+  intent: "The searcher wants real-world guidance and caution from community discussions.",
+  summary: "Reddit lessons are useful when they warn against generic blasts and encourage specific lead research. The safest takeaway is to make every outreach message trace back to a verified signal.",
+  leadIn: "iCloseLeads gives that lesson a workflow: save the lead signal, draft from context, and follow up respectfully instead of copying a high-volume script.",
+  steps: [
+    "Keep advice about specificity and relevance.",
+    "Reject spam volume tactics.",
+    "Avoid fake compliments or invented familiarity.",
+    "Attach every message to a saved signal.",
+    "Track replies and adjust the next batch."
+  ],
+  proofPoints: [
+    "Google related searches show Reddit as a trust-check modifier.",
+    "Forum SERPs can reveal objections that generic outreach guides miss.",
+    "This page turns community caution into a product-safe process."
+  ],
+  pitch: "Hi, I came across [public signal] and thought it might be connected to [outcome]. I can send a short suggestion if it is relevant.",
+  internalLinks: [
+    {
+      label: "Cold email Reddit advice",
+      href: "/resources/cold-email-freelance-reddit"
+    },
+    {
+      label: "Freelance cold outreach examples",
+      href: "/resources/freelance-cold-outreach-examples"
+    },
+    {
+      label: "CRM follow-up",
+      href: "/features/crm-pipeline"
+    }
+  ],
+  faqs: [
+    {
+      q: "What does Reddit usually criticize about cold outreach?",
+      a: "Common criticism targets generic messages, fake personalization, irrelevant offers, and aggressive follow-up."
+    },
+    {
+      q: "What should freelancers keep from Reddit advice?",
+      a: "Keep the focus on relevance, short messages, clear value, and respectful follow-up."
+    }
+  ]
+},
+  {
+  slug: "web-design-leads-for-sale",
+  title: "Web design leads for sale: buyer checklist before you pay",
+  metaTitle: "Web Design Leads for Sale | Checklist Before Buying",
+  metaDescription: "Use this checklist before buying web design leads: verify freshness, exclusivity, business need, contact route, and pitch context.",
+  keyword: "web design leads for sale",
+  relatedSearches: [
+    "buy web design leads",
+    "exclusive web design leads",
+    "verified web design leads",
+    "web design leads list"
+  ],
+  audience: "Agencies and freelancers evaluating paid web design leads",
+  intent: "The searcher wants to compare paid lead options and avoid poor-quality records.",
+  summary: "Web design leads for sale should be treated as unqualified until the source proves freshness, exclusivity, relevance, and business need. A lead you cannot verify should not drive outreach.",
+  leadIn: "iCloseLeads gives you a safer benchmark: build or verify leads from visible signals, then save the proof and pitch angle before sending.",
+  steps: [
+    "Ask how the lead was sourced.",
+    "Check whether the same lead is resold.",
+    "Verify the website or business problem.",
+    "Confirm contact route and buyer fit.",
+    "Reject sellers with spammy inventory language."
+  ],
+  proofPoints: [
+    "Related searches show sale, buy, exclusive, verified, and list modifiers together.",
+    "The backlink policy rejects link-seller and scraped inventory behavior, which also applies to lead-source quality.",
+    "This page supports a safer alternative to blind purchase decisions."
+  ],
+  pitch: "Hi, I noticed one website opportunity for your business from public information and wrote down the specific reason before reaching out.",
+  internalLinks: [
+    {
+      label: "Buy web design leads",
+      href: "/resources/buy-web-design-leads"
+    },
+    {
+      label: "Verified web design leads",
+      href: "/resources/verified-web-design-leads"
+    },
+    {
+      label: "Web design leads list",
+      href: "/resources/web-design-leads-list"
+    }
+  ],
+  faqs: [
+    {
+      q: "Are web design leads for sale safe?",
+      a: "They are safe only when the source, recency, exclusivity, business need, and contact route can be checked."
+    },
+    {
+      q: "What is a red flag?",
+      a: "Red flags include huge inventory claims, unclear sourcing, resale language, no visible business need, and no contact-route confidence."
+    }
+  ]
+},
+  {
+  slug: "best-exclusive-web-design-leads",
+  title: "Best exclusive web design leads: how to judge the claim",
+  metaTitle: "Best Exclusive Web Design Leads | Verification Checklist",
+  metaDescription: "Judge exclusive web design lead claims with checks for freshness, need, single-buyer access, proof, and pitch fit.",
+  keyword: "best exclusive web design leads",
+  relatedSearches: [
+    "exclusive web design leads",
+    "buy web design leads",
+    "web design leads for sale",
+    "verified web design leads"
+  ],
+  audience: "Freelancers and agencies comparing exclusive lead vendors",
+  intent: "The searcher wants the safest or highest-quality exclusive lead source.",
+  summary: "The best exclusive web design leads are not just sold to one buyer; they are fresh, relevant, verifiable, and connected to a visible business need. Exclusivity without proof is not enough.",
+  leadIn: "Use iCloseLeads to build an exclusivity alternative: leads found from your own search criteria, saved with proof, and pitched from context.",
+  steps: [
+    "Define what exclusive means.",
+    "Verify the business problem.",
+    "Check freshness and category fit.",
+    "Confirm the contact route.",
+    "Compare against a self-built verified lead."
+  ],
+  proofPoints: [
+    "The SERP includes exclusive lead vendors and comparison intent.",
+    "Google related searches show buyers need proof around best and buy modifiers.",
+    "A verification-first page improves trust and conversion path."
+  ],
+  pitch: "Hi, I found a specific website opportunity for your business while reviewing local results. It looked relevant enough to write down one practical suggestion.",
+  internalLinks: [
+    {
+      label: "Exclusive web design leads",
+      href: "/resources/exclusive-web-design-leads"
+    },
+    {
+      label: "Leadsify and Leadscampus alternative",
+      href: "/resources/leadsify-leadscampus-alternative"
+    },
+    {
+      label: "Web design leads for free",
+      href: "/resources/web-design-leads-for-free-vs-verified"
+    }
+  ],
+  faqs: [
+    {
+      q: "What makes an exclusive web design lead good?",
+      a: "It should be fresh, verifiable, sold to one buyer, and tied to a real website need."
+    },
+    {
+      q: "Can I create exclusive leads myself?",
+      a: "Yes. When you use your own niche and location search, the resulting verified lead is effectively exclusive to your workflow."
+    }
+  ]
+},
+  {
+  slug: "freelance-cold-outreach-reviews",
+  title: "Freelance cold outreach reviews: how to judge advice and tools",
+  metaTitle: "Freelance Cold Outreach Reviews | What to Trust Before You Send",
+  metaDescription: "Evaluate freelance cold outreach reviews by checking lead quality, message relevance, deliverability risk, CRM follow-up, and proof.",
+  keyword: "freelance cold outreach reviews",
+  relatedSearches: [
+    "freelance cold outreach reddit",
+    "freelance cold outreach examples",
+    "freelance cold outreach free",
+    "cold outreach strategy"
+  ],
+  audience: "Freelancers comparing outreach tools, templates, and advice",
+  intent: "The searcher wants to know which cold outreach approach is credible.",
+  summary: "Freelance cold outreach reviews should be judged by the quality of the lead workflow, not only by template polish. Look for tools and advice that help you find relevant leads, preserve proof, write from context, and follow up safely.",
+  leadIn: "iCloseLeads is built around the full workflow: discovery, qualification, proposal drafting, outreach preparation, and CRM follow-up.",
+  steps: [
+    "Check whether the reviewed tactic starts from qualified leads.",
+    "Look for proof capture, not only copywriting tips.",
+    "Avoid claims that ignore deliverability or relevance.",
+    "Compare how follow-up is handled.",
+    "Test with a small focused batch before scaling."
+  ],
+  proofPoints: [
+    "Google related searches include reviews, Reddit, examples, and free modifiers.",
+    "Review intent needs a risk-aware checklist rather than a sales-only answer.",
+    "This page strengthens iCloseLeads' workflow positioning."
+  ],
+  pitch: "Hi, I noticed [signal] and had one practical idea for [outcome]. If it is relevant, I can send the short version for you to review.",
+  internalLinks: [
+    {
+      label: "Freelance cold outreach",
+      href: "/resources/freelance-cold-outreach"
+    },
+    {
+      label: "Cold outreach strategy",
+      href: "/resources/cold-outreach-strategy-for-freelancers"
+    },
+    {
+      label: "Email outreach feature",
+      href: "/features/email-outreach"
+    }
+  ],
+  faqs: [
+    {
+      q: "What should freelance cold outreach reviews cover?",
+      a: "They should cover lead quality, relevance, message workflow, follow-up, risk, and actual usability."
+    },
+    {
+      q: "Are template reviews enough?",
+      a: "No. Templates matter less than whether the lead reason and follow-up path are clear."
+    }
+  ]
+},
+  {
+  slug: "web-design-leads-reddit",
+  title: "Web design leads Reddit advice: what freelancers should verify",
+  metaTitle: "Web Design Leads Reddit Advice | Verification Workflow",
+  metaDescription: "Use Reddit advice about web design leads carefully: verify site gaps, buyer fit, contact routes, and outreach context before pitching.",
+  keyword: "web design leads reddit",
+  relatedSearches: [
+    "web design leads",
+    "web design leads for free",
+    "best web design leads",
+    "verified web design leads"
+  ],
+  audience: "Web designers checking community advice before prospecting",
+  intent: "The searcher wants practical, experience-based lead generation advice.",
+  summary: "Reddit advice around web design leads is useful when it highlights trust, targeting, and realistic outreach. Treat it as a caution layer, then verify every lead from public evidence before pitching.",
+  leadIn: "iCloseLeads helps you turn community lessons into a repeatable workflow: find a specific lead, save proof, draft from context, and follow up without relying on blind volume.",
+  steps: [
+    "Keep advice about niche focus and useful offers.",
+    "Reject advice that depends on spam volume.",
+    "Verify the website gap and business activity.",
+    "Save the lead signal.",
+    "Write a first message that names the context."
+  ],
+  proofPoints: [
+    "Google SERPs for web design leads include multiple Reddit discussions.",
+    "Community-heavy results show that trust and proof are part of searcher intent.",
+    "This page gives iCloseLeads a way to answer that trust question."
+  ],
+  pitch: "Hi, I found your business while researching local website opportunities and noticed [specific signal]. I had one practical suggestion if you want me to send it.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Best web design leads",
+      href: "/resources/best-web-design-leads"
+    },
+    {
+      label: "Website design prospecting",
+      href: "/resources/website-design-prospecting"
+    }
+  ],
+  faqs: [
+    {
+      q: "Is Reddit a good place to learn web design lead generation?",
+      a: "It can reveal real objections and tactics, but every idea should be filtered through fit, relevance, and brand safety."
+    },
+    {
+      q: "What should I verify after reading Reddit advice?",
+      a: "Verify the business need, website gap, contact route, and whether your offer can produce a specific outcome."
+    }
+  ]
+},
+  {
+  slug: "web-design-leads-for-agencies",
+  title: "Web design leads for agencies",
+  metaTitle: "Web Design Leads for Agencies | Qualified Prospecting Workflow",
+  metaDescription: "Find web design leads for agencies by targeting niches, verifying website gaps, preserving context, and routing prospects into proposals.",
+  keyword: "web design leads for agencies",
+  relatedSearches: [
+    "get leads for marketing agency",
+    "web design lead generation",
+    "website leads",
+    "verified web design leads"
+  ],
+  audience: "Small agencies selling website, redesign, SEO, and conversion services",
+  intent: "The searcher wants agency-ready website prospects rather than individual freelancer tips.",
+  summary: "Agencies need web design leads that fit their offer, capacity, and proof standards. A good agency lead has a visible website issue, a realistic budget path, and a clear next step for discovery.",
+  leadIn: "iCloseLeads helps agencies run focused prospecting by segment, save the reason a lead matters, and move the prospect into proposal or consultation workflows.",
+  steps: [
+    "Choose a segment the agency can serve well.",
+    "Find website gaps that map to agency services.",
+    "Confirm the business looks active and reachable.",
+    "Save the pitch angle and proof.",
+    "Route the lead into proposal, audit, or consultation follow-up."
+  ],
+  proofPoints: [
+    "Related searches include agency and website development lead intent.",
+    "This topic supports the agency side of iCloseLeads without creating a fake location page.",
+    "The workflow links discovery to proposals and CRM follow-up."
+  ],
+  pitch: "Hi, our team noticed one website opportunity that may help [company] turn more visitors into [outcome]. I can send a short audit note if useful.",
+  internalLinks: [
+    {
+      label: "Agency client acquisition software",
+      href: "/resources/agency-client-acquisition-software"
+    },
+    {
+      label: "Get leads for marketing agency",
+      href: "/resources/get-leads-for-marketing-agency"
+    },
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    }
+  ],
+  faqs: [
+    {
+      q: "How should agencies qualify web design leads?",
+      a: "Agencies should check fit, website gap, budget likelihood, contact route, and whether the prospect needs the agency's actual service mix."
+    },
+    {
+      q: "Should agencies use the same pitch as freelancers?",
+      a: "No. Agencies should lead with audit value, team capability, and a clear consultation path while staying specific."
+    }
+  ]
+},
+  {
+  slug: "cold-outreach-for-web-designers",
+  title: "Cold outreach for web designers",
+  metaTitle: "Cold Outreach for Web Designers | Website Lead Email Workflow",
+  metaDescription: "Run cold outreach for web designers with verified website gaps, local proof, concise email examples, and follow-up tracking.",
+  keyword: "cold outreach for web designers",
+  relatedSearches: [
+    "freelance cold outreach",
+    "web design leads",
+    "freelance cold email template",
+    "cold outreach examples"
+  ],
+  audience: "Web designers and developers pitching local or SMB website work",
+  intent: "The searcher wants outreach guidance specific to web design prospects.",
+  summary: "Cold outreach for web designers should start with the website problem the prospect can recognize. Name the gap, connect it to calls or quotes, and offer one low-friction next step.",
+  leadIn: "iCloseLeads helps web designers find the prospect, save the website evidence, draft a proposal angle, and schedule follow-up from the same workflow.",
+  steps: [
+    "Find a website gap or missing-site lead.",
+    "Check business activity and contact route.",
+    "Write a first line about the specific gap.",
+    "Offer a small audit, idea, or call.",
+    "Follow up with the same business context."
+  ],
+  proofPoints: [
+    "GSC and SERP evidence connect web design leads with freelance cold outreach.",
+    "The page combines two active clusters into a clear product workflow.",
+    "The outperformance angle is web-design-specific examples and verification."
+  ],
+  pitch: "Hi, I noticed [website gap] while checking [company]. I design websites that make [customer action] easier, and I can send one focused suggestion if useful.",
+  internalLinks: [
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    },
+    {
+      label: "Freelance cold email template",
+      href: "/resources/freelance-cold-email-template"
+    },
+    {
+      label: "Web design proposal template",
+      href: "/resources/web-design-proposal-template"
+    }
+  ],
+  faqs: [
+    {
+      q: "What should web designers say in cold outreach?",
+      a: "Mention a specific website gap, connect it to a customer outcome, and ask for one small next step."
+    },
+    {
+      q: "What should web designers avoid?",
+      a: "Avoid generic redesign offers, fake urgency, broad service menus, and outreach that ignores the prospect's actual website."
+    }
+  ]
+},
+  {
+  slug: "local-website-leads",
+  title: "Local website leads for freelancers",
+  metaTitle: "Local Website Leads | Find Businesses That Need Better Websites",
+  metaDescription: "Find local website leads by scanning categories and cities for missing sites, outdated pages, weak trust signals, and quote-flow gaps.",
+  keyword: "local website leads",
+  relatedSearches: [
+    "website leads",
+    "web design leads",
+    "businesses without websites",
+    "local businesses that need websites"
+  ],
+  audience: "Freelancers selling local websites, redesigns, landing pages, or SEO support",
+  intent: "The searcher wants local prospects for website services.",
+  summary: "Local website leads work best when the business has public demand and a web presence that fails to support it. The lead should be tied to a real local category, not just a random business name.",
+  leadIn: "Use iCloseLeads to search by niche and place, save the website signal, and draft a pitch around the local customer action that is currently weak.",
+  steps: [
+    "Pick a city and a category.",
+    "Scan for missing, outdated, or confusing web paths.",
+    "Check reviews and business activity.",
+    "Save the lead with the local proof.",
+    "Pitch a practical improvement tied to calls, bookings, or quotes."
+  ],
+  proofPoints: [
+    "The existing GSC cluster includes local and web design lead intent.",
+    "This page strengthens the businesses-without-websites and web-design-leads topical graph.",
+    "The page has a clear conversion path into local lead search."
+  ],
+  pitch: "Hi, I found your business while checking local website opportunities in [city]. One part of the website path may be making it harder for customers to [action].",
+  internalLinks: [
+    {
+      label: "Businesses without websites",
+      href: "/resources/businesses-without-websites"
+    },
+    {
+      label: "Local business leads",
+      href: "/use-cases/local-business-leads"
+    },
+    {
+      label: "Web design leads",
+      href: "/resources/web-design-leads"
+    }
+  ],
+  faqs: [
+    {
+      q: "What are local website leads?",
+      a: "They are nearby businesses with a visible website, trust, booking, or quote-flow problem that a freelancer can help solve."
+    },
+    {
+      q: "Which local businesses are best?",
+      a: "Service businesses with active demand and customer comparison behavior are usually stronger than broad random listings."
+    }
+  ]
+}
 ];
 
 export function getResourcePage(slug: string) {
