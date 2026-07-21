@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
@@ -162,7 +164,10 @@ const MIGRATIONS = [
 export async function GET(req: NextRequest) {
   const secret = process.env.MIGRATE_SECRET;
   const supplied = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || req.nextUrl.searchParams.get("secret");
-  if (!secret || supplied !== secret) {
+  const session = await getServerSession(authOptions);
+  const hasSecret = Boolean(secret && supplied === secret);
+  const isAdmin = session?.user?.role === "ADMIN";
+  if (!hasSecret && !isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
