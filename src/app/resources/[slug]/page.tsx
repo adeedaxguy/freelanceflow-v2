@@ -177,7 +177,7 @@ const RESOURCE_RESEARCH_INTENT: Record<string, ResourceResearchIntent> = {
 };
 
 function getResourceResearchIntent(page: ResourcePageData) {
-  return RESOURCE_RESEARCH_INTENT[page.slug] ?? {
+  return page.researchIntent ?? RESOURCE_RESEARCH_INTENT[page.slug] ?? {
     searcherJob: `Find a useful, verified path for the ${page.keyword} workflow before sending outreach.`,
     competitorGap: "Competing pages often stop at advice or lists; this page should connect the search intent to a practical lead workflow.",
     workflowNudge: "Save the lead reason, proof, and next action together before drafting.",

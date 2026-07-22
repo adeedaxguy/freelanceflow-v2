@@ -7,6 +7,12 @@ export type ResourcePage = {
   relatedSearches?: string[];
   audience: string;
   intent: string;
+  researchIntent?: {
+    searcherJob: string;
+    competitorGap: string;
+    workflowNudge: string;
+    conversionPath: string;
+  };
   summary: string;
   leadIn: string;
   steps: string[];
@@ -4393,8 +4399,441 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       a: "Service businesses with active demand and customer comparison behavior are usually stronger than broad random listings."
     }
   ]
-}
+},
+  ...buildJuly23SerpResourcePages(),
 ];
+
+
+
+function buildJuly23SerpResourcePages(): ResourcePage[] {
+  type Input = {
+    slug: string;
+    title: string;
+    keyword: string;
+    relatedSearches: string[];
+    audience: string;
+    intent: string;
+    signal: string;
+    workflow: string;
+    pitchAngle: string;
+    competitorGap: string;
+    internalLinks: ResourcePage["internalLinks"];
+  };
+
+  const pages: Input[] = [
+    {
+      slug: "freelance-cold-outreach-template",
+      title: "Freelance cold outreach template built from the lead signal",
+      keyword: "freelance cold outreach template",
+      relatedSearches: ["freelance cold outreach examples", "cold outreach examples", "cold email freelance reddit", "freelance cold outreach free"],
+      audience: "Freelancers, consultants, web designers, and agency owners",
+      intent: "The searcher wants a first-message structure that gets replies without sounding like a copied script.",
+      signal: "the prospect has a visible business gap, hiring signal, website issue, or local demand clue",
+      workflow: "save the prospect, write one sentence about why the lead matters, then draft the template around that reason",
+      pitchAngle: "a short, specific first message that names the observed signal and asks for one easy next step",
+      competitorGap: "SERPs and AI Overviews emphasize personalization and brevity, but many template pages still begin with generic copy instead of verified lead context.",
+      internalLinks: [
+        { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+        { label: "Cold outreach examples", href: "/resources/freelance-cold-outreach-examples" },
+        { label: "Email outreach feature", href: "/features/email-outreach" },
+      ],
+    },
+    {
+      slug: "cold-outreach-follow-up-sequence-for-freelancers",
+      title: "Cold outreach follow-up sequence for freelancers",
+      keyword: "cold outreach follow up sequence for freelancers",
+      relatedSearches: ["cold outreach strategy", "cold outreach examples", "freelance cold outreach", "proposal follow up email"],
+      audience: "Freelancers who need replies from direct outreach, not one-and-done messages",
+      intent: "The searcher needs a respectful follow-up rhythm after the first cold email or proposal.",
+      signal: "the first message had a clear business reason but the buyer has not replied yet",
+      workflow: "save the first pitch, set a follow-up date, then write each follow-up around the original lead reason",
+      pitchAngle: "a three-touch sequence that adds clarity without guilt, fake urgency, or spam pressure",
+      competitorGap: "Most follow-up examples are disconnected from prospecting context; iCloseLeads can connect the saved lead, proposal angle, Gmail draft, and CRM stage.",
+      internalLinks: [
+        { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
+        { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
+        { label: "CRM pipeline", href: "/features/crm-pipeline" },
+      ],
+    },
+    {
+      slug: "cold-outreach-meaning-for-freelancers",
+      title: "Cold outreach meaning for freelancers",
+      keyword: "cold outreach meaning",
+      relatedSearches: ["cold outreach strategy", "cold outreach examples", "freelance cold outreach", "cold email freelance reddit"],
+      audience: "New freelancers learning client acquisition without marketplaces",
+      intent: "The searcher wants a plain explanation of cold outreach and when it is appropriate.",
+      signal: "a business has not asked for help, but public context suggests your offer could solve a real problem",
+      workflow: "define the buyer, verify the reason to contact them, then save enough proof to keep the first message useful",
+      pitchAngle: "a simple definition that moves readers from passive learning into one ethical lead search",
+      competitorGap: "Definition pages often stop at vocabulary; this page connects the term to source quality, public proof, and signup-to-first-search activation.",
+      internalLinks: [
+        { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+        { label: "Lead generation workflow", href: "/resources/lead-generation-workflow-for-freelancers" },
+        { label: "Start lead discovery", href: "/features/lead-discovery" },
+      ],
+    },
+    {
+      slug: "local-business-leads-for-web-designers-reddit",
+      title: "Local business leads for web designers: Reddit-style advice turned into a checklist",
+      keyword: "local business leads for web designers reddit",
+      relatedSearches: ["web design leads reddit", "local business leads for web designers", "businesses without websites", "where to find leads for web agency"],
+      audience: "Web designers and small agencies researching where other builders find clients",
+      intent: "The searcher wants practical, field-tested lead-source ideas without trusting a lead seller blindly.",
+      signal: "forum advice points to one source or tactic, but the actual business still needs a website gap and contact route",
+      workflow: "use Reddit-style ideas as source discovery, then verify every lead inside iCloseLeads before outreach",
+      pitchAngle: "turn informal advice into a lead-quality checklist for web design prospecting",
+      competitorGap: "Forum-heavy SERPs offer useful anecdotes but rarely convert them into a repeatable qualification workflow for signup and first search.",
+      internalLinks: [
+        { label: "Local business leads for web designers", href: "/resources/local-business-leads-for-web-designers" },
+        { label: "Web design leads Reddit", href: "/resources/web-design-leads-reddit" },
+        { label: "Local leads use case", href: "/use-cases/local-business-leads" },
+      ],
+    },
+    {
+      slug: "free-local-business-leads-for-web-designers",
+      title: "Free local business leads for web designers",
+      keyword: "free local business leads for web designers",
+      relatedSearches: ["web design leads for free", "free leads for web designers", "businesses without websites", "how to find businesses without websites on Google Maps"],
+      audience: "Freelance web designers who want to start prospecting before buying lead lists",
+      intent: "The searcher wants no-cost ways to find local website prospects.",
+      signal: "a public listing, website gap, review profile, or category search shows a reachable local business",
+      workflow: "search one city and niche, save only verified prospects, then draft the first outreach message from the public proof",
+      pitchAngle: "a free lead workflow that favors proof over scraped volume",
+      competitorGap: "Free-lead content often becomes a list of places to look; this page should show how to qualify and activate the lead inside the product.",
+      internalLinks: [
+        { label: "Web design leads for free vs verified", href: "/resources/web-design-leads-for-free-vs-verified" },
+        { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
+      ],
+    },
+    {
+      slug: "best-local-business-leads-for-web-designers",
+      title: "Best local business leads for web designers",
+      keyword: "best local business leads for web designers",
+      relatedSearches: ["best leads for web designers", "verified web design leads", "website client leads", "local business leads for web designers"],
+      audience: "Web designers choosing which local prospects deserve outreach first",
+      intent: "The searcher wants a quality filter, not just more business names.",
+      signal: "the business has local demand plus a website, booking, trust, or conversion issue a designer can explain",
+      workflow: "rank local prospects by public demand, website gap, reachable contact path, and offer fit before drafting",
+      pitchAngle: "a prioritization scorecard for website prospects that can become signup and saved-lead activity",
+      competitorGap: "Lead vendors and list pages compete on quantity; this page should win on qualification, source proof, and workflow depth.",
+      internalLinks: [
+        { label: "Best web design leads", href: "/resources/best-web-design-leads" },
+        { label: "Verified web design leads", href: "/resources/verified-web-design-leads" },
+        { label: "Lead discovery feature", href: "/features/lead-discovery" },
+      ],
+    },
+    {
+      slug: "local-business-without-websites",
+      title: "Local businesses without websites: when they are worth pitching",
+      keyword: "local business without websites",
+      relatedSearches: ["businesses without websites", "local businesses that need websites", "businesses without websites in usa", "how to find companies that need websites"],
+      audience: "Freelancers selling websites, redesigns, booking flows, or local SEO",
+      intent: "The searcher wants local companies that may need a website.",
+      signal: "the company has local demand and public proof, not just a missing domain",
+      workflow: "find the listing, confirm activity, save the business reason, and draft a website pitch tied to calls or bookings",
+      pitchAngle: "separate real local website opportunities from random no-site records",
+      competitorGap: "Search results often stop at no-website discovery; iCloseLeads can add qualification, saved proof, proposal drafting, and follow-up.",
+      internalLinks: [
+        { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
+        { label: "Local website leads", href: "/resources/local-website-leads" },
+        { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      ],
+    },
+    {
+      slug: "how-to-find-businesses-without-websites-on-google-maps",
+      title: "How to find businesses without websites on Google Maps",
+      keyword: "how to find businesses without websites on Google Maps",
+      relatedSearches: ["businesses without websites", "local business without websites", "how to find companies that need websites", "Google Maps lead generation"],
+      audience: "Web designers and local SEO freelancers using map searches for prospecting",
+      intent: "The searcher wants a practical map-based workflow for finding no-site or weak-site prospects.",
+      signal: "a map listing shows active business demand but no owned website or a weak website path",
+      workflow: "search category plus city, verify the profile, capture the site gap, and save the lead before drafting",
+      pitchAngle: "a Google Maps workflow that becomes a saved iCloseLeads prospect instead of a loose spreadsheet",
+      competitorGap: "Maps prospecting tutorials often miss the next step: contact-path verification, proposal angle, and follow-up tracking.",
+      internalLinks: [
+        { label: "Google Maps lead generation", href: "/resources/google-maps-lead-generation-for-freelancers" },
+        { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
+        { label: "Local business leads use case", href: "/use-cases/local-business-leads" },
+      ],
+    },
+    {
+      slug: "how-to-find-companies-that-need-websites",
+      title: "How to find companies that need websites",
+      keyword: "how to find companies that need websites",
+      relatedSearches: ["businesses without websites", "local businesses that need websites", "website client leads", "how to get leads for website development"],
+      audience: "Website freelancers, Webflow builders, WordPress developers, and small agencies",
+      intent: "The searcher wants a repeatable way to find companies with a clear website need.",
+      signal: "a company has demand but its website path, mobile experience, booking flow, or trust proof is weak",
+      workflow: "search a niche, inspect the public website path, save the business gap, and draft one direct improvement offer",
+      pitchAngle: "a research-to-pitch workflow for companies that need website help",
+      competitorGap: "Most results list tactics; this page should tie each tactic to lead proof, buyer route, and product activation.",
+      internalLinks: [
+        { label: "How to get leads for website development", href: "/resources/how-to-get-leads-for-website-development" },
+        { label: "Website leads", href: "/resources/website-leads" },
+        { label: "AI proposals", href: "/features/ai-proposals" },
+      ],
+    },
+    {
+      slug: "businesses-without-websites-in-usa",
+      title: "Businesses without websites in USA: prospecting workflow",
+      keyword: "businesses without websites in USA",
+      relatedSearches: ["businesses without websites", "local business without websites", "free local business leads for web designers", "website leads"],
+      audience: "Freelancers targeting US local businesses for website and local SEO work",
+      intent: "The searcher wants US business prospects where missing website presence may create an opportunity.",
+      signal: "a US local listing has active reviews, phone route, service demand, and no strong owned website",
+      workflow: "choose one state or metro, scan a service niche, save verified no-site businesses, then draft a localized pitch",
+      pitchAngle: "a US-focused prospecting workflow with local proof and no fake location claims",
+      competitorGap: "Broad no-website datasets can be stale; this page should emphasize live verification and local business context.",
+      internalLinks: [
+        { label: "Local business without websites", href: "/resources/local-business-without-websites" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
+        { label: "Web design leads", href: "/resources/web-design-leads" },
+      ],
+    },
+    {
+      slug: "website-client-leads",
+      title: "Website client leads for freelancers",
+      keyword: "website client leads",
+      relatedSearches: ["website leads", "web design leads", "website leads for sale", "how to get leads for website development"],
+      audience: "Freelancers and agencies selling website projects",
+      intent: "The searcher wants businesses that could become website clients.",
+      signal: "the business has a website problem that can be tied to calls, quotes, trust, booking, speed, or credibility",
+      workflow: "qualify the business need, save the proof, and draft a proposal path before opening another lead source",
+      pitchAngle: "turn website-client intent into a direct lead search and proposal workflow",
+      competitorGap: "Lead-list pages focus on records; this page should focus on turning one qualified website client lead into a next action.",
+      internalLinks: [
+        { label: "Website leads", href: "/resources/website-leads" },
+        { label: "Web design leads", href: "/resources/web-design-leads" },
+        { label: "Website design prospecting", href: "/resources/website-design-prospecting" },
+      ],
+    },
+    {
+      slug: "best-client-acquisition-software-for-freelancers",
+      title: "Best client acquisition software for freelancers",
+      keyword: "best client acquisition software for freelancers",
+      relatedSearches: ["client acquisition software for freelancers", "client acquisition software for freelancers free", "client acquisition platform for freelancers", "best lead generation tools for freelancers"],
+      audience: "Freelancers choosing software for lead discovery, proposals, outreach, and CRM",
+      intent: "The searcher wants software that helps win clients, not only manage work after a deal closes.",
+      signal: "the freelancer needs a repeatable path from lead source to saved prospect to proposal to follow-up",
+      workflow: "compare tools by whether they create a real first outreach action and measurable follow-up habit",
+      pitchAngle: "position iCloseLeads as client-acquisition software focused on prospecting and first-contact workflow",
+      competitorGap: "SERPs include CRMs and project tools like Plutio or HoneyBook; iCloseLeads can differentiate by lead discovery plus outreach activation.",
+      internalLinks: [
+        { label: "Freelance client acquisition software", href: "/resources/freelance-client-acquisition-software" },
+        { label: "Client acquisition platform", href: "/resources/client-acquisition-platform-for-freelancers" },
+        { label: "Lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
+      ],
+    },
+    {
+      slug: "client-acquisition-software-for-freelancers-free",
+      title: "Free client acquisition software for freelancers: what to test first",
+      keyword: "client acquisition software for freelancers free",
+      relatedSearches: ["client acquisition software for freelancers", "best client acquisition software for freelancers", "best lead generation tools for freelancers", "freelance lead generation software"],
+      audience: "Freelancers who want to test a client-acquisition workflow before upgrading",
+      intent: "The searcher wants a free or low-risk way to find and manage prospects.",
+      signal: "the tool lets the freelancer test one lead source, save context, draft outreach, and track the next follow-up",
+      workflow: "run one free search, save one qualified lead, and measure whether the tool helps create a better first message",
+      pitchAngle: "a free-first activation path that turns comparison traffic into signups",
+      competitorGap: "Free-software SERPs often compare pricing but skip the first 10-minute workflow that proves whether the tool helps acquisition.",
+      internalLinks: [
+        { label: "Best client acquisition software", href: "/resources/best-client-acquisition-software-for-freelancers" },
+        { label: "Lead generation workflow", href: "/resources/lead-generation-workflow-for-freelancers" },
+        { label: "Pricing", href: "/pricing" },
+      ],
+    },
+    {
+      slug: "client-acquisition-software-for-freelancers-reddit",
+      title: "Client acquisition software for freelancers: Reddit-style comparison checklist",
+      keyword: "client acquisition software for freelancers reddit",
+      relatedSearches: ["client acquisition software for freelancers", "best client acquisition software for freelancers", "freelancer client acquisition methods", "lead generation freelancer Upwork"],
+      audience: "Freelancers comparing tool advice from forums, communities, and product lists",
+      intent: "The searcher wants practical software recommendations and warnings from other freelancers.",
+      signal: "community advice points to a workflow problem: finding prospects, writing proposals, tracking follow-up, or managing replies",
+      workflow: "translate forum recommendations into a checklist, then test one lead-to-follow-up workflow in iCloseLeads",
+      pitchAngle: "use Reddit-style software advice without letting anecdotes replace product fit",
+      competitorGap: "Forum results are honest but fragmented; this page structures the advice into a tool-fit checklist and signup action.",
+      internalLinks: [
+        { label: "Client acquisition software", href: "/resources/freelance-client-acquisition-software" },
+        { label: "Freelance client acquisition", href: "/resources/freelance-client-acquisition" },
+        { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
+      ],
+    },
+    {
+      slug: "lead-generation-freelancer-upwork",
+      title: "Lead generation freelancer Upwork alternatives",
+      keyword: "lead generation freelancer Upwork",
+      relatedSearches: ["B2B lead generation freelancer", "lead generation freelancer", "lead generation jobs work from home", "client acquisition software for freelancers"],
+      audience: "Freelancers selling lead generation services or trying to find clients outside marketplaces",
+      intent: "The searcher is comparing Upwork-style work with direct lead generation and client acquisition.",
+      signal: "the freelancer needs prospects and outreach context instead of waiting for marketplace invites",
+      workflow: "choose one buyer niche, search fresh leads, save proof, and draft a direct proposal outside the crowded marketplace path",
+      pitchAngle: "show freelancers how iCloseLeads supports direct acquisition alongside or instead of marketplace bidding",
+      competitorGap: "Upwork-oriented results focus on profiles and jobs; this page should connect lead-generation freelancers to direct prospecting workflows.",
+      internalLinks: [
+        { label: "Lead generation workflow", href: "/resources/lead-generation-workflow-for-freelancers" },
+        { label: "Independent contractor lead generation", href: "/resources/lead-generation-for-independent-contractors" },
+        { label: "AI proposal generator", href: "/features/ai-proposals" },
+      ],
+    },
+    {
+      slug: "b2b-lead-generation-freelancer",
+      title: "B2B lead generation freelancer workflow",
+      keyword: "B2B lead generation freelancer",
+      relatedSearches: ["lead generation freelancer Upwork", "B2B lead generation freelancer Upwork", "lead generation specialist client acquisition", "outbound lead generation software for freelancers"],
+      audience: "Freelancers who provide B2B prospecting, appointment setting, or outbound services",
+      intent: "The searcher wants to operate or hire around B2B lead generation work.",
+      signal: "a B2B company has a public buying signal, hiring signal, tool gap, or market segment worth contacting",
+      workflow: "define ICP, search one source, verify company fit, save the prospect, and create a tailored outreach draft",
+      pitchAngle: "a B2B workflow page that can capture freelancer, agency, and service-provider search intent",
+      competitorGap: "Large lead-gen software pages focus on company databases; iCloseLeads can win with a freelancer-operated workflow from source to proposal.",
+      internalLinks: [
+        { label: "Outbound lead generation software", href: "/resources/outbound-lead-generation-software-for-freelancers" },
+        { label: "B2B lead generation agency alternative", href: "/resources/b2b-lead-generation-agency-alternative" },
+        { label: "Lead discovery", href: "/features/lead-discovery" },
+      ],
+    },
+    {
+      slug: "get-cold-leads-for-freelancer-reddit",
+      title: "Get cold leads for freelancer Reddit searches: better qualification path",
+      keyword: "get cold leads for freelancer reddit",
+      relatedSearches: ["cold email freelance reddit", "freelance cold outreach reddit", "client acquisition software for freelancers reddit", "freelance lead generation software reddit"],
+      audience: "Freelancers using forums to learn where to find cold leads",
+      intent: "The searcher wants practical ways to find cold leads without wasting time on spammy lists.",
+      signal: "a forum suggestion points to a source, but each lead still needs public proof and a reason to contact",
+      workflow: "capture the source idea, search for matching prospects, save one verified lead, and write a context-led first email",
+      pitchAngle: "turn forum-sourced ideas into an accountable lead workflow",
+      competitorGap: "Reddit results are useful for reality checks but do not provide a productized path from advice to saved lead to outreach.",
+      internalLinks: [
+        { label: "Cold email freelance Reddit", href: "/resources/cold-email-freelance-reddit" },
+        { label: "Freelance cold outreach Reddit", href: "/resources/freelance-cold-outreach-reddit" },
+        { label: "Lead discovery", href: "/features/lead-discovery" },
+      ],
+    },
+    {
+      slug: "lead-generation-specialist-client-acquisition",
+      title: "Lead generation specialist client acquisition workflow",
+      keyword: "lead generation specialist client acquisition",
+      relatedSearches: ["lead generation specialist", "B2B lead generation freelancer", "lead generation jobs work from home", "lead generation freelancer Upwork"],
+      audience: "Lead generation specialists, appointment setters, and freelance outbound operators",
+      intent: "The searcher wants a way to win clients for lead generation work or structure their own prospecting system.",
+      signal: "a potential client has a clear growth, hiring, sales, or pipeline problem that lead generation could help solve",
+      workflow: "search a narrow niche, save accounts with proof, draft a service-specific pitch, and track replies in CRM",
+      pitchAngle: "a specialist workflow that ties prospecting service offers to iCloseLeads activation",
+      competitorGap: "Job and career results often capture this query; this page redirects the intent toward winning clients as an independent specialist.",
+      internalLinks: [
+        { label: "B2B lead generation freelancer", href: "/resources/b2b-lead-generation-freelancer" },
+        { label: "Client acquisition platform", href: "/resources/client-acquisition-platform-for-freelancers" },
+        { label: "CRM pipeline", href: "/features/crm-pipeline" },
+      ],
+    },
+    {
+      slug: "freelance-lead-generation-software-reddit",
+      title: "Freelance lead generation software: Reddit-style tool checklist",
+      keyword: "freelance lead generation software reddit",
+      relatedSearches: ["client acquisition software for freelancers reddit", "best lead generation tools for freelancers", "cold outreach CRM for freelancers", "lead generation workflow for freelancers"],
+      audience: "Freelancers comparing lead generation tools from communities and software lists",
+      intent: "The searcher wants practical software advice with real workflow fit.",
+      signal: "a tool recommendation should help find prospects, verify context, draft outreach, and follow up",
+      workflow: "compare recommendations by first-search quality, saved proof, proposal drafting, Gmail readiness, and CRM tracking",
+      pitchAngle: "turn community software comparisons into an iCloseLeads-ready buying checklist",
+      competitorGap: "Software roundups and forum threads rarely score tools by the full client-acquisition loop.",
+      internalLinks: [
+        { label: "Best lead generation tools", href: "/resources/best-lead-generation-tools-for-freelancers" },
+        { label: "Client acquisition software", href: "/resources/best-client-acquisition-software-for-freelancers" },
+        { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
+      ],
+    },
+    {
+      slug: "cold-email-for-web-design-agency",
+      title: "Cold email for web design agency leads",
+      keyword: "cold email for web design agency",
+      relatedSearches: ["web design leads", "cold outreach for web designers", "web design leads for agencies", "freelance cold outreach examples"],
+      audience: "Web design agencies and freelancers sending direct outreach",
+      intent: "The searcher wants a cold email path for website prospects.",
+      signal: "the agency has found a specific website, booking, mobile, or trust gap worth mentioning",
+      workflow: "save the target company, record the website issue, draft a short agency email, and schedule one follow-up",
+      pitchAngle: "a web-design-specific cold email page that connects lead source to proposal and CRM follow-up",
+      competitorGap: "Generic cold-email pages ignore web-design lead context; this page should win by naming site signals and business outcomes.",
+      internalLinks: [
+        { label: "Cold outreach for web designers", href: "/resources/cold-outreach-for-web-designers" },
+        { label: "Web design leads for agencies", href: "/resources/web-design-leads-for-agencies" },
+        { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
+      ],
+    },
+  ];
+
+  return pages.map((page) => ({
+    slug: page.slug,
+    title: page.title,
+    metaTitle: page.title + " | iCloseLeads",
+    metaDescription: "Use iCloseLeads to turn " + page.keyword + " research into verified prospects, saved context, proposal drafts, and CRM follow-up.",
+    keyword: page.keyword,
+    relatedSearches: page.relatedSearches,
+    audience: page.audience,
+    intent: page.intent,
+    researchIntent: {
+      searcherJob: page.intent,
+      competitorGap: page.competitorGap,
+      workflowNudge: page.workflow,
+      conversionPath: "Move the visitor from research into a free iCloseLeads signup, one focused search, one saved lead, one proposal or Gmail-ready draft, and one scheduled follow-up.",
+    },
+    summary: page.title + " should start from " + page.signal + ". The page turns " + page.keyword + " intent into a practical iCloseLeads workflow: search, verify, save, draft, and follow up.",
+    leadIn: "Use this workflow when " + page.signal + ". The important move is to avoid passive research: " + page.workflow + ".",
+    activationPlan: {
+      trigger: "Use this when the search intent is " + page.keyword + " and you need a real prospecting action, not another generic article.",
+      firstRun: "Run one narrow search tied to " + page.keyword + ", then open the strongest prospect before saving anything.",
+      savedLead: "Save one lead only after the public signal, buyer fit, contact path, and offer angle are clear.",
+      followUp: "Generate a short outreach draft, review it manually, and place the lead into CRM follow-up before continuing the list.",
+    },
+    steps: [
+      "Choose one niche, service offer, and location or platform before searching.",
+      "Find a lead source that matches the query intent instead of browsing broad lists.",
+      "Verify the business problem, public proof, contact route, and buyer type.",
+      "Save the lead with the exact reason it deserves outreach.",
+      "Draft a proposal or cold email that uses the saved signal in the first two lines.",
+      "Set a follow-up date so the workflow continues after the first message.",
+    ],
+    qualificationChecks: [
+      {
+        signal: "Specific business signal",
+        whyItMatters: "The lead is stronger when " + page.signal + ".",
+        nextMove: "Write the signal in the saved lead note before drafting.",
+      },
+      {
+        signal: "Reachable contact path",
+        whyItMatters: "The best page or list is useless if the freelancer cannot find a responsible route to the buyer.",
+        nextMove: "Check the site, profile, role, form, or public email route before moving to outreach.",
+      },
+      {
+        signal: "Offer fit",
+        whyItMatters: "The prospect should match the freelancer's actual service, proof, and capacity.",
+        nextMove: "Reject leads where the pitch would require fake claims, irrelevant services, or unsupported promises.",
+      },
+    ],
+    proofPoints: [
+      "The workflow starts with a visible buyer signal, not a random scraped record.",
+      "The page connects research intent to signup, saved-lead context, proposal drafting, and follow-up.",
+      page.competitorGap,
+    ],
+    pitch: "Hi, I found your business while researching " + page.keyword + ". " + page.pitchAngle + ". If useful, I can send a short idea with the first step I would test.",
+    internalLinks: page.internalLinks,
+    faqs: [
+      {
+        q: "What is the first step for " + page.keyword + "?",
+        a: "Start by narrowing the buyer type and source, then verify one public signal before saving or pitching the lead.",
+      },
+      {
+        q: "How does iCloseLeads help with this workflow?",
+        a: "iCloseLeads keeps lead discovery, saved context, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow.",
+      },
+      {
+        q: "Should I buy a lead list for this?",
+        a: "Only after you can verify freshness, source quality, contact path, and offer fit. For most freelancers, a smaller verified workflow beats a large blind list.",
+      },
+    ],
+  }));
+}
 
 export function getResourcePage(slug: string) {
   return RESOURCE_PAGES.find((page) => page.slug === slug);
