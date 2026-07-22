@@ -510,20 +510,20 @@ export default function HomepageClient() {
           </div>
         </section>
 
-        <section className="marketing-section border-y border-border bg-foreground text-background">
+        <section className="marketing-section border-y border-border bg-card text-foreground">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr]">
               <div>
-                <p className="text-xs font-bold uppercase text-background/60">One connected workspace</p>
+                <p className="text-xs font-bold uppercase text-muted-foreground">One connected workspace</p>
                 <h2 className="marketing-display mt-5 text-4xl font-bold sm:text-5xl">The lead is only useful if you know what to do next.</h2>
-                <p className="mt-5 text-base leading-8 text-background/70">Every feature supports the same motion: find, understand, contact, and follow up.</p>
+                <p className="mt-5 text-base leading-8 text-muted-foreground">Every feature supports the same motion: find, understand, contact, and follow up.</p>
               </div>
-              <div className="grid divide-y divide-background/15 border-y border-background/15 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+              <div className="grid divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
                 {features.map(([Icon, title, description], index) => (
-                  <div key={title} className={`p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-background/15" : ""}`}>
+                  <div key={title} className={`p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-border" : ""}`}>
                     <Icon className="h-5 w-5 text-accent" />
                     <h3 className="mt-5 text-lg font-bold">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-background/65">{description}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
                   </div>
                 ))}
               </div>
