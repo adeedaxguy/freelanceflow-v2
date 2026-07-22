@@ -78,6 +78,43 @@
     background: var(--page-background);
   }
 
+  body.marketing-site {
+    --background: 228 32% 7%;
+    --foreground: 220 25% 97%;
+    --card: 226 27% 10%;
+    --card-foreground: 220 25% 97%;
+    --popover: 226 27% 10%;
+    --popover-foreground: 220 25% 97%;
+    --secondary: 224 22% 14%;
+    --secondary-foreground: 220 25% 97%;
+    --muted: 224 22% 14%;
+    --muted-foreground: 224 12% 67%;
+    --border: 224 20% 19%;
+    --input: 224 20% 19%;
+    --page-background: hsl(var(--background));
+    background: hsl(var(--background));
+  }
+
+  html.light body.marketing-site {
+    --background: 48 38% 97%;
+    --foreground: 231 26% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 231 26% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 231 26% 12%;
+    --secondary: 45 24% 92%;
+    --secondary-foreground: 231 26% 12%;
+    --muted: 45 24% 92%;
+    --muted-foreground: 227 11% 42%;
+    --border: 42 17% 83%;
+    --input: 42 17% 83%;
+    --primary: 233 78% 57%;
+    --primary-light: 233 72% 49%;
+    --accent: 171 69% 36%;
+    --page-background: hsl(var(--background));
+    background: hsl(var(--background));
+  }
+
   ::selection {
     background-color: hsl(var(--primary) / 0.24);
     color: hsl(var(--foreground));
@@ -104,6 +141,84 @@
 }
 
 @layer components {
+  .marketing-shell {
+    isolation: isolate;
+  }
+
+  .marketing-display {
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .marketing-kicker {
+    @apply inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase text-primary-light;
+    letter-spacing: 0;
+  }
+
+  .marketing-section {
+    @apply px-0 py-16 sm:py-20 lg:py-24;
+  }
+
+  .marketing-grid {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.38) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.38) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 92%);
+  }
+
+  .marketing-hero > .absolute:not(.marketing-grid) {
+    display: none;
+  }
+
+  .marketing-hero h1 {
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .marketing-hero .bg-clip-text {
+    background-image: none !important;
+    color: hsl(var(--primary-light));
+  }
+
+  .marketing-primary-cta,
+  .marketing-secondary-cta {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-bold transition-colors;
+  }
+
+  .marketing-primary-cta {
+    @apply bg-primary text-white hover:bg-primary-light;
+    box-shadow: 0 12px 30px hsl(var(--primary) / 0.2);
+  }
+
+  .marketing-secondary-cta {
+    @apply border border-border bg-card text-foreground hover:bg-secondary;
+  }
+
+  .marketing-icon-button {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground;
+  }
+
+  body.marketing-site .rounded-2xl,
+  body.marketing-site .rounded-xl {
+    border-radius: 0.5rem;
+  }
+
+  body.marketing-site main > section {
+    scroll-margin-top: 5rem;
+  }
+
+  html.light body.marketing-site .shadow-card,
+  html.light body.marketing-site .shadow-2xl {
+    box-shadow: 0 16px 45px hsl(231 26% 18% / 0.1);
+  }
+
+  html.light body.marketing-site .text-white\/75,
+  html.light body.marketing-site .text-white\/70,
+  html.light body.marketing-site .text-white\/65 {
+    color: rgb(255 255 255 / 0.82);
+  }
+
   .gradient-text,
   .gradient-text-warm {
     @apply bg-clip-text text-transparent;

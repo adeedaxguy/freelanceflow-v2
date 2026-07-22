@@ -110,11 +110,11 @@ const panelSurface =
 
 export default function FeatureOverviewPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="marketing-shell min-h-screen bg-background text-foreground">
       <OverviewJsonLd />
       <Navbar />
       <main className="pt-16">
-        <section className="relative overflow-hidden border-b border-border">
+        <section className="marketing-hero relative overflow-hidden border-b border-border">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(159,103,255,0.10),rgba(0,229,160,0.045),rgba(9,9,21,0))]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">

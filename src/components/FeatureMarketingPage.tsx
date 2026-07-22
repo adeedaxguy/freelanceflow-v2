@@ -160,11 +160,11 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="marketing-shell min-h-screen bg-background text-foreground">
       <JsonLd page={page} />
       <Navbar />
       <main className="pt-16">
-        <section className="relative overflow-hidden border-b border-border">
+        <section className="marketing-hero relative overflow-hidden border-b border-border">
           <div className={cn("absolute inset-0 bg-gradient-to-b opacity-80", page.theme.heroWash)} />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
@@ -180,10 +180,6 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{page.description}</p>
-              <div className="mt-6 max-w-2xl rounded-2xl border border-primary/25 bg-primary/10 p-5">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Short answer</p>
-                <p className="mt-3 text-base leading-7 text-foreground">{shortAnswer}</p>
-              </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=feature-hero`}
@@ -207,23 +203,23 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                   </span>
                 ))}
               </div>
-              <div className="mt-6 max-w-2xl rounded-2xl border border-accent/25 bg-accent/10 p-5">
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Best first run</p>
-                <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
-                  {kickoffSteps.map((step, index) => (
-                    <p key={step}>
-                      {index + 1}. {step}
-                    </p>
-                  ))}
-                </div>
-              </div>
             </div>
             <FeatureInteractiveDemo type={page.slug} />
           </div>
         </section>
 
-        <section className="border-b border-border bg-surface/35 px-4 py-8 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
+        <section className="border-b border-border bg-surface/35 px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-8 border-b border-border pb-10 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <p className="text-xs font-bold uppercase text-primary-light">In one sentence</p>
+              <p className="mt-3 max-w-3xl text-base leading-7 text-foreground">{shortAnswer}</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase text-accent">A useful first run</p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{kickoffSteps[0]} {kickoffSteps[1]}</p>
+            </div>
+          </div>
+          <div className="mx-auto mt-8 grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
             {page.stats.map(stat => (
               <div key={stat.label} className="flex min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
                 <p className={cn("text-2xl font-extrabold", page.theme.accentText)}>{stat.value}</p>

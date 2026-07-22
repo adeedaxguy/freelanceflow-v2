@@ -101,11 +101,11 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
   ];
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="marketing-shell min-h-screen overflow-x-hidden bg-background text-foreground">
       <UseCaseJsonLd page={page} />
       <Navbar />
       <main className="pt-16">
-        <section className="relative overflow-hidden border-b border-border">
+        <section className="marketing-hero relative overflow-hidden border-b border-border">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_64px]" />
           <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-24">
