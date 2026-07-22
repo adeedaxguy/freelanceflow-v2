@@ -90,6 +90,7 @@ export default function SoftphoneClient() {
   const [numbers, setNumbers] = useState<AvailableNumber[]>([]);
   const [purchase, setPurchase] = useState<AvailableNumber | null>(null);
   const [confirmation, setConfirmation] = useState("");
+  const [complianceAccepted, setComplianceAccepted] = useState(false);
   const [phone, setPhone] = useState(searchParams.get("phone") || "");
   const [deviceState, setDeviceState] = useState("Offline");
   const [activeCall, setActiveCall] = useState<Call | null>(null);
@@ -105,10 +106,15 @@ export default function SoftphoneClient() {
 
   useEffect(() => {
     void refresh().catch(error => toast({ title: "Could not load softphone", description: error.message, type: "error" })).finally(() => setLoading(false));
-    return () => { deviceRef.current?.destroy(); };
+    return () => {
+      deviceRef.current?.disconnectAll();
+      deviceRef.current?.destroy();
+      deviceRef.current = null;
+    };
   }, [refresh, toast]);
 
   function callEvents(call: Call) {
+    call.on("ringing", () => setDeviceState("Ringing"));
     call.on("accept", () => setDeviceState("Connected"));
     call.on("disconnect", () => { setActiveCall(null); setDeviceState("Ready"); setMuted(false); void refresh(); });
     call.on("cancel", () => { setIncomingCall(null); setDeviceState("Ready"); void refresh(); });
@@ -127,6 +133,8 @@ export default function SoftphoneClient() {
       const data = await api({ action: "token" });
       const { Device } = await import("@twilio/voice-sdk");
       const device = new Device(String(data.token), { closeProtection: true });
+      deviceRef.current = device;
+      device.on("registering", () => setDeviceState("Connecting"));
       device.on("registered", () => setDeviceState("Ready"));
       device.on("unregistered", () => setDeviceState("Offline"));
       device.on("error", error => toast({ title: "Phone connection error", description: error.message, type: "error" }));
@@ -144,8 +152,12 @@ export default function SoftphoneClient() {
         setDeviceState("Incoming call");
       });
       await device.register();
-      deviceRef.current = device;
       return device;
+    } catch (error) {
+      deviceRef.current?.destroy();
+      deviceRef.current = null;
+      setDeviceState("Offline");
+      throw error;
     } finally {
       setBusy(null);
     }
@@ -174,14 +186,20 @@ export default function SoftphoneClient() {
   }
 
   async function buyNumber() {
-    if (!purchase || confirmation !== "PURCHASE") return;
+    if (!purchase || confirmation !== "PURCHASE" || !complianceAccepted) return;
     setBusy("purchase");
     try {
-      const data = await api({ action: "purchase-number", quote: purchase.quote, confirmation: "PURCHASE" });
+      const data = await api({
+        action: "purchase-number",
+        quote: purchase.quote,
+        confirmation: "PURCHASE",
+        complianceAccepted: true,
+      });
       setWorkspace(data.workspace as Workspace);
       setNumbers([]);
       setPurchase(null);
       setConfirmation("");
+      setComplianceAccepted(false);
       toast({ title: "Number connected", description: `${purchase.phoneNumber} is ready for calls.`, type: "success" });
     } catch (error) {
       toast({ title: "Purchase failed", description: error instanceof Error ? error.message : "Please try again", type: "error" });
@@ -199,6 +217,11 @@ export default function SoftphoneClient() {
     } catch (error) {
       toast({ title: "Could not start call", description: error instanceof Error ? error.message : "Please try again", type: "error" });
     } finally { setBusy(null); }
+  }
+
+  function pressKey(key: string) {
+    if (activeCall) activeCall.sendDigits(key);
+    else setPhone(value => value + key);
   }
 
   if (loading) return <div className="p-6 lg:p-8"><div className="h-72 rounded-lg border border-border bg-card animate-pulse" /></div>;
@@ -266,9 +289,9 @@ export default function SoftphoneClient() {
           <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="rounded-lg border border-border bg-card p-5">
               <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Your business number</p><p className="mt-1 text-lg font-semibold text-foreground">{workspace.phoneNumber}</p></div><div className="rounded-lg bg-accent/10 p-2.5"><Phone className="h-5 w-5 text-accent" /></div></div>
-              <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
+              <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
               <div className="mt-4 grid grid-cols-3 gap-2">
-                {"123456789*0#".split("").map(key => <button key={key} onClick={() => setPhone(value => value + key)} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}
+                {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}
               </div>
               <div className="mt-4 flex gap-2">
                 {!activeCall ? <button onClick={() => void startCall()} disabled={!phone.trim() || Boolean(busy)} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground disabled:opacity-50">{busy === "call" || busy === "device" ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />} Call</button> : <>
@@ -302,10 +325,11 @@ export default function SoftphoneClient() {
 
       {purchase && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-2xl">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring Twilio charge</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring Twilio charge</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); setComplianceAccepted(false); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
           <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">Twilio usage charges for calls are separate. iCloseLeads does not add a markup during this beta.</p></div>
+          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background p-3 text-sm leading-5 text-muted-foreground"><input type="checkbox" checked={complianceAccepted} onChange={event => setComplianceAccepted(event.target.checked)} className="mt-1 h-4 w-4 accent-primary" /><span>I will call only lawful business contacts, honour opt-outs, and follow the calling rules that apply to my location and the recipient.</span></label>
           <label className="mt-5 block"><span className="mb-1.5 block text-sm font-medium text-foreground">Type PURCHASE to confirm</span><input value={confirmation} onChange={event => setConfirmation(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-foreground outline-none focus:border-gold" /></label>
-          <button onClick={() => void buyNumber()} disabled={confirmation !== "PURCHASE" || busy === "purchase"} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "purchase" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Purchase number</button>
+          <button onClick={() => void buyNumber()} disabled={confirmation !== "PURCHASE" || !complianceAccepted || busy === "purchase"} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "purchase" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Purchase number</button>
         </div>
       </div>}
     </div>

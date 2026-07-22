@@ -104,15 +104,16 @@ export async function provisionWorkspace(userId: string) {
       workspace = await prisma.telephonyWorkspace.update({
         where: { id: workspace.id },
         data: {
-          status: "READY",
           twilioApiKeySid: key.sid,
           twilioApiKeySecretEncrypted: encryptTelephonySecret(key.secret),
-          lastError: null,
         },
       });
     }
 
-    return workspace;
+    return prisma.telephonyWorkspace.update({
+      where: { id: workspace.id },
+      data: { status: "READY", lastError: null },
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message.slice(0, 500) : "Twilio setup failed";
     await prisma.telephonyWorkspace.update({
@@ -211,30 +212,57 @@ export async function purchasePhoneNumber(userId: string, token: string) {
   }
   if (workspace.phoneNumber) return workspace;
 
-  const available = await parentClient().api.v2010.accounts(workspace.twilioAccountSid)
-    .availablePhoneNumbers(quote.country).local.list({ contains: quote.phoneNumber, voiceEnabled: true, limit: 1 });
-  if (!available.some(number => number.phoneNumber === quote.phoneNumber)) throw new Error("That number is no longer available");
-
-  const purchased = await parentClient().api.v2010.accounts(workspace.twilioAccountSid).incomingPhoneNumbers.create({
-    phoneNumber: quote.phoneNumber,
-    friendlyName: `iCloseLeads ${workspace.id}`,
-    voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
-    voiceMethod: "POST",
-    statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
-    statusCallbackMethod: "POST",
+  const lock = await prisma.telephonyWorkspace.updateMany({
+    where: { id: workspace.id, status: "READY", phoneNumber: null },
+    data: { status: "PURCHASING", lastError: null },
   });
+  if (lock.count !== 1) {
+    const latest = await prisma.telephonyWorkspace.findUnique({ where: { id: workspace.id } });
+    if (latest?.phoneNumber) return latest;
+    throw new Error("A number purchase is already in progress");
+  }
 
-  return prisma.telephonyWorkspace.update({
-    where: { id: workspace.id },
-    data: {
-      phoneNumberSid: purchased.sid,
-      phoneNumber: purchased.phoneNumber,
-      phoneCountry: quote.country,
-      monthlyPriceCents: quote.monthlyPriceCents,
-      priceCurrency: quote.currency,
-      consentAcceptedAt: new Date(),
-    },
-  });
+  const accountApi = parentClient().api.v2010.accounts(workspace.twilioAccountSid);
+  try {
+    const available = await accountApi.availablePhoneNumbers(quote.country).local.list({
+      contains: quote.phoneNumber,
+      voiceEnabled: true,
+      limit: 1,
+    });
+    if (!available.some(number => number.phoneNumber === quote.phoneNumber)) {
+      throw new Error("That number is no longer available");
+    }
+
+    const purchased = await accountApi.incomingPhoneNumbers.create({
+      phoneNumber: quote.phoneNumber,
+      friendlyName: `iCloseLeads ${workspace.id}`,
+      voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
+      voiceMethod: "POST",
+      statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
+      statusCallbackMethod: "POST",
+    });
+
+    return prisma.telephonyWorkspace.update({
+      where: { id: workspace.id },
+      data: {
+        status: "READY",
+        phoneNumberSid: purchased.sid,
+        phoneNumber: purchased.phoneNumber,
+        phoneCountry: quote.country,
+        monthlyPriceCents: quote.monthlyPriceCents,
+        priceCurrency: quote.currency,
+        consentAcceptedAt: new Date(),
+        lastError: null,
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message.slice(0, 500) : "Number purchase failed";
+    await prisma.telephonyWorkspace.updateMany({
+      where: { id: workspace.id, status: "PURCHASING", phoneNumber: null },
+      data: { status: "READY", lastError: message },
+    });
+    throw error;
+  }
 }
 
 export function createVoiceToken(workspace: {

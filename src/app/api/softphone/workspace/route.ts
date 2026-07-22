@@ -27,6 +27,7 @@ const requestSchema = z.discriminatedUnion("action", [
     action: z.literal("purchase-number"),
     quote: z.string().min(20).max(3000),
     confirmation: z.literal("PURCHASE"),
+    complianceAccepted: z.literal(true),
   }),
   z.object({ action: z.literal("token") }),
 ]);
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(`[softphone/${parsed.data.action}]`, error);
     const message = error instanceof Error ? error.message : "Softphone request failed";
-    const status = /not ready|already has|no longer available|expired|invalid|unsupported|does not belong/i.test(message) ? 409 : 502;
+    const status = /not ready|already has|in progress|no longer available|expired|invalid|unsupported|does not belong/i.test(message) ? 409 : 502;
     return NextResponse.json({ error: message }, { status });
   }
 }
