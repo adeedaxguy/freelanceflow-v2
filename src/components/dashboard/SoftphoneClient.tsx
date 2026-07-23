@@ -16,6 +16,7 @@ import {
   PhoneCall,
   PhoneIncoming,
   PhoneOff,
+  Plus,
   Search,
   ShieldCheck,
   X,
@@ -69,6 +70,16 @@ type PhonePurchase = {
   lastError: string | null;
 };
 
+type OwnedNumber = {
+  id: string;
+  phoneNumber: string;
+  country: string | null;
+  monthlyPriceCents: number | null;
+  currency: string | null;
+  primary: boolean;
+  callable: boolean;
+};
+
 async function api(body?: object) {
   const response = await fetch("/api/softphone/workspace", body ? {
     method: "POST",
@@ -94,6 +105,9 @@ export default function SoftphoneClient() {
   const { toast } = useToast();
   const deviceRef = useRef<VoiceDevice | null>(null);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [ownedNumbers, setOwnedNumbers] = useState<OwnedNumber[]>([]);
+  const [selectedFrom, setSelectedFrom] = useState("");
+  const [showNumberSearch, setShowNumberSearch] = useState(false);
   const [purchaseStatus, setPurchaseStatus] = useState<PhonePurchase | null>(null);
   const [calls, setCalls] = useState<CallHistory[]>([]);
   const [configured, setConfigured] = useState(false);
@@ -115,6 +129,13 @@ export default function SoftphoneClient() {
     const data = await api();
     setConfigured(Boolean(data.configured));
     setWorkspace((data.workspace as Workspace | null) ?? null);
+    const nextNumbers = (data.numbers as OwnedNumber[]) ?? [];
+    setOwnedNumbers(nextNumbers);
+    setSelectedFrom(current => (
+      nextNumbers.some(number => number.callable && number.phoneNumber === current)
+        ? current
+        : nextNumbers.find(number => number.callable)?.phoneNumber || ""
+    ));
     setPurchaseStatus((data.purchase as PhonePurchase | null) ?? null);
     setCalls((data.calls as CallHistory[]) ?? []);
   }, []);
@@ -129,7 +150,7 @@ export default function SoftphoneClient() {
   }, [refresh, toast]);
 
   useEffect(() => {
-    if (searchParams.get("checkout") !== "success" || workspace?.phoneNumber) return;
+    if (searchParams.get("checkout") !== "success") return;
     let checks = 0;
     const timer = window.setInterval(() => {
       checks += 1;
@@ -137,7 +158,7 @@ export default function SoftphoneClient() {
       if (checks >= 15) window.clearInterval(timer);
     }, 2_000);
     return () => window.clearInterval(timer);
-  }, [refresh, searchParams, workspace?.phoneNumber]);
+  }, [refresh, searchParams]);
 
   function callEvents(call: Call) {
     call.on("ringing", () => setDeviceState("Ringing"));
@@ -217,6 +238,7 @@ export default function SoftphoneClient() {
       const data = await api({ action: "attach-existing-admin-number" });
       setWorkspace(data.workspace as Workspace);
       setNumbers([]);
+      await refresh();
       toast({
         title: "Twilio number attached",
         description: "The existing number is now connected to the admin softphone.",
@@ -255,7 +277,7 @@ export default function SoftphoneClient() {
     setBusy("call");
     try {
       const device = await connectDevice();
-      const call = await device.connect({ params: { To: phone, LeadId: searchParams.get("leadId") || "" } });
+      const call = await device.connect({ params: { To: phone, From: selectedFrom, LeadId: searchParams.get("leadId") || "" } });
       callEvents(call);
       setActiveCall(call);
       setDeviceState("Calling…");
@@ -287,7 +309,7 @@ export default function SoftphoneClient() {
         </div>
       </header>
 
-      {!workspace?.phoneNumber && purchaseStatus && ["PAYMENT_CONFIRMED", "PROVISIONING"].includes(purchaseStatus.status) && (
+      {purchaseStatus && ["PAYMENT_CONFIRMED", "PROVISIONING"].includes(purchaseStatus.status) && (
         <section className="rounded-lg border border-accent/30 bg-accent/5 p-4">
           <div className="flex items-start gap-3">
             <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-accent" />
@@ -299,14 +321,14 @@ export default function SoftphoneClient() {
         </section>
       )}
 
-      {!workspace?.phoneNumber && purchaseStatus?.status === "PAID_TEST" && (
+      {purchaseStatus?.status === "PAID_TEST" && (
         <section className="rounded-lg border border-gold/30 bg-gold/5 p-4">
           <h2 className="font-semibold text-foreground">Test payment verified</h2>
           <p className="mt-1 text-sm text-muted-foreground">The Lemon Squeezy test webhook worked. No real Twilio number was purchased or charged.</p>
         </section>
       )}
 
-      {!workspace?.phoneNumber && purchaseStatus?.status === "PROVISION_FAILED" && (
+      {purchaseStatus?.status === "PROVISION_FAILED" && (
         <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
           <h2 className="font-semibold text-foreground">Payment verified, but the number needs attention</h2>
           <p className="mt-1 text-sm text-muted-foreground">{purchaseStatus.lastError || "The selected number could not be connected. Support can retry or move the subscription to another number."}</p>
@@ -353,9 +375,18 @@ export default function SoftphoneClient() {
             </div>
           </div>
         </section>
-      ) : !workspace.phoneNumber ? (
+      ) : !workspace.phoneNumber || showNumberSearch ? (
         <section className="space-y-5">
-          <div className="flex flex-col gap-3 rounded-lg border border-accent/25 bg-accent/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+          {workspace.phoneNumber && (
+            <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-semibold text-foreground">Add another business number</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Choose a second caller ID for another market, team, or campaign.</p>
+              </div>
+              <button onClick={() => { setShowNumberSearch(false); setNumbers([]); }} className="rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground">Back to softphone</button>
+            </div>
+          )}
+          {!workspace.phoneNumber && <div className="flex flex-col gap-3 rounded-lg border border-accent/25 bg-accent/5 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-semibold text-foreground">Use the number already owned by Twilio</h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Admin recovery only. This keeps messaging untouched, connects the existing number to iCloseLeads voice, and does not create another purchase.</p>
@@ -363,7 +394,7 @@ export default function SoftphoneClient() {
             <button onClick={() => void attachExistingNumber()} disabled={Boolean(busy)} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-accent/40 bg-background px-4 py-2.5 text-sm font-semibold text-accent disabled:opacity-50">
               {busy === "attach-existing" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Phone className="h-4 w-4" />} Attach owned number
             </button>
-          </div>
+          </div>}
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end">
               <label className="block md:w-48"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Country</span><select value={country} onChange={event => setCountry(event.target.value as "US" | "GB" | "CA")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground"><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option></select></label>
@@ -384,7 +415,18 @@ export default function SoftphoneClient() {
         <>
           <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="rounded-lg border border-border bg-card p-5">
-              <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Your business number</p><p className="mt-1 text-lg font-semibold text-foreground">{workspace.phoneNumber}</p></div><div className="rounded-lg bg-accent/10 p-2.5"><Phone className="h-5 w-5 text-accent" /></div></div>
+              <div className="flex items-start justify-between gap-4">
+                <label className="min-w-0 flex-1">
+                  <span className="text-xs font-semibold uppercase text-muted-foreground">Calling from</span>
+                  {ownedNumbers.filter(number => number.callable).length > 1 ? (
+                    <select value={selectedFrom} onChange={event => setSelectedFrom(event.target.value)} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-semibold text-foreground">
+                      {ownedNumbers.filter(number => number.callable).map(number => <option key={number.id} value={number.phoneNumber}>{number.phoneNumber}{number.primary ? " · Primary" : ""}</option>)}
+                    </select>
+                  ) : <p className="mt-1 text-lg font-semibold text-foreground">{selectedFrom || workspace.phoneNumber}</p>}
+                </label>
+                <div className="rounded-lg bg-accent/10 p-2.5"><Phone className="h-5 w-5 text-accent" /></div>
+              </div>
+              {ownedNumbers.length < 3 && <button onClick={() => setShowNumberSearch(true)} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-primary-light hover:underline"><Plus className="h-3.5 w-3.5" /> Add another number</button>}
               <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
               <div className="mt-4 grid grid-cols-3 gap-2">
                 {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}

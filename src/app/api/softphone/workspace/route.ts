@@ -8,10 +8,10 @@ import {
   attachExistingParentNumberForAdmin,
   createPhonePurchaseIntent,
   createVoiceToken,
-  hasPhoneSubscriptionAccess,
   isSoftphoneAllowed,
   isTelephonyConfigured,
   latestPhonePurchase,
+  listWorkspacePhoneNumbers,
   provisionWorkspace,
   publicWorkspace,
   searchPhoneNumbers,
@@ -54,9 +54,10 @@ export async function GET() {
   const auth = await context();
   if ("error" in auth) return auth.error;
 
-  const [workspace, purchase, calls] = await Promise.all([
+  const [workspace, purchase, numbers, calls] = await Promise.all([
     prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } }),
     latestPhonePurchase(auth.session.user.id),
+    listWorkspacePhoneNumbers(auth.session.user.id),
     prisma.voiceCall.findMany({
       where: { userId: auth.session.user.id },
       orderBy: { createdAt: "desc" },
@@ -78,6 +79,7 @@ export async function GET() {
     configured: isTelephonyConfigured(),
     workspace: publicWorkspace(workspace),
     purchase,
+    numbers,
     calls,
   });
 }
@@ -202,20 +204,15 @@ export async function POST(req: NextRequest) {
 
     const workspace = await prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } });
     if (!workspace?.phoneNumber) return NextResponse.json({ error: "Choose a calling number first" }, { status: 409 });
-    if (auth.session.user.role !== "ADMIN") {
-      const purchase = await latestPhonePurchase(auth.session.user.id);
-      if (
-        purchase?.status !== "ACTIVE"
-        || !hasPhoneSubscriptionAccess(purchase.subscriptionStatus, purchase.endsAt)
-      ) {
-        return NextResponse.json({ error: "Your phone number subscription is not active" }, { status: 402 });
-      }
+    const callableNumbers = (await listWorkspacePhoneNumbers(auth.session.user.id)).filter(number => number.callable);
+    if (callableNumbers.length === 0) {
+      return NextResponse.json({ error: "Your phone number subscription is not active" }, { status: 402 });
     }
     return NextResponse.json({ token: createVoiceToken(workspace), identity: `icl_user_${auth.session.user.id}` });
   } catch (error) {
     console.error(`[softphone/${parsed.data.action}]`, error);
     const message = error instanceof Error ? error.message : "Softphone request failed";
-    const status = /not ready|already has|in progress|no longer available|expired|invalid|unsupported|does not belong/i.test(message) ? 409 : 502;
+    const status = /not ready|up to \d+ phone numbers|in progress|no longer available|expired|invalid|unsupported|does not belong/i.test(message) ? 409 : 502;
     return NextResponse.json({ error: message }, { status });
   }
 }

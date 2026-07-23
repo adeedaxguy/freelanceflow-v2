@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   appUrl,
-  hasPhoneSubscriptionAccess,
-  latestPhonePurchase,
+  listWorkspacePhoneNumbers,
   normalizeDestination,
+  selectAuthorizedCallerId,
   twilio,
   validateTwilioWebhook,
 } from "@/lib/telephony";
@@ -53,32 +53,26 @@ export async function POST(req: NextRequest) {
     return new NextResponse(null, { status: 204 });
   }
 
-  if (!workspace.phoneNumber) {
+  const phoneNumbers = await listWorkspacePhoneNumbers(workspace.userId);
+  const callerIds = phoneNumbers.filter(number => number.callable).map(number => number.phoneNumber);
+  if (callerIds.length === 0) {
     const response = new twilio.twiml.VoiceResponse();
     response.say("This calling workspace does not have an active number.");
     response.hangup();
     return xml(response);
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: workspace.userId },
-    select: { role: true },
-  });
-  if (user?.role !== "ADMIN") {
-    const purchase = await latestPhonePurchase(workspace.userId);
-    if (
-      purchase?.status !== "ACTIVE"
-      || !hasPhoneSubscriptionAccess(purchase.subscriptionStatus, purchase.endsAt)
-    ) {
+  const callSid = params.CallSid || null;
+  if (mode === "incoming") {
+    let incomingNumber: string;
+    try {
+      incomingNumber = selectAuthorizedCallerId(params.To, callerIds);
+    } catch {
       const response = new twilio.twiml.VoiceResponse();
       response.say("This phone number subscription is not active.");
       response.hangup();
       return xml(response);
     }
-  }
-
-  const callSid = params.CallSid || null;
-  if (mode === "incoming") {
     const record = callSid
       ? await prisma.voiceCall.upsert({
           where: { twilioCallSid: callSid },
@@ -89,7 +83,7 @@ export async function POST(req: NextRequest) {
             twilioCallSid: callSid,
             direction: "INBOUND",
             from: params.From || "unknown",
-            to: workspace.phoneNumber,
+            to: incomingNumber,
             status: params.CallStatus || "ringing",
           },
         })
@@ -99,7 +93,7 @@ export async function POST(req: NextRequest) {
             userId: workspace.userId,
             direction: "INBOUND",
             from: params.From || "unknown",
-            to: workspace.phoneNumber,
+            to: incomingNumber,
             status: "ringing",
           },
         });
@@ -111,8 +105,10 @@ export async function POST(req: NextRequest) {
   }
 
   let destination: string;
+  let callerId: string;
   try {
     destination = normalizeDestination(params.To || "");
+    callerId = selectAuthorizedCallerId(params.From, callerIds);
   } catch (error) {
     const response = new twilio.twiml.VoiceResponse();
     response.say(error instanceof Error ? error.message : "That destination is not supported.");
@@ -143,7 +139,7 @@ export async function POST(req: NextRequest) {
           userId: workspace.userId,
           leadId: lead?.id,
           twilioCallSid: callSid,
-          from: workspace.phoneNumber,
+          from: callerId,
           to: destination,
           status: "initiated",
         },
@@ -153,7 +149,7 @@ export async function POST(req: NextRequest) {
           workspaceId: workspace.id,
           userId: workspace.userId,
           leadId: lead?.id,
-          from: workspace.phoneNumber,
+          from: callerId,
           to: destination,
           status: "initiated",
         },
@@ -161,7 +157,7 @@ export async function POST(req: NextRequest) {
 
   const callback = appUrl(`/api/softphone/voice?mode=status&recordId=${encodeURIComponent(record.id)}`);
   const response = new twilio.twiml.VoiceResponse();
-  const dial = response.dial({ callerId: workspace.phoneNumber, answerOnBridge: true, timeout: 30, timeLimit: 1800 });
+  const dial = response.dial({ callerId, answerOnBridge: true, timeout: 30, timeLimit: 1800 });
   dial.number({ statusCallback: callback, statusCallbackMethod: "POST", statusCallbackEvent: ["initiated", "ringing", "answered", "completed"] }, destination);
   return xml(response);
 }

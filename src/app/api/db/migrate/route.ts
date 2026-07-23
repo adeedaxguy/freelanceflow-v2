@@ -120,6 +120,7 @@ const TABLE_MIGRATIONS = [
       "id" TEXT PRIMARY KEY,
       "userId" TEXT NOT NULL,
       "workspaceId" TEXT NOT NULL,
+      "phoneNumberSid" TEXT,
       "phoneNumber" TEXT NOT NULL,
       "country" TEXT NOT NULL,
       "monthlyPriceCents" INTEGER NOT NULL,
@@ -143,6 +144,10 @@ const TABLE_MIGRATIONS = [
       CONSTRAINT "TelephonyPurchase_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "TelephonyWorkspace"("id") ON DELETE CASCADE ON UPDATE CASCADE
     )`,
   },
+  {
+    name: "TelephonyPurchase.phoneNumberSid",
+    sql: `ALTER TABLE "TelephonyPurchase" ADD COLUMN IF NOT EXISTS "phoneNumberSid" TEXT`,
+  },
   { name: "Template.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_userId_idx" ON "Template"("userId")` },
   { name: "Template.isDefault_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_isDefault_idx" ON "Template"("isDefault")` },
   { name: "ContactSubmission.resolved_idx", sql: `CREATE INDEX IF NOT EXISTS "ContactSubmission_resolved_idx" ON "ContactSubmission"("resolved")` },
@@ -163,6 +168,7 @@ const TABLE_MIGRATIONS = [
   { name: "VoiceCall.leadId_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_leadId_idx" ON "VoiceCall"("leadId")` },
   { name: "VoiceCall.status_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_status_idx" ON "VoiceCall"("status")` },
   { name: "TelephonyPurchase.externalSubscriptionId_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyPurchase_externalSubscriptionId_key" ON "TelephonyPurchase"("externalSubscriptionId")` },
+  { name: "TelephonyPurchase.phoneNumberSid_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyPurchase_phoneNumberSid_key" ON "TelephonyPurchase"("phoneNumberSid")` },
   { name: "TelephonyPurchase.userId_status_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_userId_status_idx" ON "TelephonyPurchase"("userId", "status")` },
   { name: "TelephonyPurchase.workspaceId_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_workspaceId_idx" ON "TelephonyPurchase"("workspaceId")` },
 ];

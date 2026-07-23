@@ -333,6 +333,7 @@ model TelephonyPurchase {
   id                     String    @id @default(cuid())
   userId                 String
   workspaceId            String
+  phoneNumberSid         String?   @unique
   phoneNumber            String
   country                String
   monthlyPriceCents      Int

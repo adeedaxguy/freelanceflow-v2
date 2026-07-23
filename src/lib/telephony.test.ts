@@ -7,6 +7,7 @@ import {
   isSoftphoneAllowed,
   isTelephonyConfigured,
   normalizeDestination,
+  selectAuthorizedCallerId,
   verifyNumberQuote,
 } from "@/lib/telephony";
 
@@ -65,6 +66,13 @@ describe("telephony security helpers", () => {
     expect(() => normalizeDestination("+1 900 555 0123")).toThrow("Premium-rate");
     expect(() => normalizeDestination("+44 870 123 4567")).toThrow("Premium-rate");
     expect(() => normalizeDestination("+92 300 1234567")).toThrow("US, Canada, or UK");
+  });
+
+  it("uses only an owned active number as caller ID", () => {
+    const numbers = ["+14155550123", "+16506634744"];
+    expect(selectAuthorizedCallerId(undefined, numbers)).toBe(numbers[0]);
+    expect(selectAuthorizedCallerId(numbers[1], numbers)).toBe(numbers[1]);
+    expect(() => selectAuthorizedCallerId("+12125550123", numbers)).toThrow("active calling number");
   });
 
   it("keeps the beta admin-only until explicitly released", () => {
