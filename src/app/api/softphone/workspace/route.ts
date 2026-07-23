@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const workspace = await prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } });
+    const workspace = await provisionWorkspace(auth.session.user.id);
     if (!workspace?.phoneNumber) return NextResponse.json({ error: "Choose a calling number first" }, { status: 409 });
     const callableNumbers = (await listWorkspacePhoneNumbers(auth.session.user.id)).filter(number => number.callable);
     if (callableNumbers.length === 0) {

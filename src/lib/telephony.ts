@@ -1,9 +1,11 @@
 import crypto from "crypto";
 import twilio from "twilio";
+import type { TelephonyWorkspace } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 const COUNTRIES = new Set(["US", "GB", "CA"]);
 const E164 = /^\+[1-9]\d{7,14}$/;
+const EMERGENCY_DESTINATIONS = new Set(["911", "112", "999", "1911", "44999", "44112"]);
 const DEFAULT_NUMBER_MARKUP_PERCENT = 50;
 const DEFAULT_NUMBER_MIN_MARGIN_CENTS = 100;
 export const MAX_PHONE_NUMBERS = 3;
@@ -94,10 +96,157 @@ export function appUrl(path: string) {
   return new URL(path, process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
 }
 
+function voiceApplicationConfig() {
+  return {
+    voiceUrl: appUrl("/api/softphone/voice"),
+    voiceMethod: "POST" as const,
+    voiceFallbackUrl: appUrl("/api/softphone/fallback"),
+    voiceFallbackMethod: "POST" as const,
+    statusCallback: appUrl("/api/softphone/voice?mode=app-status"),
+    statusCallbackMethod: "POST" as const,
+  };
+}
+
+function phoneNumberVoiceConfig() {
+  return {
+    voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
+    voiceMethod: "POST" as const,
+    voiceFallbackUrl: appUrl("/api/softphone/fallback"),
+    voiceFallbackMethod: "POST" as const,
+    voiceApplicationSid: "",
+    statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
+    statusCallbackMethod: "POST" as const,
+  };
+}
+
+function isTwilioNotFound(error: unknown) {
+  const candidate = error as { status?: number; code?: number };
+  return candidate?.status === 404 || candidate?.code === 20404;
+}
+
+async function ensureVoiceApplication(
+  workspace: TelephonyWorkspace,
+  client: ReturnType<typeof subaccountClient>,
+) {
+  const accountSid = workspace.twilioAccountSid;
+  if (!accountSid) throw new Error("Calling workspace is not ready");
+  const accountApi = client.api.v2010.accounts(accountSid);
+  const friendlyName = `iCloseLeads Voice ${workspace.id}`;
+
+  if (workspace.twimlAppSid) {
+    try {
+      const app = await accountApi.applications(workspace.twimlAppSid).update(voiceApplicationConfig());
+      return app.sid;
+    } catch (error) {
+      if (!isTwilioNotFound(error)) throw error;
+    }
+  }
+
+  const existing = await accountApi.applications.list({ friendlyName, limit: 1 });
+  const app = existing[0]
+    ? await accountApi.applications(existing[0].sid).update(voiceApplicationConfig())
+    : await accountApi.applications.create({
+        friendlyName,
+        ...voiceApplicationConfig(),
+      });
+  return app.sid;
+}
+
+async function reconcileOwnedNumbers(
+  workspace: TelephonyWorkspace,
+  client: ReturnType<typeof subaccountClient>,
+) {
+  const accountSid = workspace.twilioAccountSid;
+  if (!accountSid) return;
+  const purchases = await prisma.telephonyPurchase.findMany({
+    where: { workspaceId: workspace.id, status: "ACTIVE", phoneNumberSid: { not: null } },
+    select: { phoneNumberSid: true },
+  });
+  const sids = new Set([
+    workspace.phoneNumberSid,
+    ...purchases.map(purchase => purchase.phoneNumberSid),
+  ].filter((sid): sid is string => Boolean(sid)));
+  const accountApi = client.api.v2010.accounts(accountSid);
+
+  await Promise.all([...sids].map(async sid => {
+    try {
+      await accountApi.incomingPhoneNumbers(sid).update(phoneNumberVoiceConfig());
+    } catch (error) {
+      if (!isTwilioNotFound(error)) throw error;
+    }
+  }));
+}
+
+async function enforceCustomerDialingPermissions(
+  workspace: TelephonyWorkspace,
+  client: ReturnType<typeof subaccountClient>,
+) {
+  const accountSid = workspace.twilioAccountSid;
+  if (!accountSid || accountSid === required("TWILIO_ACCOUNT_SID")) return;
+
+  const permissions = client.voice.v1.dialingPermissions;
+  const settings = await permissions.settings().fetch();
+  if (!settings.dialingPermissionsInheritance) return;
+
+  await permissions.settings().update({ dialingPermissionsInheritance: false });
+  const countries = await permissions.countries.list({ limit: 1_000 });
+  const updates = countries.flatMap(country => {
+    const allowed = COUNTRIES.has(country.isoCode);
+    if (
+      country.lowRiskNumbersEnabled === allowed
+      && !country.highRiskSpecialNumbersEnabled
+      && !country.highRiskTollfraudNumbersEnabled
+    ) return [];
+    return [{
+      iso_code: country.isoCode,
+      low_risk_numbers_enabled: allowed,
+      high_risk_special_numbers_enabled: false,
+      high_risk_tollfraud_numbers_enabled: false,
+    }];
+  });
+  if (updates.length > 0) {
+    await permissions.bulkCountryUpdates.create({
+      updateRequest: JSON.stringify(updates),
+    });
+  }
+}
+
+async function ensureCustomerUsageMonitoring(
+  workspace: TelephonyWorkspace,
+  client: ReturnType<typeof subaccountClient>,
+) {
+  const accountSid = workspace.twilioAccountSid;
+  if (!accountSid || accountSid === required("TWILIO_ACCOUNT_SID")) return;
+
+  const triggers = client.api.v2010.accounts(accountSid).usage.triggers;
+  const friendlyName = `iCloseLeads daily call guard ${workspace.id}`.slice(0, 64);
+  const callbackUrl = appUrl("/api/softphone/usage-alert");
+  const existing = (await triggers.list({
+    recurring: "daily",
+    usageCategory: "calls",
+    limit: 50,
+  })).find(trigger => trigger.friendlyName === friendlyName);
+
+  if (existing) {
+    if (existing.callbackUrl !== callbackUrl || existing.callbackMethod !== "POST") {
+      await triggers(existing.sid).update({ callbackUrl, callbackMethod: "POST", friendlyName });
+    }
+    return;
+  }
+
+  await triggers.create({
+    callbackUrl,
+    callbackMethod: "POST",
+    friendlyName,
+    recurring: "daily",
+    triggerBy: "count",
+    triggerValue: "60",
+    usageCategory: "calls",
+  });
+}
+
 export async function provisionWorkspace(userId: string) {
   let workspace = await prisma.telephonyWorkspace.findUnique({ where: { userId } });
-  if (workspace?.status === "READY") return workspace;
-
   workspace ??= await prisma.telephonyWorkspace.create({ data: { userId } });
   const client = parentClient();
   const friendlyName = `iCloseLeads ${workspace.id}`;
@@ -135,22 +284,13 @@ export async function provisionWorkspace(userId: string) {
       });
     }
 
-    const accountApi = subaccountClient(workspace).api.v2010.accounts(accountSid);
-    let appSid = workspace.twimlAppSid;
-    if (!appSid) {
-      const appName = `iCloseLeads Voice ${workspace.id}`;
-      const existingApps = await accountApi.applications.list({ friendlyName: appName, limit: 1 });
-      const app = existingApps[0] ?? await accountApi.applications.create({
-        friendlyName: appName,
-        voiceUrl: appUrl("/api/softphone/voice"),
-        voiceMethod: "POST",
-        statusCallback: appUrl("/api/softphone/voice?mode=app-status"),
-        statusCallbackMethod: "POST",
-      });
-      appSid = app.sid;
+    const workspaceClient = subaccountClient(workspace);
+    const accountApi = workspaceClient.api.v2010.accounts(accountSid);
+    const appSid = await ensureVoiceApplication(workspace, workspaceClient);
+    if (appSid !== workspace.twimlAppSid) {
       workspace = await prisma.telephonyWorkspace.update({
         where: { id: workspace.id },
-        data: { twimlAppSid: app.sid },
+        data: { twimlAppSid: appSid },
       });
     }
 
@@ -164,6 +304,12 @@ export async function provisionWorkspace(userId: string) {
         },
       });
     }
+
+    await Promise.all([
+      reconcileOwnedNumbers(workspace, workspaceClient),
+      enforceCustomerDialingPermissions(workspace, workspaceClient),
+      ensureCustomerUsageMonitoring(workspace, workspaceClient),
+    ]);
 
     return prisma.telephonyWorkspace.update({
       where: { id: workspace.id },
@@ -202,13 +348,12 @@ export async function attachExistingParentNumberForAdmin(userId: string) {
   const number = voiceNumbers[0]!;
   const appName = `iCloseLeads Admin Voice ${workspace.id}`;
   const existingApps = await accountApi.applications.list({ friendlyName: appName, limit: 1 });
-  const app = existingApps[0] ?? await accountApi.applications.create({
-    friendlyName: appName,
-    voiceUrl: appUrl("/api/softphone/voice"),
-    voiceMethod: "POST",
-    statusCallback: appUrl("/api/softphone/voice?mode=app-status"),
-    statusCallbackMethod: "POST",
-  });
+  const app = existingApps[0]
+    ? await accountApi.applications(existingApps[0].sid).update(voiceApplicationConfig())
+    : await accountApi.applications.create({
+        friendlyName: appName,
+        ...voiceApplicationConfig(),
+      });
 
   const originalVoiceConfig = {
     voiceUrl: number.voiceUrl || "",
@@ -220,15 +365,7 @@ export async function attachExistingParentNumberForAdmin(userId: string) {
     statusCallbackMethod: number.statusCallbackMethod || "POST",
   };
 
-  await accountApi.incomingPhoneNumbers(number.sid).update({
-    voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
-    voiceMethod: "POST",
-    voiceFallbackUrl: appUrl("/api/softphone/voice?mode=incoming"),
-    voiceFallbackMethod: "POST",
-    voiceApplicationSid: "",
-    statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
-    statusCallbackMethod: "POST",
-  });
+  await accountApi.incomingPhoneNumbers(number.sid).update(phoneNumberVoiceConfig());
 
   try {
     return await prisma.telephonyWorkspace.update({
@@ -525,11 +662,10 @@ export async function provisionPhoneNumber(purchaseId: string) {
       purchased = await accountApi.incomingPhoneNumbers.create({
         phoneNumber: purchase.phoneNumber,
         friendlyName: `iCloseLeads ${workspace.id}`,
-        voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
-        voiceMethod: "POST",
-        statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
-        statusCallbackMethod: "POST",
+        ...phoneNumberVoiceConfig(),
       });
+    } else {
+      purchased = await accountApi.incomingPhoneNumbers(purchased.sid).update(phoneNumberVoiceConfig());
     }
 
     const workspaceData = workspace.phoneNumber ? {
@@ -618,6 +754,9 @@ export function createVoiceToken(workspace: {
 
 export function normalizeDestination(value: string) {
   const normalized = value.replace(/[\s().-]/g, "");
+  if (EMERGENCY_DESTINATIONS.has(normalized.replace(/^\+/, ""))) {
+    throw new Error("Emergency services cannot be called from iCloseLeads");
+  }
   if (!E164.test(normalized) || !(normalized.startsWith("+1") || normalized.startsWith("+44"))) {
     throw new Error("Use a valid US, Canada, or UK number in international format");
   }

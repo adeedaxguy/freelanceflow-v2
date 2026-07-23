@@ -63,6 +63,8 @@ describe("telephony security helpers", () => {
   it("allows ordinary supported destinations and blocks premium routes", () => {
     expect(normalizeDestination("+1 (415) 555-0123")).toBe("+14155550123");
     expect(normalizeDestination("+44 20 7946 0958")).toBe("+442079460958");
+    expect(() => normalizeDestination("911")).toThrow("Emergency services");
+    expect(() => normalizeDestination("+44 999")).toThrow("Emergency services");
     expect(() => normalizeDestination("+1 900 555 0123")).toThrow("Premium-rate");
     expect(() => normalizeDestination("+44 870 123 4567")).toThrow("Premium-rate");
     expect(() => normalizeDestination("+92 300 1234567")).toThrow("US, Canada, or UK");
