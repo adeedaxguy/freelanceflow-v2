@@ -178,7 +178,7 @@ export async function provisionWorkspace(userId: string) {
   }
 }
 
-type NumberQuote = {
+export type NumberQuote = {
   userId: string;
   workspaceId: string;
   phoneNumber: string;
@@ -208,6 +208,14 @@ export function verifyNumberQuote(token: string): NumberQuote {
   if (quote.expiresAt < Date.now()) throw new Error("Purchase quote expired");
   if (!COUNTRIES.has(quote.country) || !E164.test(quote.phoneNumber)) throw new Error("Invalid purchase quote");
   return quote;
+}
+
+export function hasPhoneSubscriptionAccess(status: string | null | undefined, endsAt?: Date | string | null) {
+  if (!status) return false;
+  const normalized = status.toLowerCase();
+  if (["active", "on_trial", "past_due"].includes(normalized)) return true;
+  if (normalized !== "cancelled" || !endsAt) return false;
+  return new Date(endsAt).getTime() > Date.now();
 }
 
 export async function searchPhoneNumbers(userId: string, country: string, area: string) {
@@ -257,66 +265,185 @@ export async function searchPhoneNumbers(userId: string, country: string, area: 
   }));
 }
 
-export async function purchasePhoneNumber(userId: string, token: string) {
+export async function createPhonePurchaseIntent(
+  userId: string,
+  token: string,
+  variantId: string,
+) {
   const quote = verifyNumberQuote(token);
   if (quote.userId !== userId) throw new Error("Purchase quote does not belong to this user");
   const workspace = await prisma.telephonyWorkspace.findUnique({ where: { userId } });
   if (!workspace?.twilioAccountSid || workspace.id !== quote.workspaceId || workspace.status !== "READY") {
     throw new Error("Calling workspace is not ready");
   }
-  if (workspace.phoneNumber) return workspace;
+  if (workspace.phoneNumber) throw new Error("This workspace already has a number");
 
-  const lock = await prisma.telephonyWorkspace.updateMany({
+  const reusable = await prisma.telephonyPurchase.findFirst({
+    where: {
+      userId,
+      workspaceId: workspace.id,
+      phoneNumber: quote.phoneNumber,
+      variantId,
+      status: "CHECKOUT_PENDING",
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  if (reusable) return reusable;
+
+  return prisma.telephonyPurchase.create({
+    data: {
+      userId,
+      workspaceId: workspace.id,
+      phoneNumber: quote.phoneNumber,
+      country: quote.country,
+      monthlyPriceCents: quote.monthlyPriceCents,
+      currency: quote.currency,
+      variantId,
+      consentAcceptedAt: new Date(),
+      expiresAt: new Date(Date.now() + 60 * 60_000),
+    },
+  });
+}
+
+export async function provisionPhoneNumber(purchaseId: string) {
+  let purchase = await prisma.telephonyPurchase.findUnique({
+    where: { id: purchaseId },
+    include: { workspace: true },
+  });
+  if (!purchase) throw new Error("Phone purchase was not found");
+  if (purchase.testMode) throw new Error("Test payments cannot provision real phone numbers");
+  if (purchase.status === "ACTIVE" && purchase.workspace.phoneNumber) return purchase.workspace;
+  if (!["PAYMENT_CONFIRMED", "PROVISION_FAILED"].includes(purchase.status)) {
+    throw new Error("Phone payment has not been confirmed");
+  }
+  if (
+    !purchase.workspace.twilioAccountSid
+    || purchase.workspace.status !== "READY"
+    || purchase.workspace.phoneNumber
+  ) {
+    if (purchase.workspace.phoneNumber) return purchase.workspace;
+    throw new Error("Calling workspace is not ready");
+  }
+
+  const purchaseLock = await prisma.telephonyPurchase.updateMany({
+    where: {
+      id: purchase.id,
+      status: { in: ["PAYMENT_CONFIRMED", "PROVISION_FAILED"] },
+    },
+    data: {
+      status: "PROVISIONING",
+      attempts: { increment: 1 },
+      lastError: null,
+    },
+  });
+  if (purchaseLock.count !== 1) {
+    purchase = await prisma.telephonyPurchase.findUnique({
+      where: { id: purchaseId },
+      include: { workspace: true },
+    });
+    if (purchase?.status === "ACTIVE" && purchase.workspace.phoneNumber) return purchase.workspace;
+    throw new Error("Number provisioning is already in progress");
+  }
+
+  const workspace = purchase.workspace;
+  const accountSid = workspace.twilioAccountSid;
+  if (!accountSid) throw new Error("Calling workspace is not ready");
+  const workspaceLock = await prisma.telephonyWorkspace.updateMany({
     where: { id: workspace.id, status: "READY", phoneNumber: null },
     data: { status: "PURCHASING", lastError: null },
   });
-  if (lock.count !== 1) {
+  if (workspaceLock.count !== 1) {
     const latest = await prisma.telephonyWorkspace.findUnique({ where: { id: workspace.id } });
     if (latest?.phoneNumber) return latest;
-    throw new Error("A number purchase is already in progress");
+    await prisma.telephonyPurchase.update({
+      where: { id: purchase.id },
+      data: { status: "PAYMENT_CONFIRMED" },
+    });
+    throw new Error("Number provisioning is already in progress");
   }
 
-  const accountApi = subaccountClient(workspace).api.v2010.accounts(workspace.twilioAccountSid);
+  const accountApi = subaccountClient(workspace).api.v2010.accounts(accountSid);
   try {
-    const available = await accountApi.availablePhoneNumbers(quote.country).local.list({
-      contains: quote.phoneNumber,
-      voiceEnabled: true,
+    const existing = await accountApi.incomingPhoneNumbers.list({
+      phoneNumber: purchase.phoneNumber,
       limit: 1,
     });
-    if (!available.some(number => number.phoneNumber === quote.phoneNumber)) {
-      throw new Error("That number is no longer available");
+    let purchased = existing[0];
+    if (!purchased) {
+      const available = await accountApi.availablePhoneNumbers(purchase.country).local.list({
+        contains: purchase.phoneNumber,
+        voiceEnabled: true,
+        limit: 1,
+      });
+      if (!available.some(number => number.phoneNumber === purchase.phoneNumber)) {
+        throw new Error("That number is no longer available");
+      }
+
+      purchased = await accountApi.incomingPhoneNumbers.create({
+        phoneNumber: purchase.phoneNumber,
+        friendlyName: `iCloseLeads ${workspace.id}`,
+        voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
+        voiceMethod: "POST",
+        statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
+        statusCallbackMethod: "POST",
+      });
     }
 
-    const purchased = await accountApi.incomingPhoneNumbers.create({
-      phoneNumber: quote.phoneNumber,
-      friendlyName: `iCloseLeads ${workspace.id}`,
-      voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
-      voiceMethod: "POST",
-      statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
-      statusCallbackMethod: "POST",
-    });
-
-    return prisma.telephonyWorkspace.update({
-      where: { id: workspace.id },
-      data: {
-        status: "READY",
-        phoneNumberSid: purchased.sid,
-        phoneNumber: purchased.phoneNumber,
-        phoneCountry: quote.country,
-        monthlyPriceCents: quote.monthlyPriceCents,
-        priceCurrency: quote.currency,
-        consentAcceptedAt: new Date(),
-        lastError: null,
-      },
-    });
+    const [, updatedWorkspace] = await prisma.$transaction([
+      prisma.telephonyPurchase.update({
+        where: { id: purchase.id },
+        data: { status: "ACTIVE", lastError: null },
+      }),
+      prisma.telephonyWorkspace.update({
+        where: { id: workspace.id },
+        data: {
+          status: "READY",
+          phoneNumberSid: purchased.sid,
+          phoneNumber: purchased.phoneNumber,
+          phoneCountry: purchase.country,
+          monthlyPriceCents: purchase.monthlyPriceCents,
+          priceCurrency: purchase.currency,
+          consentAcceptedAt: purchase.consentAcceptedAt,
+          lastError: null,
+        },
+      }),
+    ]);
+    return updatedWorkspace;
   } catch (error) {
-    const message = error instanceof Error ? error.message.slice(0, 500) : "Number purchase failed";
-    await prisma.telephonyWorkspace.updateMany({
-      where: { id: workspace.id, status: "PURCHASING", phoneNumber: null },
-      data: { status: "READY", lastError: message },
-    });
+    const message = error instanceof Error ? error.message.slice(0, 500) : "Number provisioning failed";
+    await prisma.$transaction([
+      prisma.telephonyWorkspace.updateMany({
+        where: { id: workspace.id, status: "PURCHASING", phoneNumber: null },
+        data: { status: "READY", lastError: message },
+      }),
+      prisma.telephonyPurchase.update({
+        where: { id: purchase.id },
+        data: { status: "PROVISION_FAILED", lastError: message },
+      }),
+    ]);
     throw error;
   }
+}
+
+export async function latestPhonePurchase(userId: string) {
+  return prisma.telephonyPurchase.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      phoneNumber: true,
+      monthlyPriceCents: true,
+      currency: true,
+      status: true,
+      subscriptionStatus: true,
+      testMode: true,
+      renewsAt: true,
+      endsAt: true,
+      lastError: true,
+      createdAt: true,
+    },
+  });
 }
 
 export function createVoiceToken(workspace: {

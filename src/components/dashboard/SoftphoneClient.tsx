@@ -56,6 +56,19 @@ type AvailableNumber = {
   quote: string;
 };
 
+type PhonePurchase = {
+  id: string;
+  phoneNumber: string;
+  monthlyPriceCents: number;
+  currency: string;
+  status: string;
+  subscriptionStatus: string | null;
+  testMode: boolean;
+  renewsAt: string | null;
+  endsAt: string | null;
+  lastError: string | null;
+};
+
 async function api(body?: object) {
   const response = await fetch("/api/softphone/workspace", body ? {
     method: "POST",
@@ -81,6 +94,7 @@ export default function SoftphoneClient() {
   const { toast } = useToast();
   const deviceRef = useRef<VoiceDevice | null>(null);
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [purchaseStatus, setPurchaseStatus] = useState<PhonePurchase | null>(null);
   const [calls, setCalls] = useState<CallHistory[]>([]);
   const [configured, setConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -101,6 +115,7 @@ export default function SoftphoneClient() {
     const data = await api();
     setConfigured(Boolean(data.configured));
     setWorkspace((data.workspace as Workspace | null) ?? null);
+    setPurchaseStatus((data.purchase as PhonePurchase | null) ?? null);
     setCalls((data.calls as CallHistory[]) ?? []);
   }, []);
 
@@ -112,6 +127,17 @@ export default function SoftphoneClient() {
       deviceRef.current = null;
     };
   }, [refresh, toast]);
+
+  useEffect(() => {
+    if (searchParams.get("checkout") !== "success" || workspace?.phoneNumber) return;
+    let checks = 0;
+    const timer = window.setInterval(() => {
+      checks += 1;
+      void refresh();
+      if (checks >= 15) window.clearInterval(timer);
+    }, 2_000);
+    return () => window.clearInterval(timer);
+  }, [refresh, searchParams, workspace?.phoneNumber]);
 
   function callEvents(call: Call) {
     call.on("ringing", () => setDeviceState("Ringing"));
@@ -190,19 +216,16 @@ export default function SoftphoneClient() {
     setBusy("purchase");
     try {
       const data = await api({
-        action: "purchase-number",
+        action: "checkout-number",
         quote: purchase.quote,
         confirmation: "PURCHASE",
         complianceAccepted: true,
       });
-      setWorkspace(data.workspace as Workspace);
-      setNumbers([]);
-      setPurchase(null);
-      setConfirmation("");
-      setComplianceAccepted(false);
-      toast({ title: "Number connected", description: `${purchase.phoneNumber} is ready for calls.`, type: "success" });
+      const url = typeof data.url === "string" ? data.url : "";
+      if (!url) throw new Error("Secure checkout did not return a payment link");
+      window.location.assign(url);
     } catch (error) {
-      toast({ title: "Purchase failed", description: error instanceof Error ? error.message : "Please try again", type: "error" });
+      toast({ title: "Checkout could not start", description: error instanceof Error ? error.message : "Please try again", type: "error" });
     } finally { setBusy(null); }
   }
 
@@ -241,6 +264,32 @@ export default function SoftphoneClient() {
           <span className="font-medium text-foreground">{deviceState}</span>
         </div>
       </header>
+
+      {!workspace?.phoneNumber && purchaseStatus && ["PAYMENT_CONFIRMED", "PROVISIONING"].includes(purchaseStatus.status) && (
+        <section className="rounded-lg border border-accent/30 bg-accent/5 p-4">
+          <div className="flex items-start gap-3">
+            <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-accent" />
+            <div>
+              <h2 className="font-semibold text-foreground">Payment confirmed. Connecting your number.</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Twilio is provisioning {purchaseStatus.phoneNumber}. This page refreshes automatically and the softphone will appear here.</p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!workspace?.phoneNumber && purchaseStatus?.status === "PAID_TEST" && (
+        <section className="rounded-lg border border-gold/30 bg-gold/5 p-4">
+          <h2 className="font-semibold text-foreground">Test payment verified</h2>
+          <p className="mt-1 text-sm text-muted-foreground">The Lemon Squeezy test webhook worked. No real Twilio number was purchased or charged.</p>
+        </section>
+      )}
+
+      {!workspace?.phoneNumber && purchaseStatus?.status === "PROVISION_FAILED" && (
+        <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+          <h2 className="font-semibold text-foreground">Payment verified, but the number needs attention</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{purchaseStatus.lastError || "The selected number could not be connected. Support can retry or move the subscription to another number."}</p>
+        </section>
+      )}
 
       {!configured ? (
         <section className="rounded-lg border border-gold/30 bg-gold/5 p-6">
@@ -342,10 +391,10 @@ export default function SoftphoneClient() {
       {purchase && <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 p-4 sm:items-center">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-2xl">
           <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring number subscription</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); setComplianceAccepted(false); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
-          <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">Includes the dedicated number and iCloseLeads calling workspace. Call usage is billed separately.</p></div>
+          <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">This recurring checkout covers the dedicated number and iCloseLeads calling workspace. Calling remains inside the private beta limits; no extra usage charge is silently added here.</p></div>
           <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background p-3 text-sm leading-5 text-muted-foreground"><input type="checkbox" checked={complianceAccepted} onChange={event => setComplianceAccepted(event.target.checked)} className="mt-1 h-4 w-4 accent-primary" /><span>I will call only lawful business contacts, honour opt-outs, and follow the calling rules that apply to my location and the recipient.</span></label>
           <label className="mt-5 block"><span className="mb-1.5 block text-sm font-medium text-foreground">Type PURCHASE to confirm</span><input value={confirmation} onChange={event => setConfirmation(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-foreground outline-none focus:border-gold" /></label>
-          <button onClick={() => void buyNumber()} disabled={confirmation !== "PURCHASE" || !complianceAccepted || busy === "purchase"} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "purchase" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Purchase number</button>
+          <button onClick={() => void buyNumber()} disabled={confirmation !== "PURCHASE" || !complianceAccepted || busy === "purchase"} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "purchase" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Continue to secure checkout</button>
         </div>
       </div>}
     </div>

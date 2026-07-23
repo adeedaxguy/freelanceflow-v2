@@ -11,6 +11,7 @@ export interface LemonSqueezyConfig {
   webhookSecret: string;
   storeId: string;
   testMode: boolean;
+  softphoneVariantId: string;
   variants: Record<VariantKey, string>;
 }
 
@@ -21,6 +22,7 @@ const SETTING_KEYS = [
   "lemonsqueezy_pro_annual_variant_id",
   "lemonsqueezy_agency_monthly_variant_id",
   "lemonsqueezy_agency_annual_variant_id",
+  "lemonsqueezy_softphone_monthly_variant_id",
 ] as const;
 
 function configuredValue(environmentValue: string | undefined, storedValue: string | undefined) {
@@ -48,6 +50,10 @@ export async function getLemonSqueezyConfig(): Promise<LemonSqueezyConfig> {
     webhookSecret: (process.env.LEMONSQUEEZY_WEBHOOK_SECRET || "").trim(),
     storeId: configuredValue(process.env.LEMONSQUEEZY_STORE_ID, stored.lemonsqueezy_store_id),
     testMode: testModeValue === "" || testModeValue === "true" || testModeValue === "1",
+    softphoneVariantId: configuredValue(
+      process.env.LEMONSQUEEZY_SOFTPHONE_MONTHLY_VARIANT_ID,
+      stored.lemonsqueezy_softphone_monthly_variant_id,
+    ),
     variants: {
       pro_monthly: configuredValue(
         process.env.LEMONSQUEEZY_PRO_MONTHLY_VARIANT_ID,

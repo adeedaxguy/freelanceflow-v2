@@ -114,6 +114,35 @@ const TABLE_MIGRATIONS = [
       CONSTRAINT "VoiceCall_leadId_fkey" FOREIGN KEY ("leadId") REFERENCES "Lead"("id") ON DELETE SET NULL ON UPDATE CASCADE
     )`,
   },
+  {
+    name: "TelephonyPurchase",
+    sql: `CREATE TABLE IF NOT EXISTS "TelephonyPurchase" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "workspaceId" TEXT NOT NULL,
+      "phoneNumber" TEXT NOT NULL,
+      "country" TEXT NOT NULL,
+      "monthlyPriceCents" INTEGER NOT NULL,
+      "currency" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'CHECKOUT_PENDING',
+      "variantId" TEXT NOT NULL,
+      "externalSubscriptionId" TEXT,
+      "externalCustomerId" TEXT,
+      "externalOrderId" TEXT,
+      "subscriptionStatus" TEXT,
+      "testMode" BOOLEAN NOT NULL DEFAULT false,
+      "consentAcceptedAt" TIMESTAMP(3) NOT NULL,
+      "expiresAt" TIMESTAMP(3) NOT NULL,
+      "renewsAt" TIMESTAMP(3),
+      "endsAt" TIMESTAMP(3),
+      "attempts" INTEGER NOT NULL DEFAULT 0,
+      "lastError" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "TelephonyPurchase_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "TelephonyPurchase_workspaceId_fkey" FOREIGN KEY ("workspaceId") REFERENCES "TelephonyWorkspace"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+  },
   { name: "Template.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_userId_idx" ON "Template"("userId")` },
   { name: "Template.isDefault_idx", sql: `CREATE INDEX IF NOT EXISTS "Template_isDefault_idx" ON "Template"("isDefault")` },
   { name: "ContactSubmission.resolved_idx", sql: `CREATE INDEX IF NOT EXISTS "ContactSubmission_resolved_idx" ON "ContactSubmission"("resolved")` },
@@ -133,6 +162,9 @@ const TABLE_MIGRATIONS = [
   { name: "VoiceCall.userId_createdAt_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_userId_createdAt_idx" ON "VoiceCall"("userId", "createdAt")` },
   { name: "VoiceCall.leadId_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_leadId_idx" ON "VoiceCall"("leadId")` },
   { name: "VoiceCall.status_idx", sql: `CREATE INDEX IF NOT EXISTS "VoiceCall_status_idx" ON "VoiceCall"("status")` },
+  { name: "TelephonyPurchase.externalSubscriptionId_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyPurchase_externalSubscriptionId_key" ON "TelephonyPurchase"("externalSubscriptionId")` },
+  { name: "TelephonyPurchase.userId_status_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_userId_status_idx" ON "TelephonyPurchase"("userId", "status")` },
+  { name: "TelephonyPurchase.workspaceId_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_workspaceId_idx" ON "TelephonyPurchase"("workspaceId")` },
 ];
 
 const MIGRATIONS = [

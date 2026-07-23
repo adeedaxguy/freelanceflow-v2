@@ -5,14 +5,21 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import {
+  createPhonePurchaseIntent,
   createVoiceToken,
+  hasPhoneSubscriptionAccess,
   isSoftphoneAllowed,
   isTelephonyConfigured,
+  latestPhonePurchase,
   provisionWorkspace,
   publicWorkspace,
-  purchasePhoneNumber,
   searchPhoneNumbers,
+  verifyNumberQuote,
 } from "@/lib/telephony";
+import {
+  getLemonSqueezyConfig,
+  lemonSqueezyRequest,
+} from "@/lib/lemonsqueezy";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +31,7 @@ const requestSchema = z.discriminatedUnion("action", [
     area: z.string().trim().max(40).default(""),
   }),
   z.object({
-    action: z.literal("purchase-number"),
+    action: z.literal("checkout-number"),
     quote: z.string().min(20).max(3000),
     confirmation: z.literal("PURCHASE"),
     complianceAccepted: z.literal(true),
@@ -45,8 +52,9 @@ export async function GET() {
   const auth = await context();
   if ("error" in auth) return auth.error;
 
-  const [workspace, calls] = await Promise.all([
+  const [workspace, purchase, calls] = await Promise.all([
     prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } }),
+    latestPhonePurchase(auth.session.user.id),
     prisma.voiceCall.findMany({
       where: { userId: auth.session.user.id },
       orderBy: { createdAt: "desc" },
@@ -67,8 +75,13 @@ export async function GET() {
   return NextResponse.json({
     configured: isTelephonyConfigured(),
     workspace: publicWorkspace(workspace),
+    purchase,
     calls,
   });
+}
+
+interface CheckoutResponse {
+  data: { attributes: { url: string } };
 }
 
 export async function POST(req: NextRequest) {
@@ -97,13 +110,97 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ numbers });
     }
 
-    if (parsed.data.action === "purchase-number") {
-      const workspace = await purchasePhoneNumber(auth.session.user.id, parsed.data.quote);
-      return NextResponse.json({ workspace: publicWorkspace(workspace) });
+    if (parsed.data.action === "checkout-number") {
+      const [config, user] = await Promise.all([
+        getLemonSqueezyConfig(),
+        prisma.user.findUnique({
+          where: { id: auth.session.user.id },
+          select: { email: true, name: true, role: true },
+        }),
+      ]);
+      const variantId = config.softphoneVariantId;
+      if (!config.apiKey || !/^\d+$/.test(config.storeId) || !/^\d+$/.test(variantId)) {
+        return NextResponse.json({ error: "Secure number checkout is not configured yet" }, { status: 503 });
+      }
+      if (config.testMode && user?.role !== "ADMIN") {
+        return NextResponse.json({ error: "Number checkout is still in private testing" }, { status: 503 });
+      }
+
+      const quote = verifyNumberQuote(parsed.data.quote);
+      const purchase = await createPhonePurchaseIntent(
+        auth.session.user.id,
+        parsed.data.quote,
+        variantId,
+      );
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL
+        || process.env.NEXTAUTH_URL
+        || req.nextUrl.origin
+      ).replace(/\/$/, "");
+
+      try {
+        const checkout = await lemonSqueezyRequest<CheckoutResponse>(config, "/checkouts", {
+          method: "POST",
+          body: JSON.stringify({
+            data: {
+              type: "checkouts",
+              attributes: {
+                custom_price: quote.monthlyPriceCents,
+                product_options: {
+                  redirect_url: `${appUrl}/dashboard/softphone?checkout=success&purchase=${purchase.id}`,
+                  enabled_variants: [Number(variantId)],
+                },
+                checkout_options: {
+                  embed: false,
+                  media: true,
+                  logo: true,
+                  desc: true,
+                  discount: false,
+                  subscription_preview: true,
+                  button_color: "#7c3aed",
+                },
+                checkout_data: {
+                  email: user?.email || undefined,
+                  name: user?.name || undefined,
+                  custom: {
+                    purchase_type: "softphone_number",
+                    telephony_purchase_id: purchase.id,
+                    user_id: auth.session.user.id,
+                  },
+                },
+                test_mode: config.testMode,
+              },
+              relationships: {
+                store: { data: { type: "stores", id: config.storeId } },
+                variant: { data: { type: "variants", id: variantId } },
+              },
+            },
+          }),
+        });
+        return NextResponse.json({ url: checkout.data.attributes.url, purchaseId: purchase.id });
+      } catch (error) {
+        await prisma.telephonyPurchase.update({
+          where: { id: purchase.id },
+          data: {
+            status: "CHECKOUT_FAILED",
+            lastError: error instanceof Error ? error.message.slice(0, 500) : "Checkout failed",
+          },
+        });
+        throw error;
+      }
     }
 
     const workspace = await prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } });
     if (!workspace?.phoneNumber) return NextResponse.json({ error: "Choose a calling number first" }, { status: 409 });
+    if (auth.session.user.role !== "ADMIN") {
+      const purchase = await latestPhonePurchase(auth.session.user.id);
+      if (
+        purchase?.status !== "ACTIVE"
+        || !hasPhoneSubscriptionAccess(purchase.subscriptionStatus, purchase.endsAt)
+      ) {
+        return NextResponse.json({ error: "Your phone number subscription is not active" }, { status: 402 });
+      }
+    }
     return NextResponse.json({ token: createVoiceToken(workspace), identity: `icl_user_${auth.session.user.id}` });
   } catch (error) {
     console.error(`[softphone/${parsed.data.action}]`, error);

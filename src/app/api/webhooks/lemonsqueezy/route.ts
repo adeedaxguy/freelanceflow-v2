@@ -8,11 +8,16 @@ import {
   hasSubscriptionAccess,
   verifyLemonSqueezySignature,
 } from "@/lib/lemonsqueezy";
+import { provisionPhoneNumber } from "@/lib/telephony";
 
 interface SubscriptionPayload {
   meta?: {
     event_name?: string;
-    custom_data?: { user_id?: string };
+    custom_data?: {
+      user_id?: string;
+      purchase_type?: string;
+      telephony_purchase_id?: string;
+    };
   };
   data?: {
     type?: string;
@@ -29,6 +34,90 @@ function dateValue(value: unknown) {
   if (typeof value !== "string" || value === "") return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+async function handleSoftphoneSubscription(input: {
+  payload: SubscriptionPayload;
+  externalSubscriptionId: string;
+  variantId: string;
+  status: string;
+  attributes: Record<string, unknown>;
+  eventName: string;
+  configuredVariantId: string;
+}) {
+  const {
+    payload,
+    externalSubscriptionId,
+    variantId,
+    status,
+    attributes,
+    eventName,
+    configuredVariantId,
+  } = input;
+  const requestedPurchaseId = payload.meta?.custom_data?.telephony_purchase_id;
+  const purchase = requestedPurchaseId
+    ? await prisma.telephonyPurchase.findUnique({ where: { id: requestedPurchaseId } })
+    : await prisma.telephonyPurchase.findUnique({ where: { externalSubscriptionId } });
+
+  if (!purchase || variantId !== configuredVariantId || purchase.variantId !== variantId) {
+    console.warn("Ignored an unmapped softphone subscription", {
+      externalSubscriptionId,
+      requestedPurchaseId,
+      variantId,
+      eventName,
+    });
+    return NextResponse.json({ received: true, ignored: "unmapped_softphone_subscription" }, { status: 202 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: purchase.userId },
+    select: { role: true },
+  });
+  if (!user) {
+    return NextResponse.json({ received: true, ignored: "unknown_user" }, { status: 202 });
+  }
+
+  const testMode = attributes.test_mode === true;
+  if (testMode && user.role !== "ADMIN") {
+    return NextResponse.json({ received: true, ignored: "test_mode_non_admin" }, { status: 202 });
+  }
+
+  const canProvision = ["active", "on_trial"].includes(status.toLowerCase());
+  const terminal = ["expired", "refunded"].includes(status.toLowerCase());
+  const nextStatus = testMode
+    ? "PAID_TEST"
+    : purchase.status === "ACTIVE" && !terminal
+      ? "ACTIVE"
+      : canProvision
+        ? "PAYMENT_CONFIRMED"
+        : terminal
+          ? "EXPIRED"
+          : purchase.status;
+
+  await prisma.telephonyPurchase.update({
+    where: { id: purchase.id },
+    data: {
+      externalSubscriptionId,
+      externalCustomerId: stringValue(attributes.customer_id),
+      externalOrderId: stringValue(attributes.order_id),
+      subscriptionStatus: status,
+      testMode,
+      renewsAt: dateValue(attributes.renews_at),
+      endsAt: dateValue(attributes.ends_at),
+      status: nextStatus,
+      lastError: null,
+    },
+  });
+
+  if (canProvision && !testMode && purchase.status !== "ACTIVE") {
+    await provisionPhoneNumber(purchase.id);
+  }
+
+  return NextResponse.json({
+    received: true,
+    event: eventName,
+    softphone: testMode ? "test_payment_verified" : canProvision ? "provisioned" : "updated",
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -64,6 +153,34 @@ export async function POST(req: NextRequest) {
 
   if (!externalSubscriptionId || !status || !variantId) {
     return NextResponse.json({ error: "Incomplete subscription payload." }, { status: 400 });
+  }
+
+  const isSoftphoneSubscription = (
+    payload.meta?.custom_data?.purchase_type === "softphone_number"
+    || (
+      config.softphoneVariantId !== ""
+      && variantId === config.softphoneVariantId
+    )
+  );
+  if (isSoftphoneSubscription) {
+    try {
+      return await handleSoftphoneSubscription({
+        payload,
+        externalSubscriptionId,
+        variantId,
+        status,
+        attributes,
+        eventName,
+        configuredVariantId: config.softphoneVariantId,
+      });
+    } catch (error) {
+      console.error("Softphone subscription provisioning failed", {
+        externalSubscriptionId,
+        eventName,
+        error,
+      });
+      return NextResponse.json({ error: "Phone provisioning failed." }, { status: 500 });
+    }
   }
 
   const existing = await prisma.billingSubscription.findUnique({

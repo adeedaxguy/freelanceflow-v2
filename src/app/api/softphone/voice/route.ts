@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { appUrl, normalizeDestination, twilio, validateTwilioWebhook } from "@/lib/telephony";
+import {
+  appUrl,
+  hasPhoneSubscriptionAccess,
+  latestPhonePurchase,
+  normalizeDestination,
+  twilio,
+  validateTwilioWebhook,
+} from "@/lib/telephony";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +58,23 @@ export async function POST(req: NextRequest) {
     response.say("This calling workspace does not have an active number.");
     response.hangup();
     return xml(response);
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: workspace.userId },
+    select: { role: true },
+  });
+  if (user?.role !== "ADMIN") {
+    const purchase = await latestPhonePurchase(workspace.userId);
+    if (
+      purchase?.status !== "ACTIVE"
+      || !hasPhoneSubscriptionAccess(purchase.subscriptionStatus, purchase.endsAt)
+    ) {
+      const response = new twilio.twiml.VoiceResponse();
+      response.say("This phone number subscription is not active.");
+      response.hangup();
+      return xml(response);
+    }
   }
 
   const callSid = params.CallSid || null;

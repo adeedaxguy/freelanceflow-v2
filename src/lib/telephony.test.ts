@@ -3,6 +3,7 @@ import {
   customerNumberPriceCents,
   decryptTelephonySecret,
   encryptTelephonySecret,
+  hasPhoneSubscriptionAccess,
   isSoftphoneAllowed,
   isTelephonyConfigured,
   normalizeDestination,
@@ -49,6 +50,13 @@ describe("telephony security helpers", () => {
     process.env.TWILIO_NUMBER_MIN_MARGIN_CENTS = "0";
     expect(customerNumberPriceCents(115)).toBe(230);
     expect(() => customerNumberPriceCents(0)).toThrow("pricing is temporarily unavailable");
+  });
+
+  it("allows paid phone access and respects a cancelled subscription end date", () => {
+    expect(hasPhoneSubscriptionAccess("active")).toBe(true);
+    expect(hasPhoneSubscriptionAccess("expired")).toBe(false);
+    expect(hasPhoneSubscriptionAccess("cancelled", new Date(Date.now() + 60_000))).toBe(true);
+    expect(hasPhoneSubscriptionAccess("cancelled", new Date(Date.now() - 60_000))).toBe(false);
   });
 
   it("allows ordinary supported destinations and blocks premium routes", () => {

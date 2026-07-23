@@ -12,6 +12,7 @@ const config: LemonSqueezyConfig = {
   webhookSecret: "test-secret",
   storeId: "100",
   testMode: true,
+  softphoneVariantId: "301",
   variants: {
     pro_monthly: "101",
     pro_annual: "102",

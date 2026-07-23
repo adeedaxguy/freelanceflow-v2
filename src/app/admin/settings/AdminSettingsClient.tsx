@@ -173,6 +173,7 @@ export default function AdminSettingsClient({ initialSettings, lemonEnvironment 
           "lemonsqueezy_pro_annual_variant_id",
           "lemonsqueezy_agency_monthly_variant_id",
           "lemonsqueezy_agency_annual_variant_id",
+          "lemonsqueezy_softphone_monthly_variant_id",
         ]); }}
           className="space-y-4">
 
@@ -194,6 +195,7 @@ export default function AdminSettingsClient({ initialSettings, lemonEnvironment 
             <Field label="Pro annual variant" value={get("lemonsqueezy_pro_annual_variant_id")} onChange={v => set("lemonsqueezy_pro_annual_variant_id", v)} placeholder="123457" />
             <Field label="Agency monthly variant" value={get("lemonsqueezy_agency_monthly_variant_id")} onChange={v => set("lemonsqueezy_agency_monthly_variant_id", v)} placeholder="123458" />
             <Field label="Agency annual variant" value={get("lemonsqueezy_agency_annual_variant_id")} onChange={v => set("lemonsqueezy_agency_annual_variant_id", v)} placeholder="123459" />
+            <Field label="Softphone number monthly variant" value={get("lemonsqueezy_softphone_monthly_variant_id")} onChange={v => set("lemonsqueezy_softphone_monthly_variant_id", v)} placeholder="123460" hint="A dedicated recurring variant. Each checkout supplies the selected number's final monthly price." />
           </div>
           <div className="rounded-lg border border-border bg-surface px-3 py-3 text-xs text-muted-foreground">
             Webhook URL: <span className="font-mono text-foreground">https://icloseleads.com/api/webhooks/lemonsqueezy</span>
