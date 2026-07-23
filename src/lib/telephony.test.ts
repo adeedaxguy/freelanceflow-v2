@@ -1,5 +1,6 @@
 import {
   createNumberQuote,
+  customerNumberPriceCents,
   decryptTelephonySecret,
   encryptTelephonySecret,
   isSoftphoneAllowed,
@@ -13,6 +14,8 @@ describe("telephony security helpers", () => {
     process.env.TWILIO_ENCRYPTION_KEY = "test-encryption-key";
     process.env.NEXTAUTH_SECRET = "test-signing-secret";
     delete process.env.TWILIO_SOFTPHONE_ENABLED;
+    delete process.env.TWILIO_NUMBER_MARKUP_PERCENT;
+    delete process.env.TWILIO_NUMBER_MIN_MARGIN_CENTS;
   });
 
   it("encrypts secrets and detects tampering", () => {
@@ -38,6 +41,14 @@ describe("telephony security helpers", () => {
       monthlyPriceCents: 115,
     });
     expect(() => verifyNumberQuote(`${quote.slice(0, -1)}x`)).toThrow("Invalid purchase quote");
+  });
+
+  it("adds the configured customer margin to the provider number cost", () => {
+    expect(customerNumberPriceCents(115)).toBe(215);
+    process.env.TWILIO_NUMBER_MARKUP_PERCENT = "100";
+    process.env.TWILIO_NUMBER_MIN_MARGIN_CENTS = "0";
+    expect(customerNumberPriceCents(115)).toBe(230);
+    expect(() => customerNumberPriceCents(0)).toThrow("pricing is temporarily unavailable");
   });
 
   it("allows ordinary supported destinations and blocks premium routes", () => {

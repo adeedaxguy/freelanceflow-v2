@@ -4,11 +4,29 @@ import { prisma } from "@/lib/prisma";
 
 const COUNTRIES = new Set(["US", "GB", "CA"]);
 const E164 = /^\+[1-9]\d{7,14}$/;
+const DEFAULT_NUMBER_MARKUP_PERCENT = 50;
+const DEFAULT_NUMBER_MIN_MARGIN_CENTS = 100;
 
 function required(name: string) {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is not configured`);
   return value;
+}
+
+function boundedNumber(name: string, fallback: number, maximum: number) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value >= 0 && value <= maximum ? value : fallback;
+}
+
+export function customerNumberPriceCents(providerPriceCents: number) {
+  if (!Number.isInteger(providerPriceCents) || providerPriceCents <= 0) {
+    throw new Error("Number pricing is temporarily unavailable");
+  }
+  const markupPercent = boundedNumber("TWILIO_NUMBER_MARKUP_PERCENT", DEFAULT_NUMBER_MARKUP_PERCENT, 500);
+  const minimumMargin = Math.round(
+    boundedNumber("TWILIO_NUMBER_MIN_MARGIN_CENTS", DEFAULT_NUMBER_MIN_MARGIN_CENTS, 5_000),
+  );
+  return providerPriceCents + Math.max(Math.ceil(providerPriceCents * markupPercent / 100), minimumMargin);
 }
 
 function encryptionKey() {
@@ -215,8 +233,8 @@ export async function searchPhoneNumbers(userId: string, country: string, area: 
     local.list(filters),
     parentClient().pricing.v1.phoneNumbers.countries(normalizedCountry).fetch(),
   ]);
-  const localPrice = pricing.phoneNumberPrices.find(item => item.numberType === "local")?.currentPrice ?? 0;
-  const monthlyPriceCents = Math.round(localPrice * 100);
+  const localPrice = pricing.phoneNumberPrices.find(item => item.numberType === "local")?.currentPrice;
+  const monthlyPriceCents = customerNumberPriceCents(Math.round(Number(localPrice) * 100));
   const currency = pricing.priceUnit.toUpperCase();
 
   return numbers.map(number => ({

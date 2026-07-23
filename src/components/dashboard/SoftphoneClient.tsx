@@ -168,7 +168,7 @@ export default function SoftphoneClient() {
     try {
       const data = await api({ action: "provision" });
       setWorkspace(data.workspace as Workspace);
-      toast({ title: "Calling workspace ready", description: "Your isolated Twilio workspace has been created.", type: "success" });
+      toast({ title: "Calling workspace ready", description: "Your isolated calling workspace has been created.", type: "success" });
     } catch (error) {
       toast({ title: "Setup failed", description: error instanceof Error ? error.message : "Please try again", type: "error" });
     } finally { setBusy(null); }
@@ -254,7 +254,7 @@ export default function SoftphoneClient() {
           <div className="rounded-lg border border-border bg-card p-6">
             <PhoneCall className="h-8 w-8 text-primary-light" />
             <h2 className="mt-5 text-xl font-semibold text-foreground">Create your secure calling workspace</h2>
-            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">This creates an isolated Twilio subaccount for your number, browser credentials, call logs, and usage. It does not buy a number or create a charge.</p>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">This creates an isolated calling workspace for your number, browser credentials, call logs, and usage. It does not buy a number or create a charge.</p>
             <button onClick={() => void provision()} disabled={busy === "provision"} className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
               {busy === "provision" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />} Set up workspace
             </button>
@@ -290,7 +290,7 @@ export default function SoftphoneClient() {
               <label className="block flex-1"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">City or area code</span><input value={area} onChange={event => setArea(event.target.value)} placeholder={country === "GB" ? "London" : "e.g. 415 or Toronto"} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary" /></label>
               <button onClick={() => void searchNumbers()} disabled={busy === "search"} className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy === "search" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />} Search numbers</button>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">Only voice-enabled numbers without address-registration requirements are shown. Availability and pricing come directly from Twilio.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Only voice-enabled numbers without address-registration requirements are shown. Availability is checked live, and the displayed monthly price includes your iCloseLeads calling workspace.</p>
           </div>
 
           {numbers.length > 0 && <div className="grid gap-3 md:grid-cols-2">
@@ -341,8 +341,8 @@ export default function SoftphoneClient() {
 
       {purchase && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-2xl">
-          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring Twilio charge</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); setComplianceAccepted(false); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
-          <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">Twilio usage charges for calls are separate. iCloseLeads does not add a markup during this beta.</p></div>
+          <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring number subscription</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); setComplianceAccepted(false); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
+          <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">Includes the dedicated number and iCloseLeads calling workspace. Call usage is billed separately.</p></div>
           <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background p-3 text-sm leading-5 text-muted-foreground"><input type="checkbox" checked={complianceAccepted} onChange={event => setComplianceAccepted(event.target.checked)} className="mt-1 h-4 w-4 accent-primary" /><span>I will call only lawful business contacts, honour opt-outs, and follow the calling rules that apply to my location and the recipient.</span></label>
           <label className="mt-5 block"><span className="mb-1.5 block text-sm font-medium text-foreground">Type PURCHASE to confirm</span><input value={confirmation} onChange={event => setConfirmation(event.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-foreground outline-none focus:border-gold" /></label>
           <button onClick={() => void buyNumber()} disabled={confirmation !== "PURCHASE" || !complianceAccepted || busy === "purchase"} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "purchase" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} Purchase number</button>
