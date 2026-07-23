@@ -266,6 +266,22 @@ export default function SoftphoneClient() {
             </ul>
           </div>
         </section>
+      ) : workspace.status !== "READY" ? (
+        <section className="rounded-lg border border-destructive/30 bg-destructive/5 p-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+            <div>
+              <h2 className="font-semibold text-foreground">Calling workspace setup needs attention</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+                The previous setup attempt did not finish. Retry safely to continue from the existing Twilio workspace; this does not buy a number or create a charge.
+              </p>
+              {workspace.lastError && <p className="mt-3 text-xs text-destructive">{workspace.lastError}</p>}
+              <button onClick={() => void provision()} disabled={busy === "provision"} className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                {busy === "provision" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />} Retry setup
+              </button>
+            </div>
+          </div>
+        </section>
       ) : !workspace.phoneNumber ? (
         <section className="space-y-5">
           <div className="rounded-lg border border-border bg-card p-5">
@@ -314,7 +330,7 @@ export default function SoftphoneClient() {
         </>
       )}
 
-      {workspace?.lastError && <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{workspace.lastError}</div>}
+      {workspace?.status === "READY" && workspace.lastError && <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{workspace.lastError}</div>}
 
       {incomingCall && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 p-4 sm:items-center">
         <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 shadow-2xl">
