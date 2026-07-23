@@ -3,6 +3,7 @@ import {
   decryptTelephonySecret,
   encryptTelephonySecret,
   isSoftphoneAllowed,
+  isTelephonyConfigured,
   normalizeDestination,
   verifyNumberQuote,
 } from "@/lib/telephony";
@@ -53,5 +54,15 @@ describe("telephony security helpers", () => {
     process.env.TWILIO_SOFTPHONE_ENABLED = "true";
     expect(isSoftphoneAllowed("USER", "agency")).toBe(true);
     expect(isSoftphoneAllowed("USER", "free")).toBe(false);
+  });
+
+  it("requires both parent credentials and the dedicated API key", () => {
+    process.env.TWILIO_ACCOUNT_SID = "ACtest";
+    process.env.TWILIO_API_KEY_SID = "SKtest";
+    process.env.TWILIO_API_KEY_SECRET = "api-secret";
+    delete process.env.TWILIO_AUTH_TOKEN;
+    expect(isTelephonyConfigured()).toBe(false);
+    process.env.TWILIO_AUTH_TOKEN = "auth-token";
+    expect(isTelephonyConfigured()).toBe(true);
   });
 });

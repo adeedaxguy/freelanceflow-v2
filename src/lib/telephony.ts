@@ -33,6 +33,7 @@ export function decryptTelephonySecret(value: string) {
 export function isTelephonyConfigured() {
   return Boolean(
     process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
     process.env.TWILIO_API_KEY_SID &&
     process.env.TWILIO_API_KEY_SECRET &&
     process.env.TWILIO_ENCRYPTION_KEY,
@@ -50,6 +51,10 @@ function parentClient() {
   return twilio(required("TWILIO_API_KEY_SID"), required("TWILIO_API_KEY_SECRET"), {
     accountSid: required("TWILIO_ACCOUNT_SID"),
   });
+}
+
+function parentMasterClient() {
+  return twilio(required("TWILIO_ACCOUNT_SID"), required("TWILIO_AUTH_TOKEN"));
 }
 
 function subaccountClient(workspace: {
@@ -88,9 +93,26 @@ export async function provisionWorkspace(userId: string) {
         where: { id: workspace.id },
         data: {
           twilioAccountSid: account.sid,
-          twilioAuthTokenEncrypted: encryptTelephonySecret(account.authToken),
           lastError: null,
         },
+      });
+    }
+
+    let hasSubaccountToken = false;
+    try {
+      hasSubaccountToken = Boolean(
+        workspace.twilioAuthTokenEncrypted &&
+        decryptTelephonySecret(workspace.twilioAuthTokenEncrypted),
+      );
+    } catch {
+      hasSubaccountToken = false;
+    }
+    if (!hasSubaccountToken) {
+      const account = await parentMasterClient().api.v2010.accounts(accountSid).fetch();
+      if (!account.authToken) throw new Error("Twilio did not return the calling workspace token");
+      workspace = await prisma.telephonyWorkspace.update({
+        where: { id: workspace.id },
+        data: { twilioAuthTokenEncrypted: encryptTelephonySecret(account.authToken) },
       });
     }
 
