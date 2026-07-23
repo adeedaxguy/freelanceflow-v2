@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import {
+  attachExistingParentNumberForAdmin,
   createPhonePurchaseIntent,
   createVoiceToken,
   hasPhoneSubscriptionAccess,
@@ -25,6 +26,7 @@ export const dynamic = "force-dynamic";
 
 const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("provision") }),
+  z.object({ action: z.literal("attach-existing-admin-number") }),
   z.object({
     action: z.literal("search-numbers"),
     country: z.enum(["US", "GB", "CA"]),
@@ -102,6 +104,14 @@ export async function POST(req: NextRequest) {
   try {
     if (parsed.data.action === "provision") {
       const workspace = await provisionWorkspace(auth.session.user.id);
+      return NextResponse.json({ workspace: publicWorkspace(workspace) });
+    }
+
+    if (parsed.data.action === "attach-existing-admin-number") {
+      if (auth.session.user.role !== "ADMIN") {
+        return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      }
+      const workspace = await attachExistingParentNumberForAdmin(auth.session.user.id);
       return NextResponse.json({ workspace: publicWorkspace(workspace) });
     }
 

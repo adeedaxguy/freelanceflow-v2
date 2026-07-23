@@ -211,6 +211,28 @@ export default function SoftphoneClient() {
     } finally { setBusy(null); }
   }
 
+  async function attachExistingNumber() {
+    setBusy("attach-existing");
+    try {
+      const data = await api({ action: "attach-existing-admin-number" });
+      setWorkspace(data.workspace as Workspace);
+      setNumbers([]);
+      toast({
+        title: "Twilio number attached",
+        description: "The existing number is now connected to the admin softphone.",
+        type: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Could not attach the number",
+        description: error instanceof Error ? error.message : "Please try again",
+        type: "error",
+      });
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function buyNumber() {
     if (!purchase || confirmation !== "PURCHASE" || !complianceAccepted) return;
     setBusy("purchase");
@@ -333,6 +355,15 @@ export default function SoftphoneClient() {
         </section>
       ) : !workspace.phoneNumber ? (
         <section className="space-y-5">
+          <div className="flex flex-col gap-3 rounded-lg border border-accent/25 bg-accent/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-semibold text-foreground">Use the number already owned by Twilio</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Admin recovery only. This keeps messaging untouched, connects the existing number to iCloseLeads voice, and does not create another purchase.</p>
+            </div>
+            <button onClick={() => void attachExistingNumber()} disabled={Boolean(busy)} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-accent/40 bg-background px-4 py-2.5 text-sm font-semibold text-accent disabled:opacity-50">
+              {busy === "attach-existing" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Phone className="h-4 w-4" />} Attach owned number
+            </button>
+          </div>
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end">
               <label className="block md:w-48"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Country</span><select value={country} onChange={event => setCountry(event.target.value as "US" | "GB" | "CA")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground"><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option></select></label>

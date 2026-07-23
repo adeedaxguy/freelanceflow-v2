@@ -178,6 +178,80 @@ export async function provisionWorkspace(userId: string) {
   }
 }
 
+export async function attachExistingParentNumberForAdmin(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true },
+  });
+  if (user?.role !== "ADMIN") throw new Error("Admin access required");
+
+  const workspace = await provisionWorkspace(userId);
+  if (workspace.phoneNumber) return workspace;
+
+  const parentAccountSid = required("TWILIO_ACCOUNT_SID");
+  const master = parentMasterClient();
+  const accountApi = master.api.v2010.accounts(parentAccountSid);
+  const numbers = await accountApi.incomingPhoneNumbers.list({ limit: 20 });
+  const voiceNumbers = numbers.filter(number => number.capabilities.voice);
+  if (voiceNumbers.length === 0) throw new Error("No voice-enabled number exists in the Twilio master account");
+  if (voiceNumbers.length > 1) {
+    throw new Error("More than one master number exists. Choose the admin number in Twilio before attaching it");
+  }
+
+  const number = voiceNumbers[0]!;
+  const appName = `iCloseLeads Admin Voice ${workspace.id}`;
+  const existingApps = await accountApi.applications.list({ friendlyName: appName, limit: 1 });
+  const app = existingApps[0] ?? await accountApi.applications.create({
+    friendlyName: appName,
+    voiceUrl: appUrl("/api/softphone/voice"),
+    voiceMethod: "POST",
+    statusCallback: appUrl("/api/softphone/voice?mode=app-status"),
+    statusCallbackMethod: "POST",
+  });
+
+  const originalVoiceConfig = {
+    voiceUrl: number.voiceUrl || "",
+    voiceMethod: number.voiceMethod || "POST",
+    voiceFallbackUrl: number.voiceFallbackUrl || "",
+    voiceFallbackMethod: number.voiceFallbackMethod || "POST",
+    voiceApplicationSid: number.voiceApplicationSid || "",
+    statusCallback: number.statusCallback || "",
+    statusCallbackMethod: number.statusCallbackMethod || "POST",
+  };
+
+  await accountApi.incomingPhoneNumbers(number.sid).update({
+    voiceUrl: appUrl("/api/softphone/voice?mode=incoming"),
+    voiceMethod: "POST",
+    voiceFallbackUrl: appUrl("/api/softphone/voice?mode=incoming"),
+    voiceFallbackMethod: "POST",
+    voiceApplicationSid: "",
+    statusCallback: appUrl("/api/softphone/voice?mode=number-status"),
+    statusCallbackMethod: "POST",
+  });
+
+  try {
+    return await prisma.telephonyWorkspace.update({
+      where: { id: workspace.id },
+      data: {
+        status: "READY",
+        twilioAccountSid: parentAccountSid,
+        twilioAuthTokenEncrypted: encryptTelephonySecret(required("TWILIO_AUTH_TOKEN")),
+        twilioApiKeySid: required("TWILIO_API_KEY_SID"),
+        twilioApiKeySecretEncrypted: encryptTelephonySecret(required("TWILIO_API_KEY_SECRET")),
+        twimlAppSid: app.sid,
+        phoneNumberSid: number.sid,
+        phoneNumber: number.phoneNumber,
+        phoneCountry: number.phoneNumber.startsWith("+44") ? "GB" : "US",
+        consentAcceptedAt: new Date(),
+        lastError: null,
+      },
+    });
+  } catch (error) {
+    await accountApi.incomingPhoneNumbers(number.sid).update(originalVoiceConfig).catch(() => undefined);
+    throw error;
+  }
+}
+
 export type NumberQuote = {
   userId: string;
   workspaceId: string;
