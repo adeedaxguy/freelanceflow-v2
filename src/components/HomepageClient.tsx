@@ -510,17 +510,17 @@ export default function HomepageClient() {
           </div>
         </section>
 
-        <section className="marketing-section border-y border-border bg-card text-foreground">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr]">
-              <div>
+        <section className="marketing-section overflow-x-clip border-y border-border bg-card text-foreground">
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid min-w-0 gap-10 xl:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] xl:gap-14">
+              <div className="min-w-0 max-w-xl">
                 <p className="text-xs font-bold uppercase text-muted-foreground">One connected workspace</p>
-                <h2 className="marketing-display mt-5 text-4xl font-bold sm:text-5xl">The lead is only useful if you know what to do next.</h2>
+                <h2 className="marketing-display mt-5 break-words text-4xl font-bold sm:text-5xl">The lead is only useful if you know what to do next.</h2>
                 <p className="mt-5 text-base leading-8 text-muted-foreground">Every feature supports the same motion: find, understand, contact, and follow up.</p>
               </div>
-              <div className="grid divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+              <div className="grid min-w-0 divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
                 {features.map(([Icon, title, description], index) => (
-                  <div key={title} className={`p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-border" : ""}`}>
+                  <div key={title} className={`min-w-0 p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-border" : ""}`}>
                     <Icon className="h-5 w-5 text-accent" />
                     <h3 className="mt-5 text-lg font-bold">{title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
