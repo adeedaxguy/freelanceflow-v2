@@ -332,14 +332,14 @@ export default function SoftphoneClient() {
 
       {workspace?.status === "READY" && workspace.lastError && <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">{workspace.lastError}</div>}
 
-      {incomingCall && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/55 p-4 sm:items-center">
+      {incomingCall && <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/55 p-4 sm:items-center">
         <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 shadow-2xl">
           <PhoneIncoming className="h-7 w-7 text-accent" /><h2 className="mt-4 text-lg font-semibold text-foreground">Incoming call</h2><p className="mt-1 text-sm text-muted-foreground">{incomingCall.parameters.From || "Caller"}</p>
           <div className="mt-6 grid grid-cols-2 gap-3"><button onClick={() => { incomingCall.reject(); setIncomingCall(null); }} className="inline-flex items-center justify-center gap-2 rounded-lg border border-destructive/40 px-4 py-3 text-sm font-semibold text-destructive"><PhoneOff className="h-4 w-4" /> Decline</button><button onClick={() => { incomingCall.accept(); setActiveCall(incomingCall); setIncomingCall(null); }} className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground"><Phone className="h-4 w-4" /> Answer</button></div>
         </div>
       </div>}
 
-      {purchase && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center">
+      {purchase && <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 p-4 sm:items-center">
         <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-2xl">
           <div className="flex items-start justify-between"><div><p className="text-xs font-semibold uppercase text-gold">Recurring number subscription</p><h2 className="mt-1 text-xl font-semibold text-foreground">Confirm {purchase.friendlyName}</h2></div><button onClick={() => { setPurchase(null); setConfirmation(""); setComplianceAccepted(false); }} aria-label="Close" className="rounded-lg p-2 text-muted-foreground hover:bg-muted"><X className="h-4 w-4" /></button></div>
           <div className="mt-5 rounded-lg border border-gold/25 bg-gold/5 p-4"><p className="text-2xl font-bold text-foreground">{money(purchase.monthlyPriceCents, purchase.currency)}<span className="text-sm font-medium text-muted-foreground"> / month</span></p><p className="mt-2 text-xs leading-5 text-muted-foreground">Includes the dedicated number and iCloseLeads calling workspace. Call usage is billed separately.</p></div>
