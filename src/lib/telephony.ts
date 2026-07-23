@@ -52,6 +52,20 @@ function parentClient() {
   });
 }
 
+function subaccountClient(workspace: {
+  twilioAccountSid: string | null;
+  twilioAuthTokenEncrypted: string | null;
+}) {
+  if (!workspace.twilioAccountSid || !workspace.twilioAuthTokenEncrypted) {
+    throw new Error("Calling workspace credentials are incomplete");
+  }
+  return twilio(
+    workspace.twilioAccountSid,
+    decryptTelephonySecret(workspace.twilioAuthTokenEncrypted),
+    { accountSid: workspace.twilioAccountSid },
+  );
+}
+
 export function appUrl(path: string) {
   return new URL(path, process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
 }
@@ -80,7 +94,7 @@ export async function provisionWorkspace(userId: string) {
       });
     }
 
-    const accountApi = client.api.v2010.accounts(accountSid);
+    const accountApi = subaccountClient(workspace).api.v2010.accounts(accountSid);
     let appSid = workspace.twimlAppSid;
     if (!appSid) {
       const appName = `iCloseLeads Voice ${workspace.id}`;
@@ -163,7 +177,7 @@ export async function searchPhoneNumbers(userId: string, country: string, area: 
   if (!workspace?.twilioAccountSid || workspace.status !== "READY") throw new Error("Calling workspace is not ready");
   if (workspace.phoneNumber) throw new Error("This workspace already has a number");
 
-  const client = parentClient();
+  const client = subaccountClient(workspace);
   const local = client.api.v2010.accounts(workspace.twilioAccountSid)
     .availablePhoneNumbers(normalizedCountry).local;
   const trimmedArea = area.trim();
@@ -177,7 +191,7 @@ export async function searchPhoneNumbers(userId: string, country: string, area: 
 
   const [numbers, pricing] = await Promise.all([
     local.list(filters),
-    client.pricing.v1.phoneNumbers.countries(normalizedCountry).fetch(),
+    parentClient().pricing.v1.phoneNumbers.countries(normalizedCountry).fetch(),
   ]);
   const localPrice = pricing.phoneNumberPrices.find(item => item.numberType === "local")?.currentPrice ?? 0;
   const monthlyPriceCents = Math.round(localPrice * 100);
@@ -222,7 +236,7 @@ export async function purchasePhoneNumber(userId: string, token: string) {
     throw new Error("A number purchase is already in progress");
   }
 
-  const accountApi = parentClient().api.v2010.accounts(workspace.twilioAccountSid);
+  const accountApi = subaccountClient(workspace).api.v2010.accounts(workspace.twilioAccountSid);
   try {
     const available = await accountApi.availablePhoneNumbers(quote.country).local.list({
       contains: quote.phoneNumber,
