@@ -174,22 +174,41 @@ export default function SoftphoneClient() {
   }
 
   async function connectDevice() {
-    if (deviceRef.current) return deviceRef.current;
+    if (deviceRef.current) {
+      if (deviceState === "Offline") {
+        setBusy("device");
+        try {
+          await deviceRef.current.register();
+        } finally {
+          setBusy(null);
+        }
+      }
+      return deviceRef.current;
+    }
     setBusy("device");
     try {
       const data = await api({ action: "token" });
       const { Device } = await import("@twilio/voice-sdk");
-      const device = new Device(String(data.token), { closeProtection: true });
+      const device = new Device(String(data.token), {
+        closeProtection: true,
+        tokenRefreshMs: 30_000,
+      });
       deviceRef.current = device;
       device.on("registering", () => setDeviceState("Connecting"));
       device.on("registered", () => setDeviceState("Ready"));
       device.on("unregistered", () => setDeviceState("Offline"));
-      device.on("error", error => toast({ title: "Phone connection error", description: error.message, type: "error" }));
+      device.on("error", error => {
+        setDeviceState("Offline");
+        toast({ title: "Phone connection error", description: error.message, type: "error" });
+      });
       device.on("tokenWillExpire", async () => {
         try {
           const next = await api({ action: "token" });
           device.updateToken(String(next.token));
         } catch (error) {
+          device.destroy();
+          deviceRef.current = null;
+          setDeviceState("Offline");
           toast({ title: "Phone session expired", description: error instanceof Error ? error.message : "Reconnect the phone", type: "error" });
         }
       });
@@ -438,6 +457,10 @@ export default function SoftphoneClient() {
                 </>}
               </div>
               {deviceState === "Offline" && <button onClick={() => void connectDevice()} disabled={busy === "device"} className="mt-3 w-full text-center text-xs font-semibold text-primary-light hover:underline">Enable incoming calls</button>}
+              <div className="mt-4 space-y-1.5 border-t border-border pt-4 text-xs leading-5 text-muted-foreground">
+                <p>Keep this page open with phone status Ready to receive browser calls.</p>
+                <p className="flex items-start gap-2 text-gold"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> iCloseLeads is not an emergency calling service. Use your local emergency service for urgent help.</p>
+              </div>
             </div>
 
             <div className="rounded-lg border border-border bg-card">

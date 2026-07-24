@@ -96,6 +96,12 @@ export function appUrl(path: string) {
   return new URL(path, process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
 }
 
+export function usageAlertSettingKey(idempotencyToken: string) {
+  const token = idempotencyToken.trim();
+  if (!token) throw new Error("Twilio usage alert is missing its idempotency token");
+  return `twilio_usage_alert:${crypto.createHash("sha256").update(token).digest("hex")}`;
+}
+
 function voiceApplicationConfig() {
   return {
     voiceUrl: appUrl("/api/softphone/voice"),
@@ -186,9 +192,9 @@ async function enforceCustomerDialingPermissions(
 
   const permissions = client.voice.v1.dialingPermissions;
   const settings = await permissions.settings().fetch();
-  if (!settings.dialingPermissionsInheritance) return;
-
-  await permissions.settings().update({ dialingPermissionsInheritance: false });
+  if (settings.dialingPermissionsInheritance) {
+    await permissions.settings().update({ dialingPermissionsInheritance: false });
+  }
   const countries = await permissions.countries.list({ limit: 1_000 });
   const updates = countries.flatMap(country => {
     const allowed = COUNTRIES.has(country.isoCode);

@@ -8,6 +8,7 @@ import {
   isTelephonyConfigured,
   normalizeDestination,
   selectAuthorizedCallerId,
+  usageAlertSettingKey,
   verifyNumberQuote,
 } from "@/lib/telephony";
 
@@ -24,7 +25,8 @@ describe("telephony security helpers", () => {
     const encrypted = encryptTelephonySecret("subaccount-secret");
     expect(encrypted).not.toContain("subaccount-secret");
     expect(decryptTelephonySecret(encrypted)).toBe("subaccount-secret");
-    expect(() => decryptTelephonySecret(`${encrypted.slice(0, -1)}x`)).toThrow();
+    const tampered = `${encrypted.slice(0, -1)}${encrypted.endsWith("x") ? "y" : "x"}`;
+    expect(() => decryptTelephonySecret(tampered)).toThrow();
   });
 
   it("signs a short-lived number quote", () => {
@@ -75,6 +77,14 @@ describe("telephony security helpers", () => {
     expect(selectAuthorizedCallerId(undefined, numbers)).toBe(numbers[0]);
     expect(selectAuthorizedCallerId(numbers[1], numbers)).toBe(numbers[1]);
     expect(() => selectAuthorizedCallerId("+12125550123", numbers)).toThrow("active calling number");
+  });
+
+  it("creates a stable non-secret idempotency key for usage alerts", () => {
+    const key = usageAlertSettingKey(" alert-token ");
+    expect(key).toMatch(/^twilio_usage_alert:[a-f0-9]{64}$/);
+    expect(key).toBe(usageAlertSettingKey("alert-token"));
+    expect(key).not.toContain("alert-token");
+    expect(() => usageAlertSettingKey(" ")).toThrow("idempotency token");
   });
 
   it("keeps the beta admin-only until explicitly released", () => {
