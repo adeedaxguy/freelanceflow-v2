@@ -424,6 +424,27 @@ export default function HomepageClient() {
                 <Link href="#how-it-works" className="marketing-secondary-cta">See how it works</Link>
               </div>
 
+              <div className="mt-5 flex flex-col gap-2 text-sm font-semibold text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center">
+                <Link
+                  href="/blog/freelance-client-acquisition-system"
+                  prefetch={false}
+                  onClick={() => marketingEvent("homepage_gsc_insight_guide_click", { guide: "freelance-client-acquisition-system" })}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface/70 px-3 py-2 text-foreground transition-colors hover:border-primary/50 hover:text-primary-light"
+                >
+                  Popular guide: 21-day client acquisition system
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <Link
+                  href={isAuthenticated ? "/dashboard/local-leads" : signupHref("freelance-client-acquisition-system", "homepage-gsc-insight")}
+                  prefetch={false}
+                  onClick={() => marketingEvent("homepage_gsc_insight_signup_click", { state: isAuthenticated ? "authenticated" : "guest" })}
+                  className="inline-flex items-center gap-2 text-primary-light hover:text-foreground"
+                >
+                  Turn that plan into one lead search
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+
               <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
                 {["No credit card", "Real opportunity signals", "You approve every message"].map(item => (
                   <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-accent" />{item}</span>
