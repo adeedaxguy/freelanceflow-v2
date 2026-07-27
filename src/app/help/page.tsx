@@ -141,11 +141,11 @@ const faqs = [
       },
       {
         q: "What payment methods do you accept?",
-        a: "Paid subscriptions will use Lemon Squeezy's hosted checkout. Available payment methods are shown at checkout, and iCloseLeads does not store your card details.",
+        a: "Paid subscriptions use a secure hosted checkout from our payment provider. Available payment methods are shown at checkout, and iCloseLeads does not store your card details.",
       },
       {
         q: "Do you offer refunds?",
-        a: "The paid-plan refund policy will be shown before checkout and published when subscriptions launch. For billing support, contact support@icloseleads.com.",
+        a: "Your first paid subscription includes a 14-day money-back guarantee. See the Refund Policy for eligibility and contact billing@icloseleads.com for help.",
       },
       {
         q: "What happens to my leads if I downgrade to Free?",

@@ -5,12 +5,19 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLemonSqueezyConfig, lemonSqueezyRequest } from "@/lib/lemonsqueezy";
+import { getPaddleConfig, paddleRequest } from "@/lib/paddle";
 
 interface SubscriptionResponse {
   data: {
     attributes: {
       urls?: { customer_portal?: string };
     };
+  };
+}
+
+interface PaddlePortalResponse {
+  data: {
+    urls: { general: { overview: string } };
   };
 }
 
@@ -21,7 +28,7 @@ export async function POST() {
   }
 
   const subscription = await prisma.billingSubscription.findFirst({
-    where: { userId: session.user.id, provider: "LEMONSQUEEZY" },
+    where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
   });
   if (!subscription) {
@@ -29,6 +36,22 @@ export async function POST() {
   }
 
   try {
+    if (subscription.provider === "PADDLE") {
+      if (!subscription.externalCustomerId) {
+        throw new Error("The customer portal is not available yet.");
+      }
+      const config = getPaddleConfig();
+      const response = await paddleRequest<PaddlePortalResponse>(
+        config,
+        `/customers/${subscription.externalCustomerId}/portal-sessions`,
+        {
+          method: "POST",
+          body: JSON.stringify({ subscription_ids: [subscription.externalSubscriptionId] }),
+        },
+      );
+      return NextResponse.json({ url: response.data.urls.general.overview });
+    }
+
     const config = await getLemonSqueezyConfig();
     const response = await lemonSqueezyRequest<SubscriptionResponse>(
       config,
@@ -38,7 +61,7 @@ export async function POST() {
     if (!url) throw new Error("The customer portal is not available yet.");
     return NextResponse.json({ url });
   } catch (error) {
-    console.error("Lemon Squeezy portal error:", error);
+    console.error("Billing portal error:", error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : "Could not open the billing portal.",
     }, { status: 502 });

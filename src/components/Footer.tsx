@@ -50,6 +50,7 @@ const footerGroups = [
       { label: "Help Center", href: "/help" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
+      { label: "Refunds", href: "/refund-policy" },
       { label: "Cookies", href: "/cookie-policy" },
     ],
   },
@@ -186,6 +187,7 @@ export default function Footer() {
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
             <Link href="/terms" className="hover:text-foreground">Terms</Link>
+            <Link href="/refund-policy" className="hover:text-foreground">Refunds</Link>
             <Link href="/cookie-policy" className="hover:text-foreground">Cookies</Link>
           </div>
         </div>

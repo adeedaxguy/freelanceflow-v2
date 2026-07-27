@@ -65,6 +65,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   { url: "/help",        changeFrequency: "weekly",  priority: 0.65 },
   { url: "/privacy",     changeFrequency: "yearly",  priority: 0.5  },
   { url: "/terms",       changeFrequency: "yearly",  priority: 0.5  },
+  { url: "/refund-policy", changeFrequency: "yearly", priority: 0.5 },
   { url: "/cookie-policy", changeFrequency: "yearly", priority: 0.4 },
 ];
 

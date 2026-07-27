@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getLemonSqueezyConfig, isCheckoutConfigured } from "@/lib/lemonsqueezy";
+import { getPaddleConfig, isPaddleCheckoutConfigured } from "@/lib/paddle";
 import UpgradeClient from "./UpgradeClient";
 
 async function getPlatformPricing() {
@@ -44,17 +45,26 @@ export default async function UpgradePage({
     },
   });
 
-  const [pricing, billingConfig, hasBillingSubscription] = await Promise.all([
+  const provider = process.env.BILLING_PROVIDER === "paddle" ? "PADDLE" : "LEMONSQUEEZY";
+  const [pricing, hasBillingSubscription] = await Promise.all([
     getPlatformPricing(),
-    getLemonSqueezyConfig(),
     prisma.billingSubscription.findFirst({
-      where: { userId: session.user.id, provider: "LEMONSQUEEZY" },
+      where: { userId: session.user.id, provider },
       select: { id: true },
     }).then(Boolean).catch(() => false),
   ]);
+  const billingConfig = provider === "PADDLE"
+    ? getPaddleConfig()
+    : await getLemonSqueezyConfig();
   const currentPlan = (user?.plan ?? "free") as string;
-  const billingReady = isCheckoutConfigured(billingConfig) && Boolean(billingConfig.webhookSecret);
-  const canCheckout = billingReady && (!billingConfig.testMode || user?.role === "ADMIN");
+  const billingReady = provider === "PADDLE"
+    ? isPaddleCheckoutConfigured(billingConfig as ReturnType<typeof getPaddleConfig>)
+    : isCheckoutConfigured(billingConfig as Awaited<ReturnType<typeof getLemonSqueezyConfig>>)
+      && Boolean(billingConfig.webhookSecret);
+  const billingTestMode = provider === "PADDLE"
+    ? (billingConfig as ReturnType<typeof getPaddleConfig>).environment === "sandbox"
+    : (billingConfig as Awaited<ReturnType<typeof getLemonSqueezyConfig>>).testMode;
+  const canCheckout = billingReady && (!billingTestMode || user?.role === "ADMIN");
 
   return (
     <UpgradeClient
@@ -62,7 +72,7 @@ export default async function UpgradePage({
       userEmail={user?.email ?? ""}
       pricing={pricing}
       billingReady={billingReady}
-      billingTestMode={billingConfig.testMode}
+      billingTestMode={billingTestMode}
       canCheckout={canCheckout}
       hasBillingSubscription={hasBillingSubscription}
       checkoutReturned={searchParams?.checkout === "success"}

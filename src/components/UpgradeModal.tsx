@@ -96,7 +96,7 @@ export default function UpgradeModal({ isOpen, onClose, reason = "generic", rese
 
           {/* Trust signal */}
           <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-            <Lock className="w-3 h-3" /> Secure checkout · Cancel anytime · 7-day money-back
+            <Lock className="w-3 h-3" /> Secure checkout · Cancel anytime · 14-day money-back
           </p>
         </div>
       </div>

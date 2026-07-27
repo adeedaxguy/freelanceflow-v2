@@ -11,10 +11,21 @@ import {
   type BillingInterval,
   type PaidPlan,
 } from "@/lib/lemonsqueezy";
+import {
+  getPaddleConfig,
+  getPaddlePriceId,
+  paddleRequest,
+} from "@/lib/paddle";
 
 interface CheckoutResponse {
   data: {
     attributes: { url: string };
+  };
+}
+
+interface PaddleCheckoutResponse {
+  data: {
+    checkout?: { url?: string | null } | null;
   };
 }
 
@@ -36,6 +47,51 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const provider = process.env.BILLING_PROVIDER === "paddle" ? "paddle" : "lemonsqueezy";
+    if (provider === "paddle") {
+      const [config, user] = await Promise.all([
+        Promise.resolve(getPaddleConfig()),
+        prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { email: true, role: true },
+        }),
+      ]);
+      const priceId = getPaddlePriceId(config, plan, billing);
+      if (!config.apiKey || !/^pri_[a-z0-9]+$/.test(priceId)) {
+        return NextResponse.json({
+          error: "Paid plans are not open yet. The secure checkout is still being configured.",
+        }, { status: 503 });
+      }
+      if (config.environment === "sandbox" && user?.role !== "ADMIN") {
+        return NextResponse.json({
+          error: "Paid plans are still in private testing. Your free early-access account remains active.",
+        }, { status: 503 });
+      }
+
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL
+        || process.env.NEXTAUTH_URL
+        || req.nextUrl.origin
+      ).replace(/\/$/, "");
+      const checkout = await paddleRequest<PaddleCheckoutResponse>(config, "/transactions", {
+        method: "POST",
+        body: JSON.stringify({
+          items: [{ price_id: priceId, quantity: 1 }],
+          custom_data: {
+            user_id: session.user.id,
+            requested_plan: plan,
+            billing_interval: billing,
+          },
+          checkout: {
+            url: `${appUrl}/dashboard/upgrade?checkout=success`,
+          },
+        }),
+      });
+      const url = checkout.data.checkout?.url;
+      if (!url) throw new Error("Paddle checkout is not available yet.");
+      return NextResponse.json({ url });
+    }
+
     const [config, user] = await Promise.all([
       getLemonSqueezyConfig(),
       prisma.user.findUnique({
@@ -103,7 +159,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url: checkout.data.attributes.url });
   } catch (error) {
-    console.error("Lemon Squeezy checkout error:", error);
+    console.error("Billing checkout error:", error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : "Could not start secure checkout.",
     }, { status: 502 });
