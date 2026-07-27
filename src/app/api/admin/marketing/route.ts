@@ -46,9 +46,14 @@ export async function GET() {
   const now = Date.now();
   const subscribers = users.map(user => ({
     ...user,
+    reachedFreeLimit:
+      user.plan === "free"
+      && user.weeklyLeads >= FREE_BASE_LIMIT
+      && user.bonusLeads === 0,
     atFreeLimit:
       user.plan === "free"
       && user.weeklyLeads >= FREE_BASE_LIMIT
+      && user.bonusLeads === 0
       && now - user.weeklyLeadReset.getTime() < DAY_MS,
   }));
 
@@ -56,6 +61,7 @@ export async function GET() {
     total:              subscribers.length,
     withWhatsapp:       subscribers.filter(u => u.whatsapp).length,
     withConsent:        subscribers.filter(u => u.marketingConsent).length,
+    reachedFreeLimit:   subscribers.filter(u => u.reachedFreeLimit).length,
     atFreeLimit:        subscribers.filter(u => u.atFreeLimit).length,
     claimedShare:       subscribers.filter(u => {
                           const c = parseClaims(u.bonusClaimed);

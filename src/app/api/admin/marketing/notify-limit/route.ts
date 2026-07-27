@@ -8,7 +8,6 @@ import { sendAccountNotification } from "@/lib/admin-notifications";
 import { prisma } from "@/lib/prisma";
 
 const FREE_BASE_LIMIT = 100;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -39,14 +38,11 @@ export async function POST(req: NextRequest) {
     take: 200,
   });
 
-  const active = candidates.filter(
-    user => Date.now() - user.weeklyLeadReset.getTime() < DAY_MS,
-  );
   const sent: string[] = [];
   const skipped: string[] = [];
   const failed: { email: string; error: string }[] = [];
 
-  for (const user of active) {
+  for (const user of candidates) {
     const noticeKey = `free_limit_notice:${user.id}:${user.weeklyLeadReset.getTime()}`;
     const alreadySent = await prisma.platformSetting.findUnique({
       where: { key: noticeKey },
@@ -61,9 +57,9 @@ export async function POST(req: NextRequest) {
       const result = await sendAccountNotification({
         recipient: user.email,
         subject: "Your 300 extra iCloseLeads leads are ready to unlock",
-        title: `You reached today’s 100-lead allowance${user.name ? `, ${user.name.split(" ")[0]}` : ""}`,
+        title: `You reached the 100-lead free allowance${user.name ? `, ${user.name.split(" ")[0]}` : ""}`,
         lines: [
-          "Your free account is working as expected: you used today’s 100 included leads.",
+          "During a recent iCloseLeads search, you used the 100 leads included in your free daily allowance. That allowance refreshes automatically every 24 hours.",
           "You can unlock 300 additional leads across Local Business Leads, Remote Jobs, and Live Jobs by completing the verified share flow.",
           '<a href="https://icloseleads.com/dashboard/local-leads" style="display:inline-block;margin-top:6px;padding:12px 18px;border-radius:9px;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;">Unlock 300 leads</a>',
           'Optional product emails are controlled separately in <a href="https://icloseleads.com/dashboard/settings" style="color:#9f67ff;">Settings</a>.',
@@ -85,7 +81,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     success: failed.length === 0,
-    eligible: active.length,
+    eligible: candidates.length,
     sent: sent.length,
     skipped: skipped.length,
     failed,

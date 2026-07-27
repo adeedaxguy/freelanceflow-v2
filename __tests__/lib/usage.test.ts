@@ -60,4 +60,26 @@ describe("getUsageStats", () => {
       shareBonusClaimed: false,
     });
   });
+
+  it("shows expired usage as refreshed with a future reset time", async () => {
+    const expiredReset = new Date(Date.now() - 25 * 3_600_000);
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      email: "free@example.com",
+      plan: "free",
+      weeklyLeads: 100,
+      weeklyLeadReset: expiredReset,
+      bonusLeads: 0,
+      bonusClaimed: "[]",
+    });
+
+    const before = Date.now();
+    const usage = await getUsageStats("user-free-1");
+
+    expect(usage).toMatchObject({
+      limit: 100,
+      used: 0,
+      remaining: 100,
+    });
+    expect(new Date(usage!.nextReset).getTime()).toBeGreaterThan(before);
+  });
 });

@@ -19,6 +19,7 @@ interface Subscriber {
   plan: string;
   weeklyLeads: number;
   weeklyLeadReset: string;
+  reachedFreeLimit: boolean;
   atFreeLimit: boolean;
 }
 
@@ -26,6 +27,7 @@ interface Stats {
   total: number;
   withWhatsapp: number;
   withConsent: number;
+  reachedFreeLimit: number;
   atFreeLimit: number;
   claimedShare: number;
   claimedSubscribe: number;
@@ -55,7 +57,7 @@ export default function AdminMarketingPage() {
   useEffect(() => { void load(); }, []);
 
   async function notifyLimitUsers() {
-    if (!window.confirm("Send one account notice to eligible free users who are currently at 100 leads and have not claimed the bonus?")) return;
+    if (!window.confirm("Send one account notice to free users who reached 100 leads and have not claimed the bonus?")) return;
     setNotifying(true);
     setNoticeResult("");
     try {
@@ -82,14 +84,14 @@ export default function AdminMarketingPage() {
 
   function exportCSV() {
     const rows = [
-      ["Name", "Email", "Marketing Consent", "Plan", "Used Today", "At Free Limit", "Bonus Leads", "Joined"].join(","),
+      ["Name", "Email", "Marketing Consent", "Plan", "Last Recorded Usage", "Reached Free Limit", "Bonus Leads", "Joined"].join(","),
       ...filtered.map(s => [
         s.name ?? "",
         s.email,
         s.marketingConsent ? "yes" : "no",
         s.plan,
         s.weeklyLeads,
-        s.atFreeLimit ? "yes" : "no",
+        s.reachedFreeLimit ? "yes" : "no",
         s.bonusLeads,
         new Date(s.createdAt).toLocaleDateString(),
       ].map(v => `"${v}"`).join(",")),
@@ -105,7 +107,7 @@ export default function AdminMarketingPage() {
     const matchesAudience =
       audience === "all"
       || (audience === "consented" && subscriber.marketingConsent)
-      || (audience === "at-limit" && subscriber.atFreeLimit)
+      || (audience === "at-limit" && subscriber.reachedFreeLimit)
       || (audience === "bonus" && subscriber.bonusLeads > 0);
     const query = search.trim().toLowerCase();
     const matchesSearch = !query
@@ -125,11 +127,11 @@ export default function AdminMarketingPage() {
         <div className="flex gap-2">
           <button
             onClick={() => void notifyLimitUsers()}
-            disabled={notifying || !stats?.atFreeLimit}
+            disabled={notifying || !stats?.reachedFreeLimit}
             className="flex items-center gap-2 rounded-xl border border-gold/30 bg-gold/10 px-4 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold/15 disabled:opacity-50"
           >
             <Bell className="h-4 w-4" />
-            {notifying ? "Sending…" : "Notify at-limit users"}
+            {notifying ? "Sending…" : "Notify users who reached 100"}
           </button>
           <button onClick={() => void load()} disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-colors">
@@ -152,7 +154,7 @@ export default function AdminMarketingPage() {
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           {[
             { icon: <Users className="w-4 h-4 text-primary-light" />,     label: "Total",           val: stats.total },
-            { icon: <Gauge className="w-4 h-4 text-gold" />,              label: "At free limit",   val: stats.atFreeLimit },
+            { icon: <Gauge className="w-4 h-4 text-gold" />,              label: "Reached 100",     val: stats.reachedFreeLimit },
             { icon: <MessageCircle className="w-4 h-4 text-accent" />,    label: "WhatsApp",        val: stats.withWhatsapp },
             { icon: <Bell className="w-4 h-4 text-primary-light" />,      label: "Email Consent",   val: stats.withConsent },
             { icon: <Share2 className="w-4 h-4 text-gold" />,             label: "Shared",          val: stats.claimedShare },
@@ -171,7 +173,7 @@ export default function AdminMarketingPage() {
       <div className="mb-4 flex flex-wrap gap-2">
         {([
           ["consented", "Zoho opt-ins"],
-          ["at-limit", "Free users at limit"],
+          ["at-limit", "Free users who reached 100"],
           ["bonus", "Bonus active"],
           ["all", "All relevant users"],
         ] as const).map(([value, label]) => (
@@ -191,7 +193,7 @@ export default function AdminMarketingPage() {
       </div>
 
       <div className="mb-4 rounded-xl border border-border bg-surface px-4 py-3 text-xs leading-5 text-muted-foreground">
-        <strong className="text-foreground">Zoho Campaigns:</strong> export only the “Zoho opt-ins” audience for recurring promotional email. “Free users at limit” is for a one-time account notice about the verified bonus flow, not automatic marketing enrollment.
+        <strong className="text-foreground">Zoho Campaigns:</strong> export only the “Zoho opt-ins” audience for recurring promotional email. “Free users who reached 100” is for a one-time account notice about the verified bonus flow, not automatic marketing enrollment.
       </div>
 
       {/* Search */}
@@ -208,7 +210,7 @@ export default function AdminMarketingPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-muted/20">
-                {["Name", "Email", "Consent", "Plan", "Used today", "Bonus", "Claimed Via", "Joined"].map(h => (
+                {["Name", "Email", "Consent", "Plan", "Last usage", "Bonus", "Claimed Via", "Joined"].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -237,8 +239,8 @@ export default function AdminMarketingPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={s.atFreeLimit ? "font-semibold text-gold" : "text-muted-foreground"}>
-                        {s.weeklyLeads}{s.atFreeLimit ? " · limit" : ""}
+                      <span className={s.reachedFreeLimit ? "font-semibold text-gold" : "text-muted-foreground"}>
+                        {s.weeklyLeads}{s.reachedFreeLimit ? " · reached 100" : ""}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-accent font-semibold">+{s.bonusLeads}</td>

@@ -60,12 +60,13 @@ export async function checkAndIncrementLeads(
 
   // Reset counter if 24+ hours have passed
   const now = new Date();
-  const resetDate = new Date(user.weeklyLeadReset);
+  let resetDate = new Date(user.weeklyLeadReset);
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
 
   let currentCount = user.weeklyLeads;
   if (hoursSinceReset >= 24) {
     currentCount = 0;
+    resetDate = now;
     await prisma.user.update({
       where: { id: userId },
       data: { weeklyLeads: 0, weeklyLeadReset: now },
@@ -113,7 +114,9 @@ export async function getUsageStats(userId: string) {
   const resetDate = new Date(user.weeklyLeadReset);
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
   const dailyLeads = hoursSinceReset >= 24 ? 0 : user.weeklyLeads;
-  const nextReset = new Date(resetDate.getTime() + 24 * 3_600_000);
+  const nextReset = new Date(
+    (hoursSinceReset >= 24 ? now : resetDate).getTime() + 24 * 3_600_000,
+  );
 
   const isUnlimited = limit >= 999999;
   return {
