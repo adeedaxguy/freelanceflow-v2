@@ -33,7 +33,7 @@ export async function GET() {
     withConsent:        users.filter(u => u.marketingConsent).length,
     claimedShare:       users.filter(u => {
                           const c = JSON.parse(u.bonusClaimed ?? "[]") as string[];
-                          return c.includes("share");
+                          return c.some(entry => entry === "share" || entry.startsWith("share:"));
                         }).length,
     claimedSubscribe:   users.filter(u => {
                           const c = JSON.parse(u.bonusClaimed ?? "[]") as string[];

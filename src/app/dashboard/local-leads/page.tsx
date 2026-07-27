@@ -48,6 +48,8 @@ type UsageStats = {
   nextReset: string;
   percentage: number;
   unlimited?: boolean;
+  bonusLeads?: number;
+  shareBonusClaimed?: boolean;
 };
 
 const PHONE_TYPE_FILTERS: Array<{ value: PhoneTypeFilter; label: string; title: string }> = [
@@ -983,6 +985,7 @@ export default function LocalLeadsPage() {
   const [dailyLimit,     setDailyLimit]     = useState(FREE_PLAN_LIMIT);
   const [userPlan,       setUserPlan]       = useState<string>("free");
   const [usageResetAt,   setUsageResetAt]   = useState<string | null>(null);
+  const [shareBonusClaimed, setShareBonusClaimed] = useState(false);
   const [showBonus,      setShowBonus]      = useState(false);
   const [limitNotice,    setLimitNotice]    = useState("");
   const [yelpKey,        setYelpKey]        = useState("");
@@ -1002,6 +1005,7 @@ export default function LocalLeadsPage() {
     setDailyLimit(Number.isFinite(usage.limit) ? usage.limit : FREE_PLAN_LIMIT);
     setLeadsViewed(Number.isFinite(usage.used) ? usage.used : 0);
     setUsageResetAt(typeof usage.nextReset === "string" ? usage.nextReset : null);
+    setShareBonusClaimed(Boolean(usage.shareBonusClaimed));
   }, []);
 
   // Load persisted state and latest server-side usage
@@ -1307,7 +1311,7 @@ export default function LocalLeadsPage() {
             className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-light transition-all hover:bg-primary/15"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            Unlock +300
+            {shareBonusClaimed ? "+300 bonus active" : "Unlock +300"}
           </button>
         </div>
       )}
@@ -1316,10 +1320,14 @@ export default function LocalLeadsPage() {
       {isOverLimit && (
         <div className="bg-surface border border-border rounded-2xl p-6 text-center">
           <p className="text-foreground font-semibold mb-2">You've used your {dailyLimit} free local leads today</p>
-          <p className="text-muted-foreground text-sm mb-4">Unlock +300 more leads instantly — free.</p>
+          <p className="text-muted-foreground text-sm mb-4">
+            {shareBonusClaimed
+              ? "Your share bonus is active. Request a larger allowance and we will review it."
+              : "Unlock +300 more leads instantly — free."}
+          </p>
           <button onClick={() => setShowBonus(true)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
-            🎁 Unlock +300 Free Leads
+            {shareBonusClaimed ? "Request More Leads" : "Unlock +300 Free Leads"}
           </button>
         </div>
       )}

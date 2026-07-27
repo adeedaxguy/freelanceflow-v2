@@ -12,6 +12,7 @@ export default async function AdminUsersPage() {
     select: {
       id: true, name: true, email: true, plan: true, role: true,
       suspended: true, createdAt: true, weeklyLeads: true,
+      bonusLeads: true,
       _count: { select: { leads: true, sentEmails: true } },
     },
   });

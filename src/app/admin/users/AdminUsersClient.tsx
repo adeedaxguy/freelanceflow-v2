@@ -4,7 +4,7 @@ import { Search, Shield, UserX, UserCheck, Crown } from "lucide-react";
 
 interface User {
   id: string; name: string | null; email: string; plan: string;
-  role: string; suspended: boolean; createdAt: Date; weeklyLeads: number;
+  role: string; suspended: boolean; createdAt: Date; weeklyLeads: number; bonusLeads: number;
   _count: { leads: number; sentEmails: number };
 }
 
@@ -51,7 +51,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           <Shield className="w-6 h-6 text-primary-light" /> User Management
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">{localUsers.length} total users</p>
-        <p className="text-muted-foreground mt-1 text-xs">"Used Today" tracks lead allowance consumed across remote, live, and local lead tools. "Saved" counts leads stored in CRM.</p>
+        <p className="text-muted-foreground mt-1 text-xs">"Used / Limit" tracks the shared daily allowance across remote, live, and local lead tools. "Saved" counts leads stored in CRM.</p>
       </div>
 
       {/* Filters */}
@@ -72,10 +72,10 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
       {/* Table */}
       <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px] text-sm">
+          <table className="w-full min-w-[850px] text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-surface/50">
-                {["User","Plan","Used Today","Saved","Emails","Status","Actions"].map(h => (
+                {["User","Plan","Used / Limit","Bonus","Saved","Emails","Status","Actions"].map(h => (
                   <th key={h} className="text-left text-xs font-medium text-muted-foreground px-5 py-3 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -106,7 +106,19 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                       <option value="agency">Agency</option>
                     </select>
                   </td>
-                  <td className="px-5 py-3 text-foreground font-medium">{u.weeklyLeads}</td>
+                  <td className="px-5 py-3">
+                    <p className="font-medium text-foreground">
+                      {u.weeklyLeads} / {u.plan === "free" ? 100 + u.bonusLeads : "∞"}
+                    </p>
+                    {u.plan === "free" && u.weeklyLeads >= 100 + u.bonusLeads && (
+                      <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">Limit reached</p>
+                    )}
+                  </td>
+                  <td className="px-5 py-3">
+                    {u.bonusLeads > 0
+                      ? <span className="rounded-full border border-accent/20 bg-accent/10 px-2 py-1 text-xs font-semibold text-accent">+{u.bonusLeads}</span>
+                      : <span className="text-xs text-muted-foreground">None</span>}
+                  </td>
                   <td className="px-5 py-3 text-foreground font-medium">{u._count.leads}</td>
                   <td className="px-5 py-3 text-foreground font-medium">{u._count.sentEmails}</td>
                   <td className="px-5 py-3">
@@ -131,7 +143,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground text-sm">No users found</td></tr>
+                <tr><td colSpan={8} className="px-5 py-12 text-center text-muted-foreground text-sm">No users found</td></tr>
               )}
             </tbody>
           </table>

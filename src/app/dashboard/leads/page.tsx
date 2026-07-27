@@ -38,7 +38,16 @@ const SEARCH_COOLDOWN_SECS = 30;
 const FORCE_COOLDOWN_SECS  = 180;
 const PAGE_SIZE = 20;
 
-interface UsageStats { plan: string; limit: number; used: number; remaining: number; nextReset: string; percentage: number; }
+interface UsageStats {
+  plan: string;
+  limit: number;
+  used: number;
+  remaining: number;
+  nextReset: string;
+  percentage: number;
+  bonusLeads?: number;
+  shareBonusClaimed?: boolean;
+}
 interface SourceDiag { source: string; ok: boolean; fetched: number; kept: number; errorMessage?: string; }
 interface SearchDiagnostics {
   sources: SourceDiag[];
@@ -641,7 +650,7 @@ export default function LeadsPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
               >
                 <Sparkles className="w-4 h-4" />
-                Unlock +300 free leads
+                {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
               </button>
             </div>
           </div>

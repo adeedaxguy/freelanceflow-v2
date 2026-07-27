@@ -28,6 +28,11 @@ type BonusClaimResult = {
   referralUrl?: string;
 };
 
+type BonusStatus = {
+  canClaimShare?: boolean;
+  bonusLeads?: number;
+};
+
 interface BonusLeadsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -66,21 +71,28 @@ function toUrl(value: string): URL | null {
   }
 }
 
-function isLinkedInProfile(value: string) {
+function isLinkedInPost(value: string) {
   const url = toUrl(value);
   if (!url) return false;
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
-  return host === "linkedin.com" && (/^\/in\/[^/]+\/?$/i.test(url.pathname) || /^\/posts\//i.test(url.pathname) || /^\/feed\/update\//i.test(url.pathname));
+  return host === "linkedin.com" && (
+    /^\/posts\/[^/]+/i.test(url.pathname) ||
+    /^\/feed\/update\/urn:li:(activity|share):\d+\/?$/i.test(url.pathname)
+  );
 }
 
-function isFacebookProfile(value: string) {
+function isFacebookPost(value: string) {
   const url = toUrl(value);
   if (!url) return false;
   const host = url.hostname.replace(/^www\.|^m\./, "").toLowerCase();
   if (host !== "facebook.com" && host !== "fb.com") return false;
   const path = url.pathname.replace(/\/+$/, "");
-  if (!path || path === "/sharer" || path === "/dialog/share") return false;
-  return /^\/[A-Za-z0-9.]+/.test(path) || /^\/profile\.php$/i.test(path) || /^\/share\//i.test(path) || /^\/permalink\.php$/i.test(path);
+  return (
+    /^\/share\/[A-Za-z0-9_-]+/i.test(path) ||
+    /^\/[^/]+\/posts\/[^/]+/i.test(path) ||
+    /^\/groups\/[^/]+\/posts\/[^/]+/i.test(path) ||
+    (/^\/permalink\.php$/i.test(path) && url.searchParams.has("story_fbid"))
+  );
 }
 
 function normalizedHref(value: string) {
@@ -109,10 +121,12 @@ export default function BonusLeadsModal({
   const [requestMoreError, setRequestMoreError] = useState("");
   const [copiedPost, setCopiedPost] = useState(false);
   const [copyFallback, setCopyFallback] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(false);
   const shareTextRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+    let cancelled = false;
     setOpenedLinkedIn(false);
     setOpenedFacebook(false);
     setLinkedInUrl("");
@@ -126,7 +140,20 @@ export default function BonusLeadsModal({
     setRequestMoreError("");
     setCopiedPost(false);
     setCopyFallback(false);
-  }, [isOpen, source]);
+    setCheckingStatus(true);
+    fetch(`/api/leads/claim-bonus?source=${encodeURIComponent(source)}`)
+      .then(response => response.ok ? response.json() as Promise<BonusStatus> : null)
+      .then(status => {
+        if (!cancelled && status?.canClaimShare === false) {
+          setSuccess(`Your +${status.bonusLeads ?? copy.bonus} share bonus is already active across all lead tools.`);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setCheckingStatus(false);
+      });
+    return () => { cancelled = true; };
+  }, [copy.bonus, isOpen, source]);
 
   const shareUrl = useMemo(() => {
     const url = new URL(APP_URL);
@@ -151,9 +178,9 @@ export default function BonusLeadsModal({
   }, [shareUrl, source]);
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(sharePostText)}`;
-  const linkedInValid = isLinkedInProfile(linkedInUrl);
-  const facebookValid = isFacebookProfile(facebookUrl);
-  const canClaim = openedLinkedIn && openedFacebook && linkedInValid && facebookValid && !submitting && !success;
+  const linkedInValid = isLinkedInPost(linkedInUrl);
+  const facebookValid = isFacebookPost(facebookUrl);
+  const canClaim = openedLinkedIn && openedFacebook && linkedInValid && facebookValid && !submitting && !checkingStatus && !success;
 
   const copyShareText = async () => {
     try {
@@ -192,8 +219,8 @@ export default function BonusLeadsModal({
           action: "share",
           source,
           openedPlatforms: ["linkedin", "facebook"],
-          linkedinProfileUrl: normalizedHref(linkedInUrl),
-          facebookProfileUrl: normalizedHref(facebookUrl),
+          linkedinPostUrl: normalizedHref(linkedInUrl),
+          facebookPostUrl: normalizedHref(facebookUrl),
         }),
       });
       const data = (await response.json()) as BonusClaimResult & { error?: string };
@@ -292,13 +319,13 @@ export default function BonusLeadsModal({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-background/60 p-4 space-y-3">
+          {!success && <div className="rounded-2xl border border-border bg-background/60 p-4 space-y-3">
             <div className="flex items-start gap-2">
               <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent" />
               <div>
                 <p className="text-sm font-semibold text-foreground">Instant validation</p>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Open both share screens, then add your LinkedIn and Facebook profile/post links. We verify the platform links and allow one bonus claim per lead tool.
+                  Publish on both platforms, then paste the URLs of the two posts. Each proof pair can unlock one account-wide bonus.
                 </p>
               </div>
             </div>
@@ -355,14 +382,14 @@ export default function BonusLeadsModal({
 
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-muted-foreground">
-                LinkedIn profile or post URL
+                Published LinkedIn post URL
               </label>
               <div className="relative">
                 <LinkIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={linkedInUrl}
                   onChange={(event) => setLinkedInUrl(event.target.value)}
-                  placeholder="linkedin.com/in/your-profile"
+                  placeholder="linkedin.com/posts/your-published-post"
                   className={`w-full rounded-xl border bg-background py-2.5 pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 ${
                     linkedInUrl && !linkedInValid ? "border-destructive/50" : "border-border focus:border-primary/60"
                   }`}
@@ -373,14 +400,14 @@ export default function BonusLeadsModal({
 
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-muted-foreground">
-                Facebook profile or post URL
+                Published Facebook post URL
               </label>
               <div className="relative">
                 <LinkIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={facebookUrl}
                   onChange={(event) => setFacebookUrl(event.target.value)}
-                  placeholder="facebook.com/your.profile"
+                  placeholder="facebook.com/your-page/posts/..."
                   className={`w-full rounded-xl border bg-background py-2.5 pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 ${
                     facebookUrl && !facebookValid ? "border-destructive/50" : "border-border focus:border-primary/60"
                   }`}
@@ -388,7 +415,7 @@ export default function BonusLeadsModal({
                 {facebookValid && <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" />}
               </div>
             </div>
-          </div>
+          </div>}
 
           {error && (
             <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
@@ -442,15 +469,15 @@ export default function BonusLeadsModal({
           )}
 
           <div className="space-y-2.5">
-            <button
+            {!success && <button
               type="button"
               onClick={claimBonus}
               disabled={!canClaim}
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-hero py-3.5 text-sm font-bold text-white shadow-glow-primary transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
-              {success ? "Bonus unlocked" : submitting ? "Validating..." : "Validate & Unlock Leads"}
-            </button>
+              {checkingStatus ? "Checking status..." : submitting ? "Validating..." : "Validate & Unlock Leads"}
+            </button>}
             <button
               type="button"
               onClick={onClose}

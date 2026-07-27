@@ -16,6 +16,17 @@ export const PLAN_LIMITS = {
 
 export type Plan = keyof typeof PLAN_LIMITS;
 
+function hasShareBonusClaim(value: string | null | undefined): boolean {
+  try {
+    const claimed = JSON.parse(value ?? "[]") as unknown;
+    return Array.isArray(claimed) && claimed.some(
+      entry => typeof entry === "string" && (entry === "share" || entry.startsWith("share:"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 function getDailyLeadLimit(plan: Plan, bonusLeads = 0): number {
   const baseLimit = PLAN_LIMITS[plan].leadsPerDay;
   if (baseLimit >= 999999) return baseLimit;
@@ -28,7 +39,14 @@ export async function checkAndIncrementLeads(
 ): Promise<{ allowed: boolean; remaining: number; plan: string; resetAt?: string }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
+    select: {
+      email: true,
+      plan: true,
+      weeklyLeads: true,
+      weeklyLeadReset: true,
+      bonusLeads: true,
+      bonusClaimed: true,
+    },
   });
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
 
@@ -70,7 +88,7 @@ export async function checkAndIncrementLeads(
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true, bonusClaimed: true },
   });
   if (!user) return null;
 
@@ -84,6 +102,8 @@ export async function getUsageStats(userId: string) {
       nextReset: new Date(Date.now() + 24 * 3_600_000).toISOString(),
       percentage: 0,
       unlimited: true,
+      bonusLeads: user.bonusLeads ?? 0,
+      shareBonusClaimed: hasShareBonusClaim(user.bonusClaimed),
     };
   }
 
@@ -104,5 +124,7 @@ export async function getUsageStats(userId: string) {
     nextReset: nextReset.toISOString(),
     percentage: isUnlimited ? 0 : Math.round((dailyLeads / limit) * 100),
     unlimited: isUnlimited,
+    bonusLeads: user.bonusLeads ?? 0,
+    shareBonusClaimed: hasShareBonusClaim(user.bonusClaimed),
   };
 }
