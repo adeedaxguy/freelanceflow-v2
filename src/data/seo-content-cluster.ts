@@ -445,8 +445,8 @@ const topics: SeoTopic[] = [
     offer: "a 30-day client acquisition operating system",
     pain: "Many freelancers prospect only when work gets slow, which creates feast-or-famine stress.",
     promise: "This guide shows how to make client acquisition a repeatable weekly system instead of a panic task.",
-    internalPath: "/features/crm-pipeline",
-    secondary: ["freelance pipeline", "client acquisition for freelancers", "find freelance clients", "freelance sales system"],
+    internalPath: "/auth?mode=signup&intent=freelance-client-acquisition-system&source=gsc-top-click-article",
+    secondary: ["freelance pipeline", "client acquisition for freelancers", "find freelance clients", "freelance sales system", "freelance client acquisition system pdf", "freelance client acquisition system free", "client finder for freelancers", "AI CRM systems for freelancers", "email leads for freelancers", "B2B lead generation Upwork"],
     examples: ["remote job leads", "local businesses", "live project posts"],
     signals: ["weekly lead quota", "saved leads", "proposal drafts", "outreach count", "follow-up status", "source performance"],
     workflow: [
