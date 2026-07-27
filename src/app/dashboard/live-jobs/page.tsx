@@ -5,7 +5,7 @@ import {
   Radio, RefreshCw, Clock, Globe, Mail, ExternalLink, Bookmark,
   CheckCircle, Sparkles, Star, Filter, ChevronDown, X,
   ChevronLeft, ChevronRight, Zap, AlertCircle, Copy, Target,
-  TrendingUp, Lock, Heart, BarChart2, Rss, ArrowRight,
+  TrendingUp, Lock, Heart, Rss,
 } from "lucide-react";
 import Link from "next/link";
 import type { AggregatedLead } from "@/lib/leads-aggregator";
@@ -422,9 +422,6 @@ export default function LiveJobsPage() {
   const newCount = scored.filter(l=>!seenIds.has(l.id)).length;
   const bestMatchCount = scored.filter(l=>l.bmScore>=80).length;
   const emailCount = leads.filter(l=>!!l.email).length;
-  const usagePlanKey = (usage?.plan ?? "").toLowerCase();
-  const hasPaidAccess = usagePlanKey === "pro" || usagePlanKey === "agency";
-  const accessLabel = usagePlanKey === "agency" ? "Agency" : usagePlanKey === "pro" ? "Pro" : "Early Access";
 
   const handleSave = async (lead: AggregatedLead & { bmScore: number }) => {
     if (savedIds.has(lead.id)) return;
@@ -459,7 +456,7 @@ export default function LiveJobsPage() {
         onYes={confirmPromptApplied}
         onNo={closePrompt}
       />
-      <div className="p-4 sm:p-6 lg:p-8">
+      <div className="dashboard-page">
 
         {/* Header */}
         <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
@@ -489,7 +486,7 @@ export default function LiveJobsPage() {
               <Target className="w-3.5 h-3.5"/> <span className="hidden sm:inline">Best Match</span>
             </button>
             <select value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)}
-              className="px-3 py-2 rounded-lg border border-border bg-surface text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
+              className="dashboard-field px-3 py-2 rounded-lg border text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
               <option value="newest">Newest First</option>
               <option value="bestMatch">Best Match</option>
               <option value="confidence">Confidence</option>
@@ -506,21 +503,17 @@ export default function LiveJobsPage() {
           </div>
         </div>
 
-        {/* Two-column layout on large screens */}
-        <div className="flex flex-col xl:flex-row gap-6 items-start">
-
-          {/* ── Left: main content ── */}
-          <div className="flex-1 min-w-0 space-y-4">
+        <div className="space-y-4">
 
             {/* Niche + Time + Scan */}
-            <div className="bg-surface border border-border rounded-xl p-4 space-y-3">
+            <div className="dashboard-control-panel rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <span className="text-sm font-medium text-foreground flex items-center gap-2">
                   <Globe className="w-4 h-4 text-primary-light"/> Niches
                 </span>
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   <select value={maxHours} onChange={e=>{setMaxHours(Number(e.target.value));}}
-                    className="px-2.5 py-1.5 rounded-lg border border-border bg-background text-xs sm:text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
+                    className="dashboard-field px-2.5 py-1.5 rounded-lg border text-xs sm:text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
                     <option value={24}>Last 24h</option>
                     <option value={48}>Last 48h</option>
                     <option value={72}>Last 72h</option>
@@ -580,7 +573,7 @@ export default function LiveJobsPage() {
 
             {/* Extra filters panel */}
             {showFilter && (
-              <div className="bg-surface border border-border rounded-xl p-4 flex items-center gap-6 flex-wrap">
+              <div className="dashboard-control-panel rounded-xl p-4 flex items-center gap-6 flex-wrap">
                 <label className="flex items-center gap-2.5 cursor-pointer">
                   <div className={`w-9 h-5 rounded-full transition-colors relative ${hasEmail?"bg-accent":"bg-muted"}`}
                     onClick={()=>{setHasEmail(v=>!v);setPage(1);}}>
@@ -604,6 +597,16 @@ export default function LiveJobsPage() {
             {leads.length > 0 && !loading && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
                 <span className="font-semibold text-foreground text-sm">{filtered.length} results</span>
+                {bestMatchCount > 0 && (
+                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-medium text-primary-light">
+                    {bestMatchCount} best matches
+                  </span>
+                )}
+                {emailCount > 0 && (
+                  <span className="rounded-full border border-accent/20 bg-accent/10 px-2 py-0.5 font-medium text-accent">
+                    {emailCount} with email
+                  </span>
+                )}
                 {sourceFilter !== "all" && (
                   <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
                     {ALL_SOURCES.find(s => s.id === sourceFilter)?.label}
@@ -690,7 +693,7 @@ export default function LiveJobsPage() {
                   const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
                     <div key={lead.id}
-                      className={`group bg-gradient-card border rounded-2xl p-4 sm:p-5 transition-all hover:shadow-card-hover ${lead.bmScore>=80?"border-primary/40 hover:border-primary/60 shadow-sm shadow-primary/10":isFav?"border-yellow-500/30 hover:border-yellow-500/50":"border-border hover:border-primary/30"}`}>
+                      className={`dashboard-result-card group border rounded-xl p-4 sm:p-5 transition-all ${lead.bmScore>=80?"border-primary/40 hover:border-primary/60":isFav?"border-yellow-500/30 hover:border-yellow-500/50":"hover:border-primary/30"}`}>
                       <div className="flex items-start justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
@@ -832,99 +835,6 @@ export default function LiveJobsPage() {
                   className="mt-3 text-xs text-primary-light hover:underline">Clear filters</button>
               </div>
             )}
-          </div>
-
-          {/* ── Right: Stats sidebar (hidden until wide layouts have room) ── */}
-          <div className="hidden xl:flex flex-col gap-4 w-72 flex-shrink-0">
-
-            {/* Live stats */}
-            <div className="bg-surface border border-border rounded-2xl p-4 space-y-3 sticky top-6">
-              <h3 className="text-foreground font-semibold text-sm flex items-center gap-2">
-                <BarChart2 className="w-4 h-4 text-primary-light"/> Live Stats
-              </h3>
-              <div className="space-y-2.5">
-                {[
-                  { label: "Total fetched",  value: leads.length,       color: "text-foreground" },
-                  { label: "After filters",  value: filtered.length,    color: "text-foreground" },
-                  { label: "New this visit", value: newCount,            color: newCount > 0 ? "text-accent font-bold" : "text-muted-foreground" },
-                  { label: "Best matches",   value: bestMatchCount,      color: bestMatchCount > 0 ? "text-primary-light font-bold" : "text-muted-foreground" },
-                  { label: "Have email",     value: emailCount,          color: emailCount > 0 ? "text-green-400 font-semibold" : "text-muted-foreground" },
-                  { label: "Favourited",     value: favIds.size,         color: favIds.size > 0 ? "text-yellow-400 font-semibold" : "text-muted-foreground" },
-                ].map(({ label, value, color }) => (
-                  <div key={label} className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground text-xs">{label}</span>
-                    <span className={`text-sm font-semibold tabular-nums ${color}`}>{value}</span>
-                  </div>
-                ))}
-              </div>
-
-              {leads.length > 0 && (
-                <div className="pt-2 border-t border-border/50">
-                  <p className="text-xs text-muted-foreground mb-2">Sources found</p>
-                  <div className="space-y-1">
-                    {Object.entries(sourcesInResults)
-                      .sort((a, b) => b[1] - a[1])
-                      .slice(0, 6)
-                      .map(([src, count]) => {
-                        const label = ALL_SOURCES.find(s => s.id === src)?.label ?? src;
-                        const pct = Math.round((count / leads.length) * 100);
-                        return (
-                          <div key={src}>
-                            <div className="flex items-center justify-between text-xs mb-0.5">
-                              <span className="text-muted-foreground truncate">{label}</span>
-                              <span className="text-foreground font-medium ml-2 flex-shrink-0">{count}</span>
-                            </div>
-                            <div className="h-1 bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-primary/40 rounded-full" style={{ width: `${pct}%` }}/>
-                            </div>
-                          </div>
-                        );
-                      })
-                    }
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Quick tips */}
-            <div className="bg-gradient-to-b from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 space-y-2.5">
-              <h3 className="text-foreground font-semibold text-sm flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary-light"/> Pro Tips
-              </h3>
-              {[
-                "Set Best Match preferences to auto-score leads for your niche.",
-                "Filter by 'Has Email' to find leads you can cold-pitch right now.",
-                "Favourite your top picks — they float to the top on your next visit.",
-                "Use AI Proposal to generate a tailored draft in seconds.",
-              ].map(tip => (
-                <p key={tip} className="text-xs text-muted-foreground leading-relaxed flex gap-2">
-                  <span className="text-accent flex-shrink-0 mt-0.5">→</span>{tip}
-                </p>
-              ))}
-            </div>
-
-            {/* Plan access */}
-            <div className="bg-gradient-card border border-primary/20 rounded-2xl p-4 text-center space-y-2">
-              <p className="text-foreground font-semibold text-sm">
-                {hasPaidAccess ? `${accessLabel} access active` : "Early access active"}
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {hasPaidAccess
-                  ? "High-volume live job scanning is enabled for this account."
-                  : "Higher daily lead limits, priority sources, and AI proposal drafts."}
-              </p>
-              {hasPaidAccess ? (
-                <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
-                  {accessLabel} plan
-                </span>
-              ) : (
-                <Link href="/dashboard/upgrade"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
-                  Upgrade <ArrowRight className="w-3 h-3"/>
-                </Link>
-              )}
-            </div>
-          </div>
         </div>
       </div>
 

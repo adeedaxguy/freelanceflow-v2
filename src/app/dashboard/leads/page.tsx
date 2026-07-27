@@ -5,7 +5,7 @@ import {
   Search, Clock, Globe, Mail, Phone, ExternalLink, Bookmark, Sparkles,
   RefreshCw, Filter, X, TrendingUp, AlertCircle, CheckCircle,
   ChevronDown, Star, Zap, BarChart3, ChevronLeft, ChevronRight,
-  Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer, BarChart2, ArrowRight,
+  Copy, Users, Download, DollarSign, Flame, ArrowUpDown, Timer,
   Target,
 } from "lucide-react";
 import NicheSelector from "@/components/NicheSelector";
@@ -368,6 +368,10 @@ export default function LeadsPage() {
 
   const budgetCount  = useMemo(() => filteredLeads.filter(l => l.budget).length, [filteredLeads]);
   const urgentCount  = useMemo(() => filteredLeads.filter(l => l.urgency).length, [filteredLeads]);
+  const highQualityCount = useMemo(
+    () => filteredLeads.filter(l => (l.confidence ?? 0) >= 80).length,
+    [filteredLeads]
+  );
 
   const handlePageChange = (p: number) => {
     setPage(p);
@@ -447,21 +451,16 @@ export default function LeadsPage() {
 
   const activeFilters = (forMe ? 1 : 0) + (minMatch > 0 ? 1 : 0) + (hasEmail ? 1 : 0) + (hasBudget ? 1 : 0) + (keyword ? 1 : 0);
   const allSourceKeys = Object.keys(ALL_SOURCE_LABELS) as LeadSource[];
-  const usagePlanKey = (usage?.plan ?? "").toLowerCase();
-  const hasPaidAccess = usagePlanKey === "pro" || usagePlanKey === "agency";
-  const accessLabel = usagePlanKey === "agency" ? "Agency" : usagePlanKey === "pro" ? "Pro" : "Early Access";
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
+    <div className="dashboard-page">
       <AppliedReturnPrompt
         lead={pendingPrompt}
         loading={!!pendingPrompt && applyingUrl === pendingPrompt.url}
         onYes={confirmPromptApplied}
         onNo={closePrompt}
       />
-      <div className="flex flex-col xl:flex-row gap-6 items-start">
-      {/* ── Main column ───────────────────────────────────────── */}
-      <div className="flex-1 min-w-0 space-y-6">
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -483,7 +482,7 @@ export default function LeadsPage() {
 
       {/* Usage bar */}
       {usage && (
-        <div className="bg-surface border border-border rounded-xl p-4">
+        <div className="dashboard-control-panel rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground capitalize">{usage.plan} Plan</span>
             <span className="text-xs text-muted-foreground">{usage.used} / {usage.limit} leads today</span>
@@ -537,13 +536,13 @@ export default function LeadsPage() {
 
       {/* Advanced filters panel */}
       {showFilters && (
-        <div className="bg-surface border border-border rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up">
+        <div className="dashboard-control-panel rounded-xl p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in-up">
           <div>
             <label className="text-xs font-medium text-muted-foreground block mb-2">Keyword Filter</label>
             <div className="relative">
               <input value={keyword} onChange={e => { setKeyword(e.target.value); setPage(1); }}
                 placeholder="React, Figma, WordPress…"
-                className="w-full pl-3 pr-8 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20" />
+                className="dashboard-field w-full pl-3 pr-8 py-2 border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20" />
               {keyword && (
                 <button onClick={() => setKeyword("")} className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground">
                   <X className="w-3.5 h-3.5" />
@@ -726,6 +725,11 @@ export default function LeadsPage() {
                   <Flame className="w-3 h-3" /> {urgentCount} urgent
                 </span>
               )}
+              {highQualityCount > 0 && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary-light border border-primary/20 font-medium flex items-center gap-1">
+                  <Star className="w-3 h-3" /> {highQualityCount} high match
+                </span>
+              )}
               {diagnostics && (
                 <button onClick={() => setShowDiag(v => !v)}
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 px-2 py-1 rounded-md border border-border hover:border-primary/30 transition-all">
@@ -822,7 +826,7 @@ export default function LeadsPage() {
                   const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
                     <div key={lead.id}
-                      className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-card-hover">
+                      className="dashboard-result-card group border hover:border-primary/35 rounded-xl p-4 sm:p-5 transition-all duration-200">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           {/* Badges row */}
@@ -1010,7 +1014,7 @@ export default function LeadsPage() {
                     const nextStep = leadNextStep(lead);
 
                     return (
-                      <div key={lead.id} className="bg-gradient-card border border-border hover:border-accent/30 rounded-xl p-4 transition-all">
+                      <div key={lead.id} className="dashboard-result-card border hover:border-accent/35 rounded-xl p-4 transition-all">
                         <div className="flex items-start justify-between gap-3 mb-3">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -1148,7 +1152,7 @@ export default function LeadsPage() {
 
       {/* Initial state */}
       {!searched && !loading && (
-        <div className="text-center py-12 border border-dashed border-border rounded-2xl bg-surface/50">
+        <div className="text-center py-12 border border-dashed border-border rounded-xl bg-card/70">
           <div className="w-14 h-14 rounded-2xl bg-gradient-hero flex items-center justify-center mx-auto mb-4 shadow-glow-primary">
             <Zap className="w-7 h-7 text-white" />
           </div>
@@ -1169,117 +1173,7 @@ export default function LeadsPage() {
           <p className="text-xs text-muted-foreground mt-3">Scanning live channels in parallel</p>
         </div>
       )}
-      </div>{/* end main column */}
-
-      {/* ── Right sidebar ─────────────────────────────────────── */}
-      <aside className="xl:w-72 w-full flex-shrink-0 space-y-4 xl:sticky xl:top-6">
-
-        {/* Search Stats */}
-        <div className="bg-surface border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart2 className="w-4 h-4 text-primary-light" />
-            <h3 className="text-sm font-bold text-foreground">Search Stats</h3>
-          </div>
-          {searched && leads.length > 0 ? (
-            <div className="space-y-2.5">
-              {[
-                { label: "Total leads", value: leads.length, color: "text-foreground" },
-                { label: "With email", value: leads.filter(l => l.email).length, color: "text-accent" },
-                { label: "With budget", value: leads.filter(l => l.budget).length, color: "text-gold" },
-                { label: "Urgent", value: leads.filter(l => l.urgency).length, color: "text-red-400" },
-                { label: "High quality (80+)", value: leads.filter(l => (l.confidence ?? 0) >= 80).length, color: "text-primary-light" },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className={`font-bold ${color}`}>{value}</span>
-                </div>
-              ))}
-              {usage && (
-                <div className="pt-2 mt-2 border-t border-border/60">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                    <span>Daily usage</span>
-                    <span>{usage.used} / {usage.limit}</span>
-                  </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${usage.percentage > 80 ? "bg-red-400" : usage.percentage > 50 ? "bg-yellow-400" : "bg-accent"}`}
-                      style={{ width: `${Math.min(100, usage.percentage)}%` }} />
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-xs">Run a search to see stats</p>
-          )}
-        </div>
-
-        {/* Source Breakdown */}
-        {searched && leads.length > 0 && (() => {
-          const srcCounts: Record<string, number> = {};
-          leads.forEach(l => { srcCounts[l.source] = (srcCounts[l.source] ?? 0) + 1; });
-          const sorted = Object.entries(srcCounts).sort((a, b) => b[1] - a[1]);
-          return (
-            <div className="bg-surface border border-border rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Globe className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-foreground">Source Breakdown</h3>
-              </div>
-              <div className="space-y-2">
-                {sorted.map(([src, count]) => (
-                  <div key={src}>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-muted-foreground capitalize">{ALL_SOURCE_LABELS[src as LeadSource] ?? src}</span>
-                      <span className="text-foreground font-semibold">{count}</span>
-                    </div>
-                    <div className="h-1 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-primary/50 rounded-full" style={{ width: `${Math.round((count / leads.length) * 100)}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Pro Tips */}
-        <div className="bg-surface border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-gold" />
-            <h3 className="text-sm font-bold text-foreground">Pro Tips</h3>
-          </div>
-          <ul className="space-y-2.5">
-            {[
-              "Select multiple niches to cast a wider net in one search.",
-              "Use 12h range for the hottest leads — less competition.",
-              "Filter by 'Has Email' to find leads you can pitch right now.",
-              "Save the best leads before Force Refreshing — they may disappear.",
-              "AI Proposal generates a personalised draft in under 3 seconds.",
-            ].map((tip, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <ArrowRight className="w-3 h-3 text-primary-light flex-shrink-0 mt-0.5" />
-                {tip}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Plan access */}
-        <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 text-center">
-          <Sparkles className="w-5 h-5 text-primary-light mx-auto mb-2" />
-          <h3 className="text-sm font-bold text-foreground mb-1">
-            {hasPaidAccess ? `${accessLabel} access active` : "Early access active"}
-          </h3>
-          <p className="text-xs text-muted-foreground mb-3">
-            {hasPaidAccess
-              ? "High-volume lead search is enabled for this account."
-              : "All core lead tools are unlocked during launch."}
-          </p>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
-            ✦ {hasPaidAccess ? `${accessLabel} plan` : "Free early access"}
-          </div>
-        </div>
-
-      </aside>
-      </div>{/* end flex row */}
+      </div>
 
       <BonusLeadsModal
         isOpen={showBonus}

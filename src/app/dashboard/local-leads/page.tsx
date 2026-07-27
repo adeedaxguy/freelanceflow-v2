@@ -4,10 +4,10 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import {
   MapPin, Search, Globe, Phone, PhoneCall, Star, ExternalLink, Bookmark,
   CheckCircle, Sparkles, ChevronDown, ChevronUp, AlertCircle,
-  X, Copy, Target, Lightbulb, Mail, Building2, TrendingUp,
+  X, Copy, Target, Lightbulb, Mail, Building2,
   Zap, Info, Clock, Wifi, WifiOff, RefreshCw, DollarSign,
-  Flame, Activity, BarChart2, ChevronLeft, ChevronRight,
-  ArrowRight, Filter, Users, Store, Palette, Download,
+  Flame, Activity, ChevronLeft, ChevronRight,
+  Filter, Users, Store, Palette, Download,
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -714,7 +714,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
     : "/dashboard/softphone";
 
   return (
-    <div className={`group bg-gradient-card border rounded-2xl p-5 transition-all hover:shadow-card-hover ${borderCls}`}>
+    <div className={`dashboard-result-card group border rounded-xl p-5 transition-all ${borderCls}`}>
       <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
         <div className="flex-1 min-w-0">
           {/* Badge row 1 */}
@@ -1245,7 +1245,6 @@ export default function LocalLeadsPage() {
   const withPhone     = primaryFilteredResults.filter(r => !!r.phone).length;
   const mobilePhoneLeads = phoneTypeCounts.mobile;
   const landlineLeads = phoneTypeCounts.landline;
-  const tollFreeServiceLeads = phoneTypeCounts.toll_free_service;
   const businessUnknownLeads = phoneTypeCounts.business_unknown;
   const filtersActive = hasPhone || smallOperatorOnly || phoneTypeFilter !== "all" || minRating > 0 || filter !== "all";
   const selectedPhoneTypeOption = PHONE_TYPE_FILTERS.find(option => option.value === phoneTypeFilter);
@@ -1269,10 +1268,8 @@ export default function LocalLeadsPage() {
   }, [phoneTypeFilter, loading, primaryFilteredResults.length, selectedPhoneTypeCount]);
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl">
-      <div className="flex flex-col xl:flex-row gap-6 items-start">
-      {/* ── Main column ────────────────────────────────── */}
-      <div className="flex-1 min-w-0 space-y-6">
+    <div className="dashboard-page">
+      <div className="space-y-6">
 
       {/* Header */}
       <div>
@@ -1291,7 +1288,7 @@ export default function LocalLeadsPage() {
 
       {/* Daily usage bar — free plan only */}
       {!isOverLimit && !isPaidPlan && (
-        <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className="dashboard-control-panel rounded-xl px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-xs font-semibold text-foreground">Daily free leads</p>
@@ -1329,27 +1326,8 @@ export default function LocalLeadsPage() {
 
       {(!isOverLimit || results.length > 0 || loading || error || saveError) && (
         <>
-          {/* How it works */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {[
-              { icon: BarChart2,  color: "text-primary-light", bg: "bg-primary/10",    title: "Coverage Engine",     desc: "Combines live business profiles, location signals, and contact enrichment into one clean lead list." },
-              { icon: Wifi,       color: "text-accent",        bg: "bg-accent/10",     title: "Live Website Check",  desc: "Every site is validated in real-time for status, tech stack, and age — know exactly what to pitch." },
-              { icon: TrendingUp, color: "text-yellow-400",    bg: "bg-yellow-500/10", title: "Revenue Estimates",   desc: "See the monthly revenue potential for each opportunity — prioritise leads worth the most to you." },
-            ].map(({ icon: Icon, color, bg, title, desc }) => (
-              <div key={title} className="bg-surface border border-border rounded-xl p-4 flex gap-3">
-                <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`w-4 h-4 ${color}`}/>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
           {/* Search form */}
-          <div className="bg-surface border border-border rounded-2xl p-5 space-y-4">
+          <div className="dashboard-control-panel rounded-xl p-5 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Keyword with grouped category dropdown */}
               <div className="relative">
@@ -1361,7 +1339,7 @@ export default function LocalLeadsPage() {
                     onBlur={() => setTimeout(() => setShowSugg(current => current === "keyword" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. plumber, dentist, bakery…"
-                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                    className="dashboard-field w-full pl-9 pr-4 py-2.5 border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
                 </div>
                 {showSugg === "keyword" && (
                   <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
@@ -1415,7 +1393,7 @@ export default function LocalLeadsPage() {
                     onBlur={() => setTimeout(() => setShowSugg(current => current === "location" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. Manchester, UK or Dubai, UAE"
-                    className="w-full pl-9 pr-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                    className="dashboard-field w-full pl-9 pr-4 py-2.5 border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
                 </div>
                 {showSugg === "location" && (
                   <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
@@ -1614,6 +1592,7 @@ export default function LocalLeadsPage() {
                 )}
                 {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no website</span>}
                 {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated/down</span>}
+                {withPhone > 0 && <span className="text-accent font-medium">{withPhone} with phone</span>}
                 {smallOperatorCount > 0 && <span className="text-cyan-300 font-medium">{smallOperatorCount} small operators</span>}
                 {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
                 <div className="ml-auto flex items-center gap-2 flex-wrap">
@@ -1756,123 +1735,7 @@ export default function LocalLeadsPage() {
           </div>
         </>
       )}
-      </div>{/* end main column */}
-
-      {/* ── Right sidebar ──────────────────────────────── */}
-      <aside className="xl:w-72 w-full flex-shrink-0 space-y-4 xl:sticky xl:top-6">
-
-        {/* Search Stats */}
-        <div className="bg-surface border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart2 className="w-4 h-4 text-primary-light" />
-            <h3 className="text-sm font-bold text-foreground">Search Stats</h3>
-          </div>
-          {results.length > 0 ? (
-            <div className="space-y-2.5">
-              {[
-                { label: "Total found",    value: results.length,                                                          color: "text-foreground" },
-                { label: "No website",     value: noWebsite,                                                               color: "text-red-400" },
-                { label: "Outdated sites", value: outdated,                                                                color: "text-yellow-400" },
-                { label: "With phone",     value: withPhone,                                                               color: "text-accent" },
-                { label: "Mobile/WhatsApp likely", value: mobilePhoneLeads,                                                color: "text-accent" },
-                { label: "Landline",       value: landlineLeads,                                                           color: "text-sky-300" },
-                { label: "Business/Unknown", value: businessUnknownLeads,                                                  color: "text-muted-foreground" },
-                { label: "Toll-free/Service", value: tollFreeServiceLeads,                                                 color: "text-emerald-300" },
-                { label: "Hot leads",      value: results.filter(r => r.urgency === "high").length,                        color: "text-orange-400" },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">{label}</span>
-                  <span className={`font-bold ${color}`}>{value}</span>
-                </div>
-              ))}
-              {!isPaidPlan && (
-                <div className="pt-2 mt-1 border-t border-border/60">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
-                    <span>Daily usage</span>
-                    <span>{leadsViewed} / {dailyLimit}</span>
-                  </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all ${leadsViewed / dailyLimit > 0.8 ? "bg-red-400" : leadsViewed / dailyLimit > 0.5 ? "bg-yellow-400" : "bg-accent"}`}
-                      style={{ width: `${Math.min(100, (leadsViewed / dailyLimit) * 100)}%` }} />
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-xs">Search a location to see stats</p>
-          )}
-        </div>
-
-        {/* Coverage Quality */}
-        <div className="bg-surface border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Globe className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-foreground">Coverage Quality</h3>
-          </div>
-          <div className="space-y-2">
-            {[
-              { name: "Business profiles", status: "active", note: "Names & categories" },
-              { name: "Location matching", status: "active", note: "City-level targeting" },
-              { name: "Website signals",   status: "active", note: "Live status checks" },
-              { name: "Contact enrichment", status: (yelpKey || fsqKey) ? "active" : "partial", note: (yelpKey || fsqKey) ? "Enhanced" : "When available" },
-              { name: "Pitch context",     status: "active", note: "AI-ready notes" },
-            ].map(({ name, status, note }) => (
-              <div key={name} className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-1.5 h-1.5 rounded-full ${status === "active" ? "bg-accent" : "bg-yellow-400"}`} />
-                  <span className="text-foreground">{name}</span>
-                </div>
-                <span className="text-muted-foreground">{note}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pro Tips */}
-        <div className="bg-surface border border-border rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-gold" />
-            <h3 className="text-sm font-bold text-foreground">Pro Tips</h3>
-          </div>
-          <ul className="space-y-2.5">
-            {[
-              "Filter 'No Website' to find the best web design opportunities.",
-              "Prioritise leads with phone numbers, reviews, or recent website issues.",
-              "Use Google Maps link to verify website status before pitching.",
-              "Try different keyword synonyms — 'electrician' vs 'electrical contractor'.",
-              "Search smaller towns for less competition and easier wins.",
-            ].map((tip, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                <ArrowRight className="w-3 h-3 text-primary-light flex-shrink-0 mt-0.5" />
-                {tip}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Plan status */}
-        {isPaidPlan ? (
-          <div className="bg-gradient-to-br from-accent/10 to-primary/5 border border-accent/20 rounded-2xl p-4 text-center">
-            <div className="text-lg mb-1">✦</div>
-            <h3 className="text-sm font-bold text-foreground mb-1 capitalize">{userPlan} Plan Active</h3>
-            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, enhanced enrichment, no daily limits.</p>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-semibold">
-              ✓ Unlimited local leads
-            </div>
-          </div>
-        ) : (
-          <div className="bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 rounded-2xl p-4 text-center">
-            <div className="text-lg mb-1">🚀</div>
-            <h3 className="text-sm font-bold text-foreground mb-1">Pro Plan Coming Soon</h3>
-            <p className="text-xs text-muted-foreground mb-3">Unlimited searches, enhanced contact coverage, priority support.</p>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-semibold">
-              ✦ You&apos;re on free early access
-            </div>
-          </div>
-        )}
-
-      </aside>
-      </div>{/* end flex row */}
+      </div>
 
       <BonusLeadsModal
         isOpen={showBonus}
