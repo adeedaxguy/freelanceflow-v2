@@ -56,6 +56,7 @@ describe("POST /api/auth/register", () => {
       data: expect.objectContaining({
         email: "newuser@example.com",
         plan: "free",
+        marketingConsent: false,
       }),
     }));
     expect(notifyNewUserSignup).toHaveBeenCalledWith({
@@ -66,6 +67,15 @@ describe("POST /api/auth/register", () => {
       expertise: ["web design", "seo"],
       referralSource: "Google",
     });
+  });
+
+  it("stores explicit marketing consent without enabling it by default", async () => {
+    const { POST } = await import("@/app/api/auth/register/route");
+    await POST(registerRequest({ ...validBody, marketingConsent: true }));
+
+    expect(prisma.user.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ marketingConsent: true }),
+    }));
   });
 
   it("does not fail signup when the admin notification fails", async () => {

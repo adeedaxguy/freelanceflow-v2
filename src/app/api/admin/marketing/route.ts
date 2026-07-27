@@ -3,6 +3,20 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const FREE_BASE_LIMIT = 100;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function parseClaims(value: string | null): string[] {
+  try {
+    const parsed = JSON.parse(value ?? "[]") as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((entry): entry is string => typeof entry === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user || (session.user as { role?: string }).role !== "ADMIN") {
@@ -16,31 +30,43 @@ export async function GET() {
         { whatsapp: { not: null } },
         { bonusLeads: { gt: 0 } },
         { referralCode: { not: null } },
+        { plan: "free", weeklyLeads: { gte: FREE_BASE_LIMIT } },
       ],
     },
     select: {
       id: true, name: true, email: true, whatsapp: true,
       marketingConsent: true, bonusClaimed: true, bonusLeads: true,
       referralCode: true, referredBy: true, createdAt: true, plan: true,
+      weeklyLeads: true, weeklyLeadReset: true,
     },
     orderBy: { createdAt: "desc" },
     take: 1000,
   });
 
+  const now = Date.now();
+  const subscribers = users.map(user => ({
+    ...user,
+    atFreeLimit:
+      user.plan === "free"
+      && user.weeklyLeads >= FREE_BASE_LIMIT
+      && now - user.weeklyLeadReset.getTime() < DAY_MS,
+  }));
+
   const stats = {
-    total:              users.length,
-    withWhatsapp:       users.filter(u => u.whatsapp).length,
-    withConsent:        users.filter(u => u.marketingConsent).length,
-    claimedShare:       users.filter(u => {
-                          const c = JSON.parse(u.bonusClaimed ?? "[]") as string[];
+    total:              subscribers.length,
+    withWhatsapp:       subscribers.filter(u => u.whatsapp).length,
+    withConsent:        subscribers.filter(u => u.marketingConsent).length,
+    atFreeLimit:        subscribers.filter(u => u.atFreeLimit).length,
+    claimedShare:       subscribers.filter(u => {
+                          const c = parseClaims(u.bonusClaimed);
                           return c.some(entry => entry === "share" || entry.startsWith("share:"));
                         }).length,
-    claimedSubscribe:   users.filter(u => {
-                          const c = JSON.parse(u.bonusClaimed ?? "[]") as string[];
+    claimedSubscribe:   subscribers.filter(u => {
+                          const c = parseClaims(u.bonusClaimed);
                           return c.includes("subscribe");
                         }).length,
-    totalBonusLeads:    users.reduce((sum, u) => sum + (u.bonusLeads ?? 0), 0),
+    totalBonusLeads:    subscribers.reduce((sum, u) => sum + (u.bonusLeads ?? 0), 0),
   };
 
-  return NextResponse.json({ subscribers: users, stats });
+  return NextResponse.json({ subscribers, stats });
 }

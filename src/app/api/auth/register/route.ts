@@ -13,6 +13,7 @@ const schema = z.object({
   expertise:      z.array(z.string()).optional().default([]),
   referralSource: z.string().optional().default(""),
   plan:           z.string().optional().default("free"),
+  marketingConsent: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 400 });
   }
 
-  const { name, email, password, expertise, referralSource } = parsed.data;
+  const { name, email, password, expertise, referralSource, marketingConsent } = parsed.data;
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
         plan:           "free",
         expertise:      JSON.stringify(expertise),
         referralSource: referralSource || null,
+        marketingConsent,
         suspended:      false,
       },
       select: { id: true, email: true, name: true, plan: true },

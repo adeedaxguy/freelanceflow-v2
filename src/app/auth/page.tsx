@@ -168,6 +168,7 @@ function AuthForm() {
   const [error,     setError]     = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [referral,  setReferral]  = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
   // Prefill plan from URL params
   const planParam = params.get("plan") ?? "";
   const intentParam = params.get("intent") ?? "";
@@ -307,7 +308,15 @@ function AuthForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, expertise, referralSource: signupAttribution, plan: planParam }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          expertise,
+          referralSource: signupAttribution,
+          plan: planParam,
+          marketingConsent,
+        }),
       });
       const data = await res.json() as { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Registration failed");
@@ -596,6 +605,19 @@ function AuthForm() {
                     ))}
                   </div>
                 </div>
+
+                <label className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3.5 text-left">
+                  <input
+                    type="checkbox"
+                    checked={marketingConsent}
+                    onChange={event => setMarketingConsent(event.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-foreground">Send me useful lead-finding tips and product updates</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">Optional. Unsubscribe at any time from Settings or any marketing email.</span>
+                  </span>
+                </label>
 
                 {error && <p className="text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">{error}</p>}
 

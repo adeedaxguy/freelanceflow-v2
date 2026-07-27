@@ -46,13 +46,13 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function notificationHtml(title: string, lines: string[]): string {
+function notificationHtml(title: string, lines: string[], label = "iCloseLeads Admin Alert"): string {
   return `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:24px;background:#090915;font-family:Inter,Arial,sans-serif;color:#f8f7ff;">
   <div style="max-width:620px;margin:0 auto;background:#111123;border:1px solid #292747;border-radius:18px;padding:28px;">
-    <p style="margin:0 0 8px;color:#9f67ff;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">iCloseLeads Admin Alert</p>
+    <p style="margin:0 0 8px;color:#9f67ff;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">${escapeHtml(label)}</p>
     <h1 style="margin:0 0 20px;font-size:24px;line-height:1.25;">${escapeHtml(title)}</h1>
     <div style="background:#0b0b18;border:1px solid #272545;border-radius:14px;padding:18px;">
       ${lines.map((line) => `<p style="margin:0 0 12px;color:#c8c4dd;font-size:15px;line-height:1.55;">${line}</p>`).join("")}
@@ -61,6 +61,29 @@ function notificationHtml(title: string, lines: string[]): string {
   </div>
 </body>
 </html>`;
+}
+
+export async function sendAccountNotification(params: {
+  recipient: string;
+  subject: string;
+  title: string;
+  lines: string[];
+}) {
+  const config = await getPlatformEmailConfig();
+  if (!config) return { success: false, skipped: true };
+
+  const client = new Resend(config.apiKey);
+  const text = params.lines.map((line) => line.replace(/<[^>]+>/g, "")).join("\n");
+  const { data, error } = await client.emails.send({
+    from: `iCloseLeads <${config.fromEmail}>`,
+    to: [params.recipient],
+    subject: params.subject,
+    html: notificationHtml(params.title, params.lines, "iCloseLeads Account Update"),
+    text,
+  });
+
+  if (error) throw new Error(error.message);
+  return { success: true, id: data?.id };
 }
 
 export async function sendAdminNotification(params: {

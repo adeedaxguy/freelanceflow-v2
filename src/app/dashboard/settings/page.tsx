@@ -257,6 +257,7 @@ export default function SettingsPage() {
   });
   const [deleteOpen,    setDeleteOpen]    = useState(false);
   const [saved,         setSaved]         = useState(false);
+  const [preferencesError, setPreferencesError] = useState("");
   const [savedKeys,     setSavedKeys]     = useState<Record<string, string>>({});
   const [showAdvancedKeys, setShowAdvancedKeys] = useState(false);
 
@@ -270,11 +271,43 @@ export default function SettingsPage() {
     setSavedKeys(keys);
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/user/email-preferences")
+      .then(async response => {
+        if (!response.ok) throw new Error("Could not load email preferences.");
+        return response.json() as Promise<{ marketingConsent: boolean }>;
+      })
+      .then(data => {
+        if (!cancelled) {
+          setNotifications(previous => ({ ...previous, productUpdates: data.marketingConsent }));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setPreferencesError("Could not load your email preferences.");
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   function handleKeyUpdate(settingKey: string, val: string) {
     setSavedKeys(prev => ({ ...prev, [settingKey]: val }));
   }
 
-  function handleSaveNotifications() { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+  async function handleSaveNotifications() {
+    setPreferencesError("");
+    try {
+      const response = await fetch("/api/user/email-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ marketingConsent: notifications.productUpdates }),
+      });
+      if (!response.ok) throw new Error("Could not save preferences.");
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setPreferencesError("Could not save your email preferences. Please try again.");
+    }
+  }
   async function handleDeleteAccount() { await signOut({ callbackUrl: "/" }); }
 
   return (
@@ -328,7 +361,11 @@ export default function SettingsPage() {
               </button>
             </div>
           ))}
-          <button onClick={handleSaveNotifications}
+          <p className="text-xs leading-5 text-muted-foreground">
+            Product Updates controls optional marketing email. Account, security, billing, and requested lead-limit notices may still be sent when needed to operate your account.
+          </p>
+          {preferencesError && <p className="text-xs text-destructive">{preferencesError}</p>}
+          <button onClick={() => void handleSaveNotifications()}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-light text-white text-sm font-medium transition-all">
             {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : <><Save className="w-4 h-4" /> Save Preferences</>}
           </button>
