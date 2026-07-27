@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#020617"/>
+      <stop offset="0.56" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#06261F"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(940 142) rotate(130) scale(460 620)">
+      <stop stop-color="#22C55E" stop-opacity=".34"/>
+      <stop offset=".58" stop-color="#60A5FA" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#020617" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="46" height="46" patternUnits="userSpaceOnUse">
+      <path d="M46 0H0v46" stroke="#FFFFFF" stroke-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" rx="0" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+  <rect width="1200" height="675" fill="url(#grid)"/>
+  <rect x="58" y="58" width="1084" height="559" rx="34" stroke="#22C55E" stroke-opacity=".32"/>
+  <rect x="90" y="96" width="190" height="40" rx="20" fill="#22C55E" fill-opacity=".16" stroke="#22C55E" stroke-opacity=".42"/>
+  <text x="114" y="123" fill="#60A5FA" font-size="18" font-family="Inter, Arial, sans-serif" font-weight="850" letter-spacing="0">iCloseLeads funnel</text>
+  <text x="90" y="226" fill="#F8FAFC" font-size="50" font-family="Inter, Arial, sans-serif" font-weight="900" letter-spacing="0">Follow-up and insight loop</text>
+  <text x="92" y="340" fill="#A8B3CF" font-size="24" font-family="Inter, Arial, sans-serif" font-weight="650" letter-spacing="0">Use replies, activation, and GSC Insights to decide what</text>
+<text x="92" y="374" fill="#A8B3CF" font-size="24" font-family="Inter, Arial, sans-serif" font-weight="650" letter-spacing="0">the next page should improve.</text>
+  
+      <circle cx="858" cy="264" r="126" fill="#111827" stroke="#22C55E" stroke-opacity=".42" stroke-width="8"/>
+      <path d="M800 156c56-34 133-18 174 36M980 284c-8 70-64 126-134 134M764 370c-48-50-52-128-12-183" stroke="#60A5FA" stroke-width="18" stroke-linecap="round"/>
+      <path d="M954 184l48 12-18-46M850 422l-34 38-16-48M748 184l-48 6 26-41" fill="#60A5FA"/>
+      <circle cx="858" cy="264" r="44" fill="#22C55E" fill-opacity=".88"/>
+      <text x="834" y="273" fill="#031316" font-size="24" font-family="Inter, Arial, sans-serif" font-weight="900">QA</text>
+    
+  
+        <rect x="110" y="464" width="205" height="94" rx="22" fill="#111827" stroke="#22C55E" stroke-opacity=".46"/>
+        <circle cx="144" cy="502" r="14" fill="#22C55E"/>
+        <text x="168" y="500" fill="#E5E7EB" font-size="19" font-family="Inter, Arial, sans-serif" font-weight="800" letter-spacing="0">Replies</text>
+      
+
+        <rect x="355" y="464" width="205" height="94" rx="22" fill="#111827" stroke="#60A5FA" stroke-opacity=".46"/>
+        <circle cx="389" cy="502" r="14" fill="#60A5FA"/>
+        <text x="413" y="500" fill="#E5E7EB" font-size="19" font-family="Inter, Arial, sans-serif" font-weight="800" letter-spacing="0">Signups</text>
+      
+
+        <rect x="600" y="464" width="205" height="94" rx="22" fill="#111827" stroke="#22C55E" stroke-opacity=".46"/>
+        <circle cx="634" cy="502" r="14" fill="#22C55E"/>
+        <text x="658" y="500" fill="#E5E7EB" font-size="19" font-family="Inter, Arial, sans-serif" font-weight="800" letter-spacing="0">GSC Insights</text>
+      
+
+        <rect x="845" y="464" width="205" height="94" rx="22" fill="#111827" stroke="#60A5FA" stroke-opacity=".46"/>
+        <circle cx="879" cy="502" r="14" fill="#60A5FA"/>
+        <text x="903" y="500" fill="#E5E7EB" font-size="19" font-family="Inter, Arial, sans-serif" font-weight="800" letter-spacing="0">Refresh</text>
+      
+  <text x="918" y="596" fill="#F8FAFC" font-size="24" font-family="Inter, Arial, sans-serif" font-weight="850">icloseleads.com</text>
+</svg>

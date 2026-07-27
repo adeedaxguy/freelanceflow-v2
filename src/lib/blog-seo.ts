@@ -12,6 +12,8 @@ export interface BlogArticleSource {
   updatedAt?: Date | string;
   tags?: string[];
   focusKeyword?: string | null;
+  articleVisuals?: BlogArticleVisual[];
+  conversionFunnel?: BlogConversionFunnel | null;
 }
 
 export interface BlogLinkItem {
@@ -25,6 +27,28 @@ export interface BlogHeading {
   id: string;
   text: string;
   level: 2 | 3;
+}
+
+export interface BlogArticleVisual {
+  src: string;
+  alt: string;
+  title?: string;
+  caption?: string;
+}
+
+export interface BlogConversionFunnelStep {
+  title: string;
+  detail: string;
+}
+
+export interface BlogConversionFunnel {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  ctaLabel: string;
+  ctaHref: string;
+  steps: BlogConversionFunnelStep[];
+  proofNote?: string;
 }
 
 type ArticleTopic =

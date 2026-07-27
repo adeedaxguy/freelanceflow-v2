@@ -62,6 +62,28 @@ export interface Template {
   createdAt: Date;
 }
 
+export interface BlogArticleVisual {
+  src: string;
+  alt: string;
+  title?: string;
+  caption?: string;
+}
+
+export interface BlogConversionFunnelStep {
+  title: string;
+  detail: string;
+}
+
+export interface BlogConversionFunnel {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  ctaLabel: string;
+  ctaHref: string;
+  steps: BlogConversionFunnelStep[];
+  proofNote?: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -79,6 +101,8 @@ export interface BlogPost {
   author?: string | null;
   tags?: string[];
   focusKeyword?: string | null;
+  articleVisuals?: BlogArticleVisual[];
+  conversionFunnel?: BlogConversionFunnel | null;
 }
 
 export interface ContactSubmission {

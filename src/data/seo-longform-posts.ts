@@ -1,4 +1,4 @@
-import type { BlogPost } from "../types";
+import type { BlogArticleVisual, BlogConversionFunnel, BlogPost } from "../types";
 
 type LongformTopic = {
   slug: string;
@@ -20,6 +20,8 @@ type LongformTopic = {
   mistakes: string[];
   qaChecks: string[];
   examples: string[];
+  articleVisuals?: BlogArticleVisual[];
+  conversionFunnel?: BlogConversionFunnel | null;
 };
 
 const topics: LongformTopic[] = [
@@ -541,6 +543,52 @@ const topics: LongformTopic[] = [
     leadSource: "public local profiles, business websites, Google SERP related searches, and Ahrefs competitor gap patterns",
     offer: "a client acquisition workflow that turns leads into account signups",
     internalPath: "/signup",
+    conversionFunnel: {
+      eyebrow: "GSC top-click funnel",
+      title: "Find your next client lead from this page",
+      summary: "This article now routes high-intent readers into a practical iCloseLeads workflow: choose a market, run a lead search, save qualified prospects, prepare a proof-led proposal, and follow up from one pipeline.",
+      ctaLabel: "Start finding leads",
+      ctaHref: "/auth?mode=signup&intent=freelancer-client-acquisition-system&source=gsc-high-click-funnel",
+      proofNote: "Built for the blog page currently receiving the strongest GSC click signal, so the next action is signup and lead search instead of passive reading.",
+      steps: [
+        { title: "Pick a client market", detail: "Choose one niche, country, city, or service buyer so the search starts focused." },
+        { title: "Run a lead search", detail: "Use iCloseLeads to surface local, live, or remote opportunities that match the offer." },
+        { title: "Save only qualified prospects", detail: "Keep leads with a public source, visible need, contact route, and proof note." },
+        { title: "Generate and review the pitch", detail: "Turn lead context into a proposal or outreach draft, then edit it before sending." },
+      ],
+    },
+    articleVisuals: [
+      {
+        src: "/blog-images/freelancer-client-acquisition-system-funnel.svg",
+        alt: "Diagram showing the client acquisition funnel from article reader to lead search, saved lead, proposal, and follow-up.",
+        title: "Client acquisition funnel",
+        caption: "The page should move readers from search intent into a lead-search workflow, not leave them with theory only.",
+      },
+      {
+        src: "/blog-images/freelancer-client-acquisition-system-lead-search.svg",
+        alt: "Visual showing an iCloseLeads lead search setup with niche, location, website gap, and buyer route filters.",
+        title: "Lead search setup",
+        caption: "Start with one market and one offer so every lead has a clear reason to be saved.",
+      },
+      {
+        src: "/blog-images/freelancer-client-acquisition-system-qualification-scorecard.svg",
+        alt: "Lead qualification scorecard with fit, activity, visible need, contact route, and timing checks.",
+        title: "Lead quality scorecard",
+        caption: "A qualified lead needs fit, activity, visible need, contact route, and timing before outreach.",
+      },
+      {
+        src: "/blog-images/freelancer-client-acquisition-system-outreach-proof.svg",
+        alt: "Proof-led outreach visual showing a saved proof note becoming a reviewed outreach message.",
+        title: "Proof-led outreach",
+        caption: "Specific outreach comes from saved public proof, not generic personalization.",
+      },
+      {
+        src: "/blog-images/freelancer-client-acquisition-system-follow-up-loop.svg",
+        alt: "Follow-up loop connecting replies, signups, GSC Insights, and content refresh decisions.",
+        title: "Follow-up and insight loop",
+        caption: "Replies, signups, and GSC Insights tell the next refresh what to fix first.",
+      },
+    ],
     keywords: ["freelancer client acquisition system","freelancer client acquisition system software","freelancer client acquisition system workflow","freelance client acquisition","B2B lead generation"],
     proofSignals: ["public business profile","website or storefront status","decision-maker route","offer fit","follow-up action","saved source proof"],
     workflow: ["Start with the exact market, offer, and buyer role before opening a lead list.","Use public profile and website signals to decide whether the prospect has a visible problem.","Save the source URL, contact route, and proof note before writing outreach.","Write the first message around one business issue rather than a generic service pitch.","Route qualified prospects into a signup, demo, or saved pipeline action.","Review replies and activation data before expanding the next keyword cluster."],
@@ -1160,6 +1208,8 @@ export const SEO_LONGFORM_POSTS: BlogPost[] = topics.filter((topic) => !skippedL
     category: topic.category,
     published: true,
     coverImage: "/blog-images/default.svg",
+    articleVisuals: topic.articleVisuals,
+    conversionFunnel: topic.conversionFunnel,
     readTime: 16,
     createdAt,
     updatedAt: createdAt,

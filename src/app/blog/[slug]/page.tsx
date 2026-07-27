@@ -9,7 +9,9 @@ import BlogCard from "@/components/BlogCard";
 import BlogComments from "@/components/BlogComments";
 import {
   BlogArticleRoadmap,
+  BlogArticleVisuals,
   BlogConversionPanel,
+  BlogLeadSearchFunnel,
   BlogTrustedReferences,
 } from "@/components/BlogArticleEnhancements";
 import { formatDate } from "@/lib/utils";
@@ -457,6 +459,8 @@ export default async function BlogPostPage({ params }: Props) {
             )}
 
             <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
+            <BlogLeadSearchFunnel post={articleSource} />
+            <BlogArticleVisuals post={articleSource} />
 
             {/* Body */}
             <div className="prose-content">
@@ -508,6 +512,8 @@ export default async function BlogPostPage({ params }: Props) {
     updatedAt: updatedDate,
     tags: post.tags,
     focusKeyword: post.focusKeyword,
+    articleVisuals: post.articleVisuals,
+    conversionFunnel: post.conversionFunnel,
   };
   const articleHeadings = extractArticleHeadings(content);
   const relatedPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
