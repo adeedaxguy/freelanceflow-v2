@@ -568,6 +568,8 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
 
           <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
+          <BlogLeadSearchFunnel post={articleSource} />
+          <BlogArticleVisuals post={articleSource} />
 
           <div className="prose-content">
             {renderMarkdown(content)}
