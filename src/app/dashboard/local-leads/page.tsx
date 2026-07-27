@@ -1331,15 +1331,15 @@ export default function LocalLeadsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Keyword with grouped category dropdown */}
               <div className="relative">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Business Type</label>
+                <label className="dashboard-field-label text-sm font-bold uppercase tracking-wide mb-2 block">Business Type</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-light pointer-events-none"/>
                   <input value={keyword} onChange={e => { setKeyword(e.target.value); setKwCategory(null); setShowSugg("keyword"); }}
                     onFocus={() => setShowSugg("keyword")} onClick={() => setShowSugg("keyword")}
                     onBlur={() => setTimeout(() => setShowSugg(current => current === "keyword" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. plumber, dentist, bakery…"
-                    className="dashboard-field w-full pl-9 pr-4 py-2.5 border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                    className="dashboard-field w-full min-h-12 pl-12 pr-4 py-3 border rounded-xl text-foreground focus:outline-none transition-all text-base"/>
                 </div>
                 {showSugg === "keyword" && (
                   <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
@@ -1385,15 +1385,15 @@ export default function LocalLeadsPage() {
 
               {/* Location with grouped region dropdown */}
               <div className="relative">
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">City / Location</label>
+                <label className="dashboard-field-label text-sm font-bold uppercase tracking-wide mb-2 block">City / Location</label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"/>
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-light pointer-events-none"/>
                   <input value={location} onChange={e => { setLocation(e.target.value); setLocRegion(null); setShowSugg("location"); }}
                     onFocus={() => setShowSugg("location")} onClick={() => setShowSugg("location")}
                     onBlur={() => setTimeout(() => setShowSugg(current => current === "location" ? null : current), 250)}
                     onKeyDown={e => { if (e.key === "Enter") void doSearch(); }}
                     placeholder="e.g. Manchester, UK or Dubai, UAE"
-                    className="dashboard-field w-full pl-9 pr-4 py-2.5 border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all text-sm"/>
+                    className="dashboard-field w-full min-h-12 pl-12 pr-4 py-3 border rounded-xl text-foreground focus:outline-none transition-all text-base"/>
                 </div>
                 {showSugg === "location" && (
                   <div onPointerDown={e => e.preventDefault()} className="absolute top-full mt-1 left-0 right-0 bg-surface border border-border rounded-xl shadow-xl z-30 max-h-72 overflow-y-auto">
@@ -1440,7 +1440,7 @@ export default function LocalLeadsPage() {
 
             {/* Website status filter */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-semibold text-muted-foreground hidden sm:block">Show:</span>
+              <span className="dashboard-field-label text-xs font-bold uppercase tracking-wide hidden sm:block">Show:</span>
               {([
                 { v: "no_website",       l: "No/Unknown Website", i: WifiOff,   c: "text-red-400" },
                 { v: "outdated_website", l: "Outdated Site",      i: Clock,     c: "text-yellow-400" },
@@ -1448,7 +1448,7 @@ export default function LocalLeadsPage() {
                 { v: "all",              l: "All",                i: Building2, c: "text-muted-foreground" },
               ] as const).map(({ v, l, i: Icon, c }) => (
                 <button key={v} onClick={() => { setFilter(v); setPage(1); }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filter === v ? "bg-primary/15 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30"}`}>
+                  className={`dashboard-choice flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all ${filter === v ? "bg-primary/15 border-primary/55 text-primary-light shadow-sm" : "text-muted-foreground"}`}>
                   <Icon className={`w-3.5 h-3.5 ${filter === v ? "text-primary-light" : c}`}/>{l}
                 </button>
               ))}
@@ -1462,7 +1462,7 @@ export default function LocalLeadsPage() {
               {/* Has phone toggle */}
               <button
                 onClick={() => { setHasPhone(v => !v); setPage(1); }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${hasPhone ? "bg-accent/15 border-accent/40 text-accent" : "border-border text-muted-foreground hover:border-accent/30"}`}>
+                className={`dashboard-choice flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all ${hasPhone ? "bg-accent/15 border-accent/50 text-accent shadow-sm" : "text-muted-foreground"}`}>
                 <Phone className="w-3.5 h-3.5"/> Has Phone
               </button>
 
@@ -1470,7 +1470,7 @@ export default function LocalLeadsPage() {
                 type="button"
                 title="Prioritises businesses that look owner-run, single-location, mobile/stall-based, or lower-resource from public profile signals. Verify before pitching."
                 onClick={() => { setSmallOperatorOnly(v => !v); setPage(1); }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${smallOperatorOnly ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-300" : "border-border text-muted-foreground hover:border-cyan-500/30"}`}>
+                className={`dashboard-choice flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-semibold transition-all ${smallOperatorOnly ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300 shadow-sm" : "text-muted-foreground"}`}>
                 <Store className="w-3.5 h-3.5"/> Small operator
                 {baseFilteredResults.length > 0 && (
                   <span className={`rounded-full px-1.5 py-0.5 text-[10px] leading-none ${smallOperatorOnly ? "bg-cyan-500/20 text-cyan-200" : "bg-muted text-muted-foreground"}`}>
@@ -1481,7 +1481,7 @@ export default function LocalLeadsPage() {
 
               {/* Phone type */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-muted-foreground">Number type:</span>
+                <span className="dashboard-field-label text-xs font-bold">Number type:</span>
                 {PHONE_TYPE_FILTERS.map(option => {
                   const count = phoneTypeCounts[option.value] ?? 0;
                   const unavailable = option.value !== "all" && primaryFilteredResults.length > 0 && count === 0;
@@ -1492,12 +1492,12 @@ export default function LocalLeadsPage() {
                       title={unavailable ? `No ${option.label.toLowerCase()} numbers found in the current results.` : option.title}
                       disabled={unavailable}
                       onClick={() => { setPhoneTypeFilter(option.value); setPage(1); }}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-medium transition-all disabled:cursor-not-allowed ${
+                      className={`dashboard-choice inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all disabled:cursor-not-allowed ${
                         phoneTypeFilter === option.value
-                          ? "bg-primary/15 border-primary/40 text-primary-light"
+                          ? "bg-primary/15 border-primary/55 text-primary-light shadow-sm"
                           : unavailable
                             ? "border-border/70 bg-muted/20 text-muted-foreground/45"
-                            : "border-border text-muted-foreground hover:border-primary/30"
+                            : "text-muted-foreground"
                       }`}
                     >
                       <span>{option.label}</span>
@@ -1522,10 +1522,10 @@ export default function LocalLeadsPage() {
 
               {/* Min rating */}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-muted-foreground">Min rating:</span>
+                <span className="dashboard-field-label text-xs font-bold">Min rating:</span>
                 {[0, 3, 3.5, 4, 4.5].map(r => (
                   <button key={r} onClick={() => { setMinRating(r); setPage(1); }}
-                    className={`px-2 py-1 rounded-lg border text-xs font-medium transition-all ${minRating === r ? "bg-yellow-500/15 border-yellow-500/40 text-yellow-400" : "border-border text-muted-foreground hover:border-yellow-500/30"}`}>
+                    className={`dashboard-choice px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${minRating === r ? "bg-yellow-500/15 border-yellow-500/50 text-yellow-400 shadow-sm" : "text-muted-foreground"}`}>
                     {r === 0 ? "Any" : `${r}★`}
                   </button>
                 ))}
@@ -1541,7 +1541,7 @@ export default function LocalLeadsPage() {
 
               {/* Search button */}
               <button onClick={() => void doSearch()} disabled={loading || !keyword.trim() || !location.trim() || isOverLimit}
-                className="ml-auto flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-glow-primary/20">
+                className="ml-auto min-h-12 flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-glow-primary/20">
                 {loading
                   ? <><RefreshCw className="w-4 h-4 animate-spin"/> Searching…</>
                   : <><Search className="w-4 h-4"/> Find Businesses</>
