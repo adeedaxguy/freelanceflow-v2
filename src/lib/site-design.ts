@@ -5,6 +5,15 @@ export type DesignDepth = "short" | "balanced" | "detailed";
 export type DesignGoal = "calls" | "quotes" | "bookings" | "visits";
 export type DesignLayout = "conversion" | "editorial" | "showcase";
 export type DesignSections = "5" | "7" | "9" | "11";
+export type DesignComposition =
+  | "authority-split"
+  | "visual-first"
+  | "editorial-offset"
+  | "centered-story"
+  | "action-board"
+  | "catalog-grid"
+  | "booking-led"
+  | "listing-led";
 export type DesignTemplate =
   | "local-authority"
   | "boutique-booking"
@@ -43,6 +52,7 @@ export type SiteDesignVariation = {
   conversionGoal: DesignGoal;
   layout: DesignLayout;
   template: DesignTemplate;
+  composition: DesignComposition;
   palette: {
     accent: string;
     accent2: string;
@@ -487,6 +497,38 @@ function scoreTerms(haystack: string, terms: string[]) {
   return terms.reduce((score, term) => score + (haystack.includes(term.toLowerCase()) ? 1 : 0), 0);
 }
 
+function compositionForTemplate(template: DesignTemplate): DesignComposition {
+  switch (template) {
+    case "urgent-repair":
+    case "trade-emergency":
+      return "action-board";
+    case "restaurant-menu":
+    case "ecommerce-showroom":
+    case "visual-proof":
+      return "catalog-grid";
+    case "boutique-booking":
+    case "clinic-care":
+    case "fitness-membership":
+    case "education-course":
+    case "event-booking":
+      return "booking-led";
+    case "real-estate-listings":
+      return "listing-led";
+    case "editorial-craft":
+    case "legal-trust":
+    case "finance-advisory":
+    case "founder-story":
+      return "editorial-offset";
+    case "minimal-direct":
+      return "centered-story";
+    case "modern-productized":
+    case "consult-authority":
+      return "visual-first";
+    default:
+      return "authority-split";
+  }
+}
+
 export const DESIGN_VARIATIONS: SiteDesignVariation[] = ARCHETYPES.flatMap(archetype =>
   MOTIFS.map(motif => ({
     id: `${archetype.id}-${motif.id}`,
@@ -504,6 +546,7 @@ export const DESIGN_VARIATIONS: SiteDesignVariation[] = ARCHETYPES.flatMap(arche
     conversionGoal: archetype.conversionGoal,
     layout: archetype.layout,
     template: archetype.template,
+    composition: compositionForTemplate(archetype.template),
     palette: motif.palette,
   })),
 );

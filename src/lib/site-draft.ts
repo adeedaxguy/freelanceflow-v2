@@ -88,6 +88,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(auto|car|body|collision|mechanic|garage|repair)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: data.phone ? "Request an estimate" : "Get an estimate",
       segment: "auto",
       logoLabel: "AUTO",
       accent: "#38bdf8",
@@ -127,6 +128,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(clean|maid|janitorial|housekeeping|carpet)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Get a cleaning quote",
       segment: "cleaning",
       logoLabel: "CLEAN",
       accent: "#2dd4bf",
@@ -166,6 +168,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(cafe|coffee|restaurant|bakery|food|pizza|bar|grill|diner)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Book a table",
       segment: "food",
       logoLabel: "LOCAL",
       accent: "#fb923c",
@@ -205,6 +208,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(salon|barber|spa|nail|beauty|massage|stylist)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Book an appointment",
       segment: "beauty",
       logoLabel: "STYLE",
       accent: "#f472b6",
@@ -244,6 +248,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(plumb|electric|roof|handyman|hvac|landscap|painter|locksmith|contractor)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: data.phone ? "Request service" : "Get a quote",
       segment: "trade",
       logoLabel: "PRO",
       accent: "#facc15",
@@ -283,6 +288,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Book an appointment",
       segment: "clinic",
       logoLabel: "CARE",
       accent: "#38bdf8",
@@ -322,6 +328,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(real estate|estate agent|realtor|property|homes|apartments|lettings|rentals|valuation)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Book a viewing",
       segment: "property",
       logoLabel: "PROPERTY",
       accent: "#0ea5e9",
@@ -361,6 +368,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(law|lawyer|attorney|accountant|consultant|insurance|advisor|financial)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Book a consultation",
       segment: "professional",
       logoLabel: "ADVISORY",
       accent: "#60a5fa",
@@ -400,6 +408,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(ecommerce|e-commerce|online store|shopify|product|collection|catalogue|catalog)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Shop the collection",
       segment: "retail",
       logoLabel: "SHOP",
       accent: "#fb7185",
@@ -439,6 +448,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Start a trial",
       segment: "fitness",
       logoLabel: "MOVE",
       accent: "#22c55e",
@@ -478,6 +488,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "View classes",
       segment: "education",
       logoLabel: "LEARN",
       accent: "#6366f1",
@@ -517,6 +528,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(event|events|wedding|venue|party|entertainment|music|photobooth|conference|birthday)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Check availability",
       segment: "events",
       logoLabel: "EVENT",
       accent: "#c084fc",
@@ -556,6 +568,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(hotel|travel|tour|tourism|stay|guesthouse|airbnb|holiday|vacation)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Check availability",
       segment: "travel",
       logoLabel: "STAY",
       accent: "#38bdf8",
@@ -595,6 +608,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "Browse the collection",
       segment: "retail",
       logoLabel: "SHOP",
       accent: "#fb7185",
@@ -634,6 +648,7 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
   if (/\b(photo|photography|creative|design|agency|marketing|tattoo|artist|portfolio)\b/.test(text)) {
     return {
       ...common,
+      primaryCta: "View selected work",
       segment: "creative",
       logoLabel: "WORK",
       accent: "#a78bfa",

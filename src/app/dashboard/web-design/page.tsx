@@ -60,6 +60,10 @@ type DesignOptions = {
   layout: string;
   prompt: string;
   variation: string;
+  headline: string;
+  subheadline: string;
+  cta: string;
+  accent: string;
 };
 
 type Option = {
@@ -69,7 +73,7 @@ type Option = {
 };
 
 type BuilderStep = {
-  key: "brief" | "style" | "structure" | "launch";
+  key: "brief" | "direction" | "launch";
   label: string;
   title: string;
   description: string;
@@ -85,24 +89,17 @@ const BUILDER_STEPS: BuilderStep[] = [
     icon: FileText,
   },
   {
-    key: "style",
-    label: "Style",
-    title: "Choose the visual direction",
-    description: "Pick a direction that feels credible for this specific business, not generic SaaS.",
+    key: "direction",
+    label: "Direction",
+    title: "Choose a website direction",
+    description: "Pick an original category-matched composition, then open advanced controls only when you need them.",
     icon: Palette,
   },
   {
-    key: "structure",
-    label: "Structure",
-    title: "Shape the website experience",
-    description: "Control sections, imagery, conversion goal, and copy depth before sharing.",
-    icon: SlidersHorizontal,
-  },
-  {
     key: "launch",
-    label: "Preview",
-    title: "Review and export",
-    description: "Open the website preview, save a PDF, or create the outreach proposal from this direction.",
+    label: "Finish",
+    title: "Personalise and share",
+    description: "Tune the key copy, review the complete homepage, and export or share it with the prospect.",
     icon: Rocket,
   },
 ];
@@ -207,6 +204,10 @@ function buildPreviewSearch(data: DraftData, options: DesignOptions) {
   if (data.website) params.set("website", data.website);
   if (data.maps) params.set("maps", data.maps);
   if (options.prompt) params.set("prompt", options.prompt);
+  if (options.headline) params.set("headline", options.headline);
+  if (options.subheadline) params.set("subheadline", options.subheadline);
+  if (options.cta) params.set("cta", options.cta);
+  if (/^#[0-9a-f]{6}$/i.test(options.accent)) params.set("accent", options.accent);
   return params.toString();
 }
 
@@ -353,7 +354,7 @@ function VariationPicker({
           <div>
             <h2 className="text-lg font-black text-foreground">Design feel</h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Choose one of 125 category-aware directions, or let the prompt pick it automatically.
+              Choose one of {DESIGN_VARIATIONS.length} original category-aware directions, or let the prompt pick it automatically.
             </p>
           </div>
         </div>
@@ -406,6 +407,7 @@ function VariationPicker({
 function WebDesignBuilderContent() {
   const searchParams = useSearchParams();
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
   const data = useMemo<DraftData>(() => ({
@@ -419,6 +421,7 @@ function WebDesignBuilderContent() {
     pitch: clean(searchParams.get("pitch"), "A cleaner, faster website can turn local searches into calls, quote requests, and booked work."),
     status: clean(searchParams.get("status"), "unknown"),
   }), [searchParams]);
+  const generatedIdentity = useMemo(() => getSiteDraftIdentity(data), [data]);
 
   const [style, setStyle] = useState(() => optionValue(searchParams.get("style"), STYLE_OPTIONS, "professional"));
   const [theme, setTheme] = useState(() => optionValue(searchParams.get("theme"), THEME_OPTIONS, "dark"));
@@ -435,6 +438,13 @@ function WebDesignBuilderContent() {
     category: data.category,
     location: data.location,
   }).id);
+  const [headline, setHeadline] = useState(() => clean(searchParams.get("headline")));
+  const [subheadline, setSubheadline] = useState(() => clean(searchParams.get("subheadline")));
+  const [cta, setCta] = useState(() => clean(searchParams.get("cta")));
+  const [accent, setAccent] = useState(() => {
+    const value = clean(searchParams.get("accent"));
+    return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
+  });
 
   const options = useMemo<DesignOptions>(() => ({
     style,
@@ -446,7 +456,11 @@ function WebDesignBuilderContent() {
     layout,
     prompt: designPrompt,
     variation,
-  }), [contentDepth, conversionGoal, designPrompt, images, layout, sections, style, theme, variation]);
+    headline,
+    subheadline,
+    cta,
+    accent,
+  }), [accent, contentDepth, conversionGoal, cta, designPrompt, headline, images, layout, sections, style, subheadline, theme, variation]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data, options)}`;
   const clientPreviewHref = `${previewHref}&client=1`;
@@ -459,14 +473,16 @@ function WebDesignBuilderContent() {
     location: data.location,
   }), [data.category, data.company, data.location, designPrompt, variation]);
   const identity = useMemo(() => {
-    const base = getSiteDraftIdentity(data);
     return {
-      ...base,
-      accent: selectedVariation.palette.accent,
+      ...generatedIdentity,
+      headline: headline || generatedIdentity.headline,
+      subheadline: subheadline || generatedIdentity.subheadline,
+      primaryCta: cta || generatedIdentity.primaryCta,
+      accent: accent || selectedVariation.palette.accent,
       accent2: selectedVariation.palette.accent2,
       accentSoft: selectedVariation.palette.accentSoft,
     };
-  }, [data, selectedVariation]);
+  }, [accent, cta, generatedIdentity, headline, selectedVariation, subheadline]);
   const initials = businessInitials(data.company);
   const activeStepData = BUILDER_STEPS[activeStep] ?? BUILDER_STEPS[0]!;
   const ActiveIcon = activeStepData.icon;
@@ -491,10 +507,26 @@ function WebDesignBuilderContent() {
   }).toString()}`;
 
   async function copyPreviewLink() {
-    const absoluteUrl = `${window.location.origin}${clientPreviewHref}`;
-    await copyText(absoluteUrl);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    setSharing(true);
+    try {
+      let absoluteUrl = `${window.location.origin}${clientPreviewHref}`;
+      const response = await fetch("/api/site-preview/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ search: buildPreviewSearch(data, options) }),
+      });
+
+      if (response.ok) {
+        const payload = await response.json() as { url?: string };
+        if (payload.url) absoluteUrl = payload.url;
+      }
+
+      await copyText(absoluteUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } finally {
+      setSharing(false);
+    }
   }
 
   function applyVariation(nextVariationId: string) {
@@ -581,10 +613,11 @@ function WebDesignBuilderContent() {
             <button
               type="button"
               onClick={copyPreviewLink}
+              disabled={sharing}
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-hero px-4 py-2 text-sm font-bold text-white shadow-glow transition hover:opacity-90"
             >
               {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Client link copied" : "Share with client"}
+              {sharing ? "Creating link..." : copied ? "Client link copied" : "Share with client"}
             </button>
           </div>
         </div>
@@ -615,7 +648,7 @@ function WebDesignBuilderContent() {
               </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-3">
               {BUILDER_STEPS.map((step, index) => {
                 const StepIcon = step.icon;
                 const active = index === activeStep;
@@ -647,7 +680,7 @@ function WebDesignBuilderContent() {
           </div>
         </section>
 
-        <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
+        <section className={`mt-5 grid gap-5 ${activeStepData.key === "launch" ? "xl:grid-cols-[minmax(0,1fr)_390px]" : "grid-cols-1"}`}>
           <div className="web-design-shell rounded-[1.5rem] border border-border bg-surface p-4 shadow-card sm:p-5">
             <div className="mb-5 flex items-start gap-3">
               <div className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary-light">
@@ -737,7 +770,7 @@ function WebDesignBuilderContent() {
               </div>
             )}
 
-            {activeStepData.key === "style" && (
+            {activeStepData.key === "direction" && (
               <div className="space-y-5">
                 <VariationPicker
                   value={variation}
@@ -753,70 +786,142 @@ function WebDesignBuilderContent() {
                   onChange={setStyle}
                   columns="sm:grid-cols-2 xl:grid-cols-3"
                 />
-                <div className="grid gap-5 lg:grid-cols-2">
-                  <OptionGrid
-                    title="Theme"
-                    description="Create either a premium dark concept or a clean light local-business site."
-                    icon={theme === "dark" ? Moon : Sun}
-                    options={THEME_OPTIONS}
-                    value={theme}
-                    onChange={setTheme}
-                  />
-                  <OptionGrid
-                    title="Layout style"
-                    description="Choose how the page sells: direct conversion, brand story, or visual showcase."
-                    icon={MapPin}
-                    options={LAYOUT_OPTIONS}
-                    value={layout}
-                    onChange={setLayout}
-                  />
-                </div>
-              </div>
-            )}
-
-            {activeStepData.key === "structure" && (
-              <div className="space-y-5">
-                <OptionGrid
-                  title="Page structure"
-                  description="Use fewer sections for quick outreach, or a fuller version when the lead looks high value."
-                  icon={LayoutTemplate}
-                  options={SECTION_OPTIONS}
-                  value={sections}
-                  onChange={setSections}
-                  columns="sm:grid-cols-2 xl:grid-cols-4"
-                />
-                <OptionGrid
-                  title="Image treatment"
-                  description="Use relevant visual treatment without requiring paid stock assets or manual image uploads."
-                  icon={ImageIcon}
-                  options={IMAGE_OPTIONS}
-                  value={images}
-                  onChange={setImages}
-                  columns="sm:grid-cols-2 xl:grid-cols-4"
-                />
-                <div className="grid gap-5 lg:grid-cols-2">
-                  <OptionGrid
-                    title="Copy depth"
-                    description="Tune the content length before sharing with the prospect."
-                    icon={Wand2}
-                    options={CONTENT_OPTIONS}
-                    value={contentDepth}
-                    onChange={setContentDepth}
-                  />
-                  <OptionGrid
-                    title="Conversion goal"
-                    description="Change the CTA language and supporting sections around the action you want."
-                    icon={Phone}
-                    options={GOAL_OPTIONS}
-                    value={conversionGoal}
-                    onChange={setConversionGoal}
-                  />
-                </div>
+                <details className="group rounded-2xl border border-border bg-background/40">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 font-black text-foreground">
+                    <span className="flex items-center gap-2">
+                      <SlidersHorizontal className="h-5 w-5 text-primary-light" />
+                      Advanced controls
+                    </span>
+                    <span className="text-sm font-semibold text-muted-foreground group-open:hidden">Optional</span>
+                    <span className="hidden text-sm font-semibold text-muted-foreground group-open:inline">Hide</span>
+                  </summary>
+                  <div className="space-y-5 border-t border-border p-4">
+                    <div className="grid gap-5 lg:grid-cols-2">
+                      <OptionGrid
+                        title="Theme"
+                        description="Create either a premium dark concept or a clean light local-business site."
+                        icon={theme === "dark" ? Moon : Sun}
+                        options={THEME_OPTIONS}
+                        value={theme}
+                        onChange={setTheme}
+                      />
+                      <OptionGrid
+                        title="Layout style"
+                        description="Choose how the page sells: direct conversion, brand story, or visual showcase."
+                        icon={MapPin}
+                        options={LAYOUT_OPTIONS}
+                        value={layout}
+                        onChange={setLayout}
+                      />
+                    </div>
+                    <OptionGrid
+                      title="Page structure"
+                      description="Use fewer sections for quick outreach, or a fuller version when the lead looks high value."
+                      icon={LayoutTemplate}
+                      options={SECTION_OPTIONS}
+                      value={sections}
+                      onChange={setSections}
+                      columns="sm:grid-cols-2 xl:grid-cols-4"
+                    />
+                    <OptionGrid
+                      title="Image treatment"
+                      description="Choose the visual proof format that fits this business."
+                      icon={ImageIcon}
+                      options={IMAGE_OPTIONS}
+                      value={images}
+                      onChange={setImages}
+                      columns="sm:grid-cols-2 xl:grid-cols-4"
+                    />
+                    <div className="grid gap-5 lg:grid-cols-2">
+                      <OptionGrid
+                        title="Copy depth"
+                        description="Tune the content length before sharing with the prospect."
+                        icon={Wand2}
+                        options={CONTENT_OPTIONS}
+                        value={contentDepth}
+                        onChange={setContentDepth}
+                      />
+                      <OptionGrid
+                        title="Conversion goal"
+                        description="Change the CTA language and supporting sections around the action you want."
+                        icon={Phone}
+                        options={GOAL_OPTIONS}
+                        value={conversionGoal}
+                        onChange={setConversionGoal}
+                      />
+                    </div>
+                  </div>
+                </details>
               </div>
             )}
 
             {activeStepData.key === "launch" && (
               <div className="grid gap-5 lg:grid-cols-3">
+                <div className="rounded-3xl border border-border bg-background/45 p-5 lg:col-span-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Quick editor</p>
+                      <h3 className="mt-2 text-xl font-black text-foreground">Make the concept sound like this client</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                        Edit the three details prospects notice first. Leave a field blank to keep the generated version.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHeadline("");
+                        setSubheadline("");
+                        setCta("");
+                        setAccent("");
+                      }}
+                      className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-3 py-2 text-sm font-bold text-muted-foreground transition hover:text-foreground"
+                    >
+                      Use generated copy
+                    </button>
+                  </div>
+                  <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Headline</span>
+                      <input
+                        value={headline}
+                        onChange={event => setHeadline(event.target.value.slice(0, 120))}
+                        placeholder={generatedIdentity.headline}
+                        className="mt-2 min-h-12 w-full rounded-xl border border-border bg-surface px-4 py-3 font-semibold text-foreground outline-none transition placeholder:text-muted-foreground/55 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Primary button</span>
+                      <input
+                        value={cta}
+                        onChange={event => setCta(event.target.value.slice(0, 42))}
+                        placeholder={generatedIdentity.primaryCta}
+                        className="mt-2 min-h-12 w-full rounded-xl border border-border bg-surface px-4 py-3 font-semibold text-foreground outline-none transition placeholder:text-muted-foreground/55 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </label>
+                    <label className="block lg:col-span-2">
+                      <span className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Supporting message</span>
+                      <textarea
+                        value={subheadline}
+                        onChange={event => setSubheadline(event.target.value.slice(0, 280))}
+                        rows={3}
+                        placeholder={generatedIdentity.subheadline}
+                        className="mt-2 w-full resize-y rounded-xl border border-border bg-surface px-4 py-3 leading-7 text-foreground outline-none transition placeholder:text-muted-foreground/55 focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+                      />
+                    </label>
+                    <label className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 lg:col-span-2">
+                      <input
+                        type="color"
+                        value={accent || selectedVariation.palette.accent}
+                        onChange={event => setAccent(event.target.value)}
+                        className="h-10 w-12 cursor-pointer rounded-lg border-0 bg-transparent p-0"
+                      />
+                      <span>
+                        <span className="block text-sm font-black text-foreground">Brand accent</span>
+                        <span className="text-sm text-muted-foreground">Use a known brand colour or keep the matched palette.</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
                 {[
                   {
                     title: "Open client preview",
@@ -893,6 +998,7 @@ function WebDesignBuilderContent() {
             </div>
           </div>
 
+          {activeStepData.key === "launch" && (
           <aside className="space-y-4 xl:sticky xl:top-5 xl:self-start">
             <div className="web-design-preview-shell overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-card">
               <div className="web-design-window-bar border-b border-border bg-background/65 px-4 py-3">
@@ -961,10 +1067,11 @@ function WebDesignBuilderContent() {
                     <button
                       type="button"
                       onClick={copyPreviewLink}
+                      disabled={sharing}
                       className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-background/55 px-4 py-3 text-sm font-bold text-muted-foreground transition hover:text-foreground"
                     >
                       {copied ? <CheckCircle className="h-4 w-4 text-accent" /> : <Copy className="h-4 w-4" />}
-                      {copied ? "Copied" : "Share"}
+                      {sharing ? "Creating..." : copied ? "Copied" : "Share"}
                     </button>
                     <a
                       href={pdfHref}
@@ -1007,6 +1114,7 @@ function WebDesignBuilderContent() {
               </div>
             </div>
           </aside>
+          )}
         </section>
       </div>
     </main>
