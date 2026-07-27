@@ -59,6 +59,42 @@ const CLIENT_ACQUISITION_SYSTEM_VISUALS = [
   },
 ];
 
+const GENERIC_LEAD_WORKFLOW_VISUALS = (post: BlogArticleSource) => {
+  const title = post.title || "this lead workflow";
+  return [
+    {
+      src: "/blog-images/freelancer-client-acquisition-system-funnel.svg",
+      alt: `A funnel diagram for ${title}`,
+      title: "Search intent to signup path",
+      caption: "Connect the article topic to a real lead workflow instead of leaving the reader with passive advice.",
+    },
+    {
+      src: "/blog-images/freelancer-client-acquisition-system-lead-search.svg",
+      alt: `Lead search filters related to ${title}`,
+      title: "Lead search filters",
+      caption: "Show how the reader can move from a keyword idea into niche, location, signal, and contact filters.",
+    },
+    {
+      src: "/blog-images/freelancer-client-acquisition-system-qualification-scorecard.svg",
+      alt: `A qualification scorecard for ${title}`,
+      title: "Qualification scorecard",
+      caption: "Make the next decision visible: which leads are worth saving, pitching, or skipping.",
+    },
+    {
+      src: "/blog-images/freelancer-client-acquisition-system-outreach-proof.svg",
+      alt: `An outreach proof diagram for ${title}`,
+      title: "Pitch from proof",
+      caption: "Tie the first message to a visible business signal so the CTA feels useful and specific.",
+    },
+    {
+      src: "/blog-images/freelancer-client-acquisition-system-follow-up-loop.svg",
+      alt: `A follow-up loop for ${title}`,
+      title: "Follow-up loop",
+      caption: "Give readers a visual path from saved lead to proposal, follow-up, and outcome tracking.",
+    },
+  ];
+};
+
 const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
   eyebrow: "GSC top-click funnel",
   title: "Find your next client lead from this page",
@@ -101,7 +137,7 @@ function getDefaultConversionFunnel(post: BlogArticleSource) {
 }
 
 function getDefaultArticleVisuals(post: BlogArticleSource) {
-  return isClientAcquisitionSystemPost(post) ? CLIENT_ACQUISITION_SYSTEM_VISUALS : [];
+  return isClientAcquisitionSystemPost(post) ? CLIENT_ACQUISITION_SYSTEM_VISUALS : GENERIC_LEAD_WORKFLOW_VISUALS(post);
 }
 
 function InternalOrExternalLink({

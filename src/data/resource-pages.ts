@@ -24,7 +24,234 @@ export type ResourcePage = {
   faqs: { q: string; a: string }[];
 };
 
+
+function buildJuly28DailyResourcePages(): ResourcePage[] {
+  return [
+    {
+      slug: "upwork-lead-generation-alternative",
+      title: "Upwork lead generation alternative for freelancers",
+      metaTitle: "Upwork Lead Generation Alternative for Freelancers | iCloseLeads",
+      metaDescription: "Find freelancer leads beyond Upwork with a lead search, qualification, proposal, and follow-up workflow built for client acquisition.",
+      keyword: "upwork lead generation alternative",
+      relatedSearches: [
+        "lead generation freelancer upwork",
+        "b2b lead generation freelancer",
+        "get cold leads for freelancer",
+        "cold email freelance reddit",
+        "lead generation freelancer platform"
+      ],
+      audience: "Freelancers and small agencies that want clients without relying only on marketplaces",
+      intent: "The searcher wants a way to get client leads when Upwork is crowded, expensive, or inconsistent.",
+      researchIntent: {
+        searcherJob: "Find a repeatable lead source outside freelance marketplaces.",
+        competitorGap: "Marketplace and generic lead-gen pages often skip qualification, proposal context, and follow-up.",
+        workflowNudge: "Search a niche, qualify the business, save the lead, and generate a first pitch.",
+        conversionPath: "Signup to run the first lead search and save qualified prospects."
+      },
+      summary: "iCloseLeads is a lead generation platform for freelancers who need an Upwork alternative that starts with real business signals instead of another public job board. The better workflow is to find companies with a visible need, qualify the contact path, draft a specific pitch, and follow up from one CRM-style lead record.",
+      leadIn: "Use Upwork for inbound demand when it works, but build an owned acquisition system in parallel. iCloseLeads helps freelancers search for local and B2B prospects, save only qualified leads, and move from discovery to proposal without losing context.",
+      activationPlan: {
+        trigger: "Use this when marketplace competition is high or job replies are slowing down.",
+        firstRun: "Pick one service and one buyer niche, then search for businesses with a visible problem you can solve.",
+        savedLead: "Save the lead with the source proof, business need, contact route, and proposal angle.",
+        followUp: "Generate the first pitch and schedule a follow-up before moving to the next prospect."
+      },
+      steps: [
+        "Choose one client type that already buys your service.",
+        "Search for businesses where the website, lead flow, content, or operations gap is visible.",
+        "Reject prospects when you cannot identify a reason to contact them.",
+        "Save the lead with evidence instead of copying a blind list.",
+        "Draft an outreach message that names the problem and the business outcome.",
+        "Track follow-ups so the system gets better than a one-time export."
+      ],
+      qualificationChecks: [
+        { signal: "Clear service fit", whyItMatters: "The lead must need the thing you sell, not only match a broad category.", nextMove: "Keep one specific pitch angle with the saved lead." },
+        { signal: "Visible problem", whyItMatters: "A cold message works better when it points to a real missed opportunity.", nextMove: "Capture the website, listing, or public page proof." },
+        { signal: "Reachable route", whyItMatters: "A prospect is not useful if there is no reasonable public contact path.", nextMove: "Save only public, respectful outreach routes." }
+      ],
+      proofPoints: [
+        "Google related searches around freelance lead generation show demand beyond job boards.",
+        "The highest-click iCloseLeads content already proves client acquisition system intent.",
+        "The page routes readers into signup and lead search instead of ending at advice."
+      ],
+      pitch: "Hi, I found your business while researching companies that could improve their client acquisition flow. I noticed one specific gap and can send a short idea if you are open to it.",
+      internalLinks: [
+        { label: "Freelance client acquisition system", href: "/blog/freelance-client-acquisition-system" },
+        { label: "Find local business leads", href: "/use-cases/local-business-leads" },
+        { label: "AI proposal generator", href: "/features/ai-proposals" },
+        { label: "Client outreach CRM", href: "/features/crm" }
+      ],
+      faqs: [
+        { q: "What is a good Upwork lead generation alternative?", a: "A good alternative gives freelancers an owned way to find qualified businesses, verify the need, save prospects, and send specific outreach instead of waiting for marketplace jobs." },
+        { q: "Can cold outreach replace Upwork?", a: "It can become a parallel acquisition channel, but it works best when each lead is qualified by service fit, timing, and a visible reason to contact the business." },
+        { q: "How does iCloseLeads help with this workflow?", a: "iCloseLeads connects lead search, qualification notes, proposal drafting, and follow-up so freelancers can turn research into a repeatable client acquisition system." }
+      ]
+    },
+    {
+      slug: "freelance-client-acquisition-funnel",
+      title: "Freelance client acquisition funnel from lead search to signup",
+      metaTitle: "Freelance Client Acquisition Funnel | Find Leads and Follow Up",
+      metaDescription: "Build a freelancer client acquisition funnel with lead search, qualification, proposal drafting, CRM follow-up, and signup-focused next steps.",
+      keyword: "freelance client acquisition funnel",
+      relatedSearches: ["freelance client acquisition system", "get clients as a freelancer", "freelancer lead generation", "client acquisition for freelancers"],
+      audience: "Freelancers, consultants, agency owners, and outbound-focused service providers",
+      intent: "The searcher wants a structured system to turn research into booked conversations.",
+      researchIntent: {
+        searcherJob: "Create a repeatable funnel for finding and converting freelance clients.",
+        competitorGap: "Most advice stops at outreach scripts and does not connect lead research, qualification, and CRM follow-up.",
+        workflowNudge: "Make the funnel visible: search, qualify, pitch, follow up, measure.",
+        conversionPath: "Signup to run the first search and save the first qualified lead."
+      },
+      summary: "A freelance client acquisition funnel should start with qualified lead discovery and end with a tracked next step. iCloseLeads ties the funnel together by connecting search signals, saved leads, proposal context, and follow-up tasks in one workflow.",
+      leadIn: "The problem is rarely a lack of tactics. The problem is that lead research, pitch writing, and follow-up live in separate places. This page shows how to turn the top-click client acquisition article into a signup-ready workflow.",
+      activationPlan: {
+        trigger: "Use this when traffic lands on advice content but does not become product usage.",
+        firstRun: "Turn the searcher into a lead-search action within the first screen.",
+        savedLead: "Ask them to save one lead so the CRM loop begins.",
+        followUp: "Move from saved lead to proposal and follow-up within the same session."
+      },
+      steps: [
+        "Define the offer and the client type.",
+        "Search for businesses with visible buying signals.",
+        "Score each prospect by need, fit, urgency, and contactability.",
+        "Save the lead with proof and a first-message angle.",
+        "Generate a proposal or outreach note from the saved context.",
+        "Measure signups, saved leads, and follow-up activity from the page."
+      ],
+      qualificationChecks: [
+        { signal: "High-click SEO page", whyItMatters: "The audience already cares about client acquisition.", nextMove: "Add a signup path, examples, and lead-search visuals." },
+        { signal: "Reader has a service to sell", whyItMatters: "The funnel only works when there is a clear offer.", nextMove: "Use a service-first search flow." },
+        { signal: "Lead can be saved", whyItMatters: "Saved leads prove activation better than passive reading.", nextMove: "Route the CTA to signup with intent tracking." }
+      ],
+      proofPoints: [
+        "GSC shows the client acquisition article is a leading iCloseLeads entry point.",
+        "The new default visual system adds 4-5 workflow diagrams to blog articles.",
+        "The signup CTA uses source and intent parameters for clearer measurement."
+      ],
+      pitch: "Use this workflow to find one qualified prospect today, save the evidence, and send a pitch that references the actual business need.",
+      internalLinks: [
+        { label: "Freelance client acquisition system", href: "/blog/freelance-client-acquisition-system" },
+        { label: "Upwork lead generation alternative", href: "/resources/upwork-lead-generation-alternative" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
+        { label: "AI proposals", href: "/features/ai-proposals" }
+      ],
+      faqs: [
+        { q: "What should a freelancer client acquisition funnel include?", a: "It should include lead research, qualification, saved lead records, a specific pitch, follow-up timing, and a measurement loop for signups or booked calls." },
+        { q: "What is the first action on the funnel?", a: "The first action should be a focused lead search tied to the freelancer's offer and target customer." },
+        { q: "Why add visuals to acquisition content?", a: "Visuals help readers understand the workflow quickly and move from advice into action." }
+      ]
+    },
+    {
+      slug: "local-service-business-lead-finder",
+      title: "Local service business lead finder workflow",
+      metaTitle: "Local Service Business Lead Finder | Qualify Better Prospects",
+      metaDescription: "Use a local service business lead finder workflow to identify reachable prospects with visible demand, website gaps, and outreach angles.",
+      keyword: "local service business lead finder",
+      relatedSearches: ["local business leads", "find local businesses that need websites", "service business leads", "b2b lead generation local"],
+      audience: "Freelancers and agencies selling websites, SEO, booking flows, ads, or local marketing",
+      intent: "The searcher wants local business prospects that can become sales conversations.",
+      researchIntent: {
+        searcherJob: "Find local businesses with visible reasons to pitch.",
+        competitorGap: "Lead-list pages sell volume but rarely prove business need or contact quality.",
+        workflowNudge: "Search by niche and city, then qualify need before outreach.",
+        conversionPath: "Use iCloseLeads to run the local search and save the first qualified prospects."
+      },
+      summary: "A local service business lead finder is useful only when it separates real prospects from generic business records. iCloseLeads helps freelancers connect location, service fit, public contact paths, visible website gaps, and proposal angles before outreach.",
+      leadIn: "Local service leads work best when the offer is specific. A web designer should look for site and booking gaps; an SEO consultant should look for local visibility gaps; a lead-gen consultant should look for missed response paths.",
+      activationPlan: {
+        trigger: "Use this when a campaign needs local B2B prospects rather than marketplace jobs.",
+        firstRun: "Search one service category and one city.",
+        savedLead: "Save only prospects with a visible need and a reachable public route.",
+        followUp: "Generate the first message from the exact local gap."
+      },
+      steps: [
+        "Pick a service category where buyers research before contacting.",
+        "Choose one city or local area.",
+        "Identify no-site, outdated-site, weak review, booking, or quote-flow gaps.",
+        "Confirm public contact routes.",
+        "Save the qualified lead and proof notes.",
+        "Draft outreach around the business outcome, not the tool."
+      ],
+      qualificationChecks: [
+        { signal: "Local demand exists", whyItMatters: "A business with demand can value better conversion flow.", nextMove: "Save the local proof and service category." },
+        { signal: "The gap is visible", whyItMatters: "Visible proof makes outreach more specific.", nextMove: "Write the issue in one sentence." },
+        { signal: "The CTA can be measured", whyItMatters: "The page must create signups or saved leads.", nextMove: "Route readers to a search-ready signup." }
+      ],
+      proofPoints: [
+        "Google related searches keep showing local lead and businesses-without-websites language.",
+        "Ahrefs shows iCloseLeads authority is still low, so long-tail conversion pages are safer than broad head terms.",
+        "GSC indexing issues require stronger internal links and sitemap exposure for new resources."
+      ],
+      pitch: "Hi, I found your company while checking local service businesses with conversion gaps. I noticed one area where the website or listing could make it easier for people to contact you.",
+      internalLinks: [
+        { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
+        { label: "Web design leads", href: "/resources/web-design-leads" },
+        { label: "AI proposal generator", href: "/features/ai-proposals" }
+      ],
+      faqs: [
+        { q: "What makes a local service lead worth contacting?", a: "A worthwhile lead has service fit, local demand, a visible business gap, and a respectful public contact route." },
+        { q: "Should I buy local business lead lists?", a: "Only after verifying fit and contact quality. A smaller qualified list is usually more useful than a large unverified export." },
+        { q: "How does iCloseLeads help local prospecting?", a: "It gives freelancers a place to search, save, qualify, pitch, and follow up with local leads." }
+      ]
+    },
+    {
+      slug: "agency-prospecting-crm",
+      title: "Agency prospecting CRM for outreach follow-up",
+      metaTitle: "Agency Prospecting CRM | Track Leads, Pitches, and Follow-Ups",
+      metaDescription: "Use an agency prospecting CRM workflow to keep lead research, pitch context, follow-ups, and client acquisition tasks organized.",
+      keyword: "agency prospecting CRM",
+      relatedSearches: ["lead generation CRM for agencies", "freelancer CRM for leads", "outreach follow up CRM", "agency lead management"],
+      audience: "Small agencies, solo consultants, and freelancers running outbound campaigns",
+      intent: "The searcher wants an organized way to manage prospects and follow-up.",
+      researchIntent: {
+        searcherJob: "Track prospecting work after lead discovery.",
+        competitorGap: "CRM pages talk about pipelines but often skip the research context that makes cold outreach work.",
+        workflowNudge: "Save lead evidence, proposal angle, owner route, status, and next follow-up.",
+        conversionPath: "Signup and save a lead so the follow-up workflow starts."
+      },
+      summary: "An agency prospecting CRM should preserve why a lead was saved, not only who the lead is. iCloseLeads connects prospect research, saved context, pitch generation, and follow-up so agencies can improve reply quality without losing the original reason to reach out.",
+      leadIn: "Most outbound systems fail between research and follow-up. The first message is written from memory, the second message has no context, and the team cannot see which signal made the lead worth saving.",
+      activationPlan: {
+        trigger: "Use this when a lead search produces prospects but follow-up is inconsistent.",
+        firstRun: "Save each lead with the signal that made it worth contacting.",
+        savedLead: "Add status, pitch angle, target service, and next action.",
+        followUp: "Use the saved context to send a more specific second touch."
+      },
+      steps: [
+        "Search leads by target service and niche.",
+        "Save the source URL or public profile that proves fit.",
+        "Record the problem, pitch angle, owner route, and next action.",
+        "Generate the first proposal or cold email from the saved context.",
+        "Set a follow-up window.",
+        "Review replies and refine the target niche."
+      ],
+      qualificationChecks: [
+        { signal: "Lead has a saved reason", whyItMatters: "Follow-up quality depends on remembering the original context.", nextMove: "Require a one-sentence pitch angle before saving." },
+        { signal: "Status is current", whyItMatters: "Old open leads create busy work.", nextMove: "Move each lead to follow-up, monitor, won, lost, or archive." },
+        { signal: "Campaign matches business goal", whyItMatters: "The CRM should create users and sales conversations.", nextMove: "Track signups, saved leads, proposals, and replies." }
+      ],
+      proofPoints: [
+        "Agency and freelancer searches overlap around lead generation, CRM, and follow-up.",
+        "iCloseLeads can compete by making research context part of the CRM record.",
+        "This page supports signup activation from resource and blog traffic."
+      ],
+      pitch: "Hi, I saved this lead because there is a specific service gap that matches what we do. Here is the short reason it may be worth a conversation.",
+      internalLinks: [
+        { label: "Freelance client acquisition funnel", href: "/resources/freelance-client-acquisition-funnel" },
+        { label: "Client outreach CRM", href: "/features/crm" },
+        { label: "AI proposal generator", href: "/features/ai-proposals" }
+      ],
+      faqs: [
+        { q: "What should an agency prospecting CRM track?", a: "It should track the prospect, source proof, qualification reason, pitch angle, contact route, status, follow-up date, and outcome." },
+        { q: "Is iCloseLeads only a lead finder?", a: "No. The strongest workflow connects lead discovery with saved records, proposal drafting, and follow-up." },
+        { q: "Why does context matter in a CRM?", a: "Context helps each message feel specific and prevents a team from sending generic outreach after the research is forgotten." }
+      ]
+    }
+  ];
+}
+
 export const RESOURCE_PAGES: ResourcePage[] = [
+  ...buildJuly28DailyResourcePages(),
   {
     slug: "web-design-leads",
     title: "Web design leads that are worth pitching",
