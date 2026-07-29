@@ -6,6 +6,7 @@ type PriceKey = `${PaidPlan}_${BillingInterval}`;
 
 export interface PaddleConfig {
   apiKey: string;
+  clientToken: string;
   webhookSecret: string;
   environment: "sandbox" | "live";
   prices: Record<PriceKey, string>;
@@ -15,6 +16,7 @@ export function getPaddleConfig(): PaddleConfig {
   const environment = process.env.PADDLE_ENVIRONMENT === "live" ? "live" : "sandbox";
   return {
     apiKey: (process.env.PADDLE_API_KEY || "").trim(),
+    clientToken: (process.env.PADDLE_CLIENT_TOKEN || "").trim(),
     webhookSecret: (process.env.PADDLE_WEBHOOK_SECRET || "").trim(),
     environment,
     prices: {
@@ -44,8 +46,10 @@ export function getPlanForPaddlePrice(
 }
 
 export function isPaddleCheckoutConfigured(config: PaddleConfig) {
+  const clientTokenPrefix = config.environment === "live" ? "live_" : "test_";
   return Boolean(
     config.apiKey
+    && config.clientToken.startsWith(clientTokenPrefix)
     && config.webhookSecret
     && Object.values(config.prices).every((id) => /^pri_[a-z0-9]+$/.test(id)),
   );
@@ -72,7 +76,7 @@ export function verifyPaddleSignature(
     .map((part) => part.slice(3));
 
   if (!Number.isFinite(timestamp) || signatures.length === 0) return false;
-  if (Math.abs(Math.floor(now / 1000) - timestamp) > 300) return false;
+  if (Math.abs(Math.floor(now / 1000) - timestamp) > 5) return false;
 
   const expected = createHmac("sha256", secret)
     .update(`${timestamp}:${rawBody}`)

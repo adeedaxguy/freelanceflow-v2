@@ -72,6 +72,7 @@ export default async function UpgradePage({
       userEmail={user?.email ?? ""}
       pricing={pricing}
       billingReady={billingReady}
+      billingProvider={provider}
       billingTestMode={billingTestMode}
       canCheckout={canCheckout}
       hasBillingSubscription={hasBillingSubscription}

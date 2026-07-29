@@ -57,7 +57,11 @@ export async function POST(req: NextRequest) {
         }),
       ]);
       const priceId = getPaddlePriceId(config, plan, billing);
-      if (!config.apiKey || !/^pri_[a-z0-9]+$/.test(priceId)) {
+      if (
+        !config.apiKey
+        || !config.clientToken
+        || !/^pri_[a-z0-9]+$/.test(priceId)
+      ) {
         return NextResponse.json({
           error: "Paid plans are not open yet. The secure checkout is still being configured.",
         }, { status: 503 });
@@ -83,7 +87,7 @@ export async function POST(req: NextRequest) {
             billing_interval: billing,
           },
           checkout: {
-            url: `${appUrl}/dashboard/upgrade?checkout=success`,
+            url: `${appUrl}/checkout/paddle`,
           },
         }),
       });

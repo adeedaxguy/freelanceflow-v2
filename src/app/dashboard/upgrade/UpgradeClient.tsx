@@ -9,6 +9,7 @@ interface Props {
   currentPlan: string;
   userEmail: string;
   billingReady: boolean;
+  billingProvider: "LEMONSQUEEZY" | "PADDLE";
   billingTestMode: boolean;
   canCheckout: boolean;
   hasBillingSubscription: boolean;
@@ -26,6 +27,7 @@ export default function UpgradeClient({
   userEmail,
   pricing,
   billingReady,
+  billingProvider,
   billingTestMode,
   canCheckout,
   hasBillingSubscription,
@@ -294,7 +296,7 @@ export default function UpgradeClient({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Shield className="w-4 h-4 text-accent" />
-          Secure Lemon Squeezy checkout
+          Secure {billingProvider === "PADDLE" ? "Paddle" : "Lemon Squeezy"} checkout
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />

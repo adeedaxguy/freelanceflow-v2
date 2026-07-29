@@ -10,6 +10,7 @@ import {
 
 const config: PaddleConfig = {
   apiKey: "pdl_sdbx_apikey",
+  clientToken: "test_client_token",
   webhookSecret: "pdl_ntfset_secret",
   environment: "sandbox",
   prices: {
@@ -26,6 +27,7 @@ describe("Paddle billing helpers", () => {
     expect(getPlanForPaddlePrice(config, "pri_01pro000monthly0000000000")).toBe("pro");
     expect(getPlanForPaddlePrice(config, "pri_missing")).toBeNull();
     expect(isPaddleCheckoutConfigured(config)).toBe(true);
+    expect(isPaddleCheckoutConfigured({ ...config, clientToken: "live_wrong_environment" })).toBe(false);
   });
 
   it("verifies signed raw webhook bodies and rejects stale signatures", () => {
@@ -44,7 +46,7 @@ describe("Paddle billing helpers", () => {
     )).toBe(true);
     expect(verifyPaddleSignature(
       rawBody,
-      `ts=${timestamp - 600};h1=${signature}`,
+      `ts=${timestamp - 10};h1=${signature}`,
       config.webhookSecret,
       now,
     )).toBe(false);

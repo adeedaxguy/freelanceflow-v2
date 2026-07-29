@@ -1508,9 +1508,14 @@ function shouldTrustWebsiteForLead(raw: Partial<LocalBizLead>): boolean {
 }
 
 // ── Email pattern generator ────────────────────────────────────────────────────
-function guessEmails(domain: string | undefined): string[] {
+export function guessEmails(domain: string | undefined): string[] {
   if (!domain) return [];
-  const d = domain.replace(/^https?:\/\/(www\.)?/,"").split("/")[0]!.toLowerCase().trim();
+  const d = domain
+    .replace(/^https?:\/\//i, "")
+    .split("/")[0]!
+    .toLowerCase()
+    .trim()
+    .replace(/^www\./, "");
   if (!d || d.length < 4) return [];
   return [`info@${d}`, `contact@${d}`, `hello@${d}`, `admin@${d}`];
 }

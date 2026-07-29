@@ -101,6 +101,10 @@ function cleanWebsiteValue(value?: string | null) {
   return cleaned;
 }
 
+function cleanEmailValue(value?: string | null) {
+  return cleanContactValue(value).replace(/@www\./i, "@");
+}
+
 function normalizeUrl(url: string) {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
@@ -108,9 +112,9 @@ function normalizeUrl(url: string) {
 function getContactInfo(lead: LeadExt) {
   const guessedEmails = contextField(lead.notes, "Guessed Emails")
     .split(",")
-    .map(email => cleanContactValue(email.replace(/\s*\(guessed\)\s*$/i, "")))
+    .map(email => cleanEmailValue(email.replace(/\s*\(guessed\)\s*$/i, "")))
     .filter((email): email is string => Boolean(email));
-  const directEmail = cleanContactValue(lead.email);
+  const directEmail = cleanEmailValue(lead.email);
 
   const country = cleanContactValue(contextField(lead.notes, "Country"));
   const phone = cleanContactValue(lead.phone ?? contextField(lead.notes, "Phone"));
