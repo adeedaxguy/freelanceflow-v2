@@ -589,7 +589,7 @@ export default function SavedLeadsPage() {
                     <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
                       <CalendarClock className="w-2.5 h-2.5" /> {formatSavedDateTime(lead.savedAt)}
                     </div>
-                    {lead.email && <div className="text-[10px] text-accent mt-1 flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{lead.email}</div>}
+                    {lead.email && <div className="text-[10px] text-accent mt-1 flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{cleanEmailValue(lead.email)}</div>}
                   </div>
                 ))}
               </div>
@@ -644,7 +644,7 @@ export default function SavedLeadsPage() {
                     <span className="flex items-center gap-1 whitespace-nowrap"><CalendarClock className="w-3 h-3" />Saved {formatSavedDateTime(lead.savedAt)}</span>
                     {countryLabel(inferLeadCountry(lead)) && <span className="flex items-center gap-1 whitespace-nowrap"><MapPin className="w-3 h-3" />{countryLabel(inferLeadCountry(lead))}</span>}
                     <span className="flex items-center gap-1"><Globe className="w-3 h-3" />{lead.domain}</span>
-                    {lead.email && <span className="flex items-center gap-1 text-accent"><Mail className="w-3 h-3" />{lead.email}</span>}
+                    {lead.email && <span className="flex items-center gap-1 text-accent"><Mail className="w-3 h-3" />{cleanEmailValue(lead.email)}</span>}
                     {lead.niche && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">{lead.niche}</span>}
                     {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
                   </div>
