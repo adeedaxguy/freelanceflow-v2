@@ -503,6 +503,7 @@ function compositionForTemplate(template: DesignTemplate): DesignComposition {
     case "trade-emergency":
       return "action-board";
     case "restaurant-menu":
+    case "neighborhood-commerce":
     case "ecommerce-showroom":
     case "visual-proof":
       return "catalog-grid";

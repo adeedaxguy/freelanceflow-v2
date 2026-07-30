@@ -80,8 +80,8 @@ function baseIdentity(data: SiteDraftData): Pick<SiteDraftIdentity,
   };
 }
 
-export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
-  const text = `${data.company} ${data.category}`.toLowerCase();
+export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): SiteDraftIdentity {
+  const text = `${data.company} ${data.category} ${creativeBrief}`.toLowerCase();
   const market = marketFromLocation(data.location);
   const common = baseIdentity(data);
 
@@ -165,41 +165,69 @@ export function getSiteDraftIdentity(data: SiteDraftData): SiteDraftIdentity {
     };
   }
 
-  if (/\b(cafe|coffee|restaurant|bakery|food|pizza|bar|grill|diner)\b/.test(text)) {
+  if (/\b(cafe|coffee|restaurant|bakery|bake|bread|pastry|cake|food|pizza|bar|grill|diner|catering)\b/.test(text)) {
+    const isBakery = /\b(bakery|bake|bread|pastry|cake|patisserie)\b/.test(text);
     return {
       ...common,
-      primaryCta: "Book a table",
-      segment: "food",
-      logoLabel: "LOCAL",
+      eyebrow: `${isBakery ? "Bakery" : data.category} · ${market}`,
+      primaryCta: isBakery ? "Order online" : "Book a table",
+      secondaryCta: isBakery ? "Plan catering" : common.secondaryCta,
+      segment: isBakery ? "bakery" : "food",
+      logoLabel: isBakery ? "BAKE" : "LOCAL",
       accent: "#fb923c",
       accent2: "#fef08a",
       accentSoft: "rgba(251,146,60,0.2)",
       surface: "linear-gradient(135deg, rgba(67,20,7,0.94), rgba(120,53,15,0.72))",
-      headline: `Fresh local flavor from ${data.company}, easy to find and visit.`,
-      subheadline: `Menus, specials, photos, hours, reviews, and directions help ${market} customers decide faster.`,
-      visualTitle: "Menu, photos, hours, and directions in one place",
-      visualSubtitle: "Food photos, menu highlights, opening hours, and location actions are built for mobile guests.",
-      pitchHook: "Sell menu clarity, local discovery, photo-led trust, and event enquiry capture.",
-      services: [
-        { title: "Menu and specials", description: "Make signature items, prices, and specials easy to scan before customers arrive." },
-        { title: "Hours and directions", description: "Put location, opening hours, and map actions where mobile visitors expect them." },
-        { title: "Photo-led trust", description: "Use a visual section for best sellers, atmosphere, and customer favorites." },
-        { title: "Events and catering", description: "Capture private dining, catering, and group enquiries from visitors already interested." },
-      ],
+      headline: isBakery
+        ? `Small-batch baking with a big reason to visit ${data.company}.`
+        : `Fresh local flavor from ${data.company}, easy to find and visit.`,
+      subheadline: isBakery
+        ? `Show ${market} what is fresh today, make online ordering effortless, and turn celebration cakes and catering into clear enquiries.`
+        : `Menus, specials, photos, hours, reviews, and directions help ${market} customers decide faster.`,
+      visualTitle: isBakery
+        ? "Today’s bakes, celebration orders, and catering"
+        : "Menu, photos, hours, and directions in one place",
+      visualSubtitle: isBakery
+        ? "A warm, photo-led storefront that lets customers browse, order, and enquire without hunting through social posts."
+        : "Food photos, menu highlights, opening hours, and location actions are built for mobile guests.",
+      pitchHook: isBakery
+        ? "Lead with fresh products, online ordering, catering, and celebration enquiries."
+        : "Sell menu clarity, local discovery, photo-led trust, and event enquiry capture.",
+      services: isBakery
+        ? [
+            { title: "Today’s bakes", description: "Make breads, pastries, cakes, and seasonal favourites easy to browse from the first screen." },
+            { title: "Order online", description: "Give regular customers a direct route to collection orders without a phone call." },
+            { title: "Cakes and catering", description: "Capture date, size, flavour, and event details in a focused enquiry path." },
+            { title: "Visit the bakery", description: "Keep opening hours, location, directions, and contact details close to every decision." },
+          ]
+        : [
+            { title: "Menu and specials", description: "Make signature items, prices, and specials easy to scan before customers arrive." },
+            { title: "Hours and directions", description: "Put location, opening hours, and map actions where mobile visitors expect them." },
+            { title: "Photo-led trust", description: "Use a visual section for best sellers, atmosphere, and customer favorites." },
+            { title: "Events and catering", description: "Capture private dining, catering, and group enquiries from visitors already interested." },
+          ],
       proof: [
-        { value: "Menu", label: "first layout" },
-        { value: "Photos", label: "built for appetite" },
+        { value: isBakery ? "Order" : "Menu", label: isBakery ? "ready from mobile" : "first layout" },
+        { value: isBakery ? "Cakes" : "Photos", label: isBakery ? "enquiry path" : "built for appetite" },
         { value: market, label: "local discovery" },
       ],
-      process: [
-        { step: "01", title: "Browse menu", description: "Customers see signature items and specials quickly." },
-        { step: "02", title: "Check hours", description: "The page removes friction around location and timing." },
-        { step: "03", title: "Visit or enquire", description: "Directions, calls, and event enquiries are one tap away." },
-      ],
-      pages: ["Menu", "Gallery", "Events", "Location"],
-      trustBadges: ["Menu ready", "Photo-led", "Local discovery"],
+      process: isBakery
+        ? [
+            { step: "01", title: "Choose a favourite", description: "Customers browse fresh bakes, seasonal items, and celebration options." },
+            { step: "02", title: "Order or enquire", description: "The right form captures collection, cake, or catering details." },
+            { step: "03", title: "Collect or visit", description: "Hours, directions, and order expectations stay clear." },
+          ]
+        : [
+            { step: "01", title: "Browse menu", description: "Customers see signature items and specials quickly." },
+            { step: "02", title: "Check hours", description: "The page removes friction around location and timing." },
+            { step: "03", title: "Visit or enquire", description: "Directions, calls, and event enquiries are one tap away." },
+          ],
+      pages: isBakery ? ["Today’s bakes", "Celebration cakes", "Catering", "Visit"] : ["Menu", "Gallery", "Events", "Location"],
+      trustBadges: isBakery ? ["Baked locally", "Order ready", "Catering enquiries"] : ["Menu ready", "Photo-led", "Local discovery"],
       testimonial: {
-        quote: "I found the menu, checked the location, and knew exactly what to order.",
+        quote: isBakery
+          ? "I could see what looked good, place an order, and plan collection in minutes."
+          : "I found the menu, checked the location, and knew exactly what to order.",
         name: "Nearby guest",
       },
     };

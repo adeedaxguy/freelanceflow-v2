@@ -20,6 +20,7 @@ import {
 } from "@/lib/site-draft";
 import {
   resolveDesignVariation,
+  type DesignComposition,
   type DesignTemplate,
   variationToOptionPatch,
 } from "@/lib/site-design";
@@ -209,6 +210,19 @@ type PreviewBlueprint = {
   ctaTitle: string;
   order: Array<"services" | "visual" | "trust" | "process" | "pages" | "local" | "details" | "questions" | "expanded-copy">;
 };
+
+function compositionForBlueprint(id: PreviewBlueprint["id"], fallback: DesignComposition): DesignComposition {
+  if (id === "auto-estimate" || id === "trade-emergency") return "action-board";
+  if (id === "menu-visit" || id === "retail-showcase" || id === "ecommerce-showroom") return "catalog-grid";
+  if (id === "creative-portfolio") return "visual-first";
+  if (id === "real-estate-listings") return "listing-led";
+  if (["beauty-booking", "clinic-trust", "fitness-membership", "education-course", "event-booking", "travel-booking"].includes(id)) {
+    return "booking-led";
+  }
+  if (["professional-consult", "founder-story", "editorial-craft"].includes(id)) return "editorial-offset";
+  if (id === "minimal-direct") return "centered-story";
+  return fallback;
+}
 
 function templateFromBusiness(text: string, fallback: DesignTemplate): PreviewBlueprint["id"] {
   const value = text.toLowerCase();
@@ -592,6 +606,12 @@ const SEGMENT_IMAGES: Record<string, string[]> = {
     "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80",
     "https://images.unsplash.com/photo-1551218808-94e220e084d2?auto=format&fit=crop&w=1000&q=80",
   ],
+  bakery: [
+    "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1600&q=85",
+    "https://images.unsplash.com/photo-1517433670267-08bbd4be890f?auto=format&fit=crop&w=1100&q=82",
+    "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?auto=format&fit=crop&w=1100&q=82",
+    "https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=1100&q=82",
+  ],
   beauty: [
     "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=1400&q=80",
     "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80",
@@ -681,6 +701,112 @@ function imageBackground(segment: string, index: number, overlay: string) {
 
 function printStyles(isLight: boolean) {
   return `
+    .site-preview-menu-visit > section:first-of-type {
+      background-position: center;
+      background-size: cover;
+    }
+
+    .site-preview-menu-visit .site-preview-hero-decoration {
+      display: none;
+    }
+
+    .site-preview-menu-visit .site-preview-hero {
+      max-width: 100%;
+      min-height: min(920px, 100vh);
+      padding-left: clamp(1.25rem, 6vw, 7rem);
+      padding-right: clamp(1.25rem, 6vw, 7rem);
+    }
+
+    .site-preview-menu-visit .site-preview-hero-grid {
+      display: flex;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      align-items: flex-end;
+      padding-top: clamp(5rem, 12vh, 9rem);
+      padding-bottom: clamp(2rem, 7vh, 5rem);
+    }
+
+    .site-preview-menu-visit .site-preview-hero-grid > div:first-child {
+      max-width: 820px;
+      order: 1;
+    }
+
+    .site-preview-menu-visit .site-preview-hero-visual {
+      display: none;
+    }
+
+    .site-preview-menu-visit .site-preview-hero h1 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      font-size: clamp(3.4rem, 7vw, 7.8rem);
+      line-height: 0.94;
+      letter-spacing: -0.035em;
+      color: white;
+      text-wrap: balance;
+    }
+
+    .site-preview-menu-visit .site-preview-hero-grid > div:first-child > p {
+      max-width: 700px;
+      color: rgba(255,255,255,0.82);
+      font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+    }
+
+    .site-preview-menu-visit .site-preview-hero header {
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+      color: white;
+    }
+
+    .site-preview-menu-visit .site-preview-hero header > div:last-child {
+      border-color: rgba(255,255,255,0.34);
+      background: rgba(15,23,42,0.35);
+      color: white;
+      backdrop-filter: blur(16px);
+    }
+
+    .site-preview-menu-visit .site-preview-hero nav {
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(15,23,42,0.28);
+      backdrop-filter: blur(16px);
+    }
+
+    .site-preview-menu-visit .site-preview-signal-grid {
+      max-width: 1480px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+      border-color: rgba(255,255,255,0.18);
+      background: rgba(15,23,42,0.56);
+      color: white;
+      backdrop-filter: blur(18px);
+      box-shadow: none;
+    }
+
+    .site-preview-menu-visit .site-preview-signal-grid > div {
+      border-color: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+    }
+
+    .site-preview-menu-visit .site-preview-signal-grid p:first-of-type {
+      color: rgba(255,255,255,0.52);
+    }
+
+    @media (max-width: 767px) {
+      .site-preview-menu-visit .site-preview-hero {
+        min-height: 820px;
+      }
+
+      .site-preview-menu-visit .site-preview-hero-grid {
+        padding-top: 6rem;
+      }
+
+      .site-preview-menu-visit .site-preview-hero h1 {
+        font-size: clamp(3.15rem, 15vw, 5.5rem);
+      }
+    }
+
     @page {
       size: 1440px 11200px;
       margin: 0;
@@ -1233,7 +1359,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
     layout: hasExplicitParam(searchParams?.layout) ? baseOptions.layout : inferredOptions.layout,
   };
 
-  const baseIdentity = getSiteDraftIdentity(data);
+  const baseIdentity = getSiteDraftIdentity(data, designPrompt);
   const identity = {
     ...baseIdentity,
     headline: customHeadline || baseIdentity.headline,
@@ -1244,9 +1370,24 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
     accentSoft: customAccent ? `${customAccent}2e` : variation.palette.accentSoft,
     surface: `linear-gradient(135deg, ${variation.palette.previewSurface}, ${variation.palette.previewBackground})`,
   };
-  const blueprint = getPreviewBlueprint(data, designPrompt, variation.template);
+  const displayCategory = identity.segment === "bakery" ? "Bakery" : category;
+  const displayData = displayCategory === category ? data : { ...data, category: displayCategory };
   const initials = businessInitials(company);
   const market = marketFromLocation(location);
+  const baseBlueprint = getPreviewBlueprint(displayData, designPrompt, variation.template);
+  const blueprint = identity.segment === "bakery"
+    ? {
+        ...baseBlueprint,
+        label: "Bakery storefront",
+        serviceTitle: "Fresh bakes, online ordering, and celebration enquiries",
+        serviceCopy: `${company} should make today's products irresistible, collection simple, and larger cake or catering orders easy to start.`,
+        visualEyebrow: "Fresh from the bakery",
+        trustTitle: "Give customers a reason to order before they arrive",
+        processTitle: "From today's counter to confirmed collection",
+        pagesTitle: "Products, celebration cakes, catering, and visiting",
+        ctaTitle: `Make ${company} the bakery ${market} remembers`,
+      }
+    : baseBlueprint;
   const callLink = telHref(phone);
   const heroPitch = identity.subheadline;
   const isLight = options.theme === "light";
@@ -1255,7 +1396,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
   const primaryCta = customCta || identity.primaryCta || goalCopy.primary;
   const autoPrint = clean(searchParams?.print).toLowerCase() === "1";
   const isClientPreview = clean(searchParams?.client).toLowerCase() === "1";
-  const composition = variation.composition;
+  const composition = compositionForBlueprint(blueprint.id, variation.composition);
   const heroGrid = composition === "centered-story"
     ? "lg:grid-cols-1"
     : composition === "editorial-offset"
@@ -1325,7 +1466,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
 
     <VisualStory
       key="visual"
-      data={data}
+      data={displayData}
       options={options}
       identity={identity}
       initials={initials}
@@ -1425,7 +1566,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
         <MousePointerClick className="mb-5 h-8 w-8" style={{ color: identity.accent }} />
         <h2 className="text-3xl font-black sm:text-5xl">Why customers should choose {company}</h2>
         <p className={`mt-4 max-w-4xl text-lg leading-8 ${mutedClass(isLight)}`}>
-          Customers comparing {data.category.toLowerCase()} options in {market} need quick proof, plain service descriptions, a visible phone path, and enough local confidence to stop searching and call.
+          Customers comparing {displayCategory.toLowerCase()} options in {market} need quick proof, plain service descriptions, a visible phone path, and enough local confidence to stop searching and call.
         </p>
       </div>
     </section>,
@@ -1434,7 +1575,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
       <HeadingBlock
         eyebrow="Decision support"
         title="Answer the questions that slow down enquiries"
-        copy={`A stronger ${data.category.toLowerCase()} homepage can answer practical buying questions before the customer reaches the phone.`}
+        copy={`A stronger ${displayCategory.toLowerCase()} homepage can answer practical buying questions before the customer reaches the phone.`}
         isLight={isLight}
       />
       <div className="grid gap-4 lg:grid-cols-3">
@@ -1463,20 +1604,31 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
       pdfTitle={`${company} homepage`}
       showActions={!autoPrint && !isClientPreview}
     />
-    <main className={`site-preview-root site-preview-${composition} min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
-      <section className="relative overflow-hidden">
+    <main className={`site-preview-root site-preview-${composition} site-preview-${blueprint.id} min-h-screen pb-20 sm:pb-0 ${isLight ? "bg-[#f8fafc] text-slate-950" : "bg-[#070b12] text-white"}`} style={themeVars}>
+      <section
+        className="relative overflow-hidden"
+        style={blueprint.id === "menu-visit"
+          ? {
+              backgroundImage: imageBackground(
+                identity.segment,
+                0,
+                "linear-gradient(90deg, rgba(18,10,5,0.88) 0%, rgba(18,10,5,0.62) 52%, rgba(18,10,5,0.28) 100%)",
+              ),
+            }
+          : undefined}
+      >
         {usesGridTexture ? (
-          <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
+          <div className={`site-preview-hero-decoration absolute inset-0 ${isLight ? "bg-[linear-gradient(rgba(15,23,42,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.06)_1px,transparent_1px)]" : "bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)]"} bg-[size:54px_54px]`} />
         ) : (
-          <div className={`absolute inset-0 ${isLight ? "bg-[linear-gradient(145deg,#ffffff_0%,#f8fafc_48%,#eef2ff_100%)]" : "bg-[linear-gradient(145deg,#070b12_0%,#0d1424_52%,#080b13_100%)]"}`} />
+          <div className={`site-preview-hero-decoration absolute inset-0 ${isLight ? "bg-[linear-gradient(145deg,#ffffff_0%,#f8fafc_48%,#eef2ff_100%)]" : "bg-[linear-gradient(145deg,#070b12_0%,#0d1424_52%,#080b13_100%)]"}`} />
         )}
         <div
-          className="absolute inset-x-0 top-0 h-[560px] opacity-90"
+          className="site-preview-hero-decoration absolute inset-x-0 top-0 h-[560px] opacity-90"
           style={{
             background: `radial-gradient(circle at 18% 18%, ${identity.accentSoft}, transparent 34%), radial-gradient(circle at 78% 4%, ${identity.accent2}33, transparent 30%)`,
           }}
         />
-        <div className="absolute bottom-0 left-1/2 h-80 w-[80vw] -translate-x-1/2 rounded-full blur-3xl" style={{ background: identity.accentSoft }} />
+        <div className="site-preview-hero-decoration absolute bottom-0 left-1/2 h-80 w-[80vw] -translate-x-1/2 rounded-full blur-3xl" style={{ background: identity.accentSoft }} />
 
         <div className="site-preview-hero relative mx-auto flex max-w-7xl flex-col px-5 py-6 sm:px-8 lg:min-h-[690px] lg:px-10">
           <header className="flex items-center justify-between gap-4">
@@ -1490,7 +1642,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
               <div>
                 <p className="text-lg font-black leading-none">{company}</p>
                 <p className={`mt-1 text-xs font-bold uppercase tracking-[0.2em] ${isLight ? "text-slate-500" : "text-white/45"}`}>
-                  {category}
+                  {displayCategory}
                 </p>
               </div>
             </div>
@@ -1566,7 +1718,7 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
 
             <div className={heroVisualClass}>
               <HeroPreviewVisual
-                data={data}
+                data={displayData}
                 identity={identity}
                 initials={initials}
                 isLight={isLight}
