@@ -9,7 +9,7 @@ import {
   FileText, Megaphone, User, Wrench, MessageCircle, Zap,
   CalendarDays, GitMerge, Mail, Menu, X, Radio, ChevronRight,
   LogOut, Crown, Shield, Sparkles, MapPin, ChevronLeft,
-  Command, Users, Palette, PhoneCall,
+  Command, Users, Palette, PhoneCall, MoreHorizontal,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
@@ -44,19 +44,18 @@ const NAV_GROUPS = [
       { href: "/dashboard/whatsapp",   label: "WhatsApp",    icon: MessageCircle, badge: "SOON" },
       { href: "/dashboard/templates",  label: "Templates",   icon: FileText },
       { href: "/dashboard/sent",       label: "Outreach History", icon: Send },
-      { href: "/dashboard/analytics",  label: "Analytics",   icon: BarChart2 },
     ],
   },
-  {
-    label: "Account",
-    items: [
-      { href: "/dashboard/email-settings", label: "Email Setup", icon: Mail },
-      { href: "/dashboard/tools",          label: "Free Tools",        icon: Wrench },
-      { href: "/dashboard/support",        label: "Support",           icon: MessageCircle },
-      { href: "/dashboard/profile",        label: "Profile",           icon: User },
-      { href: "/dashboard/settings",       label: "Settings",          icon: Settings },
-    ],
-  },
+];
+
+const QUICK_ACCESS_ITEMS = [
+  { href: "/dashboard/analytics",      label: "Analytics", icon: BarChart2 },
+  { href: "/dashboard/email-settings", label: "Email",     icon: Mail },
+];
+
+const MORE_ITEMS = [
+  { href: "/dashboard/tools",   label: "Free Tools", icon: Wrench },
+  { href: "/dashboard/support", label: "Support",    icon: MessageCircle },
 ];
 
 // ─── Plan config ──────────────────────────────────────────────────────────────
@@ -130,6 +129,67 @@ function NavLink({
     return <CollapseTooltip label={label}>{inner}</CollapseTooltip>;
   }
   return inner;
+}
+
+// ─── Secondary utilities ─────────────────────────────────────────────────────
+function QuickAccess({
+  pathname, onLinkClick,
+}: {
+  pathname: string; onLinkClick?: () => void;
+}) {
+  return (
+    <div className="relative z-20 px-3 pt-2">
+      <div className="flex items-center gap-1 rounded-lg border border-border bg-background/35 p-1">
+        {QUICK_ACCESS_ITEMS.map(({ href, label, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(`${href}/`);
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onLinkClick}
+              className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-2 text-[11px] font-semibold transition-colors ${
+                active
+                  ? "bg-accent/12 text-accent"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">{label}</span>
+            </Link>
+          );
+        })}
+
+        <details className="group relative">
+          <summary
+            aria-label="Open more tools"
+            className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground [&::-webkit-details-marker]:hidden"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </summary>
+          <div className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-lg border border-border bg-surface p-1 shadow-xl">
+            {MORE_ITEMS.map(({ href, label, icon: Icon }) => {
+              const active = pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={onLinkClick}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                    active
+                      ? "bg-accent/12 text-accent"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
+        </details>
+      </div>
+    </div>
+  );
 }
 
 // ─── Nav content ──────────────────────────────────────────────────────────────
@@ -397,6 +457,8 @@ export default function Sidebar() {
           </div>
         )}
 
+        {!collapsed && <QuickAccess pathname={pathname} />}
+
         {/* Nav */}
         <NavContent pathname={pathname} collapsed={collapsed} />
 
@@ -458,6 +520,7 @@ export default function Sidebar() {
             <X className="w-4 h-4" />
           </button>
         </div>
+        <QuickAccess pathname={pathname} onLinkClick={() => setMobileOpen(false)} />
         <NavContent pathname={pathname} onLinkClick={() => setMobileOpen(false)} />
         <UserPanel onLinkClick={() => setMobileOpen(false)} />
       </aside>
