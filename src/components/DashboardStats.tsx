@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Users, Mail, TrendingUp, TrendingDown, Bookmark, Minus } from "lucide-react";
 import AnimatedCounter from "./AnimatedCounter";
 
@@ -89,20 +88,17 @@ const CARDS = [
 export default function DashboardStats({ stats }: { stats: Stats }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {CARDS.map(({ key, trendKey, label, icon: Icon, border, iconBg, iconColor, suffix, trendSfx }, i) => (
-        <motion.div
+      {CARDS.map(({ key, trendKey, label, icon: Icon, border, iconBg, iconColor, suffix, trendSfx }) => (
+        <div
           key={key}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.07, duration: 0.4, ease: "easeOut" }}
-          className={`bg-gradient-card border ${border} rounded-2xl p-5 space-y-2 group hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200`}
+          className={`rounded-xl border bg-card p-5 space-y-2 transition-colors hover:border-foreground/20 ${border}`}
         >
           {/* Header row */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <span className="text-sm font-medium text-muted-foreground">
               {label}
             </span>
-            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}>
               <Icon className={`w-4 h-4 ${iconColor}`} />
             </div>
           </div>
@@ -114,7 +110,7 @@ export default function DashboardStats({ stats }: { stats: Stats }) {
 
           {/* Trend */}
           <TrendBadge value={stats.trends[trendKey]} suffix={trendSfx} />
-        </motion.div>
+        </div>
       ))}
     </div>
   );

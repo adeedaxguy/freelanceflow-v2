@@ -141,7 +141,7 @@ function EmptyState({
 }) {
   return (
     <div className="py-12 flex flex-col items-center gap-3 text-center px-4">
-      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
         <Icon className="w-6 h-6 text-primary-light opacity-60" />
       </div>
       <p className="text-foreground font-semibold text-sm">{title}</p>
@@ -183,13 +183,13 @@ export default async function DashboardPage() {
   })();
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl">
+    <div className="dashboard-page max-w-7xl space-y-7">
 
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-            {greeting}, {firstName} 👋
+            {greeting}, {firstName}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
             Here&apos;s what&apos;s happening with your outreach this month.
@@ -200,7 +200,7 @@ export default async function DashboardPage() {
           <CmdKButton />
           <Link
             href="/dashboard/local-leads"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary-light text-white text-sm font-medium transition-all shadow-glow-primary"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-light text-white text-sm font-medium transition-colors"
           >
             <MapPin className="w-4 h-4" /> Find Local Leads
           </Link>
@@ -208,7 +208,7 @@ export default async function DashboardPage() {
       </div>
 
       {dashboardDataError && (
-        <div className="rounded-2xl border border-gold/30 bg-gold/10 p-4">
+        <div className="rounded-xl border border-gold/30 bg-gold/10 p-4">
           <div className="flex gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-gold" />
             <div>
@@ -236,23 +236,23 @@ export default async function DashboardPage() {
           <EmailChart data={data.chartData} title="Outreach Prepared — Last 30 Days" />
         </div>
 
-        <div className="bg-gradient-card border border-border rounded-2xl p-6 flex flex-col gap-4">
+        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4">
           <h3 className="text-foreground font-semibold">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
             {QUICK_ACTIONS.map(({ label, href, icon: Icon, color }) => (
               <Link
                 key={label}
                 href={href}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border text-center transition-all hover:-translate-y-0.5 hover:shadow-md ${color}`}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${color}`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="text-xs font-medium">{label}</span>
+                <span className="text-sm font-medium">{label}</span>
               </Link>
             ))}
           </div>
 
           {!isPro && (
-            <div className="mt-auto rounded-xl border border-accent/20 bg-accent/10 px-4 py-3">
+            <div className="mt-auto rounded-lg border border-accent/20 bg-accent/10 px-4 py-3">
               <p className="flex items-center gap-2 text-sm font-semibold text-accent">
                 <CheckCircle className="w-4 h-4" /> Free launch access
               </p>
@@ -268,7 +268,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Recent Leads */}
-        <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h3 className="text-foreground font-semibold flex items-center gap-2">
               <Users className="w-4 h-4 text-primary-light" /> Recent Leads
@@ -309,7 +309,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent Outreach */}
-        <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <h3 className="text-foreground font-semibold flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary-light" /> Recent Outreach
@@ -350,15 +350,15 @@ export default async function DashboardPage() {
 
       {/* ── Onboarding prompt (only for new users with 0 leads) ── */}
       {data.leadsFound === 0 && data.emailsSent === 0 && (
-        <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/5 border border-primary/20 rounded-2xl p-6">
+        <div className="rounded-xl border border-primary/20 bg-card p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-5 h-5 text-primary-light" />
             </div>
             <div className="flex-1">
-              <h3 className="text-foreground font-bold text-base">Welcome to iCloseLeads! 🎉</h3>
+              <h3 className="text-foreground font-bold text-base">Start with your first lead search</h3>
               <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
-                You&apos;re all set up. Here&apos;s how to get your first client in 3 steps:
+                Your workspace is ready. Use this three-step path to move from a real signal to a tracked conversation.
               </p>
               <div className="mt-4 grid sm:grid-cols-3 gap-3">
                 {[
@@ -369,7 +369,7 @@ export default async function DashboardPage() {
                   <Link
                     key={step}
                     href={href}
-                    className={`flex flex-col gap-1.5 p-4 rounded-xl border ${color} hover:opacity-90 transition-opacity`}
+                    className={`flex flex-col gap-1.5 p-4 rounded-lg border ${color} hover:border-foreground/20 transition-colors`}
                   >
                     <span className="text-xs font-bold text-muted-foreground">Step {step}</span>
                     <p className="text-foreground font-semibold text-sm">{title}</p>

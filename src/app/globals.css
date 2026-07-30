@@ -314,6 +314,99 @@
   .badge-pop { animation: badge-pop 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
   .site-footer-panel { border-radius: 0.75rem; }
 
+  .dashboard-shell {
+    --background: 225 22% 6%;
+    --foreground: 220 20% 96%;
+    --card: 222 18% 9%;
+    --card-foreground: 220 20% 96%;
+    --popover: 222 18% 10%;
+    --popover-foreground: 220 20% 96%;
+    --secondary: 220 14% 14%;
+    --secondary-foreground: 220 20% 96%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 220 9% 66%;
+    --border: 220 12% 19%;
+    --input: 220 12% 24%;
+    --primary: 217 91% 60%;
+    --primary-light: 213 94% 68%;
+    --accent: 169 77% 42%;
+    color-scheme: dark;
+    background: hsl(var(--background));
+  }
+
+  html.light .dashboard-shell {
+    --background: 220 20% 97%;
+    --foreground: 224 18% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 18% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 18% 12%;
+    --secondary: 220 17% 93%;
+    --secondary-foreground: 224 18% 12%;
+    --muted: 220 17% 94%;
+    --muted-foreground: 224 10% 42%;
+    --border: 220 13% 83%;
+    --input: 220 14% 72%;
+    --primary: 217 86% 52%;
+    --primary-light: 217 82% 44%;
+    --accent: 169 73% 34%;
+    color-scheme: light;
+  }
+
+  .dashboard-content {
+    background: hsl(var(--background));
+  }
+
+  .dashboard-shell .bg-gradient-card,
+  .dashboard-shell .bg-gradient-card-hover {
+    background-color: hsl(var(--card));
+    background-image: none;
+  }
+
+  .dashboard-shell .shadow-card,
+  .dashboard-shell .shadow-card-hover {
+    box-shadow: none;
+  }
+
+  .dashboard-shell .shadow-glow-primary,
+  .dashboard-shell .cta-glow {
+    box-shadow: 0 1px 2px hsl(224 45% 2% / 0.24);
+  }
+
+  .dashboard-shell .card-hover-lift {
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+
+  .dashboard-shell .card-hover-lift:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .dashboard-shell .rounded-2xl {
+    border-radius: 0.75rem;
+  }
+
+  .dashboard-shell .rounded-3xl {
+    border-radius: 0.875rem;
+  }
+
+  .dashboard-shell :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+    select,
+    textarea
+  ) {
+    border-color: hsl(var(--input));
+    background-color: hsl(var(--card));
+  }
+
+  .dashboard-shell :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+    select,
+    textarea
+  ):focus {
+    border-color: hsl(var(--primary) / 0.72);
+  }
+
   .dashboard-page {
     width: 100%;
     max-width: 100rem;
@@ -324,15 +417,13 @@
   .dashboard-control-panel {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
-    box-shadow: 0 14px 34px hsl(225 45% 2% / 0.18);
+    box-shadow: 0 1px 2px hsl(225 45% 2% / 0.18);
   }
 
   .dashboard-field {
-    background: hsl(var(--background) / 0.9);
-    border-color: hsl(var(--foreground) / 0.18);
-    box-shadow:
-      inset 0 1px 0 hsl(var(--foreground) / 0.035),
-      0 3px 10px hsl(225 45% 2% / 0.12);
+    background: hsl(var(--card));
+    border-color: hsl(var(--input));
+    box-shadow: inset 0 1px 0 hsl(var(--foreground) / 0.035);
   }
 
   .dashboard-field:hover {
@@ -343,8 +434,8 @@
   .dashboard-field:focus-visible {
     border-color: hsl(var(--primary) / 0.72);
     box-shadow:
-      0 0 0 3px hsl(var(--primary) / 0.16),
-      0 5px 16px hsl(225 45% 2% / 0.15);
+      0 0 0 3px hsl(var(--primary) / 0.14),
+      inset 0 1px 0 hsl(var(--foreground) / 0.035);
   }
 
   .dashboard-field::placeholder {
@@ -356,9 +447,9 @@
   }
 
   .dashboard-choice {
-    background: hsl(var(--background) / 0.58);
-    border-color: hsl(var(--foreground) / 0.14);
-    box-shadow: inset 0 1px 0 hsl(var(--foreground) / 0.025);
+    background: hsl(var(--secondary) / 0.68);
+    border-color: hsl(var(--border));
+    box-shadow: none;
   }
 
   .dashboard-choice:hover:not(:disabled) {
@@ -369,36 +460,36 @@
   .dashboard-result-card {
     background: hsl(var(--card));
     border-color: hsl(var(--border));
-    box-shadow: 0 10px 24px hsl(225 45% 2% / 0.14);
+    box-shadow: 0 1px 2px hsl(225 45% 2% / 0.16);
   }
 
   .dashboard-result-card:hover {
-    box-shadow: 0 16px 34px hsl(225 45% 2% / 0.2);
+    border-color: hsl(var(--foreground) / 0.2);
+    box-shadow: 0 1px 2px hsl(225 45% 2% / 0.16);
   }
 
   html.light .dashboard-control-panel {
-    box-shadow: 0 10px 28px hsl(220 35% 25% / 0.07);
+    box-shadow: 0 1px 2px hsl(220 35% 25% / 0.06);
   }
 
   html.light .dashboard-field {
     background: hsl(0 0% 100%);
-    border-color: hsl(220 16% 73%);
-    box-shadow:
-      inset 0 1px 0 hsl(0 0% 100%),
-      0 4px 12px hsl(220 35% 25% / 0.08);
+    border-color: hsl(var(--input));
+    box-shadow: inset 0 1px 0 hsl(0 0% 100%);
   }
 
   html.light .dashboard-choice {
-    background: hsl(0 0% 100% / 0.8);
-    border-color: hsl(220 16% 78%);
+    background: hsl(0 0% 100%);
+    border-color: hsl(var(--border));
   }
 
   html.light .dashboard-result-card {
-    box-shadow: 0 8px 24px hsl(220 35% 25% / 0.07);
+    box-shadow: 0 1px 2px hsl(220 35% 25% / 0.06);
   }
 
   html.light .dashboard-result-card:hover {
-    box-shadow: 0 14px 30px hsl(220 35% 25% / 0.11);
+    border-color: hsl(var(--foreground) / 0.2);
+    box-shadow: 0 1px 2px hsl(220 35% 25% / 0.06);
   }
 
   @media (min-width: 640px) {

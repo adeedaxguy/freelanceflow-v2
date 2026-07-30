@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
@@ -36,11 +35,9 @@ export default function StatsCard({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className={cn(
-        "bg-gradient-card border rounded-2xl p-6 transition-all duration-200 hover:shadow-card-hover",
+        "rounded-xl border bg-card p-6 transition-colors",
         variantStyles[variant],
         className
       )}
@@ -103,6 +100,6 @@ export default function StatsCard({
           )}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
