@@ -250,7 +250,1874 @@ function buildJuly28DailyResourcePages(): ResourcePage[] {
   ];
 }
 
+
+function buildJuly31ManualResearchResourcePages(): ResourcePage[] {
+  return [
+  {
+    "slug": "ai-lead-finder-for-freelancers",
+    "title": "AI Lead Finder for Freelancers",
+    "metaTitle": "AI Lead Finder for Freelancers | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for AI lead Finder: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "AI lead Finder",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants AI lead Finder without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for AI lead Finder.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns AI lead Finder into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want AI lead Finder and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching AI lead Finder. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is AI lead Finder?",
+        "a": "AI lead Finder is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "freelancer-lead-search-workflow",
+    "title": "Freelancer Lead Search Workflow",
+    "metaTitle": "Freelancer Lead Search Workflow | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for lead generation freelancer: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "lead generation freelancer",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants lead generation freelancer without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for lead generation freelancer.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns lead generation freelancer into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want lead generation freelancer and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching lead generation freelancer. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead generation freelancer?",
+        "a": "lead generation freelancer is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "web-design-client-leads-finder",
+    "title": "Web Design Client Leads Finder",
+    "metaTitle": "Web Design Client Leads Finder | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for web design client leads: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "web design client leads",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants web design client leads without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for web design client leads.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns web design client leads into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want web design client leads and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching web design client leads. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is web design client leads?",
+        "a": "web design client leads is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "local-businesses-without-websites-leads",
+    "title": "Local Businesses Without Websites Leads",
+    "metaTitle": "Local Businesses Without Websites Leads | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for find local businesses that need websites: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "find local businesses that need websites",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants find local businesses that need websites without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for find local businesses that need websites.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns find local businesses that need websites into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want find local businesses that need websites and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching find local businesses that need websites. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is find local businesses that need websites?",
+        "a": "find local businesses that need websites is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "cold-email-lead-list-for-freelancers",
+    "title": "Cold Email Lead List for Freelancers",
+    "metaTitle": "Cold Email Lead List for Freelancers | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for cold email freelance leads: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "cold email freelance leads",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants cold email freelance leads without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for cold email freelance leads.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns cold email freelance leads into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want cold email freelance leads and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching cold email freelance leads. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is cold email freelance leads?",
+        "a": "cold email freelance leads is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "agency-client-acquisition-system",
+    "title": "Agency Client Acquisition System",
+    "metaTitle": "Agency Client Acquisition System | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for agency client acquisition system: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "agency client acquisition system",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants agency client acquisition system without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for agency client acquisition system.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns agency client acquisition system into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want agency client acquisition system and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching agency client acquisition system. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is agency client acquisition system?",
+        "a": "agency client acquisition system is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "b2b-lead-generation-for-web-designers",
+    "title": "B2B Lead Generation for Web Designers",
+    "metaTitle": "B2B Lead Generation for Web Designers | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for B2B lead generation freelancer: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "B2B lead generation freelancer",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants B2B lead generation freelancer without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for B2B lead generation freelancer.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns B2B lead generation freelancer into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want B2B lead generation freelancer and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching B2B lead generation freelancer. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is B2B lead generation freelancer?",
+        "a": "B2B lead generation freelancer is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "lead-generation-crm-for-freelancers",
+    "title": "Lead Generation CRM for Freelancers",
+    "metaTitle": "Lead Generation CRM for Freelancers | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for lead generation CRM for freelancers: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "lead generation CRM for freelancers",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants lead generation CRM for freelancers without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for lead generation CRM for freelancers.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns lead generation CRM for freelancers into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want lead generation CRM for freelancers and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching lead generation CRM for freelancers. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead generation CRM for freelancers?",
+        "a": "lead generation CRM for freelancers is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "proposal-ready-lead-research",
+    "title": "Proposal Ready Lead Research",
+    "metaTitle": "Proposal Ready Lead Research | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for proposal ready lead research: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "proposal ready lead research",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants proposal ready lead research without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for proposal ready lead research.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns proposal ready lead research into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want proposal ready lead research and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching proposal ready lead research. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is proposal ready lead research?",
+        "a": "proposal ready lead research is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "find-decision-makers-for-local-businesses",
+    "title": "Find Decision Makers for Local Businesses",
+    "metaTitle": "Find Decision Makers for Local Businesses | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for find decision makers for local businesses: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "find decision makers for local businesses",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants find decision makers for local businesses without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for find decision makers for local businesses.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns find decision makers for local businesses into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want find decision makers for local businesses and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching find decision makers for local businesses. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is find decision makers for local businesses?",
+        "a": "find decision makers for local businesses is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "freelance-outreach-follow-up-system",
+    "title": "Freelance Outreach Follow Up System",
+    "metaTitle": "Freelance Outreach Follow Up System | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for freelance outreach follow up system: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "freelance outreach follow up system",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants freelance outreach follow up system without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for freelance outreach follow up system.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns freelance outreach follow up system into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want freelance outreach follow up system and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching freelance outreach follow up system. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is freelance outreach follow up system?",
+        "a": "freelance outreach follow up system is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "qualified-leads-vs-lead-lists",
+    "title": "Qualified Leads vs Lead Lists",
+    "metaTitle": "Qualified Leads vs Lead Lists | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for qualified leads vs lead lists: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "qualified leads vs lead lists",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants qualified leads vs lead lists without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for qualified leads vs lead lists.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns qualified leads vs lead lists into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want qualified leads vs lead lists and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching qualified leads vs lead lists. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is qualified leads vs lead lists?",
+        "a": "qualified leads vs lead lists is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "lead-generation-platform-for-agencies",
+    "title": "Lead Generation Platform for Agencies",
+    "metaTitle": "Lead Generation Platform for Agencies | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for lead generation platform for agencies: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "lead generation platform for agencies",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants lead generation platform for agencies without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for lead generation platform for agencies.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns lead generation platform for agencies into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want lead generation platform for agencies and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching lead generation platform for agencies. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead generation platform for agencies?",
+        "a": "lead generation platform for agencies is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "client-acquisition-software-for-consultants",
+    "title": "Client Acquisition Software for Consultants",
+    "metaTitle": "Client Acquisition Software for Consultants | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for client acquisition software for consultants: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "client acquisition software for consultants",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants client acquisition software for consultants without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for client acquisition software for consultants.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns client acquisition software for consultants into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want client acquisition software for consultants and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching client acquisition software for consultants. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is client acquisition software for consultants?",
+        "a": "client acquisition software for consultants is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "email-outreach-workflow-for-web-design",
+    "title": "Email Outreach Workflow for Web Design",
+    "metaTitle": "Email Outreach Workflow for Web Design | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for email outreach workflow web design: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "email outreach workflow web design",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants email outreach workflow web design without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for email outreach workflow web design.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns email outreach workflow web design into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want email outreach workflow web design and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching email outreach workflow web design. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is email outreach workflow web design?",
+        "a": "email outreach workflow web design is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "find-startups-that-need-websites",
+    "title": "Find Startups That Need Websites",
+    "metaTitle": "Find Startups That Need Websites | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for find startups that need websites: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "find startups that need websites",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants find startups that need websites without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for find startups that need websites.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns find startups that need websites into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want find startups that need websites and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching find startups that need websites. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is find startups that need websites?",
+        "a": "find startups that need websites is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "small-business-lead-generation-software",
+    "title": "Small Business Lead Generation Software",
+    "metaTitle": "Small Business Lead Generation Software | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for small business lead generation software: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "small business lead generation software",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants small business lead generation software without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for small business lead generation software.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns small business lead generation software into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want small business lead generation software and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching small business lead generation software. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is small business lead generation software?",
+        "a": "small business lead generation software is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "freelancer-crm-with-ai-proposals",
+    "title": "Freelancer CRM With AI Proposals",
+    "metaTitle": "Freelancer CRM With AI Proposals | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for freelancer CRM with AI proposals: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "freelancer CRM with AI proposals",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants freelancer CRM with AI proposals without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for freelancer CRM with AI proposals.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns freelancer CRM with AI proposals into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want freelancer CRM with AI proposals and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching freelancer CRM with AI proposals. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is freelancer CRM with AI proposals?",
+        "a": "freelancer CRM with AI proposals is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "lead-magnet-to-outreach-workflow",
+    "title": "Lead Magnet to Outreach Workflow",
+    "metaTitle": "Lead Magnet to Outreach Workflow | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for lead magnet outreach workflow: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "lead magnet outreach workflow",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants lead magnet outreach workflow without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for lead magnet outreach workflow.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns lead magnet outreach workflow into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want lead magnet outreach workflow and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching lead magnet outreach workflow. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is lead magnet outreach workflow?",
+        "a": "lead magnet outreach workflow is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  },
+  {
+    "slug": "upwork-alternative-client-leads",
+    "title": "Upwork Alternative Client Leads",
+    "metaTitle": "Upwork Alternative Client Leads | iCloseLeads",
+    "metaDescription": "Use iCloseLeads for Upwork lead generation alternative: lead search, qualification, saved context, AI proposal drafting, and follow-up in one client acquisition workflow.",
+    "keyword": "Upwork lead generation alternative",
+    "relatedSearches": [
+      "Leads generator",
+      "AI lead Finder",
+      "Lead generator AI",
+      "B2b leads database",
+      "Lead generation software"
+    ],
+    "audience": "Freelancers, consultants, web designers, and small agencies that need real prospects and signups.",
+    "intent": "The searcher wants Upwork lead generation alternative without relying only on generic lead lists or marketplace bidding.",
+    "researchIntent": {
+      "searcherJob": "Find and qualify prospects for Upwork lead generation alternative.",
+      "competitorGap": "Competitor pages often sell broad databases, services, or CRM features without connecting search signals to proposal-ready outreach.",
+      "workflowNudge": "Run one focused lead search, save only qualified prospects, generate a pitch, and schedule follow-up.",
+      "conversionPath": "Signup to run the first lead search and save a qualified lead."
+    },
+    "summary": "iCloseLeads turns Upwork lead generation alternative into a practical acquisition workflow. The point is not a larger spreadsheet. The point is a smaller set of qualified leads with the reason to reach out preserved.",
+    "leadIn": "Use this workflow when you want Upwork lead generation alternative and need the path from search to signup, saved lead, proposal, and follow-up to stay connected.",
+    "activationPlan": {
+      "trigger": "Use this when a visitor arrives from lead-generation or client-acquisition search intent.",
+      "firstRun": "Pick one service, niche, city, or buyer type and run a focused search.",
+      "savedLead": "Save a lead only when there is visible fit, proof, and a public contact route.",
+      "followUp": "Generate a specific pitch from the saved context and set the next follow-up."
+    },
+    "steps": [
+      "Define the offer and target buyer.",
+      "Search by niche, location, source, or buying signal.",
+      "Reject leads without fit, evidence, or a reachable path.",
+      "Save the lead with the exact reason it matters.",
+      "Generate a message or proposal using the saved context.",
+      "Track follow-up so the workflow improves over time."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Visible need",
+        "whyItMatters": "The pitch must be tied to something real.",
+        "nextMove": "Capture the source URL, website gap, job signal, or profile proof."
+      },
+      {
+        "signal": "Offer fit",
+        "whyItMatters": "The lead should match the freelancer's actual service.",
+        "nextMove": "Save only prospects where the next message can be specific."
+      },
+      {
+        "signal": "Reachable route",
+        "whyItMatters": "A lead is useful only when there is a respectful business contact path.",
+        "nextMove": "Use public contact routes and avoid deceptive outreach."
+      }
+    ],
+    "proofPoints": [
+      "Manual keyword research shows demand around AI lead finder, leads generator, B2B leads database, and lead generation software.",
+      "The strongest iCloseLeads organic article already proves client acquisition intent.",
+      "The conversion path routes readers into signup and first lead search rather than ending at advice."
+    ],
+    "pitch": "Hi, I found your business while researching Upwork lead generation alternative. I noticed one signal that may be worth improving and can send a short idea if useful.",
+    "internalLinks": [
+      {
+        "label": "Freelance client acquisition system",
+        "href": "/blog/freelance-client-acquisition-system"
+      },
+      {
+        "label": "Lead discovery",
+        "href": "/features/lead-discovery"
+      },
+      {
+        "label": "AI proposals",
+        "href": "/features/ai-proposals"
+      },
+      {
+        "label": "Saved leads",
+        "href": "/dashboard/saved-leads"
+      }
+    ],
+    "faqs": [
+      {
+        "q": "What is Upwork lead generation alternative?",
+        "a": "Upwork lead generation alternative is useful when it connects lead discovery, qualification, outreach context, and follow-up instead of handing you a blind list."
+      },
+      {
+        "q": "How does iCloseLeads help?",
+        "a": "iCloseLeads keeps lead search, saved lead notes, AI proposal drafting, Gmail-ready outreach, and CRM follow-up in one workflow."
+      },
+      {
+        "q": "Should I buy a lead list?",
+        "a": "Only after verifying freshness, source quality, contact path, and offer fit. A smaller verified workflow usually beats a large blind list."
+      }
+    ]
+  }
+];
+}
+
 export const RESOURCE_PAGES: ResourcePage[] = [
+  ...buildJuly31ManualResearchResourcePages(),
   ...buildJuly28DailyResourcePages(),
   {
     slug: "web-design-leads",

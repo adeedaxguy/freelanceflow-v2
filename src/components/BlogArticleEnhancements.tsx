@@ -99,9 +99,9 @@ const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
   title: "Turn this guide into a real prospect list",
   summary:
     "Choose the market you want to serve, find businesses and jobs with visible demand, save the strongest matches, and prepare a specific first pitch inside iCloseLeads.",
-  ctaLabel: "Find my first leads free",
+  ctaLabel: "Find qualified leads free",
   proofNote:
-    "No card required. Start with one focused search and keep every next step attached to the lead.",
+    "No card required. Start with one focused search, save a qualified prospect, and generate the first outreach angle from the lead context.",
   steps: [
     {
       title: "Pick a market",
