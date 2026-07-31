@@ -96,13 +96,12 @@ const GENERIC_LEAD_WORKFLOW_VISUALS = (post: BlogArticleSource) => {
 };
 
 const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
-  eyebrow: "GSC top-click funnel",
-  title: "Find your next client lead from this page",
+  title: "Turn this guide into a real prospect list",
   summary:
-    "Use iCloseLeads to turn this client acquisition system into a live prospect list. Pick your service, search businesses with buying signals, save the best-fit leads, and generate a personalized first pitch.",
-  ctaLabel: "Start finding leads",
+    "Choose the market you want to serve, find businesses and jobs with visible demand, save the strongest matches, and prepare a specific first pitch inside iCloseLeads.",
+  ctaLabel: "Find my first leads free",
   proofNote:
-    "This funnel is placed on a high-click GSC article so search visitors can move from learning the system to trying the lead workflow immediately.",
+    "No card required. Start with one focused search and keep every next step attached to the lead.",
   steps: [
     {
       title: "Pick a market",
@@ -132,7 +131,7 @@ function getDefaultConversionFunnel(post: BlogArticleSource) {
 
   return {
     ...CLIENT_ACQUISITION_SYSTEM_FUNNEL,
-    ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=gsc-high-click-funnel`,
+    ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=organic-client-acquisition-guide`,
   };
 }
 
@@ -232,13 +231,9 @@ export function BlogLeadSearchFunnel({ post }: { post: BlogArticleSource }) {
   if (!funnel) return null;
 
   return (
-    <section className="my-10 overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-surface to-accent/10 p-5 sm:p-6">
+    <section className="my-10 overflow-hidden rounded-2xl border border-primary/25 bg-surface p-5 sm:p-6">
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div>
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-primary-light">
-            <Sparkles className="h-3.5 w-3.5" />
-            {funnel.eyebrow}
-          </div>
           <h2 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">{funnel.title}</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{funnel.summary}</p>
           {funnel.proofNote && (
@@ -255,9 +250,9 @@ export function BlogLeadSearchFunnel({ post }: { post: BlogArticleSource }) {
           </Link>
         </div>
 
-        <div className="grid gap-3">
+        <ol className="grid border-t border-border lg:border-l lg:border-t-0">
           {funnel.steps.map((step, index) => (
-            <div key={step.title} className="rounded-xl border border-border bg-background/45 p-4">
+            <li key={step.title} className="border-b border-border p-4 last:border-b-0 lg:px-5">
               <div className="flex gap-3">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/15 text-sm font-black text-accent">
                   {index + 1}
@@ -267,9 +262,9 @@ export function BlogLeadSearchFunnel({ post }: { post: BlogArticleSource }) {
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">{step.detail}</p>
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

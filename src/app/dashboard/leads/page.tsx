@@ -16,6 +16,7 @@ import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
 import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
 import { NICHES } from "@/types";
 import { copyText } from "@/lib/clipboard";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const HOUR_OPTIONS = [
   { label: "12h", value: 12 },
@@ -420,11 +421,21 @@ export default function LeadsPage() {
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
 
-      setLeads(data.leads ?? []);
+      const foundLeads = data.leads ?? [];
+      setLeads(foundLeads);
       setUsage(data.usage ?? null);
       setFetchedAt(data.fetchedAt ?? "");
       setDiagnostics(data.diagnostics ?? null);
       setSelectedSources([]);
+      const searchDetails = {
+        lead_type: "remote_job",
+        search_term: niches.join(", "),
+        result_count: foundLeads.length,
+        range_hours: maxHours,
+        fresh_only: Boolean(opts.freshOnly),
+      };
+      trackAnalyticsEvent("search", searchDetails);
+      trackAnalyticsEvent("lead_search", searchDetails);
 
       if (!opts.freshOnly) setSearchCooldown(SEARCH_COOLDOWN_SECS);
       else                 setForceCooldown(FORCE_COOLDOWN_SECS);

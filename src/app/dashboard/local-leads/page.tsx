@@ -15,6 +15,7 @@ import BonusLeadsModal from "@/components/BonusLeadsModal";
 import type { LocalLead } from "@/app/api/local-leads/search/route";
 import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/phone-type";
 import { copyText } from "@/lib/clipboard";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
@@ -1127,6 +1128,15 @@ export default function LocalLeadsPage() {
         setLimitNotice("");
       }
       setResults(newResults);
+      const searchDetails = {
+        lead_type: "local_business",
+        search_term: keyword.trim(),
+        search_location: location.trim(),
+        result_count: newResults.length,
+        website_filter: filter,
+      };
+      trackAnalyticsEvent("search", searchDetails);
+      trackAnalyticsEvent("lead_search", searchDetails);
       setMeta({ source: data.source, geocoded: data.geocoded, cached: data.cached, sources: data.sources });
       try {
         sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify({

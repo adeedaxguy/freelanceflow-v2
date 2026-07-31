@@ -8,6 +8,9 @@ import { ArrowRight, Eye, EyeOff, Check, Loader2, Zap } from "lucide-react";
 import Link from "next/link";
 import { NICHES } from "@/types";
 import Logo from "@/components/Logo";
+import { trackAnalyticsEvent } from "@/lib/analytics";
+
+const PENDING_SIGNUP_KEY = "icl_pending_oauth_signup";
 
 const REFERRAL_OPTIONS = [
   "Google Search", "Reddit", "Twitter / X", "LinkedIn", "Friend / Referral",
@@ -215,8 +218,7 @@ function AuthForm() {
   const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
 
   const trackAuthEvent = useCallback((eventName: string, extra: Record<string, string | number | boolean> = {}) => {
-    if (typeof window === "undefined") return;
-    (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.("event", eventName, {
+    trackAnalyticsEvent(eventName, {
       auth_mode: mode,
       auth_step: step,
       signup_intent: intentParam || "default",
@@ -224,6 +226,27 @@ function AuthForm() {
       ...extra,
     });
   }, [mode, step, intentParam, sourceParam]);
+
+  const rememberOAuthSignup = (method: "google" | "github") => {
+    if (mode !== "signup") return;
+    try {
+      sessionStorage.setItem(PENDING_SIGNUP_KEY, JSON.stringify({
+        method,
+        intent: intentParam,
+        source: sourceParam,
+      }));
+    } catch {
+      // Authentication should still work when browser storage is unavailable.
+    }
+  };
+
+  const clearPendingOAuthSignup = () => {
+    try {
+      sessionStorage.removeItem(PENDING_SIGNUP_KEY);
+    } catch {
+      // Nothing to clean up when browser storage is unavailable.
+    }
+  };
 
   useEffect(() => {
     if (mode !== "signup") return;
@@ -242,9 +265,11 @@ function AuthForm() {
     setError("");
     if (mode === "signup") trackAuthEvent("signup_started", { method: "google" });
     trackAuthEvent("auth_oauth_click", { provider: "google" });
+    rememberOAuthSignup("google");
     try {
       await signIn("google", { callbackUrl: "/dashboard" });
     } catch {
+      clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "google" });
       setError("Google sign-in failed. Please try again.");
       setGoogleLoading(false);
@@ -260,9 +285,11 @@ function AuthForm() {
     setError("");
     if (mode === "signup") trackAuthEvent("signup_started", { method: "github" });
     trackAuthEvent("auth_oauth_click", { provider: "github" });
+    rememberOAuthSignup("github");
     try {
       await signIn("github", { callbackUrl: "/dashboard" });
     } catch {
+      clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "github" });
       setError("GitHub sign-in failed. Please try again.");
       setGithubLoading(false);

@@ -460,13 +460,13 @@ export default async function BlogPostPage({ params }: Props) {
 
             <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
             <BlogLeadSearchFunnel post={articleSource} />
-            <BlogArticleVisuals post={articleSource} />
 
             {/* Body */}
             <div className="prose-content">
               {renderMarkdown(dbPost.content)}
             </div>
 
+            <BlogArticleVisuals post={articleSource} />
             <BlogConversionPanel post={articleSource} />
             <BlogTrustedReferences post={articleSource} />
 
@@ -569,12 +569,12 @@ export default async function BlogPostPage({ params }: Props) {
 
           <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
           <BlogLeadSearchFunnel post={articleSource} />
-          <BlogArticleVisuals post={articleSource} />
 
           <div className="prose-content">
             {renderMarkdown(content)}
           </div>
 
+          <BlogArticleVisuals post={articleSource} />
           <BlogConversionPanel post={articleSource} />
           <BlogTrustedReferences post={articleSource} />
 

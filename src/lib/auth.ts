@@ -15,12 +15,14 @@ declare module "next-auth" {
       image?: string | null;
       role: "USER" | "ADMIN";
       plan: string;
+      createdAt?: string;
     };
   }
   interface User {
     id: string;
     role: "USER" | "ADMIN";
     plan?: string;
+    createdAt?: string;
   }
 }
 
@@ -29,6 +31,7 @@ declare module "next-auth/jwt" {
     id: string;
     role: "USER" | "ADMIN";
     plan: string;
+    createdAt?: string;
   }
 }
 
@@ -84,7 +87,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email.trim().toLowerCase() },
-            select: { id: true, name: true, email: true, password: true, role: true, plan: true, suspended: true },
+            select: { id: true, name: true, email: true, password: true, role: true, plan: true, suspended: true, createdAt: true },
           });
 
           if (!user) return null;
@@ -104,6 +107,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             role:  (user.role as "USER" | "ADMIN") ?? "USER",
             plan:  user.plan ?? "free",
+            createdAt: user.createdAt.toISOString(),
           };
         } catch (err) {
           console.error("[auth] authorize error:", err);
@@ -128,7 +132,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const existing = await prisma.user.findUnique({
             where: { email: normalizedEmail },
-            select: { id: true, role: true, plan: true, suspended: true },
+            select: { id: true, role: true, plan: true, suspended: true, createdAt: true },
           });
 
           if (existing) {
@@ -136,6 +140,7 @@ export const authOptions: NextAuthOptions = {
             user.id = existing.id;
             (user as { role?: string; plan?: string }).role = existing.role ?? "USER";
             (user as { role?: string; plan?: string }).plan = existing.plan ?? "free";
+            user.createdAt = existing.createdAt.toISOString();
           } else {
             // Create new OAuth account
             const newUser = await prisma.user.create({
@@ -145,11 +150,12 @@ export const authOptions: NextAuthOptions = {
                 plan:  "free",
                 role:  "USER",
               },
-              select: { id: true, role: true, plan: true },
+              select: { id: true, role: true, plan: true, createdAt: true },
             });
             user.id = newUser.id;
             (user as { role?: string; plan?: string }).role = newUser.role;
             (user as { role?: string; plan?: string }).plan = newUser.plan ?? "free";
+            user.createdAt = newUser.createdAt.toISOString();
 
             try {
               await notifyNewUserSignup({
@@ -177,6 +183,7 @@ export const authOptions: NextAuthOptions = {
         token.id   = user.id;
         token.role = (user as { role?: "USER" | "ADMIN" }).role ?? "USER";
         token.plan = (user as { plan?: string }).plan ?? "free";
+        token.createdAt = user.createdAt;
       }
       // Re-fetch plan on session refresh
       if (trigger === "update" && token.id) {
@@ -199,6 +206,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id   = token.id;
         session.user.role = token.role ?? "USER";
         session.user.plan = token.plan ?? "free";
+        session.user.createdAt = token.createdAt;
       }
       return session;
     },

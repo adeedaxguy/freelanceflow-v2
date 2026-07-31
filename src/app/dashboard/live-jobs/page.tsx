@@ -12,6 +12,7 @@ import type { AggregatedLead } from "@/lib/leads-aggregator";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 import { copyText } from "@/lib/clipboard";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
@@ -351,6 +352,14 @@ export default function LiveJobsPage() {
       };
 
       const fetched = data.leads ?? [];
+      const searchDetails = {
+        lead_type: "live_job",
+        search_term: nichesToFetch.join(", "),
+        result_count: fetched.length,
+        range_hours: maxHours,
+      };
+      trackAnalyticsEvent("search", searchDetails);
+      trackAnalyticsEvent("lead_search", searchDetails);
       setTotalFound(data.total ?? fetched.length);
       setActiveSources(data.activeSources ?? []);
       if (data.usage) setUsage(data.usage);

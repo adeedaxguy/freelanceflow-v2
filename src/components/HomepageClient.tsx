@@ -147,6 +147,7 @@ const faq = [
 
 function marketingEvent(name: string, data: Record<string, string> = {}) {
   if (typeof window === "undefined") return;
+  window.gtag?.("event", name, data);
   window.dispatchEvent(new CustomEvent("icloseleads:marketing", { detail: { name, ...data } }));
 }
 

@@ -7,6 +7,7 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OnboardingTour from "@/components/OnboardingTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
+import SignupAnalytics from "@/components/SignupAnalytics";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -14,6 +15,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <div className="dashboard-shell flex min-h-screen bg-background">
+      <SignupAnalytics createdAt={session.user.createdAt} />
       {/* Sidebar: desktop aside + mobile top-bar + mobile slide drawer */}
       <Sidebar />
 
