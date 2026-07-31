@@ -43,7 +43,6 @@ const CARDS = [
     trendKey:  "leads"     as const,
     label:     "Leads Found",
     icon:      Users,
-    border:    "border-border",
     iconBg:    "bg-primary/10",
     iconColor: "text-primary-light",
     suffix:    "",
@@ -54,7 +53,6 @@ const CARDS = [
     trendKey:  "emails"    as const,
     label:     "Outreach",
     icon:      Mail,
-    border:    "border-border",
     iconBg:    "bg-primary/10",
     iconColor: "text-primary-light",
     suffix:    "",
@@ -65,7 +63,6 @@ const CARDS = [
     trendKey:  "openRate"  as const,
     label:     "Open Rate",
     icon:      TrendingUp,
-    border:    "border-accent/20",
     iconBg:    "bg-accent/10",
     iconColor: "text-accent",
     suffix:    "%",
@@ -76,9 +73,8 @@ const CARDS = [
     trendKey:  "responses" as const,
     label:     "Responses",
     icon:      Bookmark,
-    border:    "border-gold/20",
-    iconBg:    "bg-gold/10",
-    iconColor: "text-gold",
+    iconBg:    "bg-[hsl(var(--signal)/0.18)]",
+    iconColor: "text-foreground",
     suffix:    "",
     trendSfx:  "%",
   },
@@ -87,29 +83,27 @@ const CARDS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function DashboardStats({ stats }: { stats: Stats }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {CARDS.map(({ key, trendKey, label, icon: Icon, border, iconBg, iconColor, suffix, trendSfx }) => (
+    <div className="grid grid-cols-2 gap-3">
+      {CARDS.map(({ key, trendKey, label, icon: Icon, iconBg, iconColor, suffix, trendSfx }) => (
         <div
           key={key}
-          className={`rounded-xl border bg-card p-5 space-y-2 transition-colors hover:border-foreground/20 ${border}`}
+          className="dashboard-metric-card flex flex-col p-4 sm:p-5 transition-colors hover:border-foreground/25"
         >
-          {/* Header row */}
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">
-              {label}
-            </span>
-            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}>
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full ${iconBg} flex items-center justify-center`}>
               <Icon className={`w-4 h-4 ${iconColor}`} />
+            </div>
+            <div className="text-2xl sm:text-4xl font-semibold text-foreground tracking-tight tabular-nums">
+              <AnimatedCounter value={stats[key]} suffix={suffix} />
             </div>
           </div>
 
-          {/* Animated number */}
-          <div className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            <AnimatedCounter value={stats[key]} suffix={suffix} />
+          <div className="mt-auto pt-5 sm:pt-6">
+            <p className="text-sm sm:text-base font-semibold text-foreground">{label}</p>
+            <div className="mt-1.5">
+              <TrendBadge value={stats.trends[trendKey]} suffix={trendSfx} />
+            </div>
           </div>
-
-          {/* Trend */}
-          <TrendBadge value={stats.trends[trendKey]} suffix={trendSfx} />
         </div>
       ))}
     </div>

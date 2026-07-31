@@ -106,11 +106,11 @@ function NavLink({
         collapsed ? "px-2.5 py-2.5 justify-center" : "px-3 py-2.5"
       } ${
         active
-          ? "bg-accent/10 text-foreground shadow-[inset_3px_0_0_hsl(var(--accent))]"
-          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+          ? "dashboard-nav-active"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary"
       }`}
     >
-      <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-accent" : ""}`} />
+      <Icon className="w-4 h-4 flex-shrink-0" />
       {!collapsed && (
         <>
           <span className="flex-1">{label}</span>
@@ -374,11 +374,11 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
 
         <div className="flex border-t border-border/60">
           <Link href="/dashboard/profile" onClick={onLinkClick}
-            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all border-r border-border/60">
+            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors border-r border-border/60">
             <User className="w-3 h-3" /> Profile
           </Link>
           <Link href="/dashboard/settings" onClick={onLinkClick}
-            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
             <Settings className="w-3 h-3" /> Settings
           </Link>
         </div>
@@ -470,7 +470,7 @@ export default function Sidebar() {
           <button
             onClick={toggleCollapse}
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
           >
             <ChevronLeft className={`w-4 h-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
           </button>

@@ -119,10 +119,10 @@ function getEmptyDashboardData(): DashboardData {
 
 // ─── Quick Actions ─────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { label: "Local Leads", href: "/dashboard/local-leads", icon: MapPin,   color: "bg-accent/10 text-accent border-accent/20 hover:bg-accent/20" },
-  { label: "Remote Jobs", href: "/dashboard/leads",       icon: Search,   color: "bg-primary/10 text-primary-light border-primary/20 hover:bg-primary/20" },
-  { label: "Live Jobs",   href: "/dashboard/live-jobs",   icon: Radio,    color: "bg-gold/10 text-gold border-gold/20 hover:bg-gold/20" },
-  { label: "Saved Leads", href: "/dashboard/saved-leads", icon: Bookmark, color: "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20" },
+  { label: "Local Leads", href: "/dashboard/local-leads", icon: MapPin },
+  { label: "Remote Jobs", href: "/dashboard/leads",       icon: Search },
+  { label: "Live Jobs",   href: "/dashboard/live-jobs",   icon: Radio },
+  { label: "Saved Leads", href: "/dashboard/saved-leads", icon: Bookmark },
 ];
 
 // ─── Empty state component ─────────────────────────────────────────────────────
@@ -183,15 +183,16 @@ export default async function DashboardPage() {
   })();
 
   return (
-    <div className="dashboard-page max-w-7xl space-y-7">
+    <div className="dashboard-page max-w-7xl space-y-6">
 
       {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 pt-1">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">
-            {greeting}, {firstName}
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Workspace overview</p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-medium tracking-tight text-foreground">
+            {greeting}, {firstName}.
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+          <p className="text-muted-foreground mt-2 text-sm">
             Here&apos;s what&apos;s happening with your outreach this month.
           </p>
         </div>
@@ -200,7 +201,7 @@ export default async function DashboardPage() {
           <CmdKButton />
           <Link
             href="/dashboard/local-leads"
-            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-light text-white text-sm font-medium transition-colors"
+            className="hidden sm:flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
           >
             <MapPin className="w-4 h-4" /> Find Local Leads
           </Link>
@@ -221,47 +222,44 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* ── Animated stat cards ── */}
-      <DashboardStats stats={{
-        leadsFound: data.leadsFound,
-        emailsSent: data.emailsSent,
-        openRate:   data.openRate,
-        responses:  data.responses,
-        trends:     data.trends,
-      }} />
-
-      {/* ── Chart + Quick Actions ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)] gap-4">
+        <DashboardStats stats={{
+          leadsFound: data.leadsFound,
+          emailsSent: data.emailsSent,
+          openRate: data.openRate,
+          responses: data.responses,
+          trends: data.trends,
+        }} />
+        <div>
           <EmailChart data={data.chartData} title="Outreach Prepared — Last 30 Days" />
         </div>
+      </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4">
-          <h3 className="text-foreground font-semibold">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
-            {QUICK_ACTIONS.map(({ label, href, icon: Icon, color }) => (
-              <Link
-                key={label}
-                href={href}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${color}`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-sm font-medium">{label}</span>
-              </Link>
-            ))}
-          </div>
-
-          {!isPro && (
-            <div className="mt-auto rounded-lg border border-accent/20 bg-accent/10 px-4 py-3">
-              <p className="flex items-center gap-2 text-sm font-semibold text-accent">
-                <CheckCircle className="w-4 h-4" /> Free launch access
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                Remote jobs, live jobs, local business leads, and AI proposal prep are open while paid plans are being prepared.
-              </p>
-            </div>
-          )}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="mr-1 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Quick access</span>
+          {QUICK_ACTIONS.map(({ label, href, icon: Icon }) => (
+            <Link
+              key={label}
+              href={href}
+              className="dashboard-action-pill flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-colors"
+            >
+              <Icon className="w-4 h-4 text-primary-light" />
+              <span>{label}</span>
+            </Link>
+          ))}
         </div>
+
+        {!isPro && (
+          <div className="dashboard-surface flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex items-center gap-2 text-sm font-semibold text-accent">
+              <CheckCircle className="w-4 h-4" /> Free launch access is active
+            </p>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              Core lead discovery and proposal preparation are available now.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── Recent Activity ── */}
