@@ -4,6 +4,8 @@ type SeoTopic = {
   slug: string;
   title: string;
   excerpt: string;
+  metaTitle?: string;
+  metaDescription?: string;
   category: string;
   focusKeyword: string;
   audience: string;
@@ -576,6 +578,8 @@ const topics: SeoTopic[] = [
     slug: "freelance-client-acquisition-system",
     title: "Freelance Client Acquisition System: Build a Repeatable Pipeline in 30 Days",
     excerpt: "A freelance client acquisition system turns lead discovery, proposals, outreach, and follow-up into a weekly routine.",
+    metaTitle: "Freelance Client Acquisition System | 30-Day Pipeline",
+    metaDescription: "Build a repeatable freelance client acquisition system with lead discovery, qualification, proposals, outreach, and follow-up.",
     category: "Strategy",
     focusKeyword: "freelance client acquisition system",
     audience: "freelancers who want predictable pipeline",
@@ -2108,5 +2112,7 @@ export const SEO_CONTENT_CLUSTER: BlogPost[] = topics.slice(0, PUBLISHED_TOPIC_L
     readTime: 11,
     createdAt,
     updatedAt: createdAt,
+    metaTitle: topic.metaTitle ?? null,
+    metaDescription: topic.metaDescription ?? null,
   };
 });
