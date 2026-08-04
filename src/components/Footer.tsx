@@ -1,7 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Mail, Radar, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Facebook,
+  Instagram,
+  Mail,
+  Music2,
+  Pin,
+  Radar,
+  ShieldCheck,
+  Sparkles,
+  Youtube,
+} from "lucide-react";
 import Logo from "./Logo";
 
 const primaryLinks = [
@@ -73,6 +84,34 @@ const mobileFooterLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
+const socialLinks = [
+  {
+    label: "Facebook",
+    href: "https://web.facebook.com/profile.php?id=61592657612774",
+    icon: Facebook,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/icloseleads.com2026/",
+    icon: Instagram,
+  },
+  {
+    label: "YouTube",
+    href: "https://youtube.com/@icloseleads-e6s?si=giZvftdloI8ZOInE",
+    icon: Youtube,
+  },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@icloseleads1",
+    icon: Music2,
+  },
+  {
+    label: "Pinterest",
+    href: "https://www.pinterest.com/icloseleads/",
+    icon: Pin,
+  },
+];
+
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-background/95" aria-label="Site footer">
@@ -112,6 +151,27 @@ export default function Footer() {
                   <Mail className="h-4 w-4" />
                   Contact
                 </a>
+              </div>
+
+              <div className="mt-5 border-t border-border pt-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  Follow iCloseLeads
+                </p>
+                <div className="flex flex-wrap gap-2" aria-label="iCloseLeads social profiles">
+                  {socialLinks.map(({ label, href, icon: Icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Follow iCloseLeads on ${label}`}
+                      title={label}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background/70 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
 
