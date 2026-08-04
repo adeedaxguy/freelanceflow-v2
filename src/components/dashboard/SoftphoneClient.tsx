@@ -7,6 +7,7 @@ import {
   AlertTriangle,
   ArrowDownLeft,
   ArrowUpRight,
+  Bot,
   Check,
   Clock3,
   Loader2,
@@ -80,6 +81,20 @@ type OwnedNumber = {
   callable: boolean;
 };
 
+type AiAgentCall = {
+  id: string;
+  from: string;
+  to: string;
+  status: string;
+  outcome: string | null;
+  durationSeconds: number | null;
+  createdAt: string;
+  endedAt: string | null;
+  companyName: string;
+  contactName: string;
+  transcript: Array<{ speaker: "agent" | "prospect"; text: string; at: string }>;
+};
+
 async function api(body?: object) {
   const response = await fetch("/api/softphone/workspace", body ? {
     method: "POST",
@@ -88,6 +103,17 @@ async function api(body?: object) {
   } : undefined);
   const data = await response.json() as Record<string, unknown>;
   if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : "Softphone request failed");
+  return data;
+}
+
+async function agentApi(body?: object) {
+  const response = await fetch("/api/softphone/ai-agent", body ? {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  } : undefined);
+  const data = await response.json() as Record<string, unknown>;
+  if (!response.ok) throw new Error(typeof data.error === "string" ? data.error : "AI call request failed");
   return data;
 }
 
@@ -124,6 +150,13 @@ export default function SoftphoneClient() {
   const [activeCall, setActiveCall] = useState<Call | null>(null);
   const [incomingCall, setIncomingCall] = useState<Call | null>(null);
   const [muted, setMuted] = useState(false);
+  const [callMode, setCallMode] = useState<"manual" | "agent">("manual");
+  const [agentCalls, setAgentCalls] = useState<AiAgentCall[]>([]);
+  const [companyName, setCompanyName] = useState(searchParams.get("company") || "");
+  const [contactName, setContactName] = useState("");
+  const [campaignContext, setCampaignContext] = useState("");
+  const [consentBasis, setConsentBasis] = useState("");
+  const [consentConfirmed, setConsentConfirmed] = useState(false);
 
   const refresh = useCallback(async () => {
     const data = await api();
@@ -140,6 +173,11 @@ export default function SoftphoneClient() {
     setCalls((data.calls as CallHistory[]) ?? []);
   }, []);
 
+  const refreshAgent = useCallback(async () => {
+    const data = await agentApi();
+    setAgentCalls((data.calls as AiAgentCall[]) ?? []);
+  }, []);
+
   useEffect(() => {
     void refresh().catch(error => toast({ title: "Could not load softphone", description: error.message, type: "error" })).finally(() => setLoading(false));
     return () => {
@@ -148,6 +186,19 @@ export default function SoftphoneClient() {
       deviceRef.current = null;
     };
   }, [refresh, toast]);
+
+  useEffect(() => {
+    void refreshAgent().catch(() => undefined);
+  }, [refreshAgent]);
+
+  useEffect(() => {
+    const latest = agentCalls[0];
+    if (!latest || latest.endedAt || !["queued", "initiated", "ringing", "in-progress"].includes(latest.status)) return;
+    const timer = window.setInterval(() => {
+      void Promise.all([refreshAgent(), refresh()]);
+    }, 2_500);
+    return () => window.clearInterval(timer);
+  }, [agentCalls, refresh, refreshAgent]);
 
   useEffect(() => {
     if (searchParams.get("checkout") !== "success") return;
@@ -305,6 +356,43 @@ export default function SoftphoneClient() {
     } finally { setBusy(null); }
   }
 
+  async function startAgentCall() {
+    setBusy("agent-call");
+    try {
+      const data = await agentApi({
+        action: "start",
+        to: phone,
+        from: selectedFrom,
+        companyName,
+        contactName,
+        campaignContext,
+        consentBasis,
+        consentConfirmed,
+        leadId: searchParams.get("leadId") || undefined,
+      });
+      setAgentCalls(current => [data.call as AiAgentCall, ...current.filter(call => call.id !== (data.call as AiAgentCall).id)]);
+      toast({ title: "AI call started", description: "The agent will disclose that it is AI and call on behalf of Adnan.", type: "success" });
+    } catch (error) {
+      toast({ title: "Could not start AI call", description: error instanceof Error ? error.message : "Please try again", type: "error" });
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function stopAgentCall(recordId: string) {
+    setBusy("agent-stop");
+    try {
+      const data = await agentApi({ action: "cancel", recordId });
+      setAgentCalls(current => current.map(call => call.id === recordId ? data.call as AiAgentCall : call));
+      await refresh();
+      toast({ title: "AI call ended", type: "success" });
+    } catch (error) {
+      toast({ title: "Could not end AI call", description: error instanceof Error ? error.message : "Please try again", type: "error" });
+    } finally {
+      setBusy(null);
+    }
+  }
+
   function pressKey(key: string) {
     if (activeCall) activeCall.sendDigits(key);
     else setPhone(value => value + key);
@@ -446,27 +534,52 @@ export default function SoftphoneClient() {
                 <div className="rounded-lg bg-accent/10 p-2.5"><Phone className="h-5 w-5 text-accent" /></div>
               </div>
               {ownedNumbers.length < 3 && <button onClick={() => setShowNumberSearch(true)} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-primary-light hover:underline"><Plus className="h-3.5 w-3.5" /> Add another number</button>}
-              <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
-              <div className="mt-4 grid grid-cols-3 gap-2">
-                {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}
+              <div className="mt-5 grid grid-cols-2 rounded-lg border border-border bg-muted p-1" aria-label="Calling mode">
+                <button onClick={() => setCallMode("manual")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "manual" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><PhoneCall className="h-4 w-4" /> Manual call</button>
+                <button onClick={() => setCallMode("agent")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "agent" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><Bot className="h-4 w-4" /> AI agent</button>
               </div>
-              <div className="mt-4 flex gap-2">
-                {!activeCall ? <button onClick={() => void startCall()} disabled={!phone.trim() || Boolean(busy)} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground disabled:opacity-50">{busy === "call" || busy === "device" ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />} Call</button> : <>
-                  <button onClick={() => { activeCall.mute(!muted); setMuted(!muted); }} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">{muted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}{muted ? "Unmute" : "Mute"}</button>
-                  <button onClick={() => activeCall.disconnect()} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-3 text-sm font-semibold text-white"><PhoneOff className="h-4 w-4" /> End</button>
-                </>}
-              </div>
-              {deviceState === "Offline" && <button onClick={() => void connectDevice()} disabled={busy === "device"} className="mt-3 w-full text-center text-xs font-semibold text-primary-light hover:underline">Enable incoming calls</button>}
-              <div className="mt-4 space-y-1.5 border-t border-border pt-4 text-xs leading-5 text-muted-foreground">
-                <p>Keep this page open with phone status Ready to receive browser calls.</p>
-                <p className="flex items-start gap-2 text-gold"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> iCloseLeads is not an emergency calling service. Use your local emergency service for urgent help.</p>
-              </div>
+
+              {callMode === "manual" ? <>
+                <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}
+                </div>
+                <div className="mt-4 flex gap-2">
+                  {!activeCall ? <button onClick={() => void startCall()} disabled={!phone.trim() || Boolean(busy)} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground disabled:opacity-50">{busy === "call" || busy === "device" ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />} Call</button> : <>
+                    <button onClick={() => { activeCall.mute(!muted); setMuted(!muted); }} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">{muted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}{muted ? "Unmute" : "Mute"}</button>
+                    <button onClick={() => activeCall.disconnect()} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-3 text-sm font-semibold text-white"><PhoneOff className="h-4 w-4" /> End</button>
+                  </>}
+                </div>
+                {deviceState === "Offline" && <button onClick={() => void connectDevice()} disabled={busy === "device"} className="mt-3 w-full text-center text-xs font-semibold text-primary-light hover:underline">Enable incoming calls</button>}
+                <div className="mt-4 space-y-1.5 border-t border-border pt-4 text-xs leading-5 text-muted-foreground">
+                  <p>Keep this page open with phone status Ready to receive browser calls.</p>
+                  <p className="flex items-start gap-2 text-gold"><AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> iCloseLeads is not an emergency calling service. Use your local emergency service for urgent help.</p>
+                </div>
+              </> : <div className="mt-5 space-y-4">
+                <div className="rounded-lg border border-accent/25 bg-accent/5 p-3 text-xs leading-5 text-muted-foreground">
+                  <p className="flex gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" /><span>The agent introduces itself as AI, asks one question at a time, records no audio, and stops immediately on an opt-out.</span></p>
+                </div>
+                <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-base font-semibold text-foreground outline-none focus:border-primary" /></label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Business</span><input value={companyName} onChange={event => setCompanyName(event.target.value)} placeholder="Northstar Dental" className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary" /></label>
+                  <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Contact, if known</span><input value={contactName} onChange={event => setContactName(event.target.value)} placeholder="Alex" className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary" /></label>
+                </div>
+                <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Reason for calling</span><textarea value={campaignContext} onChange={event => setCampaignContext(event.target.value)} placeholder="Ask whether they want more local appointment enquiries and offer a short website conversion review." rows={3} className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm leading-6 text-foreground outline-none focus:border-primary" /></label>
+                <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Consent basis</span><textarea value={consentBasis} onChange={event => setConsentBasis(event.target.value)} placeholder="Where and when this contact agreed to receive an automated sales call." rows={2} className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm leading-6 text-foreground outline-none focus:border-primary" /></label>
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background p-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" checked={consentConfirmed} onChange={event => setConsentConfirmed(event.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" /><span>I confirm this contact gave prior permission for an automated or AI-assisted sales call and is not on our do-not-call list.</span></label>
+                <button onClick={() => void startAgentCall()} disabled={!phone.trim() || !companyName.trim() || campaignContext.trim().length < 20 || consentBasis.trim().length < 10 || !consentConfirmed || Boolean(busy) || Boolean(agentCalls[0] && !agentCalls[0].endedAt)} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "agent-call" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />} Start disclosed AI call</button>
+
+                {agentCalls[0] && <div className="rounded-lg border border-border bg-background p-4">
+                  <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-foreground">{agentCalls[0].companyName}</p><p className="mt-1 text-xs text-muted-foreground">{agentCalls[0].status} · {agentCalls[0].outcome || "ACTIVE"}</p></div>{!agentCalls[0].endedAt && <button onClick={() => void stopAgentCall(agentCalls[0]!.id)} disabled={busy === "agent-stop"} className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/40 px-3 py-2 text-xs font-semibold text-destructive"><PhoneOff className="h-3.5 w-3.5" /> Stop</button>}</div>
+                  <div className="mt-3 max-h-48 space-y-2 overflow-y-auto border-t border-border pt-3">{agentCalls[0].transcript.length === 0 ? <p className="text-xs text-muted-foreground">Waiting for the call to connect.</p> : agentCalls[0].transcript.map((entry, index) => <div key={`${entry.at}-${index}`} className="flex gap-2 text-xs leading-5"><span className={`shrink-0 font-semibold ${entry.speaker === "agent" ? "text-primary-light" : "text-accent"}`}>{entry.speaker === "agent" ? "Agent" : "Prospect"}</span><span className="text-muted-foreground">{entry.text}</span></div>)}</div>
+                </div>}
+              </div>}
             </div>
 
             <div className="rounded-lg border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border px-5 py-4"><div><h2 className="font-semibold text-foreground">Recent calls</h2><p className="mt-0.5 text-xs text-muted-foreground">The latest 20 calls for this workspace</p></div><Clock3 className="h-5 w-5 text-muted-foreground" /></div>
               {calls.length === 0 ? <div className="p-10 text-center text-sm text-muted-foreground">No calls yet.</div> : <div className="divide-y divide-border">{calls.map(call => <div key={call.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-3.5">
-                <div className="rounded-lg bg-muted p-2">{call.direction === "INBOUND" ? <ArrowDownLeft className="h-4 w-4 text-accent" /> : <ArrowUpRight className="h-4 w-4 text-primary-light" />}</div>
+                <div className="rounded-lg bg-muted p-2">{call.direction === "INBOUND" ? <ArrowDownLeft className="h-4 w-4 text-accent" /> : call.direction === "OUTBOUND_AI" ? <Bot className="h-4 w-4 text-primary-light" /> : <ArrowUpRight className="h-4 w-4 text-primary-light" />}</div>
                 <div className="min-w-0"><p className="truncate text-sm font-semibold text-foreground">{call.direction === "INBOUND" ? call.from : call.to}</p><p className="mt-0.5 text-xs text-muted-foreground">{new Date(call.createdAt).toLocaleString()} · {call.status}</p></div>
                 <span className="text-xs font-medium text-muted-foreground">{duration(call.durationSeconds)}</span>
               </div>)}</div>}

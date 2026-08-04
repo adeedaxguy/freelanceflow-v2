@@ -92,6 +92,32 @@ function subaccountClient(workspace: {
   );
 }
 
+export async function startAiVoiceCall(
+  workspace: { twilioAccountSid: string | null; twilioAuthTokenEncrypted: string | null },
+  recordId: string,
+  to: string,
+  from: string,
+) {
+  return subaccountClient(workspace).calls.create({
+    to,
+    from,
+    url: appUrl(`/api/softphone/ai-agent/voice?recordId=${encodeURIComponent(recordId)}`),
+    method: "POST",
+    statusCallback: appUrl(`/api/softphone/ai-agent/voice?mode=status&recordId=${encodeURIComponent(recordId)}`),
+    statusCallbackMethod: "POST",
+    statusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
+    timeout: 30,
+    record: false,
+  });
+}
+
+export async function stopVoiceCall(
+  workspace: { twilioAccountSid: string | null; twilioAuthTokenEncrypted: string | null },
+  callSid: string,
+) {
+  return subaccountClient(workspace).calls(callSid).update({ status: "completed" });
+}
+
 export function appUrl(path: string) {
   return new URL(path, process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
 }
