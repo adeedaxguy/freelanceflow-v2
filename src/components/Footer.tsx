@@ -243,7 +243,27 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col gap-3 px-1 pt-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} iCloseLeads. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} iCloseLeads. Developed by{" "}
+            <a
+              href="https://technodigg.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-foreground transition-colors hover:text-primary-light"
+            >
+              Technodigg
+            </a>{" "}
+            x{" "}
+            <a
+              href="https://lofts.studio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-foreground transition-colors hover:text-primary-light"
+            >
+              Lofts.studio
+            </a>
+            . All rights reserved.
+          </p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
             <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
             <Link href="/terms" className="hover:text-foreground">Terms</Link>
