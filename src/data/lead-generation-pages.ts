@@ -39,16 +39,16 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "web-design-leads",
     path: "/lead-generation/web-design-leads",
     primaryKeyword: "web design leads",
-    metaTitle: "Web Design Leads for Freelancers | Find Clients Who Need Websites",
+    metaTitle: "Web Design Leads for Freelancers | Free Local Leads and Website-Gap Prospects",
     metaDescription:
-      "Find web design leads from remote jobs, local businesses, businesses without websites, outdated websites, and owner/contact paths. Start free with iCloseLeads.",
+      "Find web design leads for free from local businesses, weak websites, businesses without websites, and remote hiring signals. Start free with iCloseLeads.",
     eyebrow: "Web Design Leads",
     title: "Find web design leads",
     accentTitle: "with a real reason to pitch today",
     summary:
-      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find prospects with visible website, conversion, SEO, booking, or launch signals.",
+      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals.",
     directAnswer:
-      "The fastest way to find web design leads is to search for businesses with a visible website gap, recent hiring demand, or public growth problem, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads brings those signals into one workflow so you can search, save, draft, and follow up.",
+      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads brings those signals into one workflow so you can search, save, draft, and follow up.",
     primaryCta: "Find Web Design Leads Free",
     secondaryCta: "See local lead workflow",
     dashboardPath: "/dashboard/local-leads",
@@ -62,13 +62,13 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       "Move high-fit leads into AI proposals, owner checks, and CRM follow-up.",
     ],
     searchAngles: [
-      { group: "Core intent", terms: ["web design leads", "website design leads", "leads for web design"] },
+      { group: "Core intent", terms: ["web design leads", "website design leads", "leads for web design", "web design leads for free", "web design leads free"] },
       { group: "Buyer signal", terms: ["businesses needing websites", "outdated website leads", "local businesses without websites"] },
       { group: "Freelancer workflow", terms: ["find web design clients", "cold outreach for web designers", "web design prospecting"] },
     ],
     workflow: [
       { title: "Pick a narrow market", description: "Search one service area and niche so every result has a clear reason for a website pitch." },
-      { title: "Filter for website gaps", description: "Prioritize no website, unverified website, outdated website, or weak conversion signals." },
+      { title: "Filter for website gaps", description: "Prioritize no website, unverified website, outdated website, weak Google Maps-to-site flow, or weak conversion signals." },
       { title: "Open the owner path", description: "Check the business profile, public phone route, and owner or manager search before outreach." },
       { title: "Draft a specific pitch", description: "Turn the signal into a short message about calls, bookings, local SEO, or conversion." },
     ],
@@ -102,7 +102,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     ],
     internalLinks: [
       { label: "Local Business Leads", href: "/lead-generation/local-business-leads", description: "Find businesses by city, category, website status, and phone signals." },
-      { label: "Businesses Without Websites", href: "/lead-generation/businesses-without-websites", description: "Target prospects with the clearest web design need." },
+      { label: "Web design leads for free vs verified", href: "/resources/web-design-leads-for-free-vs-verified", description: "Compare free research with a safer verified workflow before you pitch." },
       { label: "AI Proposals", href: "/features/ai-proposals", description: "Turn a lead signal into a draft you can edit before sending." },
     ],
     faqs: [
@@ -113,6 +113,10 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       {
         q: "Can iCloseLeads find businesses without websites?",
         a: "Yes. Local business search can prioritize no or unknown website status, then you can verify the profile before pitching.",
+      },
+      {
+        q: "Can I get web design leads for free?",
+        a: "Yes. A free workflow can work when you start with local business profiles, website gaps, and public hiring signals, then verify the context before you pitch. iCloseLeads is built to help you keep that verified context attached to the lead.",
       },
       {
         q: "Is this only for web designers?",

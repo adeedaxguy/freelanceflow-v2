@@ -14,6 +14,10 @@ interface Props {
 
 type ResourcePageData = NonNullable<ReturnType<typeof getResourcePage>>;
 
+function normalizeResourceMetaTitle(title: string) {
+  return title.replace(/\s*\|\s*iCloseLeads\s*$/i, "");
+}
+
 function getResourceSignalScorecard(page: ResourcePageData) {
   return [
     {
@@ -192,15 +196,16 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props): Metadata {
   const page = getResourcePage(params.slug);
   if (!page) return { title: "Resource Not Found" };
+  const pageTitle = normalizeResourceMetaTitle(page.metaTitle);
 
   return {
     metadataBase: new URL(BASE_URL),
-    title: page.metaTitle,
+    title: pageTitle,
     description: page.metaDescription,
     keywords: [page.keyword, "freelance lead generation", "iCloseLeads", "client acquisition"],
     alternates: { canonical: `${BASE_URL}/resources/${page.slug}` },
     openGraph: {
-      title: page.metaTitle,
+      title: pageTitle,
       description: page.metaDescription,
       url: `${BASE_URL}/resources/${page.slug}`,
       type: "article",
@@ -208,7 +213,7 @@ export function generateMetadata({ params }: Props): Metadata {
     },
     twitter: {
       card: "summary_large_image",
-      title: page.metaTitle,
+      title: pageTitle,
       description: page.metaDescription,
     },
   };
@@ -216,12 +221,13 @@ export function generateMetadata({ params }: Props): Metadata {
 
 function ResourceJsonLd({ page }: { page: ResourcePageData }) {
   const url = `${BASE_URL}/resources/${page.slug}`;
+  const pageTitle = normalizeResourceMetaTitle(page.metaTitle);
   const scorecard = getResourceSignalScorecard(page);
   const graph = [
     {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: page.metaTitle,
+      headline: pageTitle,
       description: page.metaDescription,
       author: { "@type": "Organization", name: "iCloseLeads" },
       publisher: { "@type": "Organization", name: "iCloseLeads", url: BASE_URL },

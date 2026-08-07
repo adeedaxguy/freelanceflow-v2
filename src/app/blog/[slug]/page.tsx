@@ -1,6 +1,6 @@
 import React, { type ReactNode } from "react";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import { Calendar, Clock, ArrowLeft, ArrowRight, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -366,6 +366,10 @@ function RelatedArticlesSection({ posts }: { posts: BlogPost[] }) {
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
+  if (params.slug === "freelancer-client-acquisition-system") {
+    permanentRedirect("/blog/freelance-client-acquisition-system");
+  }
+
   // 1. Try DB (admin-published posts with SEO fields)
   const dbPost = await getDbPost(params.slug);
   if (dbPost) {

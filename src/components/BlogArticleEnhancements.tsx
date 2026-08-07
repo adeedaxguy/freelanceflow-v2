@@ -96,28 +96,28 @@ const GENERIC_LEAD_WORKFLOW_VISUALS = (post: BlogArticleSource) => {
 };
 
 const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
-  title: "Turn this guide into a real prospect list",
+  title: "Turn this search into a real client workflow",
   summary:
-    "Choose the market you want to serve, find businesses and jobs with visible demand, save the strongest matches, and prepare a specific first pitch inside iCloseLeads.",
-  ctaLabel: "Find qualified leads free",
+    "Choose one market, run a local-business or hiring-led search, save only qualified leads with proof, then generate a proposal and follow-up from one workflow.",
+  ctaLabel: "Run a free lead search",
   proofNote:
-    "No card required. Start with one focused search, save a qualified prospect, and generate the first outreach angle from the lead context.",
+    "Built for searchers who want clients, not generic advice. Start with a focused search, a saved proof note, and a reviewed pitch path.",
   steps: [
     {
-      title: "Pick a market",
-      detail: "Choose the niche, service, city, or client type you want to win.",
+      title: "Pick a market and offer",
+      detail: "Choose the niche, service, city, or buyer type you want to win before opening more tabs.",
     },
     {
-      title: "Run lead search",
-      detail: "Find prospects with websites, contact paths, and visible improvement signals.",
+      title: "Run local and live lead search",
+      detail: "Find prospects with website gaps, hiring cues, contact paths, and visible improvement signals.",
     },
     {
-      title: "Save qualified prospects",
-      detail: "Keep only the leads that match your offer, budget signals, and outreach angle.",
+      title: "Save proof-led prospects",
+      detail: "Keep only the leads that match your offer, contact route, business reason, and outreach angle.",
     },
     {
-      title: "Generate the pitch",
-      detail: "Turn the saved lead into a specific first message and follow-up workflow.",
+      title: "Generate the pitch and follow-up",
+      detail: "Turn the saved lead into a specific message, reviewed proposal, and scheduled next step.",
     },
   ],
 };

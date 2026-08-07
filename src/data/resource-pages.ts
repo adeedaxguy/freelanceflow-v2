@@ -2379,18 +2379,19 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       },
     ],
     proofPoints: [
-      "GSC continues to show freelance cold outreach as an early recurring query cluster for the site.",
+      "Cold outreach searchers also need lead qualification, local business lead context, and a proposal path, not just email copy.",
       "Live US SERPs reward practical templates, examples, and workflow pages over vague cold-email advice.",
-      "GA4 shows engagement and form-start activity on outreach-related pages even though key-event tracking is still incomplete.",
+      "The page should route readers from the first signal into saved context, Gmail preparation, and follow-up instead of leaving them with standalone templates.",
       "iCloseLeads connects discovery, proposal writing, Gmail preparation, and CRM follow-up in one product path.",
     ],
     pitch:
       "Hi, I found your post/profile while researching companies that may need help with [specific issue]. I noticed [signal]. I can help with a small first step that would make this easier to solve.",
     internalLinks: [
       { label: "Cold outreach use case", href: "/use-cases/freelance-cold-outreach" },
+      { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },
+      { label: "Local business leads", href: "/use-cases/local-business-leads" },
       { label: "Cold outreach CRM for freelancers", href: "/resources/cold-outreach-crm-for-freelancers" },
       { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
-      { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
     ],
     faqs: [
       {
@@ -2400,6 +2401,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         q: "How many leads should I contact?",
         a: "Start with a small batch you can personalize properly. Quality matters more than raw send count.",
+      },
+      {
+        q: "How do I pitch a Google Maps listing without sounding generic?",
+        a: "Mention the visible profile-to-website or booking gap, connect it to calls, quotes, or trust, and offer one small next step instead of a broad redesign pitch.",
       },
     ],
   },
@@ -4240,7 +4245,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "audience": "Freelancers who want fewer poor-fit pitches and better prospecting discipline",
     "intent": "The searcher wants a checklist for deciding whether a lead is worth contacting.",
     "summary": "Lead qualification protects your time. A prospect should pass fit, signal, contact path, timing, and offer relevance before it enters your outreach pipeline.",
-    "leadIn": "Use iCloseLeads to save the checklist outcome with each lead so your pipeline stays focused on prospects you can actually explain, pitch, and follow up.",
+    "leadIn": "Use iCloseLeads to turn the checklist into a saved lead score, a proposal-ready note, and a follow-up path before you ever draft the outreach.",
     "steps": [
       "Fit: does the business match your niche and offer?",
       "Signal: is there a public reason to reach out now?",
@@ -4251,7 +4256,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "proofPoints": [
       "Qualification content supports high-intent prospecting keywords without encouraging spammy outreach.",
       "Competitor pages often skip the operational checklist freelancers need before sending.",
-      "The checklist creates a strong internal link bridge into lead discovery, CRM, and proposal workflows."
+      "The checklist bridges directly into local business leads, freelance cold outreach, and proposal workflows instead of stopping at theory."
     ],
     "pitch": "Hi, I found [company] while checking [niche] businesses and noticed [signal]. It looks like there may be a practical opportunity around [outcome].",
     "internalLinks": [
@@ -4260,12 +4265,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
         "href": "/features/lead-discovery"
       },
       {
-        "label": "Lead scoring for freelancers",
-        "href": "/resources/lead-scoring-for-freelancers"
+        "label": "Local business leads",
+        "href": "/use-cases/local-business-leads"
       },
       {
-        "label": "Email validator checklist",
-        "href": "/resources/email-validator-for-freelance-leads"
+        "label": "Freelance cold outreach",
+        "href": "/resources/freelance-cold-outreach"
       },
       {
         "label": "CRM pipeline",
@@ -4280,6 +4285,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "Should freelancers qualify before finding emails?",
         "a": "Yes. Contact research is only useful after the company is worth contacting."
+      },
+      {
+        "q": "What should I qualify on a local business lead?",
+        "a": "Check whether the business is active, whether the website or Google Maps path shows a real problem, whether the contact route is usable, and whether your offer solves the next customer action such as calls, quotes, or bookings."
       }
     ]
   },
@@ -5130,10 +5139,11 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
   slug: "web-design-leads-for-free-vs-verified",
   title: "Web design leads for free vs verified leads",
-  metaTitle: "Web Design Leads for Free vs Verified Leads | iCloseLeads",
+  metaTitle: "Web Design Leads for Free vs Verified Leads",
   metaDescription: "Compare free web design lead research with verified lead workflows, proof checks, and outreach paths before pitching local website prospects.",
   keyword: "web design leads for free",
   relatedSearches: [
+    "web design leads free",
     "verified web design leads",
     "web design leads list",
     "web design leads for sale",
@@ -5168,7 +5178,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     }
   ],
   proofPoints: [
-    "GSC surfaced web design leads, leads for web designers, and exclusive web design leads as live acquisition queries.",
+    "Searchers comparing free and verified leads usually still need a way to qualify local business demand before they pitch.",
     "Google related searches include free, list, sale, verified, and best modifiers, showing the market is comparing lead source quality.",
     "iCloseLeads supports the safer path: search, verify, save context, draft, and follow up."
   ],
@@ -5176,11 +5186,11 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   internalLinks: [
     {
       label: "Web design leads",
-      href: "/resources/web-design-leads"
+      href: "/lead-generation/web-design-leads"
     },
     {
-      label: "Businesses without websites",
-      href: "/resources/businesses-without-websites"
+      label: "Local business leads",
+      href: "/use-cases/local-business-leads"
     },
     {
       label: "AI proposal generator",
@@ -5195,6 +5205,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     {
       q: "Are verified leads better than free leads?",
       a: "Verified leads are better when verification means fresh context, visible need, and contact confidence, not just a paid list label."
+    },
+    {
+      q: "How do I turn free web design leads into proposals?",
+      a: "Save the visible website or profile gap, qualify the contact route, and use that proof as the first paragraph of a short proposal or outreach draft."
     }
   ]
 },
@@ -6606,17 +6620,34 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       slug: "google-maps-prospecting-tool-for-freelancers",
       title: "Google Maps prospecting tool for freelancers",
       keyword: "Google Maps prospecting tool",
-      relatedSearches: ["Google Maps lead generation", "find businesses without websites on Google Maps", "local lead generation software", "Google Maps prospecting for web designers"],
+      relatedSearches: ["Google Maps lead generation", "find businesses without websites on Google Maps", "local lead generation software", "Google Maps prospecting for web designers", "the pitch google maps listing"],
       audience: "Freelancers who use map results to find local service businesses",
       intent: "The searcher wants a repeatable way to turn map searches into qualified prospects.",
       signal: "a local listing shows category demand, contact information, reviews, website status, or a visible conversion gap",
-      workflow: "search a narrow category, capture the profile signal, verify the contact path, and save the lead with a pitch note",
-      pitchAngle: "make Google Maps prospecting less manual by connecting each lead to proposal and follow-up",
-      competitorGap: "Maps prospecting tutorials stop at discovery; iCloseLeads can add saved context, buyer-route checks, pitch drafting, and CRM follow-through.",
+      workflow: "search a narrow category, capture the Google Maps listing signal, verify the contact path, and save the lead with a pitch note tied to calls, quotes, or bookings",
+      pitchAngle: "turn a Google Maps listing into a respectful website or local SEO pitch with saved proof and follow-up",
+      competitorGap: "Maps prospecting tutorials stop at discovery; iCloseLeads can add saved context, buyer-route checks, lead qualification, proposal drafting, and CRM follow-through.",
       internalLinks: [
         { label: "How to find businesses without websites on Google Maps", href: "/resources/how-to-find-businesses-without-websites-on-google-maps" },
-        { label: "Local website leads", href: "/resources/local-website-leads" },
-        { label: "Lead discovery", href: "/features/lead-discovery" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
+        { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
+      ],
+    },
+    {
+      slug: "google-maps-listing-pitch-for-freelancers",
+      title: "Google Maps listing pitch for freelancers",
+      keyword: "the pitch google maps listing",
+      relatedSearches: ["Google Maps listing pitch", "how to pitch Google Maps leads", "Google Maps prospecting tool", "local business leads"],
+      audience: "Freelancers pitching local businesses from Google Maps and profile signals",
+      intent: "The searcher wants to know what to say when a Google Maps listing reveals a website or conversion gap.",
+      signal: "the business has an active listing, a phone route, and a weak website or missing next step after the profile visit",
+      workflow: "save the listing, note the customer action that breaks, verify the contact route, and draft a short pitch around calls, quotes, or bookings",
+      pitchAngle: "turn the Google Maps listing into a specific website or local SEO suggestion instead of a generic cold email",
+      competitorGap: "Most Google Maps pitch advice is generic or spammy; this page should show a proof-led workflow that routes the lead into signup, proposal drafting, and follow-up.",
+      internalLinks: [
+        { label: "Google Maps prospecting tool", href: "/resources/google-maps-prospecting-tool-for-freelancers" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
+        { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },
       ],
     },
     {
