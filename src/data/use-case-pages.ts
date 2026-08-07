@@ -278,9 +278,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads for Web Designers | Find Google Maps, No-Website, and Weak-Site Prospects",
+    metaTitle: "Local Business Leads | Free Web Design Leads, Google Maps Gaps, and Owner Paths",
     metaDescription:
-      "Find local business leads for web designers with no website, outdated websites, Google Maps listing signals, phone numbers, and owner or manager verification paths that turn into outreach.",
+      "Find local business leads for web designers, SEO consultants, and marketers using website gaps, Google Maps listing signals, phone numbers, and owner or manager paths.",
     keywords: [
       "local business leads",
       "local business leads for web designers",
@@ -300,18 +300,18 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "website redesign leads",
     ],
     heroSummary:
-      "Find local business leads that already show a reason to pitch: no website, outdated site, weak Google Maps-to-website flow, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into signup, proposal drafting, and saved-lead follow-up without losing context or bouncing between tools.",
-    primaryCta: "Find Local Business Leads Free",
-    secondaryCta: "Read Lead Discovery",
+      "Find local business leads that already show a reason to pitch: no website, outdated site, weak Google Maps-to-website flow, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into signup, a real local lead search, proposal drafting, and saved-lead follow-up without losing context or bouncing between tools.",
+    primaryCta: "Search Local Leads Free",
+    secondaryCta: "See Google Maps Pitch Workflow",
     dashboardPath: "/dashboard/local-leads",
     searchIntent:
-      "People searching for local business leads often want web design clients, SEO clients, Google Maps listing pitch ideas, or small businesses with visible marketing gaps. This page targets that commercial intent with no-website, outdated-website, and local-profile conversion paths.",
+      "People searching for local business leads often want free web design leads, SEO clients, Google Maps listing pitch ideas, or small businesses with visible marketing gaps. This page targets that commercial intent with no-website, outdated-website, and local-profile conversion paths.",
     audience:
       "Built for web designers, SEO consultants, local ads specialists, automation freelancers, copywriters, and agencies selling to small businesses.",
     outcome:
-      "A practical local prospecting workflow where each lead includes the business profile, website signal, Google Maps context, contact details when available, owner or manager research path, pitch angle, proposal route, notes, and CRM status.",
+      "A practical local prospecting workflow where each lead includes the business profile, website signal, Google Maps context, contact details when available, owner or manager research path, pitch angle, proposal route, notes, and CRM status, plus a clear route into signup and the local-leads dashboard.",
     intro: [
-      "Local prospecting works best when it starts with a visible business problem. A cleaning company with no website, a dental clinic with an outdated site, or a Google Maps listing that gets attention but sends visitors to a weak website is not just a name in a spreadsheet. It is a business likely losing trust, calls, bookings, or quote requests.",
+      "Local prospecting works best when it starts with a visible business problem. A cleaning company with no website, a dental clinic with an outdated site, or a Google Maps listing that gets attention but sends visitors to a weak website is not just a name in a spreadsheet. It is a business likely losing trust, calls, bookings, or quote requests, which is why this query converts better than generic lead-advice pages.",
       "iCloseLeads helps freelancers search by business type and city, then filter by website status, local-profile signal, and contact readiness. When a lead looks worth pursuing, Decision Maker Finder helps you look for public owner or manager signals, social profiles, phone routes, registry guidance, and proof links. The goal is not to pretend every business needs the same service. The goal is to find the gap, verify the contact route, and route the lead into signup, proposal drafting, and a useful first message tied back to calls, quotes, or bookings.",
     ],
     signals: [
@@ -323,7 +323,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     workflow: [
       {
-        title: "Pick a city and service category",
+        title: "Pick a city, service category, and 21-day batch",
         description:
           "Search practical categories like dentist, plumber, cleaning service, gym, salon, roofer, accountant, or restaurant.",
       },
@@ -345,7 +345,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       {
         title: "Save the lead and pitch the business reason",
         description:
-          "Keep the contact info, address, notes, pitch points, and proposal workflow together.",
+          "Keep the contact info, address, notes, pitch points, and proposal workflow together so the first search can turn into signup and a tracked next action.",
       },
     ],
     keywordsCluster: [

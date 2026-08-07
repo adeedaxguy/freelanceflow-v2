@@ -96,28 +96,28 @@ const GENERIC_LEAD_WORKFLOW_VISUALS = (post: BlogArticleSource) => {
 };
 
 const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
-  title: "Turn this search into a real client workflow",
+  title: "Turn this search into a 21-day client sprint",
   summary:
-    "Choose one market, run a local-business or hiring-led search, save only qualified leads with proof, then generate a proposal and follow-up from one workflow.",
+    "Use this guide as a focused 21-day sprint: choose one market, run a local-business or hiring-led search, save only qualified leads with proof, then generate a proposal and follow-up from one workflow.",
   ctaLabel: "Run a free lead search",
   proofNote:
-    "Built for searchers who want clients, not generic advice. Start with a focused search, a saved proof note, and a reviewed pitch path.",
+    "Built for searchers who want a working client system, not generic advice. Start with one focused search, a saved proof note, and a reviewed pitch path that can keep moving for the next 30 days.",
   steps: [
     {
-      title: "Pick a market and offer",
-      detail: "Choose the niche, service, city, or buyer type you want to win before opening more tabs.",
+      title: "Pick the offer and 21-day market",
+      detail: "Choose the niche, service, city, or buyer type you want to win before opening more tabs or copying outreach examples.",
     },
     {
       title: "Run local and live lead search",
-      detail: "Find prospects with website gaps, hiring cues, contact paths, and visible improvement signals.",
+      detail: "Find prospects with website gaps, hiring cues, contact paths, and visible improvement signals you can reference in the first message.",
     },
     {
       title: "Save proof-led prospects",
-      detail: "Keep only the leads that match your offer, contact route, business reason, and outreach angle.",
+      detail: "Keep only the leads that match your offer, contact route, business reason, and outreach angle instead of building a blind list.",
     },
     {
-      title: "Generate the pitch and follow-up",
-      detail: "Turn the saved lead into a specific message, reviewed proposal, and scheduled next step.",
+      title: "Generate the pitch and 30-day follow-up",
+      detail: "Turn the saved lead into a specific message, reviewed proposal, and scheduled next step so the pipeline keeps moving after the first sprint.",
     },
   ],
 };

@@ -2345,9 +2345,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     audience: "Freelancers and solo agencies selling services directly",
     intent: "The searcher wants clients without relying only on job boards, marketplaces, or referrals.",
     summary:
-      "Cold outreach works best when the first line proves why you are reaching out. The signal can be a job post, website gap, local listing issue, hiring cue, Reddit discussion, or recent business change that gives your email a reason to exist.",
+      "Cold outreach works best when the first line proves why you are reaching out. The signal can be a job post, website gap, local listing issue, hiring cue, Reddit discussion, or recent business change that gives your email a reason to exist and gives the buyer a reason to keep reading.",
     leadIn:
-      "Do not start with a spreadsheet of names. Start with a reason, then keep the batch small enough to review. iCloseLeads helps you find the signal, save the prospect, and prepare a concise Gmail-ready draft that can be checked before sending.",
+      "Do not start with a spreadsheet of names. Start with a reason, then keep the batch small enough to review. iCloseLeads helps you find the signal, save the prospect, and prepare a concise Gmail-ready draft that can be checked before sending, followed up, and tied back to the original proof.",
     activationPlan: {
       trigger: "Use this when you have an offer but need a small, signal-led outreach batch instead of generic cold email volume.",
       firstRun: "Pick one offer and buyer type, then search for visible signals such as website gaps, hiring cues, or local demand.",
@@ -2379,8 +2379,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       },
     ],
     proofPoints: [
-      "Cold outreach searchers also need lead qualification, local business lead context, and a proposal path, not just email copy.",
-      "Live US SERPs reward practical templates, examples, and workflow pages over vague cold-email advice.",
+      "GSC already shows freelance cold outreach as a live query for iCloseLeads, so this page needs to bridge search intent into signup and saved workflow, not just email copy.",
+      "Live Google results mix examples, templates, Reddit validation, and AI answers, which means the outperformance angle is proof-led workflow rather than more generic cold-email advice.",
       "The page should route readers from the first signal into saved context, Gmail preparation, and follow-up instead of leaving them with standalone templates.",
       "iCloseLeads connects discovery, proposal writing, Gmail preparation, and CRM follow-up in one product path.",
     ],
@@ -4239,13 +4239,13 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   {
     "slug": "lead-qualification-checklist-for-freelancers",
     "title": "Lead qualification checklist for freelancers",
-    "metaTitle": "Lead Qualification Checklist for Freelancers | Before You Send Outreach",
-    "metaDescription": "Use this lead qualification checklist to confirm fit, signal, contact route, timing, value, and follow-up before pitching a freelance prospect.",
+    "metaTitle": "Lead Qualification Checklist for Freelancers | Before You Send Outreach or Buy Leads",
+    "metaDescription": "Use this lead qualification checklist to confirm fit, signal, contact route, timing, value, and follow-up before pitching a freelance prospect or trusting a lead list.",
     "keyword": "lead qualification checklist",
     "audience": "Freelancers who want fewer poor-fit pitches and better prospecting discipline",
     "intent": "The searcher wants a checklist for deciding whether a lead is worth contacting.",
-    "summary": "Lead qualification protects your time. A prospect should pass fit, signal, contact path, timing, and offer relevance before it enters your outreach pipeline.",
-    "leadIn": "Use iCloseLeads to turn the checklist into a saved lead score, a proposal-ready note, and a follow-up path before you ever draft the outreach.",
+    "summary": "Lead qualification protects your time. A prospect should pass fit, signal, contact path, timing, offer relevance, and next-step clarity before it enters your outreach pipeline.",
+    "leadIn": "Use iCloseLeads to turn the checklist into a saved lead score, a proposal-ready note, and a follow-up path before you ever draft the outreach or trust a purchased list.",
     "steps": [
       "Fit: does the business match your niche and offer?",
       "Signal: is there a public reason to reach out now?",
@@ -4254,9 +4254,9 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       "Follow-up: do you know the next step after the first message?"
     ],
     "proofPoints": [
-      "Qualification content supports high-intent prospecting keywords without encouraging spammy outreach.",
-      "Competitor pages often skip the operational checklist freelancers need before sending.",
-      "The checklist bridges directly into local business leads, freelance cold outreach, and proposal workflows instead of stopping at theory."
+      "GSC already shows lead qualification checklist intent surfacing for iCloseLeads, so this page needs to convert the query into a real workflow instead of passive advice.",
+      "Competitor pages often skip the operational checklist freelancers need before sending or buying leads.",
+      "The checklist bridges directly into local business leads, freelance cold outreach, Google Maps pitch workflows, and proposal drafting instead of stopping at theory."
     ],
     "pitch": "Hi, I found [company] while checking [niche] businesses and noticed [signal]. It looks like there may be a practical opportunity around [outcome].",
     "internalLinks": [
@@ -4273,8 +4273,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
         "href": "/resources/freelance-cold-outreach"
       },
       {
-        "label": "CRM pipeline",
-        "href": "/features/crm-pipeline"
+        "label": "Google Maps listing pitch",
+        "href": "/resources/google-maps-listing-pitch-for-freelancers"
       }
     ],
     "faqs": [
@@ -4289,6 +4289,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "What should I qualify on a local business lead?",
         "a": "Check whether the business is active, whether the website or Google Maps path shows a real problem, whether the contact route is usable, and whether your offer solves the next customer action such as calls, quotes, or bookings."
+      },
+      {
+        "q": "Should I qualify free web design leads before writing outreach?",
+        "a": "Yes. Free leads only become useful when you can prove the website gap, local demand, contact path, and first pitch angle before sending anything."
       }
     ]
   },
@@ -5136,11 +5140,11 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       }
     ]
   },
-  {
+{
   slug: "web-design-leads-for-free-vs-verified",
-  title: "Web design leads for free vs verified leads",
-  metaTitle: "Web Design Leads for Free vs Verified Leads",
-  metaDescription: "Compare free web design lead research with verified lead workflows, proof checks, and outreach paths before pitching local website prospects.",
+  title: "Web design leads free vs verified leads",
+  metaTitle: "Web Design Leads Free vs Verified Leads | What to Trust Before You Pitch",
+  metaDescription: "Compare free web design lead research with verified lead workflows, proof checks, Google Maps context, and outreach paths before pitching local website prospects.",
   keyword: "web design leads for free",
   relatedSearches: [
     "web design leads free",
@@ -5151,8 +5155,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   audience: "Web designers and freelancers comparing free prospecting with verified lead workflows",
   intent: "The searcher wants to know whether free lead research can produce pitch-ready web design prospects.",
-  summary: "Free web design leads can work when they are verified from public proof, not scraped into a blind list. The useful workflow is to find a visible website gap, confirm local demand, save the context, and pitch only when the business problem is specific.",
-  leadIn: "Use free research as a qualification workflow, not a shortcut. iCloseLeads helps you turn a public business signal into a saved lead, proposal angle, and follow-up path without trusting a generic lead seller.",
+  summary: "Free web design leads can work when they are verified from public proof, not scraped into a blind list. The useful workflow is to find a visible website gap, confirm local demand, save the context, and pitch only when the business problem is specific enough to defend.",
+  leadIn: "Use free research as a qualification workflow, not a shortcut. iCloseLeads helps you turn a public business signal into a saved lead, Google Maps note, proposal angle, and follow-up path without trusting a generic lead seller.",
   steps: [
     "Pick one local category and city.",
     "Search for businesses with no website, weak mobile experience, or outdated conversion paths.",
@@ -5179,8 +5183,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   proofPoints: [
     "Searchers comparing free and verified leads usually still need a way to qualify local business demand before they pitch.",
-    "Google related searches include free, list, sale, verified, and best modifiers, showing the market is comparing lead source quality.",
-    "iCloseLeads supports the safer path: search, verify, save context, draft, and follow up."
+    "Google related searches include free, list, sale, verified, and best modifiers, showing the market is comparing lead source quality before it commits.",
+    "iCloseLeads supports the safer path: search, verify, save context, draft, and follow up instead of jumping from a free search straight into a generic pitch."
   ],
   pitch: "Hi, I found your business while checking local website opportunities and noticed one public website gap that may be affecting calls or quote requests. I can send over the specific idea if useful.",
   internalLinks: [
@@ -5193,8 +5197,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       href: "/use-cases/local-business-leads"
     },
     {
-      label: "AI proposal generator",
-      href: "/features/ai-proposals"
+      label: "Google Maps prospecting tool",
+      href: "/resources/google-maps-prospecting-tool-for-freelancers"
     }
   ],
   faqs: [
@@ -5205,6 +5209,10 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     {
       q: "Are verified leads better than free leads?",
       a: "Verified leads are better when verification means fresh context, visible need, and contact confidence, not just a paid list label."
+    },
+    {
+      q: "What makes a free web design lead worth saving?",
+      a: "A free web design lead is worth saving when the website gap is visible, the business looks active, the contact route is usable, and your first pitch can name a real business outcome."
     },
     {
       q: "How do I turn free web design leads into proposals?",
@@ -5281,7 +5289,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   audience: "Freelancers who want outreach examples they can adapt without sounding generic",
   intent: "The searcher wants practical cold outreach examples for getting clients.",
   summary: "The best freelance cold outreach examples begin with a visible signal: a website gap, hiring cue, local profile issue, recent post, or business process problem. The message should prove why the freelancer is contacting that buyer now.",
-  leadIn: "Use examples as structure, not as copy-paste scripts. iCloseLeads helps you save the reason for outreach first, then draft a message that fits the lead.",
+  leadIn: "Use examples as structure, not as copy-paste scripts. iCloseLeads helps you save the reason for outreach first, then draft a message that fits the lead, the buyer, and the next step.",
   steps: [
     "Name the signal in the first sentence.",
     "Connect it to one business outcome.",
@@ -5291,7 +5299,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   proofPoints: [
     "GSC shows freelance cold outreach as a live query for iCloseLeads.",
-    "Google related searches include examples, templates, free, and Reddit modifiers.",
+    "Google related searches include examples, templates, free, and Reddit modifiers, which means examples alone are not enough unless they connect to a workflow.",
     "This page routes advice into the product workflow: search, save, draft, and follow up."
   ],
   pitch: "Hi, I noticed [specific signal] while reviewing [company]. I help [buyer type] improve [outcome], and I had one practical idea that may be worth a quick look.",
@@ -5305,8 +5313,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       href: "/resources/freelance-proposal-subject-lines"
     },
     {
-      label: "Email outreach",
-      href: "/features/email-outreach"
+      label: "Local business leads",
+      href: "/use-cases/local-business-leads"
     }
   ],
   faqs: [
@@ -5334,8 +5342,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   audience: "Freelancers writing cold emails to prospects they found manually or inside iCloseLeads",
   intent: "The searcher wants a ready structure for pitching without sounding mass-sent.",
-  summary: "A freelance cold email template should be short enough to read quickly and specific enough to show real research. Lead with the signal, connect it to the business outcome, offer one useful next step, and keep the follow-up attached.",
-  leadIn: "The template works best after a lead is qualified. iCloseLeads gives you the saved context, proposal angle, and follow-up path before you send.",
+  summary: "A freelance cold email template should be short enough to read quickly and specific enough to show real research. Lead with the signal, connect it to the business outcome, offer one useful next step, and keep the follow-up attached to the same lead record.",
+  leadIn: "The template works best after a lead is qualified. iCloseLeads gives you the saved context, proposal angle, and follow-up path before you send, which is how a template stops sounding mass-produced.",
   steps: [
     "Subject: name the useful idea or business context.",
     "Line 1: mention the verified signal.",
@@ -5346,7 +5354,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   proofPoints: [
     "Related searches connect cold email templates with freelance cold outreach examples and Reddit validation.",
     "Template pages compete heavily, so the outperformance angle is context-first workflow, not a longer script library.",
-    "iCloseLeads can turn a saved lead into a review-first outreach draft."
+    "AI Overview patterns and practical SERPs both favor short, specific structures, which is why iCloseLeads turns a saved lead into a review-first outreach draft."
   ],
   pitch: "Subject: quick idea for [company] [outcome]. Hi [name], I noticed [specific signal]. I help [buyer type] improve [outcome], and I can send one short suggestion if useful.",
   internalLinks: [
@@ -5389,7 +5397,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   audience: "Freelancers who need a repeatable outbound system",
   intent: "The searcher wants a strategy, not just a one-off email template.",
   summary: "A strong cold outreach strategy chooses one buyer segment, one offer, and one signal source before writing any messages. The goal is not more emails; it is better reasons to contact the right prospects.",
-  leadIn: "Use iCloseLeads as the operating table for the strategy: search, qualify, save, draft, follow up, and review the small batch before expanding.",
+  leadIn: "Use iCloseLeads as the operating table for the strategy: search, qualify, save, draft, follow up, and review the small batch before expanding into a larger 30-day pipeline.",
   steps: [
     "Choose one offer and one buyer type.",
     "Pick the signal source: local sites, job posts, profile gaps, or recent changes.",
@@ -5400,7 +5408,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   proofPoints: [
     "Google related searches show strategy, examples, templates, and Reddit proof as adjacent intents.",
     "The GSC query set confirms iCloseLeads has visibility for freelance cold outreach.",
-    "A system page supports signup and activation better than a generic template post."
+    "A system page supports signup and activation better than a generic template post because it can move the reader into a 21-day outreach batch."
   ],
   pitch: "Hi, I noticed [signal] and thought it might connect to [business outcome]. I work with [buyer type] on [offer], and I can share one practical next step if helpful.",
   internalLinks: [
@@ -6036,8 +6044,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   audience: "Freelancers starting outbound without paid lead lists",
   intent: "The searcher wants a no-cost way to start cold outreach.",
-  summary: "A free freelance cold outreach workflow can work if the lead source is public, relevant, and small enough to personalize. The free path should still include qualification, saved proof, and follow-up.",
-  leadIn: "Use iCloseLeads to keep the free workflow disciplined: one segment, one source, one saved batch, one proposal angle, and one follow-up routine.",
+  summary: "A free freelance cold outreach workflow can work if the lead source is public, relevant, and small enough to personalize. The free path should still include qualification, saved proof, and follow-up instead of turning into a random list-building exercise.",
+  leadIn: "Use iCloseLeads to keep the free workflow disciplined: one segment, one source, one saved batch, one proposal angle, and one follow-up routine you can actually maintain for the first 21 days.",
   steps: [
     "Choose one free source such as local search, job posts, or public business profiles.",
     "Collect only leads with a visible reason to contact them.",
@@ -6047,7 +6055,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   proofPoints: [
     "Google related searches include free and Reddit modifiers for freelance outreach.",
-    "The user intent is practical and budget-conscious.",
+    "The user intent is practical and budget-conscious, so the page needs to show how to get to a real lead search without paying for a list first.",
     "This page supports first activation for free account users."
   ],
   pitch: "Hi, I found [signal] while researching [buyer type]. I had one quick idea for [outcome] and can send it over if useful.",
@@ -6090,8 +6098,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   ],
   audience: "Freelancers checking community feedback before outreach",
   intent: "The searcher wants real-world guidance and caution from community discussions.",
-  summary: "Reddit lessons are useful when they warn against generic blasts and encourage specific lead research. The safest takeaway is to make every outreach message trace back to a verified signal.",
-  leadIn: "iCloseLeads gives that lesson a workflow: save the lead signal, draft from context, and follow up respectfully instead of copying a high-volume script.",
+  summary: "Reddit lessons are useful when they warn against generic blasts and encourage specific lead research. The safest takeaway is to make every outreach message trace back to a verified signal, not a copied script or a volume goal.",
+  leadIn: "iCloseLeads gives that lesson a workflow: save the lead signal, draft from context, and follow up respectfully instead of copying a high-volume script or a forum shortcut.",
   steps: [
     "Keep advice about specificity and relevance.",
     "Reject spam volume tactics.",
@@ -6100,7 +6108,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "Track replies and adjust the next batch."
   ],
   proofPoints: [
-    "Google related searches show Reddit as a trust-check modifier.",
+    "Live Google results show forum and discussion surfaces for this cluster, so Reddit is acting as a trust-check modifier, not a final answer.",
     "Forum SERPs can reveal objections that generic outreach guides miss.",
     "This page turns community caution into a product-safe process."
   ],
@@ -6115,8 +6123,8 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       href: "/resources/freelance-cold-outreach-examples"
     },
     {
-      label: "CRM follow-up",
-      href: "/features/crm-pipeline"
+      label: "Lead qualification checklist",
+      href: "/resources/lead-qualification-checklist-for-freelancers"
     }
   ],
   faqs: [
@@ -6624,9 +6632,9 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       audience: "Freelancers who use map results to find local service businesses",
       intent: "The searcher wants a repeatable way to turn map searches into qualified prospects.",
       signal: "a local listing shows category demand, contact information, reviews, website status, or a visible conversion gap",
-      workflow: "search a narrow category, capture the Google Maps listing signal, verify the contact path, and save the lead with a pitch note tied to calls, quotes, or bookings",
-      pitchAngle: "turn a Google Maps listing into a respectful website or local SEO pitch with saved proof and follow-up",
-      competitorGap: "Maps prospecting tutorials stop at discovery; iCloseLeads can add saved context, buyer-route checks, lead qualification, proposal drafting, and CRM follow-through.",
+      workflow: "search a narrow category, capture the Google Maps listing signal, verify the contact path, and save the lead with a pitch note tied to calls, quotes, or bookings before you draft outreach",
+      pitchAngle: "turn a Google Maps listing into a respectful website or local SEO pitch with saved proof, qualification, and follow-up",
+      competitorGap: "Maps prospecting tutorials stop at discovery; iCloseLeads can add saved context, buyer-route checks, lead qualification, proposal drafting, signup, and CRM follow-through.",
       internalLinks: [
         { label: "How to find businesses without websites on Google Maps", href: "/resources/how-to-find-businesses-without-websites-on-google-maps" },
         { label: "Local business leads", href: "/use-cases/local-business-leads" },
@@ -6641,8 +6649,8 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       audience: "Freelancers pitching local businesses from Google Maps and profile signals",
       intent: "The searcher wants to know what to say when a Google Maps listing reveals a website or conversion gap.",
       signal: "the business has an active listing, a phone route, and a weak website or missing next step after the profile visit",
-      workflow: "save the listing, note the customer action that breaks, verify the contact route, and draft a short pitch around calls, quotes, or bookings",
-      pitchAngle: "turn the Google Maps listing into a specific website or local SEO suggestion instead of a generic cold email",
+      workflow: "save the listing, note the customer action that breaks, verify the contact route, and draft a short pitch around calls, quotes, or bookings before the reason goes stale",
+      pitchAngle: "turn the Google Maps listing into a specific website or local SEO suggestion instead of a generic cold email or redesign claim",
       competitorGap: "Most Google Maps pitch advice is generic or spammy; this page should show a proof-led workflow that routes the lead into signup, proposal drafting, and follow-up.",
       internalLinks: [
         { label: "Google Maps prospecting tool", href: "/resources/google-maps-prospecting-tool-for-freelancers" },
@@ -7015,15 +7023,15 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
   const pages: Input[] = [
     {
       slug: "freelance-cold-outreach-template",
-      title: "Freelance cold outreach template built from the lead signal",
+      title: "Freelance cold outreach template built from verified lead signals",
       keyword: "freelance cold outreach template",
       relatedSearches: ["freelance cold outreach examples", "cold outreach examples", "cold email freelance reddit", "freelance cold outreach free"],
       audience: "Freelancers, consultants, web designers, and agency owners",
       intent: "The searcher wants a first-message structure that gets replies without sounding like a copied script.",
       signal: "the prospect has a visible business gap, hiring signal, website issue, or local demand clue",
-      workflow: "save the prospect, write one sentence about why the lead matters, then draft the template around that reason",
+      workflow: "save the prospect, write one sentence about why the lead matters, then draft the template around that reason before the context goes stale",
       pitchAngle: "a short, specific first message that names the observed signal and asks for one easy next step",
-      competitorGap: "SERPs and AI Overviews emphasize personalization and brevity, but many template pages still begin with generic copy instead of verified lead context.",
+      competitorGap: "SERPs and AI Overviews emphasize personalization and brevity, but many template pages still begin with generic copy instead of verified lead context and a saved proof note.",
       internalLinks: [
         { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
         { label: "Cold outreach examples", href: "/resources/freelance-cold-outreach-examples" },
@@ -7038,9 +7046,9 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
       audience: "Freelancers who need replies from direct outreach, not one-and-done messages",
       intent: "The searcher needs a respectful follow-up rhythm after the first cold email or proposal.",
       signal: "the first message had a clear business reason but the buyer has not replied yet",
-      workflow: "save the first pitch, set a follow-up date, then write each follow-up around the original lead reason",
+      workflow: "save the first pitch, set a follow-up date, then write each follow-up around the original lead reason and the next action you want",
       pitchAngle: "a three-touch sequence that adds clarity without guilt, fake urgency, or spam pressure",
-      competitorGap: "Most follow-up examples are disconnected from prospecting context; iCloseLeads can connect the saved lead, proposal angle, Gmail draft, and CRM stage.",
+      competitorGap: "Most follow-up examples are disconnected from prospecting context; iCloseLeads can connect the saved lead, proposal angle, Gmail draft, and CRM stage so the sequence stays relevant.",
       internalLinks: [
         { label: "Proposal follow-up email", href: "/resources/proposal-follow-up-email" },
         { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
@@ -7055,9 +7063,9 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
       audience: "New freelancers learning client acquisition without marketplaces",
       intent: "The searcher wants a plain explanation of cold outreach and when it is appropriate.",
       signal: "a business has not asked for help, but public context suggests your offer could solve a real problem",
-      workflow: "define the buyer, verify the reason to contact them, then save enough proof to keep the first message useful",
+      workflow: "define the buyer, verify the reason to contact them, then save enough proof to keep the first message useful and worth following up on",
       pitchAngle: "a simple definition that moves readers from passive learning into one ethical lead search",
-      competitorGap: "Definition pages often stop at vocabulary; this page connects the term to source quality, public proof, and signup-to-first-search activation.",
+      competitorGap: "Definition pages often stop at vocabulary; this page connects the term to source quality, public proof, and signup-to-first-search activation so the searcher can act immediately.",
       internalLinks: [
         { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
         { label: "Lead generation workflow", href: "/resources/lead-generation-workflow-for-freelancers" },

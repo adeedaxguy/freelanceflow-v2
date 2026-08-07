@@ -310,18 +310,18 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "local-business-leads",
     path: "/lead-generation/local-business-leads",
     primaryKeyword: "local business leads",
-    metaTitle: "Local Business Leads | Find Businesses to Pitch by City and Website Signal",
+    metaTitle: "Local Business Leads | Free Web Design Leads by City, Website Signal, and Owner Path",
     metaDescription:
-      "Find local business leads by city, category, website status, phone signals, and owner/contact paths. Built for freelancers selling websites, SEO, ads, and branding.",
+      "Find local business leads by city, category, website status, phone signals, Google Maps gaps, and owner/contact paths. Built for freelancers selling websites, SEO, ads, and branding.",
     eyebrow: "Local Business Leads",
     title: "Find local business leads",
     accentTitle: "with a clear pitch path",
     summary:
-      "iCloseLeads helps freelancers find local businesses that may need websites, SEO, branding, booking flows, ads, content, or modernization.",
+      "iCloseLeads helps freelancers find local businesses that may need websites, SEO, branding, booking flows, ads, content, or modernization, then route the best prospects into saved proof, proposals, and follow-up.",
     directAnswer:
-      "Good local business leads are not just names on a map. They have a visible pitch reason: no website, an outdated site, weak local presence, a public phone route, recent reviews, or a category where better digital presence can create more calls and bookings.",
-    primaryCta: "Find Local Leads Free",
-    secondaryCta: "Find businesses without websites",
+      "Good local business leads are not just names on a map. They have a visible pitch reason: no website, an outdated site, weak local presence, a public phone route, recent reviews, or a category where better digital presence can create more calls and bookings. The best ones can move straight into signup, saved notes, and a proposal-ready pitch path.",
+    primaryCta: "Search Local Leads Free",
+    secondaryCta: "See businesses without websites",
     dashboardPath: "/dashboard/local-leads",
     audience:
       "Freelancers and agencies selling websites, local SEO, Google Business Profile help, branding, booking systems, POS setup, paid ads, and content.",
@@ -338,10 +338,10 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { group: "Workflow intent", terms: ["find local clients", "local business prospecting", "business owner finder"] },
     ],
     workflow: [
-      { title: "Search one city and category", description: "Pick a service category that matches what you can sell this week." },
+      { title: "Search one city and category", description: "Pick a service category that matches what you can sell in the next 21 days." },
       { title: "Filter for buying signals", description: "Prioritize website gaps, phone availability, small-operator clues, and category fit." },
       { title: "Verify before outreach", description: "Open the business profile and confirm phone, address, website status, and recent activity." },
-      { title: "Move into pitch or owner check", description: "Use the pitch panel, AI proposal, web design preview, or decision-maker workflow." },
+      { title: "Move into pitch or owner check", description: "Use the pitch panel, AI proposal, web design preview, or decision-maker workflow so the lead becomes a tracked next action instead of another browser tab." },
     ],
     sampleLeads: [
       {
