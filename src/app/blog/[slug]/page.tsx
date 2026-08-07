@@ -124,7 +124,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ── Static params (static posts only; DB posts rendered dynamically) ──────────
 export function generateStaticParams() {
-  return STATIC_POSTS.map(p => ({ slug: p.slug }));
+  return STATIC_POSTS
+    .filter((post) => !isHiddenBlogSlug(post.slug))
+    .map((post) => ({ slug: post.slug }));
 }
 
 // ── Render helpers ─────────────────────────────────────────────────────────────
