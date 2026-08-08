@@ -1,3 +1,5 @@
+import { AUGUST_8_2026_RESOURCE_PAGES } from "./resource-pages-2026-08-08";
+
 export type ResourcePage = {
   slug: string;
   title: string;
@@ -2117,6 +2119,7 @@ function buildJuly31ManualResearchResourcePages(): ResourcePage[] {
 }
 
 export const RESOURCE_PAGES: ResourcePage[] = [
+  ...AUGUST_8_2026_RESOURCE_PAGES,
   ...buildJuly31ManualResearchResourcePages(),
   ...buildJuly28DailyResourcePages(),
   {
