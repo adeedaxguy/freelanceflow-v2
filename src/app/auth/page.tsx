@@ -3,19 +3,13 @@
 import { useState, useEffect, useCallback, Suspense, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProviders, signIn, useSession } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Check, Loader2, Zap } from "lucide-react";
 import Link from "next/link";
-import { NICHES } from "@/types";
 import Logo from "@/components/Logo";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const PENDING_SIGNUP_KEY = "icl_pending_oauth_signup";
-
-const REFERRAL_OPTIONS = [
-  "Google Search", "Reddit", "Twitter / X", "LinkedIn", "Friend / Referral",
-  "YouTube", "ProductHunt", "Newsletter", "Other",
-];
 
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   Configuration: "This sign-in method is not configured yet. Please use email or Google while we finish setup.",
@@ -126,6 +120,14 @@ function getSignupNextSteps(intent: string) {
   return SIGNUP_NEXT_STEP_COPY.default;
 }
 
+function getSignupDestination(intent: string) {
+  const normalized = intent.toLowerCase();
+  if (normalized.includes("web-design")) return "/dashboard/local-leads?welcome=web-design";
+  if (normalized.includes("remote")) return "/dashboard/leads?welcome=1";
+  if (normalized.includes("live")) return "/dashboard/live-jobs?welcome=1";
+  return "/dashboard/local-leads?welcome=1";
+}
+
 function strengthLabel(p: string): { label: string; color: string; width: string } {
   if (!p) return { label: "", color: "bg-border", width: "0%" };
   if (p.length < 6)  return { label: "Too short", color: "bg-destructive", width: "20%" };
@@ -158,7 +160,6 @@ function AuthForm() {
   const params = useSearchParams();
   const { status } = useSession();
   const [mode,      setMode]      = useState<"signin" | "signup">(params.get("mode") === "signup" ? "signup" : "signin");
-  const [step,      setStep]      = useState(1);
   const [name,      setName]      = useState("");
   const [email,     setEmail]     = useState("");
   const [password,  setPassword]  = useState("");
@@ -169,15 +170,13 @@ function AuthForm() {
   const [providersLoaded, setProvidersLoaded] = useState(false);
   const [oauthProviders, setOauthProviders] = useState({ google: false, github: false });
   const [error,     setError]     = useState("");
-  const [expertise, setExpertise] = useState<string[]>([]);
-  const [referral,  setReferral]  = useState("");
-  const [marketingConsent, setMarketingConsent] = useState(false);
   // Prefill plan from URL params
   const planParam = params.get("plan") ?? "";
   const intentParam = params.get("intent") ?? "";
   const sourceParam = params.get("source") ?? "";
   const signupIntentCopy = getSignupIntentCopy(intentParam);
   const signupNextSteps = getSignupNextSteps(intentParam);
+  const signupDestination = getSignupDestination(intentParam);
 
   // Sync mode from URL
   useEffect(() => {
@@ -211,8 +210,10 @@ function AuthForm() {
   }, []);
 
   useEffect(() => {
-    if (status === "authenticated") router.replace("/dashboard");
-  }, [status, router]);
+    if (status === "authenticated") {
+      router.replace(mode === "signup" ? signupDestination : "/dashboard");
+    }
+  }, [status, router, mode, signupDestination]);
 
   const strength = strengthLabel(password);
   const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
@@ -220,12 +221,11 @@ function AuthForm() {
   const trackAuthEvent = useCallback((eventName: string, extra: Record<string, string | number | boolean> = {}) => {
     trackAnalyticsEvent(eventName, {
       auth_mode: mode,
-      auth_step: step,
       signup_intent: intentParam || "default",
       signup_source: sourceParam || "direct",
       ...extra,
     });
-  }, [mode, step, intentParam, sourceParam]);
+  }, [mode, intentParam, sourceParam]);
 
   const rememberOAuthSignup = (method: "google" | "github") => {
     if (mode !== "signup") return;
@@ -267,7 +267,7 @@ function AuthForm() {
     trackAuthEvent("auth_oauth_click", { provider: "google" });
     rememberOAuthSignup("google");
     try {
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn("google", { callbackUrl: mode === "signup" ? signupDestination : "/dashboard" });
     } catch {
       clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "google" });
@@ -287,7 +287,7 @@ function AuthForm() {
     trackAuthEvent("auth_oauth_click", { provider: "github" });
     rememberOAuthSignup("github");
     try {
-      await signIn("github", { callbackUrl: "/dashboard" });
+      await signIn("github", { callbackUrl: mode === "signup" ? signupDestination : "/dashboard" });
     } catch {
       clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "github" });
@@ -310,25 +310,15 @@ function AuthForm() {
       router.push("/dashboard");
       return;
     }
-    // Sign up — validate then go to onboarding step
     if (password.length < 8) {
-      trackAuthEvent("auth_signup_step1_error", { reason: "password_too_short" });
+      trackAuthEvent("auth_signup_error", { method: "credentials", reason: "password_too_short" });
       setError("Password must be at least 8 characters");
       setLoading(false);
       return;
     }
     trackAuthEvent("signup_started", { method: "credentials" });
-    trackAuthEvent("auth_signup_step1_continue", { method: "credentials" });
-    setLoading(false);
-    setStep(2);
-  };
-
-  const handleSignup = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(""); setLoading(true);
     try {
       const signupAttribution = [
-        referral,
         intentParam ? `intent: ${intentParam}` : "",
         sourceParam ? `source: ${sourceParam}` : "",
       ].filter(Boolean).join(" | ");
@@ -339,10 +329,8 @@ function AuthForm() {
           name,
           email,
           password,
-          expertise,
           referralSource: signupAttribution,
           plan: planParam,
-          marketingConsent,
         }),
       });
       const data = await res.json() as { error?: string };
@@ -351,24 +339,18 @@ function AuthForm() {
       if (signInRes?.error) throw new Error("Login after registration failed");
       trackAuthEvent("sign_up", {
         method: "credentials",
-        selected_expertise_count: expertise.length,
         has_referral_source: Boolean(signupAttribution),
         signup_intent: intentParam || "default",
       });
       trackAuthEvent("signup_completed", {
         method: "credentials",
-        selected_expertise_count: expertise.length,
         has_referral_source: Boolean(signupAttribution),
       });
-      router.push("/dashboard");
+      router.push(signupDestination);
     } catch (err) {
       trackAuthEvent("auth_signup_error", { method: "credentials" });
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally { setLoading(false); }
-  };
-
-  const toggleExpertise = (id: string) => {
-    setExpertise(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id].slice(0, 4));
   };
 
   return (
@@ -404,7 +386,7 @@ function AuthForm() {
           </p>
           <div className="space-y-3">
             {[
-              "Free plan includes 20 leads per week",
+              "Free plan includes 100 leads per day",
               "Free plan includes 10 proposals per month",
               "Search local businesses, remote jobs, and live signals",
               "Save leads and track follow-up in one CRM pipeline",
@@ -446,20 +428,16 @@ function AuthForm() {
             <Logo href="/" showText size="md" />
           </div>
 
-          {step === 1 && (
-            <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-8">
-              {(["signin", "signup"] as const).map(m => (
-                <button key={m} onClick={() => { setMode(m); setError(""); if (m === "signup") trackAuthEvent("signup_started", { method: "mode_toggle" }); }}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === m ? "bg-primary text-white shadow-glow-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                  {m === "signin" ? "Sign In" : "Create Account"}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-1 bg-surface border border-border rounded-xl p-1 mb-8">
+            {(["signin", "signup"] as const).map(m => (
+              <button key={m} onClick={() => { setMode(m); setError(""); }}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode === m ? "bg-primary text-white shadow-glow-primary" : "text-muted-foreground hover:text-foreground"}`}>
+                {m === "signin" ? "Sign In" : "Create Account"}
+              </button>
+            ))}
+          </div>
 
-          <AnimatePresence mode="wait">
-            {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+          <motion.div key={mode} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                 <h1 className="text-2xl font-extrabold text-foreground mb-6">
                   {mode === "signin" ? "Welcome back" : "Create your account"}
                 </h1>
@@ -472,19 +450,6 @@ function AuthForm() {
                     </div>
                     <p className="mt-2 text-sm font-semibold text-foreground">{signupIntentCopy.title}</p>
                     <p className="mt-1 text-xs leading-5 text-muted-foreground">{signupIntentCopy.body}</p>
-                    <div className="mt-4 rounded-xl border border-border bg-background/70 p-3">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary-light">Best first run</p>
-                      <ul className="mt-2 space-y-2 text-xs leading-5 text-muted-foreground">
-                        {signupNextSteps.map((stepText, index) => (
-                          <li key={stepText} className="flex items-start gap-2">
-                            <span className="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary-light">
-                              {index + 1}
-                            </span>
-                            <span>{stepText}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
                   </div>
                 )}
 
@@ -533,21 +498,21 @@ function AuthForm() {
                   {mode === "signup" && (
                     <div>
                       <label className="block text-sm font-medium text-muted-foreground mb-1.5">Full Name</label>
-                      <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Your name"
+                      <input type="text" autoComplete="name" value={name} onChange={e => setName(e.target.value)} required placeholder="Your name"
                         className="w-full px-4 py-3 bg-surface border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 text-sm" />
                     </div>
                   )}
 
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-1.5">Email</label>
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com"
+                    <input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="you@example.com"
                       className="w-full px-4 py-3 bg-surface border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 text-sm" />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
                     <div className="relative">
-                      <input type={showPwd ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} required
+                      <input type={showPwd ? "text" : "password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} required
                         placeholder={mode === "signup" ? "Min 8 characters" : "Your password"}
                         className="w-full px-4 py-3 pr-10 bg-surface border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 text-sm" />
                       <button type="button" onClick={() => setShowPwd(p => !p)} className="absolute right-3 top-3.5 text-muted-foreground">
@@ -569,13 +534,17 @@ function AuthForm() {
                   <button type="submit" disabled={loading}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold transition-all shadow-glow-primary disabled:opacity-60">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                    {mode === "signin" ? "Sign In" : "Continue →"}
+                    {mode === "signin" ? "Sign In" : "Create free account"}
                   </button>
+
+                  {mode === "signup" && (
+                    <p className="text-center text-xs text-muted-foreground">No card required. Your account opens directly into your first search.</p>
+                  )}
 
                   {mode === "signin" ? (
                     <p className="text-center text-sm text-muted-foreground">
                       Don&apos;t have an account?{" "}
-                      <button type="button" onClick={() => { setMode("signup"); trackAuthEvent("signup_started", { method: "signin_footer_link" }); }} className="text-primary-light hover:underline font-medium">Sign up free</button>
+                      <button type="button" onClick={() => setMode("signup")} className="text-primary-light hover:underline font-medium">Sign up free</button>
                     </p>
                   ) : (
                     <p className="text-center text-xs text-muted-foreground">
@@ -586,79 +555,7 @@ function AuthForm() {
                     </p>
                   )}
                 </form>
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.form key="step2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                onSubmit={e => void handleSignup(e)} className="space-y-6">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex gap-1">
-                      <span className="w-6 h-1.5 rounded-full bg-border" />
-                      <span className="w-6 h-1.5 rounded-full bg-primary" />
-                    </div>
-                    <span className="text-xs font-bold text-primary-light uppercase tracking-wider">Optional setup</span>
-                  </div>
-                  <h1 className="text-2xl font-extrabold text-foreground">Personalize your first search</h1>
-                  <p className="text-muted-foreground text-sm mt-1">Pick a niche if you want better first recommendations. You can leave this empty and change it later.</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-3">Your Expertise <span className="text-muted-foreground font-normal">(optional, pick up to 4)</span></label>
-                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
-                    {NICHES.map(n => (
-                      <button key={n.id} type="button" onClick={() => toggleExpertise(n.id)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium transition-all text-left ${
-                          expertise.includes(n.id) ? "bg-primary/15 border-primary/50 text-primary-light" : "bg-surface border-border text-muted-foreground hover:border-primary/30"
-                        }`}>
-                        <span>{n.icon}</span> {n.label}
-                        {expertise.includes(n.id) && <Check className="w-3 h-3 ml-auto flex-shrink-0" />}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">How did you find iCloseLeads? <span className="text-muted-foreground font-normal">(optional)</span></label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {REFERRAL_OPTIONS.map(r => (
-                      <button key={r} type="button" onClick={() => setReferral(r)}
-                        className={`px-2 py-2 rounded-xl border text-xs font-medium transition-all ${
-                          referral === r ? "bg-accent/15 border-accent/40 text-accent" : "bg-surface border-border text-muted-foreground hover:border-accent/20"
-                        }`}>
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <label className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3.5 text-left">
-                  <input
-                    type="checkbox"
-                    checked={marketingConsent}
-                    onChange={event => setMarketingConsent(event.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
-                  />
-                  <span>
-                    <span className="block text-sm font-medium text-foreground">Send me useful lead-finding tips and product updates</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">Optional. Unsubscribe at any time from Settings or any marketing email.</span>
-                  </span>
-                </label>
-
-                {error && <p className="text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">{error}</p>}
-
-                <button type="submit" disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-hero text-white font-semibold transition-all shadow-glow-primary disabled:opacity-60">
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-                  Create Free Account
-                </button>
-                <button type="button" onClick={() => setStep(1)} className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  ← Back
-                </button>
-              </motion.form>
-            )}
-          </AnimatePresence>
+          </motion.div>
         </div>
       </div>
     </div>

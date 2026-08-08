@@ -78,6 +78,24 @@ describe("POST /api/auth/register", () => {
     }));
   });
 
+  it("creates an account when optional onboarding answers are omitted", async () => {
+    const { POST } = await import("@/app/api/auth/register/route");
+    const res = await POST(registerRequest({
+      name: "New User",
+      email: "NewUser@Example.com",
+      password: "StrongPass123",
+    }));
+
+    expect(res.status).toBe(201);
+    expect(prisma.user.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({
+        expertise: "[]",
+        marketingConsent: false,
+        referralSource: null,
+      }),
+    }));
+  });
+
   it("does not fail signup when the admin notification fails", async () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     (notifyNewUserSignup as jest.Mock).mockRejectedValue(new Error("Resend down"));
