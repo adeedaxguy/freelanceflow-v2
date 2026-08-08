@@ -354,7 +354,7 @@ function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="flex min-h-screen w-full overflow-x-hidden bg-background">
       {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between w-[46%] bg-gradient-card border-r border-border p-12 relative overflow-hidden">
         {/* Background glow effects */}
@@ -421,8 +421,8 @@ function AuthForm() {
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
+      <div className="flex min-w-0 flex-1 items-center justify-center px-4 py-8 sm:p-8">
+        <div className="min-w-0 w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex lg:hidden justify-center mb-8">
             <Logo href="/" showText size="md" />
