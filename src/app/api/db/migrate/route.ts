@@ -8,6 +8,25 @@ export const dynamic = 'force-dynamic';
 // PostgreSQL-compatible migrations. Safe to run repeatedly.
 const TABLE_MIGRATIONS = [
   {
+    name: "ApiKey",
+    sql: `CREATE TABLE IF NOT EXISTS "ApiKey" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "keyHash" TEXT NOT NULL,
+      "prefix" TEXT NOT NULL,
+      "scopes" TEXT NOT NULL,
+      "requestsToday" INTEGER NOT NULL DEFAULT 0,
+      "requestDay" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "totalRequests" INTEGER NOT NULL DEFAULT 0,
+      "lastUsedAt" TIMESTAMP(3),
+      "revokedAt" TIMESTAMP(3),
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "ApiKey_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+  },
+  {
     name: "Template",
     sql: `CREATE TABLE IF NOT EXISTS "Template" (
       "id" TEXT PRIMARY KEY,
@@ -171,6 +190,9 @@ const TABLE_MIGRATIONS = [
   { name: "TelephonyPurchase.phoneNumberSid_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "TelephonyPurchase_phoneNumberSid_key" ON "TelephonyPurchase"("phoneNumberSid")` },
   { name: "TelephonyPurchase.userId_status_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_userId_status_idx" ON "TelephonyPurchase"("userId", "status")` },
   { name: "TelephonyPurchase.workspaceId_idx", sql: `CREATE INDEX IF NOT EXISTS "TelephonyPurchase_workspaceId_idx" ON "TelephonyPurchase"("workspaceId")` },
+  { name: "ApiKey.keyHash_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "ApiKey_keyHash_key" ON "ApiKey"("keyHash")` },
+  { name: "ApiKey.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_userId_idx" ON "ApiKey"("userId")` },
+  { name: "ApiKey.revokedAt_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_revokedAt_idx" ON "ApiKey"("revokedAt")` },
 ];
 
 const MIGRATIONS = [

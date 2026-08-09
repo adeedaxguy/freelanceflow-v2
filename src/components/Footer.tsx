@@ -31,6 +31,7 @@ const footerGroups = [
       { label: "Pricing", href: "/pricing" },
       { label: "Use cases", href: "/use-cases" },
       { label: "Resources", href: "/resources" },
+      { label: "Developer API", href: "/developers" },
     ],
   },
   {
@@ -82,6 +83,7 @@ const mobileFooterLinks = [
   { label: "Pricing", href: "/pricing" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },
+  { label: "API", href: "/developers" },
 ];
 
 const socialLinks = [

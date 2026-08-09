@@ -6,7 +6,7 @@ import {
   Search, LayoutDashboard, Radio, Bookmark,
   Send, BarChart2, Settings, FileText, Megaphone, User,
   Wrench, MessageCircle, Zap, CalendarDays, GitMerge,
-  Mail, MapPin, ArrowRight, Crown, Users, Palette, PhoneCall,
+  Mail, MapPin, ArrowRight, Crown, Users, Palette, PhoneCall, Code2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -30,6 +30,7 @@ const COMMANDS = [
   { id: "sent",           label: "Outreach History",       desc: "Prepared and sent emails", href: "/dashboard/sent",           icon: Send,            group: "Outreach" },
   { id: "analytics",      label: "Analytics",              desc: "Performance stats",      href: "/dashboard/analytics",        icon: BarChart2,       group: "Outreach" },
   { id: "email-settings", label: "Email Setup",            desc: "Safe Gmail prepare mode", href: "/dashboard/email-settings",   icon: Mail,            group: "Account" },
+  { id: "developer-api", label: "Developer API",           desc: "API keys and usage",      href: "/dashboard/api",              icon: Code2,           group: "Account" },
   { id: "tools",          label: "Free Tools",             desc: "Useful utilities",       href: "/dashboard/tools",            icon: Wrench,          group: "Account" },
   { id: "support",        label: "Support",                desc: "Get help",               href: "/dashboard/support",          icon: MessageCircle,   group: "Account" },
   { id: "profile",        label: "Profile",                desc: "Your profile",           href: "/dashboard/profile",          icon: User,            group: "Account" },

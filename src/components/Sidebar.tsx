@@ -9,7 +9,7 @@ import {
   FileText, Megaphone, User, Wrench, MessageCircle, Zap,
   CalendarDays, GitMerge, Mail, Menu, X, Radio, ChevronRight,
   LogOut, Crown, Shield, Sparkles, MapPin, ChevronLeft,
-  Command, Users, Palette, PhoneCall, MoreHorizontal,
+  Command, Users, Palette, PhoneCall, MoreHorizontal, Code2,
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
@@ -54,6 +54,7 @@ const QUICK_ACCESS_ITEMS = [
 ];
 
 const MORE_ITEMS = [
+  { href: "/dashboard/api",     label: "Developer API", icon: Code2 },
   { href: "/dashboard/tools",   label: "Free Tools", icon: Wrench },
   { href: "/dashboard/support", label: "Support",    icon: MessageCircle },
 ];

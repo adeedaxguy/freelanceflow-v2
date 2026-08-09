@@ -57,6 +57,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   // Product
   { url: "/changelog",   changeFrequency: "weekly",  priority: 0.75 },
   { url: "/status",      changeFrequency: "hourly",  priority: 0.7  },
+  { url: "/developers",  changeFrequency: "weekly",  priority: 0.72 },
   // Company
   { url: "/careers",     changeFrequency: "weekly",  priority: 0.7  },
   { url: "/press",       changeFrequency: "monthly", priority: 0.6  },

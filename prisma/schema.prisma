@@ -56,10 +56,32 @@ model User {
   telephonyWorkspace   TelephonyWorkspace?
   telephonyPurchases   TelephonyPurchase[]
   voiceCalls           VoiceCall[]
+  apiKeys              ApiKey[]
 
   @@index([email])
   @@index([role])
   @@index([plan])
+}
+
+model ApiKey {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  keyHash       String    @unique
+  prefix        String
+  scopes        String
+  requestsToday Int       @default(0)
+  requestDay    DateTime  @default(now())
+  totalRequests Int       @default(0)
+  lastUsedAt    DateTime?
+  revokedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([revokedAt])
 }
 
 model BillingSubscription {
