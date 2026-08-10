@@ -7,6 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Careers at iCloseLeads — Join Our Team",
   description: "Help us build the future of freelance client acquisition. We're a remote-first team on a mission to help freelancers build sustainable businesses.",
+  alternates: { canonical: "https://icloseleads.com/careers" },
 };
 
 const openings = [

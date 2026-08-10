@@ -7,6 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Help Center — iCloseLeads",
   description: "Find answers to common questions about iCloseLeads. Get help with lead search, proposals, billing, email sending, and account settings.",
+  alternates: { canonical: "https://icloseleads.com/help" },
 };
 
 const categories = [

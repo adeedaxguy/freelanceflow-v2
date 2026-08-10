@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Changelog — iCloseLeads",
   description: "See what's new in iCloseLeads. Product updates, new features, bug fixes, and improvements — updated regularly.",
+  alternates: { canonical: "https://icloseleads.com/changelog" },
 };
 
 const releases = [

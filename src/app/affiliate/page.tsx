@@ -7,6 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Affiliate Program — iCloseLeads",
   description: "Earn 30% recurring commission for every iCloseLeads customer you refer. Join our affiliate program and build a passive income stream.",
+  alternates: { canonical: "https://icloseleads.com/affiliate" },
 };
 
 const steps = [

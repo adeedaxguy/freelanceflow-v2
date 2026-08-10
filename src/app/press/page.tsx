@@ -7,6 +7,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Press & Media — iCloseLeads",
   description: "iCloseLeads press kit, media resources, brand assets, and press contact information for journalists and media professionals.",
+  alternates: { canonical: "https://icloseleads.com/press" },
 };
 
 const coverage = [

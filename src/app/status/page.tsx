@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Platform Status — iCloseLeads",
   description: "Real-time status of all iCloseLeads services. Check if lead search, email sending, AI proposals, and APIs are operational.",
+  alternates: { canonical: "https://icloseleads.com/status" },
 };
 
 const services = [

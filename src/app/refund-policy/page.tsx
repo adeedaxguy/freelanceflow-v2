@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 export const metadata: Metadata = {
   title: "Refund Policy — iCloseLeads",
   description: "Read the iCloseLeads refund policy for paid monthly and annual subscriptions.",
+  alternates: { canonical: "https://icloseleads.com/refund-policy" },
 };
 
 export default function RefundPolicyPage() {

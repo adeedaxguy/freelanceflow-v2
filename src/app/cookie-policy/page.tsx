@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Cookie Policy — iCloseLeads",
   description: "iCloseLeads Cookie Policy. Learn about the cookies we use, why we use them, and how to control your cookie preferences.",
+  alternates: { canonical: "https://icloseleads.com/cookie-policy" },
 };
 
 export default function CookiePolicyPage() {

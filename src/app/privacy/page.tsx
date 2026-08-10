@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Privacy Policy — iCloseLeads",
   description: "iCloseLeads Privacy Policy. Learn how we collect, use, and protect your personal data in compliance with GDPR.",
+  alternates: { canonical: "https://icloseleads.com/privacy" },
 };
 
 export default function PrivacyPage() {

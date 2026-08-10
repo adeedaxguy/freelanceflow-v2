@@ -9,6 +9,7 @@ import { PRICING_TIERS } from "@/data/marketing";
 export const metadata: Metadata = {
   title: "iCloseLeads Pricing — Affordable Plans for Freelancers",
   description: "Start free, upgrade when ready. iCloseLeads offers plans from $0 to $79/mo with AI proposals, lead discovery, and email outreach.",
+  alternates: { canonical: "https://icloseleads.com/pricing" },
 };
 
 const billingFAQ = [

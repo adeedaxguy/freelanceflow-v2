@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Terms of Service — iCloseLeads",
   description: "iCloseLeads Terms of Service. Read our terms of use, acceptable use policy, and service agreement.",
+  alternates: { canonical: "https://icloseleads.com/terms" },
 };
 
 export default function TermsPage() {

@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "About iCloseLeads — Built for Freelancers Who Mean Business",
   description: "iCloseLeads is on a mission to help freelancers worldwide escape platform dependency and build sustainable client pipelines through AI-powered outreach.",
+  alternates: { canonical: "https://icloseleads.com/about" },
 };
 
 const team = [
