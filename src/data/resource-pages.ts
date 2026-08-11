@@ -83,7 +83,7 @@ function buildJuly28DailyResourcePages(): ResourcePage[] {
         { label: "Freelance client acquisition system", href: "/blog/freelance-client-acquisition-system" },
         { label: "Find local business leads", href: "/use-cases/local-business-leads" },
         { label: "AI proposal generator", href: "/features/ai-proposals" },
-        { label: "Client outreach CRM", href: "/features/crm" }
+        { label: "Client outreach CRM", href: "/features/crm-pipeline" }
       ],
       faqs: [
         { q: "What is a good Upwork lead generation alternative?", a: "A good alternative gives freelancers an owned way to find qualified businesses, verify the need, save prospects, and send specific outreach instead of waiting for marketplace jobs." },
@@ -242,7 +242,7 @@ function buildJuly28DailyResourcePages(): ResourcePage[] {
       pitch: "Hi, I saved this lead because there is a specific service gap that matches what we do. Here is the short reason it may be worth a conversation.",
       internalLinks: [
         { label: "Freelance client acquisition funnel", href: "/resources/freelance-client-acquisition-funnel" },
-        { label: "Client outreach CRM", href: "/features/crm" },
+        { label: "Client outreach CRM", href: "/features/crm-pipeline" },
         { label: "AI proposal generator", href: "/features/ai-proposals" }
       ],
       faqs: [
