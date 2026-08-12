@@ -167,6 +167,7 @@ function InternalOrExternalLink({
 
 export function BlogArticleRoadmap({ post, headings }: BlogArticleEnhancementProps) {
   const internalLinks = getArticleInternalLinks(post, 4);
+  const topFunnel = post.conversionFunnel ?? getDefaultConversionFunnel(post);
   const summary = post.excerpt?.trim()
     || `A practical guide to ${post.title.toLowerCase()} with the steps, examples, and next actions worth using in iCloseLeads.`;
 
@@ -180,6 +181,15 @@ export function BlogArticleRoadmap({ post, headings }: BlogArticleEnhancementPro
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Quick answer</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{summary}</p>
+            {topFunnel && (
+              <Link
+                href={topFunnel.ctaHref}
+                className="mt-4 inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-glow-primary transition-colors hover:bg-primary-light"
+              >
+                {topFunnel.ctaLabel}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
           </div>
         </div>
 
