@@ -21,7 +21,7 @@ describe("public API keys", () => {
     expect(getApiDailyLimit("free", "USER")).toBe(0);
     expect(getApiDailyLimit("pro", "USER")).toBe(0);
     expect(getApiDailyLimit("agency", "USER")).toBe(250);
-    expect(getApiDailyLimit("free", "ADMIN")).toBe(1000);
+    expect(getApiDailyLimit("free", "ADMIN")).toBeNull();
   });
 });
 

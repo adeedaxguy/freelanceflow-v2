@@ -27,8 +27,8 @@ export function createApiKey(): { secret: string; hash: string; prefix: string }
   return { secret, hash: hashApiKey(secret), prefix: `${secret.slice(0, 17)}...` };
 }
 
-export function getApiDailyLimit(plan: string, role: string): number {
-  return role === "ADMIN" ? 1000 : (DAILY_LIMITS[plan.toLowerCase()] ?? 0);
+export function getApiDailyLimit(plan: string, role: string): number | null {
+  return role === "ADMIN" ? null : (DAILY_LIMITS[plan.toLowerCase()] ?? 0);
 }
 
 export function readBearerToken(request: NextRequest): string {
@@ -85,8 +85,8 @@ type ApiKeyRow = {
 };
 
 export type ApiAuthorization =
-  | { ok: true; userId: string; keyId: string; limit: number; remaining: number; resetAt: string }
-  | { ok: false; status: number; error: string; code: string; limit?: number; remaining?: number; resetAt?: string };
+  | { ok: true; userId: string; keyId: string; limit: number | null; remaining: number | null; resetAt?: string }
+  | { ok: false; status: number; error: string; code: string; limit?: number | null; remaining?: number | null; resetAt?: string };
 
 export async function authorizePublicApi(request: NextRequest, requiredScope: ApiScope): Promise<ApiAuthorization> {
   const supplied = readBearerToken(request);
@@ -112,7 +112,7 @@ export async function authorizePublicApi(request: NextRequest, requiredScope: Ap
   }
 
   const limit = getApiDailyLimit(key.plan, key.role);
-  if (!limit) {
+  if (limit === 0) {
     return { ok: false, status: 403, error: "Public API access requires an eligible plan.", code: "api_access_required" };
   }
 
@@ -126,21 +126,36 @@ export async function authorizePublicApi(request: NextRequest, requiredScope: Ap
     );
   }
 
-  const updated = await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
-    UPDATE "ApiKey"
-    SET "requestsToday" = "requestsToday" + 1,
-        "totalRequests" = "totalRequests" + 1,
-        "lastUsedAt" = $2,
-        "updatedAt" = $2
-    WHERE "id" = $1 AND "requestsToday" < $3
-    RETURNING "requestsToday"
-  `, key.id, now, limit);
+  const updated = limit === null
+    ? await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
+        UPDATE "ApiKey"
+        SET "requestsToday" = "requestsToday" + 1,
+            "totalRequests" = "totalRequests" + 1,
+            "lastUsedAt" = $2,
+            "updatedAt" = $2
+        WHERE "id" = $1
+        RETURNING "requestsToday"
+      `, key.id, now)
+    : await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
+        UPDATE "ApiKey"
+        SET "requestsToday" = "requestsToday" + 1,
+            "totalRequests" = "totalRequests" + 1,
+            "lastUsedAt" = $2,
+            "updatedAt" = $2
+        WHERE "id" = $1 AND "requestsToday" < $3
+        RETURNING "requestsToday"
+      `, key.id, now, limit);
   const used = updated[0]?.requestsToday;
-  const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
   if (!used) {
+    const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
     return { ok: false, status: 429, error: "Daily API request limit reached.", code: "rate_limit_exceeded", limit, remaining: 0, resetAt };
   }
 
+  if (limit === null) {
+    return { ok: true, userId: key.userId, keyId: key.id, limit: null, remaining: null };
+  }
+
+  const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
   return { ok: true, userId: key.userId, keyId: key.id, limit, remaining: Math.max(0, limit - used), resetAt };
 }
 

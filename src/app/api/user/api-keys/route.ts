@@ -51,7 +51,7 @@ export async function GET() {
   });
 
   return NextResponse.json({
-    eligible: limit > 0,
+    eligible: limit === null || limit > 0,
     dailyLimit: limit,
     availableScopes: API_SCOPES,
     keys: keys.map(key => ({ ...key, scopes: parseScopes(key.scopes) })),
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
   await ensureApiKeyTable();
   const account = await apiAccount(session.user.id);
   const limit = getApiDailyLimit(account?.plan ?? "free", account?.role ?? "USER");
-  if (!limit) {
+  if (limit === 0) {
     return NextResponse.json({ error: "Developer API access requires an Agency plan." }, { status: 403 });
   }
 

@@ -60,7 +60,7 @@ export default function DevelopersPage() {
               <pre className="mt-5 overflow-x-auto bg-background p-4 text-sm leading-6 text-muted-foreground"><code>{`Authorization: Bearer icl_live_...`}</code></pre>
               <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
                 <div><dt className="text-muted-foreground">Access</dt><dd className="mt-1 font-semibold">Agency / admin</dd></div>
-                <div><dt className="text-muted-foreground">Daily allowance</dt><dd className="mt-1 font-semibold">250 requests</dd></div>
+                <div><dt className="text-muted-foreground">Daily allowance</dt><dd className="mt-1 font-semibold">Agency 250 · Admin unlimited</dd></div>
                 <div><dt className="text-muted-foreground">Page size</dt><dd className="mt-1 font-semibold">Up to 50 results</dd></div>
                 <div><dt className="text-muted-foreground">Reset</dt><dd className="mt-1 font-semibold">00:00 UTC</dd></div>
               </dl>

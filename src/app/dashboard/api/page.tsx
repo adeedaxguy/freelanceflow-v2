@@ -25,7 +25,7 @@ type ApiKeyRecord = {
 
 type ApiKeyData = {
   eligible: boolean;
-  dailyLimit: number;
+  dailyLimit: number | null;
   availableScopes: string[];
   keys: ApiKeyRecord[];
 };
@@ -134,7 +134,10 @@ export default function DeveloperApiPage() {
                 <h2 className="flex items-center gap-2 font-semibold text-foreground"><Plus className="h-4 w-4 text-accent" /> Create an API key</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Choose only the data this integration needs. The secret is shown once.</p>
               </div>
-              <div className="text-sm text-muted-foreground"><strong className="text-foreground">{data.dailyLimit}</strong> requests / UTC day</div>
+              <div className="text-sm text-muted-foreground">
+                <strong className="text-foreground">{data.dailyLimit === null ? "Unlimited" : data.dailyLimit}</strong>
+                {data.dailyLimit === null ? " API requests" : " requests / UTC day"}
+              </div>
             </div>
 
             <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
