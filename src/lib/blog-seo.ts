@@ -333,6 +333,143 @@ const DEFAULT_INTERNAL_LINKS: BlogLinkItem[] = [
   },
 ];
 
+const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
+  "freelance-client-acquisition-system": [
+    {
+      href: "/blog/how-to-get-more-freelance-clients",
+      label: "How to get more freelance clients",
+      description: "Use this as the broader acquisition playbook before choosing a specific lead source.",
+    },
+    {
+      href: "/blog/best-freelance-client-acquisition-software-2025",
+      label: "Best freelance client acquisition software",
+      description: "Compare tools by source quality, follow-up workflow, proposal support, and pipeline fit.",
+    },
+    {
+      href: "/blog/get-freelance-clients-without-cold-calling",
+      label: "Get freelance clients without cold calling",
+      description: "Build a warmer acquisition path using search, proof, referrals, and targeted outreach.",
+    },
+    {
+      href: "/blog/cold-email-templates-freelancers-2025",
+      label: "Cold email templates for freelancers",
+      description: "Turn the acquisition plan into first messages that reference a real reason to talk.",
+    },
+  ],
+  "how-to-get-more-freelance-clients": [
+    {
+      href: "/blog/how-to-find-seo-clients-2025",
+      label: "How to find SEO clients",
+      description: "A niche-specific client-finding workflow for SEO consultants and agencies.",
+    },
+    {
+      href: "/blog/how-to-find-wordpress-clients-2025",
+      label: "How to find WordPress clients",
+      description: "Target businesses with site, plugin, speed, security, or redesign signals.",
+    },
+    {
+      href: "/blog/how-to-find-graphic-design-clients-2025",
+      label: "How to find graphic design clients",
+      description: "Use portfolio fit, brand signals, and local business gaps to find better prospects.",
+    },
+    {
+      href: "/blog/virtual-assistant-find-clients-2025",
+      label: "Find virtual assistant clients",
+      description: "Adapt the same acquisition system for admin, ops, and support-service buyers.",
+    },
+  ],
+  "best-freelance-client-acquisition-software-2025": [
+    {
+      href: "/blog/best-crm-for-freelancers-2025",
+      label: "Best CRM for freelancers",
+      description: "Compare the pipeline and follow-up side of client acquisition software.",
+    },
+    {
+      href: "/blog/how-to-write-winning-freelance-proposals-2025",
+      label: "Write winning freelance proposals",
+      description: "Connect lead context to stronger proposal structure and clearer next steps.",
+    },
+    {
+      href: "/blog/freelance-client-acquisition-system",
+      label: "Freelance client acquisition system",
+      description: "Use the full system page as the hub for finding, qualifying, pitching, and following up.",
+    },
+    {
+      href: "/blog/how-to-get-more-freelance-clients",
+      label: "More freelance clients playbook",
+      description: "Start with the strategic acquisition workflow, then choose the right software layer.",
+    },
+  ],
+  "freelance-niche-research": [
+    {
+      href: "/blog/data-science-freelancer-find-clients",
+      label: "Data science freelancer clients",
+      description: "Apply niche research to higher-value analytics, AI, and data consulting buyers.",
+    },
+    {
+      href: "/blog/video-editor-find-clients-2025",
+      label: "Video editor clients",
+      description: "Use creator-economy demand signals to find better video editing prospects.",
+    },
+    {
+      href: "/blog/email-marketing-freelancer-find-clients",
+      label: "Email marketing freelancer clients",
+      description: "Find retainer-style prospects where lifecycle, newsletter, or sales-email help is valuable.",
+    },
+    {
+      href: "/blog/social-media-manager-find-clients-2025",
+      label: "Social media manager clients",
+      description: "Turn niche selection into a focused pipeline for social media management work.",
+    },
+  ],
+  "find-local-businesses-without-website": [
+    {
+      href: "/blog/local-business-leads-for-web-designers",
+      label: "Local business leads for web designers",
+      description: "Use no-website and weak-website signals to build a practical redesign lead list.",
+    },
+    {
+      href: "/blog/how-to-find-wordpress-clients-2025",
+      label: "WordPress client prospecting",
+      description: "Match local business gaps with WordPress build, redesign, and maintenance offers.",
+    },
+    {
+      href: "/blog/how-to-find-graphic-design-clients-2025",
+      label: "Graphic design client prospecting",
+      description: "Spot brand, menu, signage, and local profile gaps that can support a design pitch.",
+    },
+  ],
+  "cold-email-leads-for-freelancers": [
+    {
+      href: "/blog/cold-email-templates-freelancers-2025",
+      label: "Cold email templates for freelancers",
+      description: "Use these examples after choosing a lead with a clear public reason to pitch.",
+    },
+    {
+      href: "/blog/get-freelance-clients-without-cold-calling",
+      label: "Clients without cold calling",
+      description: "Compare cold email with warmer search, referral, and proof-led acquisition routes.",
+    },
+    {
+      href: "/blog/freelance-follow-up-system",
+      label: "Freelance follow-up system",
+      description: "Keep the conversation alive after the first email without sounding automated.",
+    },
+  ],
+  "ai-proposal-generator-for-freelancers": [
+    {
+      href: "/blog/how-to-write-winning-freelance-proposals-2025",
+      label: "Write winning freelance proposals",
+      description: "Use AI for structure, then improve the message with proof, fit, and a clear next step.",
+    },
+    {
+      href: "/blog/why-clients-reject-freelance-proposals",
+      label: "Why clients reject proposals",
+      description: "Fix the trust, timing, proof, and relevance gaps that make buyers ignore proposals.",
+    },
+  ],
+};
+
 const OUTBOUND_LINKS: Record<ArticleTopic, BlogLinkItem[]> = {
   webdesign: [
     {
@@ -583,8 +720,9 @@ function uniqueLinks(links: BlogLinkItem[], limit: number) {
 }
 
 export function getArticleInternalLinks(post: BlogArticleSource, limit = 6) {
+  const strategicLinks = STRATEGIC_INTERNAL_LINKS[post.slug] ?? [];
   const topicLinks = getArticleTopics(post).flatMap(topic => INTERNAL_LINKS[topic]);
-  return uniqueLinks([...topicLinks, ...DEFAULT_INTERNAL_LINKS], limit);
+  return uniqueLinks([...strategicLinks, ...topicLinks, ...DEFAULT_INTERNAL_LINKS], limit);
 }
 
 export function getArticleOutboundLinks(post: BlogArticleSource, limit = 3) {
