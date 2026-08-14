@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
 
   let usage = {
     plan: userPlan,
-    limit: isAgencyPlan ? 99999 : 100,
+    limit: isAgencyPlan ? 99999 : 600,
     used: 0,
-    remaining: isAgencyPlan ? 99999 : 100,
-    nextReset: new Date(Date.now() + 86_400_000).toISOString(),
+    remaining: isAgencyPlan ? 99999 : 600,
+    nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
     percentage: 0,
     unlimited: isAgencyPlan,
   };
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
   if (usage.remaining === 0) {
     return NextResponse.json({
-      error: "Daily limit reached. You have used your free lead allowance for this 24-hour window. Share iCloseLeads to unlock more leads instantly.",
+      error: "Weekly limit reached. You have used your free lead allowance for this week. Share iCloseLeads to unlock bonus leads instantly.",
       plan: usage.plan,
       limit: usage.limit,
       nextReset: usage.nextReset,

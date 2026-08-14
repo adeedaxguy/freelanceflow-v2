@@ -74,9 +74,9 @@ export async function POST(req: NextRequest) {
     // Usage stats — agency/pro bypass first; fall back to free defaults if DB unavailable.
     let usage = {
       plan: isUnlimitedUser ? "agency" : "free",
-      limit: isUnlimitedUser ? 99999 : 100,
+      limit: isUnlimitedUser ? 99999 : 600,
       used: 0,
-      remaining: isUnlimitedUser ? 99999 : 100,
+      remaining: isUnlimitedUser ? 99999 : 600,
       nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
       percentage: 0,
     };
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
 
     if (usage.remaining === 0) {
       return NextResponse.json({
-        error:     `Daily limit reached. You have used your ${usage.limit} free leads for this 24-hour window. Share iCloseLeads to unlock more leads instantly.`,
+        error:     `Weekly limit reached. You have used your ${usage.limit} free leads for this week. Share iCloseLeads to unlock bonus leads instantly.`,
         plan:      usage.plan,
         limit:     usage.limit,
         nextReset: usage.nextReset,

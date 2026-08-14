@@ -29,9 +29,9 @@ export const PRICING_TIERS: PricingTier[] = [
     name: "Free",
     price: "$0",
     description: "Full early access to core lead, proposal, and CRM tools. No card required.",
-    limit: "100 leads/day",
+    limit: "600 leads/week",
     features: [
-      "100 leads per day during Early Access",
+      "600 leads per week during Early Access",
       "5 AI proposals per week",
       "3 free tools (Rate Calc, Subject Gen, Red Flag)",
       "Live job and local lead discovery",

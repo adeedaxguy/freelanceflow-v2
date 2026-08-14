@@ -9,10 +9,12 @@ const UNLIMITED_EMAILS = [
 ];
 
 export const PLAN_LIMITS = {
-  free:   { leadsPerDay: 100,    proposalsPerMonth: 10,  campaigns: 3 },
+  free:   { leadsPerDay: 600,    proposalsPerMonth: 10,  campaigns: 3 },
   pro:    { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 10 },
   agency: { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 999 },
 } as const;
+
+const FREE_LEAD_RESET_HOURS = 7 * 24;
 
 export type Plan = keyof typeof PLAN_LIMITS;
 
@@ -58,13 +60,13 @@ export async function checkAndIncrementLeads(
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
   const limit = getDailyLeadLimit(plan, user.bonusLeads ?? 0);
 
-  // Reset counter if 24+ hours have passed
+  // Free lead counters reset weekly during the 600-lead early access offer.
   const now = new Date();
   let resetDate = new Date(user.weeklyLeadReset);
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
 
   let currentCount = user.weeklyLeads;
-  if (hoursSinceReset >= 24) {
+  if (hoursSinceReset >= FREE_LEAD_RESET_HOURS) {
     currentCount = 0;
     resetDate = now;
     await prisma.user.update({
@@ -73,7 +75,7 @@ export async function checkAndIncrementLeads(
     });
   }
 
-  const resetAt = new Date(resetDate.getTime() + 24 * 3_600_000).toISOString();
+  const resetAt = new Date(resetDate.getTime() + FREE_LEAD_RESET_HOURS * 3_600_000).toISOString();
   const remaining = Math.max(0, limit - currentCount);
   if (remaining === 0) return { allowed: false, remaining: 0, plan, resetAt };
 
@@ -100,7 +102,7 @@ export async function getUsageStats(userId: string) {
       limit: 99999,
       used: 0,
       remaining: 99999,
-      nextReset: new Date(Date.now() + 24 * 3_600_000).toISOString(),
+      nextReset: new Date(Date.now() + FREE_LEAD_RESET_HOURS * 3_600_000).toISOString(),
       percentage: 0,
       unlimited: true,
       bonusLeads: user.bonusLeads ?? 0,
@@ -113,9 +115,9 @@ export async function getUsageStats(userId: string) {
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
-  const dailyLeads = hoursSinceReset >= 24 ? 0 : user.weeklyLeads;
+  const dailyLeads = hoursSinceReset >= FREE_LEAD_RESET_HOURS ? 0 : user.weeklyLeads;
   const nextReset = new Date(
-    (hoursSinceReset >= 24 ? now : resetDate).getTime() + 24 * 3_600_000,
+    (hoursSinceReset >= FREE_LEAD_RESET_HOURS ? now : resetDate).getTime() + FREE_LEAD_RESET_HOURS * 3_600_000,
   );
 
   const isUnlimited = limit >= 999999;

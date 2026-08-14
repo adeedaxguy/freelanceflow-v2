@@ -108,9 +108,9 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
                   </td>
                   <td className="px-5 py-3">
                     <p className="font-medium text-foreground">
-                      {u.weeklyLeads} / {u.plan === "free" ? 100 + u.bonusLeads : "∞"}
+                      {u.weeklyLeads} / {u.plan === "free" ? 600 + u.bonusLeads : "∞"}
                     </p>
-                    {u.plan === "free" && u.weeklyLeads >= 100 + u.bonusLeads && (
+                    {u.plan === "free" && u.weeklyLeads >= 600 + u.bonusLeads && (
                       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">Limit reached</p>
                     )}
                   </td>

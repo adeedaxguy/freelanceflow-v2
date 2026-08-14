@@ -20,7 +20,7 @@ import { LeadResultsAd } from "@/components/AdSenseUnit";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
-const FREE_PLAN_LIMIT      = 100;          // 100 leads per 24 hours
+const FREE_PLAN_LIMIT      = 600;          // 600 leads per week
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
@@ -1306,8 +1306,8 @@ export default function LocalLeadsPage() {
         <div className="dashboard-control-panel rounded-xl px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-xs font-semibold text-foreground">Daily free leads</p>
-              <p className="text-xs text-muted-foreground">{leadsViewed} / {dailyLimit} today · resets in 24h</p>
+              <p className="text-xs font-semibold text-foreground">Weekly free leads</p>
+              <p className="text-xs text-muted-foreground">{leadsViewed} / {dailyLimit} this week</p>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div
@@ -1330,7 +1330,7 @@ export default function LocalLeadsPage() {
       {/* Daily limit hit */}
       {isOverLimit && (
         <div className="bg-surface border border-border rounded-2xl p-6 text-center">
-          <p className="text-foreground font-semibold mb-2">You've used your {dailyLimit} free local leads today</p>
+          <p className="text-foreground font-semibold mb-2">You've used your {dailyLimit} free local leads this week</p>
           <p className="text-muted-foreground text-sm mb-4">
             {shareBonusClaimed
               ? "Your share bonus is active. Request a larger allowance and we will review it."

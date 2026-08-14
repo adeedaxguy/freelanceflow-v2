@@ -336,6 +336,11 @@ const DEFAULT_INTERNAL_LINKS: BlogLinkItem[] = [
 const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   "freelance-client-acquisition-system": [
     {
+      href: "/blog/600-free-leads-per-week-for-freelancers",
+      label: "600 free leads per week workflow",
+      description: "Use the free iCloseLeads allowance as a focused weekly client-acquisition sprint.",
+    },
+    {
       href: "/blog/how-to-get-more-freelance-clients",
       label: "How to get more freelance clients",
       description: "Use this as the broader acquisition playbook before choosing a specific lead source.",
@@ -398,6 +403,28 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
       href: "/blog/how-to-get-more-freelance-clients",
       label: "More freelance clients playbook",
       description: "Start with the strategic acquisition workflow, then choose the right software layer.",
+    },
+  ],
+  "600-free-leads-per-week-for-freelancers": [
+    {
+      href: "/features/lead-discovery",
+      label: "Freelance lead discovery",
+      description: "Run focused lead searches across local, remote, and live opportunity workflows.",
+    },
+    {
+      href: "/use-cases/local-business-leads",
+      label: "Local business leads",
+      description: "Use the weekly allowance to test local niches with visible website, profile, and contact signals.",
+    },
+    {
+      href: "/blog/freelance-client-acquisition-system",
+      label: "Freelance client acquisition system",
+      description: "Connect free weekly lead searches to a full system for qualifying, pitching, and following up.",
+    },
+    {
+      href: "/tools/lead-calculator",
+      label: "Lead value calculator",
+      description: "Estimate how many qualified leads you need based on close rate and project value.",
     },
   ],
   "freelance-niche-research": [

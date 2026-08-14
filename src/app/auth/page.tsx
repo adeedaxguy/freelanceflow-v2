@@ -386,7 +386,7 @@ function AuthForm() {
           </p>
           <div className="space-y-3">
             {[
-              "Free plan includes 100 leads per day",
+              "Free plan includes 600 leads per week",
               "Free plan includes 10 proposals per month",
               "Search local businesses, remote jobs, and live signals",
               "Save leads and track follow-up in one CRM pipeline",

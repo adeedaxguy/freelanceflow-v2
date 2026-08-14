@@ -7,7 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { sendAccountNotification } from "@/lib/admin-notifications";
 import { prisma } from "@/lib/prisma";
 
-const FREE_BASE_LIMIT = 100;
+const FREE_BASE_LIMIT = 600;
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);

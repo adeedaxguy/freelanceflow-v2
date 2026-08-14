@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const FREE_BASE_LIMIT = 100;
+const FREE_BASE_LIMIT = 600;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 function parseClaims(value: string | null): string[] {

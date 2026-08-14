@@ -648,11 +648,11 @@ export default function LiveJobsPage() {
                     <AlertCircle className="w-5 h-5 text-gold" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 100} free leads today</p>
+                    <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 600} free leads this week</p>
                     <p className="text-muted-foreground text-sm mb-3">
-                      Free plan resets every 24 hours.
+                      Free plan resets weekly.
                       {limitHit.nextReset && (
-                        <> Resets at <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
+                        <> Next reset: <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleDateString([], { month: "short", day: "numeric" })}</strong>.</>
                       )}
                     </p>
                     <button
