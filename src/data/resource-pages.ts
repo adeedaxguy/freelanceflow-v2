@@ -6649,6 +6649,7 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       pitchAngle: "turn a Google Maps listing into a respectful website or local SEO pitch with saved proof, qualification, and follow-up",
       competitorGap: "Maps prospecting tutorials stop at discovery; iCloseLeads can add saved context, buyer-route checks, lead qualification, proposal drafting, signup, and CRM follow-through.",
       internalLinks: [
+        { label: "Google Maps prospecting tool for agencies", href: "/blog/google-maps-prospecting-tool-for-agencies" },
         { label: "How to find businesses without websites on Google Maps", href: "/resources/how-to-find-businesses-without-websites-on-google-maps" },
         { label: "Local business leads", href: "/use-cases/local-business-leads" },
         { label: "Freelance cold outreach", href: "/resources/freelance-cold-outreach" },
@@ -6666,6 +6667,7 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       pitchAngle: "turn the Google Maps listing into a specific website or local SEO suggestion instead of a generic cold email or redesign claim",
       competitorGap: "Most Google Maps pitch advice is generic or spammy; this page should show a proof-led workflow that routes the lead into signup, proposal drafting, and follow-up.",
       internalLinks: [
+        { label: "Google Maps prospecting tool for agencies", href: "/blog/google-maps-prospecting-tool-for-agencies" },
         { label: "Google Maps prospecting tool", href: "/resources/google-maps-prospecting-tool-for-freelancers" },
         { label: "Local business leads", href: "/use-cases/local-business-leads" },
         { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },

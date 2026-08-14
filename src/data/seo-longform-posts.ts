@@ -663,23 +663,23 @@ const topics: LongformTopic[] = [
   {
     slug: "google-maps-prospecting-tool-for-agencies",
     title: "Google Maps Prospecting Tool for Agencies: Build Better Local Lead Lists",
-    excerpt: "How agencies can use profile signals, website status, phone routes, and decision-maker checks to create stronger local lead lists.",
+    excerpt: "How agencies can use Google Maps, business profile signals, website status, phone routes, and decision-maker checks to build better local lead lists.",
     category: "Local Leads",
     focusKeyword: "Google Maps prospecting tool for agencies",
     audience: "local agencies and B2B service providers",
-    searchIntent: "The searcher wants map-based prospecting that is faster and cleaner than manual spreadsheet work.",
-    problem: "Generic maps scraping creates low-quality lists unless the team verifies website and contact context.",
-    whyNow: "Ahrefs overview still shows low keyword footprint, so iCloseLeads needs exact tool-intent pages around local prospecting.",
-    leadSource: "map-style SERPs, local business profiles, and competitor prospecting tools",
-    offer: "a local prospecting workflow with clear signup CTA",
-    internalPath: "/dashboard/local-leads",
-    keywords: ["Google Maps prospecting tool for agencies","Google Maps prospecting tool for agencies software","Google Maps prospecting tool for agencies workflow","freelance client acquisition","B2B lead generation"],
-    proofSignals: ["public business profile","website or storefront status","decision-maker route","offer fit","follow-up action","saved source proof"],
-    workflow: ["Start with the exact market, offer, and buyer role before opening a lead list.","Use public profile and website signals to decide whether the prospect has a visible problem.","Save the source URL, contact route, and proof note before writing outreach.","Write the first message around one business issue rather than a generic service pitch.","Route qualified prospects into a signup, demo, or saved pipeline action.","Review replies and activation data before expanding the next keyword cluster."],
-    outreachAngles: ["I found a public profile-to-website gap that may be costing you inquiries.","This is a short audit note based on your visible business information, not a scraped-list blast.","I can show the exact lead source and the next conversion step I would improve."],
-    mistakes: ["buying stale lists","hiding low confidence","guessing private contact data","sending generic claims","forgetting the next activation path"],
-    qaChecks: ["Public source saved","Internal link to signup or dashboard present","Short answer visible","FAQ covers buying concern","Schema is generated through the existing blog renderer"],
-    examples: ["local web design prospect","freelancer agency lead","service business owner route"],
+    searchIntent: "The searcher wants a practical Google Maps prospecting workflow or tool that helps an agency find local businesses worth pitching, not just scrape a list of names.",
+    problem: "Generic Google Maps scraping creates low-quality lists unless the agency verifies profile activity, website context, contact route, offer fit, and the reason the business should care.",
+    whyNow: "GSC Insights flagged this page as losing impressions, while the nearby Google Maps listing pitch resource is gaining visibility. The recovery move is to connect the tool-intent article to the pitch workflow, local lead qualification, and iCloseLeads signup path.",
+    leadSource: "GSC Insights, Google Maps style searches, Google Business Profile signals, local business websites, phone routes, website status checks, and competitor prospecting pages",
+    offer: "a Google Maps prospecting workflow that turns profile signals into qualified local leads, saved proof notes, and outreach-ready agency pitches",
+    internalPath: "/use-cases/local-business-leads",
+    keywords: ["Google Maps prospecting tool for agencies","Google Maps lead generation tool","Google Maps prospecting for agencies","Google Maps scraping alternative","Google Business Profile prospecting","find local business leads from Google Maps","local business prospecting tool","Google Maps leads for web design agencies"],
+    proofSignals: ["exact public business profile","active category and location","website missing, weak, or mismatched","phone or contact route present","review or photo activity suggests the business is operating","decision-maker route or business-facing inbox exists","offer fit is clear before outreach","saved source proof explains the pitch"],
+    workflow: ["Choose one service offer, city, and business category before opening a map search.","Look for profile-to-website friction: no website, outdated website, weak call path, generic service page, or unclear quote route.","Confirm the business is active through reviews, hours, photos, phone, or website signals before saving it.","Save the source URL, website status, contact route, and one proof note while the context is fresh.","Use decision-maker research only after the business passes fit and activity checks.","Draft the first agency pitch around one visible profile or website issue, then route the lead into follow-up."],
+    outreachAngles: ["I found your public Google profile and noticed the website path could make calls or quote requests clearer.","This is a short note based on one visible profile-to-website signal, not a scraped-list blast.","I can show the exact Maps/profile signal and the first conversion step I would improve."],
+    mistakes: ["scraping broad map lists without qualification","treating every no-website profile as a good lead","guessing private contact data","claiming traffic or revenue loss without proof","sending the same pitch to every category","forgetting the saved proof note before follow-up"],
+    qaChecks: ["Exact profile/source saved","Website status checked","Contact route visible","Pitch reason written in one sentence","Internal link to local lead workflow present","Short answer and related Google Maps pitch resource visible","Schema generated by the blog renderer"],
+    examples: ["web design agency prospecting from Google Maps","local SEO agency lead list","service business profile with weak website route"],
   },
   {
     slug: "cold-email-follow-up-system-for-freelancers",
@@ -1217,6 +1217,7 @@ const skippedLaunchSlugs = new Set([
 ]);
 
 const publishedAt = (index: number) => new Date(Date.UTC(2026, 5, 21, 12, 0, 0) - index * 60 * 60 * 1000);
+const gscInsightRefreshAt = new Date(Date.UTC(2026, 7, 14, 22, 45, 0));
 
 function bulletList(items: string[]) {
   return items.map((item) => `- ${item}`).join("\n");
@@ -1410,6 +1411,7 @@ Open ${topic.internalPath}, run a focused search for your niche, save a small ba
 
 export const SEO_LONGFORM_POSTS: BlogPost[] = topics.filter((topic) => !skippedLaunchSlugs.has(topic.slug)).map((topic, index) => {
   const createdAt = publishedAt(index);
+  const updatedAt = topic.slug === "google-maps-prospecting-tool-for-agencies" ? gscInsightRefreshAt : createdAt;
   return {
     id: `seo-longform-${topic.slug}`,
     title: topic.title,
@@ -1419,10 +1421,14 @@ export const SEO_LONGFORM_POSTS: BlogPost[] = topics.filter((topic) => !skippedL
     category: topic.category,
     published: true,
     coverImage: "/blog-images/default.svg",
+    metaTitle: topic.title,
+    metaDescription: topic.excerpt,
+    focusKeyword: topic.focusKeyword,
+    tags: topic.keywords.slice(0, 8),
     articleVisuals: topic.articleVisuals,
     conversionFunnel: topic.conversionFunnel,
     readTime: 16,
     createdAt,
-    updatedAt: createdAt,
+    updatedAt,
   };
 });

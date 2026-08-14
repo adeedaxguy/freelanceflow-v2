@@ -424,6 +424,11 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   ],
   "find-local-businesses-without-website": [
     {
+      href: "/blog/google-maps-prospecting-tool-for-agencies",
+      label: "Google Maps prospecting tool for agencies",
+      description: "Turn map listings into qualified local leads instead of broad scraped spreadsheets.",
+    },
+    {
       href: "/blog/local-business-leads-for-web-designers",
       label: "Local business leads for web designers",
       description: "Use no-website and weak-website signals to build a practical redesign lead list.",
@@ -437,6 +442,45 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
       href: "/blog/how-to-find-graphic-design-clients-2025",
       label: "Graphic design client prospecting",
       description: "Spot brand, menu, signage, and local profile gaps that can support a design pitch.",
+    },
+  ],
+  "local-business-leads-for-web-designers": [
+    {
+      href: "/blog/google-maps-prospecting-tool-for-agencies",
+      label: "Google Maps prospecting tool for agencies",
+      description: "Use profile, website, phone, and activity signals before pitching local businesses.",
+    },
+    {
+      href: "/resources/google-maps-listing-pitch-for-freelancers",
+      label: "Google Maps listing pitch",
+      description: "Move from a map listing signal into a short, proof-led outreach angle.",
+    },
+    {
+      href: "/resources/how-to-find-businesses-without-websites-on-google-maps",
+      label: "Find businesses without websites on Google Maps",
+      description: "Verify no-website opportunities before treating them as web design leads.",
+    },
+  ],
+  "google-maps-prospecting-tool-for-agencies": [
+    {
+      href: "/resources/google-maps-listing-pitch-for-freelancers",
+      label: "Google Maps listing pitch",
+      description: "Use the rising GSC resource to turn map signals into a respectful first pitch.",
+    },
+    {
+      href: "/resources/google-maps-prospecting-tool-for-freelancers",
+      label: "Google Maps prospecting for freelancers",
+      description: "Compare the freelancer workflow with the agency local-lead workflow.",
+    },
+    {
+      href: "/resources/how-to-find-businesses-without-websites-on-google-maps",
+      label: "Businesses without websites on Google Maps",
+      description: "Qualify missing-website signals before adding them to an agency lead list.",
+    },
+    {
+      href: "/use-cases/local-business-leads",
+      label: "Local business lead workflow",
+      description: "Run profile, website, contact, and follow-up checks inside one lead workflow.",
     },
   ],
   "cold-email-leads-for-freelancers": [
