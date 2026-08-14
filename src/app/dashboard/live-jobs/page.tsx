@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { Fragment, useState, useEffect, useCallback, useRef } from "react";
 import {
   Radio, RefreshCw, Clock, Globe, Mail, ExternalLink, Bookmark,
   CheckCircle, Sparkles, Star, Filter, ChevronDown, X,
@@ -13,6 +13,7 @@ import BonusLeadsModal from "@/components/BonusLeadsModal";
 import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { LeadResultsAd } from "@/components/AdSenseUnit";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
@@ -694,7 +695,7 @@ export default function LiveJobsPage() {
             {/* Cards */}
             {!loading && current.length > 0 && (
               <div className="space-y-3">
-                {current.map(lead=>{
+                {current.map((lead,index)=>{
                   const isSaved  = savedIds.has(lead.id);
                   const isSaving = savingId === lead.id;
                   const isFav    = favIds.has(lead.id);
@@ -703,7 +704,8 @@ export default function LiveJobsPage() {
                   const hasApplied = !!appliedByUrl[lead.url];
                   const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
-                    <div key={lead.id}
+                    <Fragment key={lead.id}>
+                    <div
                       className={`dashboard-result-card group border rounded-xl p-4 sm:p-5 transition-all ${lead.bmScore>=80?"border-primary/40 hover:border-primary/60":isFav?"border-yellow-500/30 hover:border-yellow-500/50":"hover:border-primary/30"}`}>
                       <div className="flex items-start justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
@@ -794,6 +796,8 @@ export default function LiveJobsPage() {
                         </div>
                       )}
                     </div>
+                    {index === 5 && <LeadResultsAd />}
+                    </Fragment>
                   );
                 })}
               </div>

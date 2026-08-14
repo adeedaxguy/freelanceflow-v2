@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { Fragment, useState, useCallback, useMemo, useEffect, useRef } from "react";
 import {
   Search, Clock, Globe, Mail, Phone, ExternalLink, Bookmark, Sparkles,
   RefreshCw, Filter, X, TrendingUp, AlertCircle, CheckCircle,
@@ -17,6 +17,7 @@ import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
 import { NICHES } from "@/types";
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { LeadResultsAd } from "@/components/AdSenseUnit";
 
 const HOUR_OPTIONS = [
   { label: "12h", value: 12 },
@@ -836,7 +837,7 @@ export default function LeadsPage() {
           {activeTab === "leads" && (
             <>
               <div className="space-y-3">
-                {currentPageLeads.map(lead => {
+                {currentPageLeads.map((lead, index) => {
                   const isSaved    = savedIds.has(lead.id);
                   const isSaving   = savingId === lead.id;
                   const isExpanded = expandedIds.has(lead.id);
@@ -845,7 +846,8 @@ export default function LeadsPage() {
                   const hasApplied = !!appliedByUrl[lead.url];
                   const appliedCount = countsByUrl[lead.url] ?? 0;
                   return (
-                    <div key={lead.id}
+                    <Fragment key={lead.id}>
+                    <div
                       className="dashboard-result-card group border hover:border-primary/35 rounded-xl p-4 sm:p-5 transition-all duration-200">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
@@ -991,6 +993,8 @@ export default function LeadsPage() {
                         </Link>
                       </div>
                     </div>
+                    {index === 5 && <LeadResultsAd />}
+                    </Fragment>
                   );
                 })}
               </div>

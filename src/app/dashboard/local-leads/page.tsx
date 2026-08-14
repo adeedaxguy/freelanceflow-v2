@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { Fragment, useState, useCallback, useEffect, useRef, useMemo } from "react";
 import {
   MapPin, Search, Globe, Phone, PhoneCall, Star, ExternalLink, Bookmark,
   CheckCircle, Sparkles, ChevronDown, ChevronUp, AlertCircle,
@@ -16,6 +16,7 @@ import type { LocalLead } from "@/app/api/local-leads/search/route";
 import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/phone-type";
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { LeadResultsAd } from "@/components/AdSenseUnit";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
@@ -1680,10 +1681,13 @@ export default function LocalLeadsPage() {
             {/* Result cards (paginated) */}
             {!loading && pagedResults.length > 0 && (
               <div className="space-y-4">
-                {pagedResults.map(lead => (
-                  <LeadCard key={lead.id} lead={lead} onSave={handleSave}
+                {pagedResults.map((lead, index) => (
+                  <Fragment key={lead.id}>
+                  <LeadCard lead={lead} onSave={handleSave}
                     isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}
                     searchLocation={location} canUseSoftphone={session?.user?.role === "ADMIN"}/>
+                  {index === 5 && <LeadResultsAd />}
+                  </Fragment>
                 ))}
               </div>
             )}

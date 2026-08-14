@@ -14,6 +14,7 @@ import DashboardStats from "@/components/DashboardStats";
 import CmdKButton from "@/components/CmdKButton";
 import { LeadStatusBadge, EmailStatusBadge } from "@/components/Badge";
 import { formatRelativeTime } from "@/lib/utils";
+import { DashboardBottomAd } from "@/components/AdSenseUnit";
 
 const DIRECT_EMAIL_STATUSES = ["SENT", "DELIVERED", "OPENED", "BOUNCED", "FAILED"];
 const OUTREACH_STATUSES = [...DIRECT_EMAIL_STATUSES, "READY_TO_SEND"];
@@ -379,6 +380,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      <DashboardBottomAd />
     </div>
   );
 }
