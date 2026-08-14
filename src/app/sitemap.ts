@@ -47,6 +47,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
     changeFrequency: "weekly" as const,
     priority: 0.78,
   })),
+  { url: "/tools/lead-calculator", changeFrequency: "monthly", priority: 0.72 },
   { url: "/about",       changeFrequency: "monthly", priority: 0.8  },
   { url: "/contact",     changeFrequency: "monthly", priority: 0.7  },
   ...INDUSTRY_PAGES.map(url => ({

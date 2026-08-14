@@ -337,6 +337,7 @@ async function getRelatedDbPosts(post: DbPost): Promise<BlogPost[]> {
 function mergeRelatedPosts(posts: BlogPost[], limit = 3) {
   const seen = new Set<string>();
   return posts.filter(post => {
+    if (isHiddenBlogSlug(post.slug)) return false;
     if (seen.has(post.slug)) return false;
     seen.add(post.slug);
     return true;
@@ -397,7 +398,7 @@ export default async function BlogPostPage({ params }: Props) {
     };
     const articleHeadings = extractArticleHeadings(dbPost.content);
     const relatedDbPosts = await getRelatedDbPosts(dbPost);
-    const relatedStaticPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
+    const relatedStaticPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 6);
     const relatedPosts = mergeRelatedPosts([...relatedDbPosts, ...relatedStaticPosts], 3);
     let jsonLd: object;
     try { jsonLd = JSON.parse(dbPost.schema ?? "{}") as object; } catch { jsonLd = {}; }
@@ -524,7 +525,7 @@ export default async function BlogPostPage({ params }: Props) {
     conversionFunnel: post.conversionFunnel,
   };
   const articleHeadings = extractArticleHeadings(content);
-  const relatedPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 3);
+  const relatedPosts = mergeRelatedPosts(getRelatedStaticPosts(articleSource, STATIC_POSTS, 6), 3);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
