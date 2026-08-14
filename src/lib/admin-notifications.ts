@@ -17,6 +17,17 @@ interface PlatformEmailConfig {
 }
 
 async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
+  const envApiKey = process.env.RESEND_API_KEY?.trim();
+  const envFromEmail = process.env.RESEND_FROM_EMAIL?.trim();
+
+  if (envApiKey) {
+    return {
+      provider: "resend",
+      apiKey: envApiKey,
+      fromEmail: envFromEmail || "hello@icloseleads.com",
+    };
+  }
+
   const smtpHost = process.env.PLATFORM_SMTP_HOST?.trim();
   const smtpUser = process.env.PLATFORM_SMTP_USER?.trim();
   const smtpPass = process.env.PLATFORM_SMTP_PASS?.trim();
@@ -32,17 +43,6 @@ async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
       secure: process.env.PLATFORM_SMTP_SECURE !== "false",
       user: smtpUser,
       pass: smtpPass,
-    };
-  }
-
-  const envApiKey = process.env.RESEND_API_KEY?.trim();
-  const envFromEmail = process.env.RESEND_FROM_EMAIL?.trim();
-
-  if (envApiKey) {
-    return {
-      provider: "resend",
-      apiKey: envApiKey,
-      fromEmail: envFromEmail || "hello@icloseleads.com",
     };
   }
 

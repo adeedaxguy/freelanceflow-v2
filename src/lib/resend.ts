@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 let resendClient: Resend | null = null;
 
-function getResendClient(): Resend {
+export function getResendClient(): Resend {
   if (!resendClient) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) throw new Error("RESEND_API_KEY is not configured");
@@ -35,7 +35,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
     subject: params.subject,
     html: emailToHtml(params.body),
     text: params.body,
-    reply_to: params.replyTo,
+    replyTo: params.replyTo,
   });
 
   if (error) {
@@ -49,7 +49,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
   return { id: data.id, success: true };
 }
 
-function emailToHtml(text: string): string {
+export function emailToHtml(text: string): string {
   const escaped = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

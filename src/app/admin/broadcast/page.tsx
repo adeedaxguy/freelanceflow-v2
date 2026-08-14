@@ -182,7 +182,7 @@ export default function AdminBroadcastPage() {
           <div>
             <p className="text-sm font-semibold text-foreground">Preview is available; delivery is locked</p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Zoho is signed in, but the hello@icloseleads.com mailbox still needs a plan and SMTP app password. No campaign can be presented as sent until that connection is complete.
+              Verify hello@icloseleads.com in Resend and connect its API key. No campaign can be presented as sent until the sender is verified.
             </p>
           </div>
         </div>

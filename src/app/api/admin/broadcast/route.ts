@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   const sender = await getPlatformEmailStatus();
   if (!sender.configured) {
     return NextResponse.json({
-      error: "Email delivery is not configured. Finish the Zoho mailbox and add its SMTP credentials before sending.",
+      error: "Email delivery is not configured. Verify hello@icloseleads.com in Resend and add its API credentials before sending.",
     }, { status: 503 });
   }
 

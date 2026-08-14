@@ -159,6 +159,26 @@ model SentEmail {
   @@index([sentAt])
 }
 
+model AdminMailboxMessage {
+  id         String    @id @default(cuid())
+  externalId String?   @unique
+  messageId  String?
+  direction  String
+  fromEmail  String
+  toEmail    String
+  subject    String
+  body       String
+  status     String    @default("RECEIVED")
+  readAt     DateTime?
+  replyToId  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([direction, createdAt])
+  @@index([status])
+  @@index([readAt])
+}
+
 model Campaign {
   id         String   @id @default(cuid())
   userId     String

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, Settings, BarChart2, Shield, LogOut, Zap,
   MessageSquare, DollarSign, Megaphone, UserCheck, FileText, BookOpen,
-  Mail, ChevronRight, Menu, X, MessageCircle,
+  Inbox, Mail, ChevronRight, Menu, X, MessageCircle,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import ThemeToggle from "./ThemeToggle";
@@ -36,6 +36,7 @@ const NAV_GROUPS = [
   {
     label: "Communication",
     items: [
+      { label: "Mailbox",          href: "/admin/inbox",     icon: Inbox         },
       { label: "Support Tickets",  href: "/admin/support",   icon: MessageSquare },
       { label: "Broadcast",        href: "/admin/broadcast", icon: Megaphone     },
       { label: "Contact Forms",    href: "/admin/contacts",  icon: Mail          },
