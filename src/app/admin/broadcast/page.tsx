@@ -1,150 +1,351 @@
 "use client";
 
-import { useState } from "react";
-import { Megaphone, Users, CheckCircle, AlertTriangle, Send, RefreshCw } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Eye,
+  MailCheck,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
-const SEGMENTS = [
-  { key: "all",    label: "All Users",    desc: "Every registered user on the platform" },
-  { key: "free",   label: "Free Users",   desc: "Users on the free plan only" },
-  { key: "pro",    label: "Pro Users",    desc: "Users on the Pro plan" },
-  { key: "agency", label: "Agency Users", desc: "Users on the Agency plan" },
-];
+type Segment = "all" | "free" | "pro" | "agency";
+type Status = {
+  sender: { configured: boolean; provider: "resend" | "smtp" | null; fromEmail: string };
+  counts: Record<Segment, number>;
+  maxBatchSize: number;
+};
+
+const ACTIVATION_TEMPLATE = {
+  label: "Free user activation",
+  subject: "Find your first client lead with iCloseLeads",
+  body: `Hi {name},
+
+Your iCloseLeads workspace is ready. Start with Local Business Leads: choose a business type and location, review the results, and save the opportunities that fit your service.
+
+A good first search:
+• Pick one service you sell
+• Search one city
+• Open the business profile before outreach
+• Save only leads you can genuinely help
+
+Start your search:
+https://icloseleads.com/dashboard/local-leads
+
+Best,
+The iCloseLeads team`,
+};
 
 const TEMPLATES = [
-  { label: "New Feature Announcement", subject: "🚀 New Feature: [Feature Name]", body: "Hi {name},\n\nWe've just launched [Feature Name] to help you [benefit]. Here's what's new:\n\n• [Point 1]\n• [Point 2]\n• [Point 3]\n\nLog in to try it now.\n\nBest,\nThe iCloseLeads Team" },
-  { label: "Upgrade Prompt", subject: "Unlock higher daily lead limits with iCloseLeads Pro", body: "Hi {name},\n\nYou've been using iCloseLeads and we've noticed you're hitting the free tier limits. Upgrade to Pro to unlock:\n\n• Higher daily lead limits\n• Unlimited AI proposals\n• Priority support\n\nUpgrade now → https://icloseleads.com/dashboard/upgrade\n\nBest,\nThe iCloseLeads Team" },
-  { label: "Maintenance Notice", subject: "Scheduled maintenance — [Date]", body: "Hi {name},\n\nWe'll be performing scheduled maintenance on [Date] from [Time] to [Time] UTC. During this window, the platform may be briefly unavailable.\n\nWe apologize for any inconvenience.\n\nBest,\nThe iCloseLeads Team" },
+  ACTIVATION_TEMPLATE,
+  {
+    label: "Product update",
+    subject: "A useful iCloseLeads update for your next search",
+    body: `Hi {name},
+
+We have improved the iCloseLeads workflow so it is easier to move from a lead to a practical next step.
+
+What is new:
+• Clearer local business searches
+• Better owner and decision-maker research paths
+• Faster proposal preparation
+
+Open your workspace and try one focused search today.
+
+Best,
+The iCloseLeads team`,
+  },
+];
+
+const SEGMENTS: Array<{ key: Segment; label: string; description: string }> = [
+  { key: "all", label: "All opted-in users", description: "Every active user who accepted product emails" },
+  { key: "free", label: "Free", description: "Opted-in users on the free plan" },
+  { key: "pro", label: "Pro", description: "Opted-in users on the Pro plan" },
+  { key: "agency", label: "Agency", description: "Opted-in users on the Agency plan" },
 ];
 
 export default function AdminBroadcastPage() {
-  const [segment, setSegment]   = useState("all");
-  const [subject, setSubject]   = useState("");
-  const [message, setMessage]   = useState("");
-  const [sending, setSending]   = useState(false);
-  const [result, setResult]     = useState<{ count: number; segment: string } | null>(null);
-  const [error, setError]       = useState("");
+  const [segment, setSegment] = useState<Segment>("free");
+  const [subject, setSubject] = useState(ACTIVATION_TEMPLATE.subject);
+  const [message, setMessage] = useState(ACTIVATION_TEMPLATE.body);
+  const [status, setStatus] = useState<Status | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [result, setResult] = useState<{ delivered: number; failed: number; skipped: number } | null>(null);
 
-  async function send() {
-    if (!subject.trim() || !message.trim()) { setError("Subject and message are required."); return; }
+  const audienceCount = status?.counts[segment] ?? 0;
+  const previewMessage = useMemo(() => message.replaceAll("{name}", "Alex"), [message]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/admin/broadcast", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json() as Status & { error?: string };
+        if (!response.ok) throw new Error(data.error || "Could not load campaign status.");
+        if (active) setStatus(data);
+      })
+      .catch((requestError: unknown) => {
+        if (active) setError(requestError instanceof Error ? requestError.message : "Could not load campaign status.");
+      })
+      .finally(() => {
+        if (active) setLoadingStatus(false);
+      });
+    return () => { active = false; };
+  }, []);
+
+  function markChanged() {
+    setPreviewId(null);
+    setConfirmed(false);
+    setResult(null);
+  }
+
+  function applyTemplate(template: typeof ACTIVATION_TEMPLATE) {
+    setSubject(template.subject);
+    setMessage(template.body);
+    markChanged();
+  }
+
+  function preview() {
+    if (subject.trim().length < 3 || message.trim().length < 20) {
+      setError("Add a complete subject and message before previewing.");
+      return;
+    }
+    setError("");
+    setConfirmed(false);
+    setPreviewId(crypto.randomUUID());
+  }
+
+  async function sendCampaign() {
+    if (!previewId || !confirmed) return;
     setSending(true);
     setError("");
     setResult(null);
-    const res = await fetch("/api/admin/broadcast", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject, message, segment }),
-    });
-    const d = await res.json() as { recipientCount?: number; segment?: string; error?: string };
-    setSending(false);
-    if (res.ok && d.recipientCount !== undefined) {
-      setResult({ count: d.recipientCount, segment: d.segment ?? segment });
-      setSubject("");
-      setMessage("");
-    } else {
-      setError(d.error ?? "Broadcast failed.");
+    try {
+      const response = await fetch("/api/admin/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: previewId,
+          subject,
+          message,
+          segment,
+          confirm: "SEND_CONSENTED_CAMPAIGN",
+        }),
+      });
+      const data = await response.json() as {
+        delivered?: number;
+        failed?: number;
+        skipped?: number;
+        error?: string;
+      };
+      if (!response.ok) throw new Error(data.error || "Campaign delivery failed.");
+      setResult({ delivered: data.delivered ?? 0, failed: data.failed ?? 0, skipped: data.skipped ?? 0 });
+      setConfirmed(false);
+      setPreviewId(null);
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Campaign delivery failed.");
+    } finally {
+      setSending(false);
     }
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Broadcast Message</h1>
-        <p className="text-muted-foreground mt-1 text-sm">Send announcements, feature updates, or promotions to user segments.</p>
-      </div>
-
-      {result && (
-        <div className="flex items-start gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-2xl">
-          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
+      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary-light">Admin communication</p>
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Email campaigns</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Review the exact email, confirm the consented audience, then send through the configured iCloseLeads mailbox.
+          </p>
+        </div>
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-4 py-3">
+          <span className={`h-2.5 w-2.5 rounded-full ${status?.sender.configured ? "bg-emerald-500" : "bg-amber-400"}`} />
           <div>
-            <p className="text-sm font-medium text-foreground">Broadcast logged successfully</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Ready to send to <strong>{result.count}</strong> {result.segment} users.
-              Connect Resend in Settings to deliver emails.
+            <p className="text-xs font-medium text-foreground">
+              {loadingStatus ? "Checking sender" : status?.sender.configured ? "Sender ready" : "Sender not configured"}
+            </p>
+            <p className="text-xs text-muted-foreground">{status?.sender.fromEmail || "hello@icloseleads.com"}</p>
+          </div>
+        </div>
+      </header>
+
+      {!loadingStatus && !status?.sender.configured && (
+        <div className="flex gap-3 rounded-lg border border-amber-500/35 bg-amber-500/10 p-4">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">Preview is available; delivery is locked</p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              Zoho is signed in, but the hello@icloseleads.com mailbox still needs a plan and SMTP app password. No campaign can be presented as sent until that connection is complete.
             </p>
           </div>
         </div>
       )}
 
-      {/* Segment selector */}
-      <div className="bg-gradient-card border border-border rounded-2xl p-6">
-        <h2 className="text-foreground font-semibold mb-4 flex items-center gap-2">
-          <Users className="w-4 h-4 text-primary-light" /> Target Segment
-        </h2>
-        <div className="grid grid-cols-2 gap-3">
-          {SEGMENTS.map(s => (
-            <button key={s.key} onClick={() => setSegment(s.key)}
-              className={`text-left p-4 rounded-xl border transition-all ${
-                segment === s.key
-                  ? "bg-primary/15 border-primary/50 text-primary-light"
-                  : "bg-background border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
-              }`}>
-              <p className="text-sm font-semibold">{s.label}</p>
-              <p className="text-xs mt-0.5 opacity-70">{s.desc}</p>
-            </button>
-          ))}
+      {result && (
+        <div className="flex gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4">
+          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+          <p className="text-sm text-foreground">
+            Campaign complete: <strong>{result.delivered} delivered</strong>, {result.failed} failed, {result.skipped} held outside this batch.
+          </p>
         </div>
-      </div>
+      )}
 
-      {/* Quick templates */}
-      <div className="bg-gradient-card border border-border rounded-2xl p-6">
-        <h2 className="text-foreground font-semibold mb-4 flex items-center gap-2">
-          <Megaphone className="w-4 h-4 text-accent" /> Quick Templates
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {TEMPLATES.map(t => (
-            <button key={t.label}
-              onClick={() => { setSubject(t.subject); setMessage(t.body); }}
-              className="text-xs px-3 py-1.5 rounded-lg bg-muted border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all">
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Compose */}
-      <div className="bg-gradient-card border border-border rounded-2xl p-6 space-y-4">
-        <h2 className="text-foreground font-semibold flex items-center gap-2">
-          <Send className="w-4 h-4 text-primary-light" /> Compose
-        </h2>
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Subject</label>
-          <input
-            value={subject}
-            onChange={e => setSubject(e.target.value)}
-            placeholder="e.g. 🚀 New Feature: AI Deal Closer"
-            className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-1.5">Message Body</label>
-          <textarea
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            rows={10}
-            placeholder="Write your message here. Use {name} to personalise with the user's name."
-            className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 text-sm resize-none font-mono"
-          />
-          <p className="text-xs text-muted-foreground mt-1">Supports plain text. HTML will be stripped. Use {"{name}"} for personalisation.</p>
-        </div>
-
-        {error && (
-          <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-xl text-sm text-destructive">
-            <AlertTriangle className="w-4 h-4 flex-shrink-0" /> {error}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)]">
+        <section className="space-y-5 rounded-xl border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 font-semibold text-foreground">
+                <MailCheck className="h-4 w-4 text-primary-light" /> Compose
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">Use {"{name}"} for first-name personalization.</p>
+            </div>
+            <div className="flex flex-wrap justify-end gap-2">
+              {TEMPLATES.map((template) => (
+                <button
+                  key={template.label}
+                  type="button"
+                  onClick={() => applyTemplate(template)}
+                  className="rounded-md border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
+                >
+                  {template.label}
+                </button>
+              ))}
+            </div>
           </div>
-        )}
 
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-xs text-muted-foreground">
-            Sending to: <strong className="text-foreground">{SEGMENTS.find(s => s.key === segment)?.label}</strong>
+          <div>
+            <label htmlFor="campaign-subject" className="mb-2 block text-sm font-medium text-foreground">Subject</label>
+            <input
+              id="campaign-subject"
+              value={subject}
+              onChange={(event) => { setSubject(event.target.value); markChanged(); }}
+              className="h-12 w-full rounded-lg border border-border bg-background px-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15"
+            />
           </div>
-          <button onClick={() => void send()} disabled={sending || !subject.trim() || !message.trim()}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-light transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-            {sending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            {sending ? "Sending…" : "Send Broadcast"}
+
+          <div>
+            <label htmlFor="campaign-message" className="mb-2 block text-sm font-medium text-foreground">Message</label>
+            <textarea
+              id="campaign-message"
+              value={message}
+              onChange={(event) => { setMessage(event.target.value); markChanged(); }}
+              rows={14}
+              className="w-full resize-y rounded-lg border border-border bg-background px-4 py-3 font-mono text-sm leading-6 text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15"
+            />
+          </div>
+
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <label className="text-sm font-medium text-foreground">Consented audience</label>
+              <span className="text-sm font-semibold tabular-nums text-foreground">{audienceCount} recipients</span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {SEGMENTS.map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => { setSegment(option.key); markChanged(); }}
+                  className={`rounded-lg border p-3 text-left transition-colors ${
+                    segment === option.key
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-3 text-sm font-medium text-foreground">
+                    {option.label}
+                    <span className="tabular-nums text-muted-foreground">{status?.counts[option.key] ?? 0}</span>
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">{option.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <div role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" /> {error}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={preview}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-light"
+          >
+            <Eye className="h-4 w-4" /> Preview email
           </button>
-        </div>
+        </section>
+
+        <aside className="self-start rounded-xl border border-border bg-card p-5 sm:p-6 lg:sticky lg:top-6">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 font-semibold text-foreground">
+              <Eye className="h-4 w-4 text-primary-light" /> Recipient preview
+            </h2>
+            {previewId && <span className="rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold text-emerald-500">Reviewed</span>}
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-border bg-white text-[#171522] shadow-sm">
+            <div className="border-b border-[#ece9f2] px-6 py-5 text-lg font-bold">
+              iClose<span className="text-[#6842e8]">Leads</span>
+            </div>
+            <div className="px-6 py-6">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-wider text-[#716c80]">Subject</p>
+              <p className="mb-6 font-semibold leading-6">{subject || "Your subject will appear here"}</p>
+              <div className="whitespace-pre-line text-sm leading-6 text-[#29263a]">{previewMessage || "Your message will appear here."}</div>
+              <span className="mt-6 inline-flex rounded-md bg-[#6842e8] px-4 py-2.5 text-sm font-semibold text-white">Open iCloseLeads</span>
+            </div>
+            <div className="border-t border-[#ece9f2] bg-[#f8f7fb] px-6 py-4 text-xs leading-5 text-[#716c80]">
+              Includes an unsubscribe link and email-preference notice for every recipient.
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-lg border border-border bg-background p-4">
+            <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" /> Delivery safeguards
+            </p>
+            <ul className="mt-3 space-y-2 text-xs leading-5 text-muted-foreground">
+              <li>Only active users with marketing consent are included.</li>
+              <li>Each reviewed send has duplicate-delivery protection.</li>
+              <li>The current batch is capped at {status?.maxBatchSize ?? 200} recipients.</li>
+            </ul>
+          </div>
+
+          {previewId && (
+            <div className="mt-5 space-y-4 border-t border-border pt-5">
+              <label className="flex cursor-pointer items-start gap-3 text-sm leading-6 text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={(event) => setConfirmed(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-border accent-primary"
+                />
+                I reviewed this email and confirm delivery to {audienceCount} opted-in {segment === "all" ? "users" : `${segment} users`}.
+              </label>
+              <button
+                type="button"
+                onClick={() => void sendCampaign()}
+                disabled={!confirmed || sending || !status?.sender.configured || audienceCount === 0}
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                {sending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {sending ? "Delivering" : `Send to ${audienceCount} opted-in users`}
+              </button>
+            </div>
+          )}
+
+          {!previewId && (
+            <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
+              <Users className="h-4 w-4" /> Preview again after every edit before delivery is enabled.
+            </div>
+          )}
+        </aside>
       </div>
     </div>
   );

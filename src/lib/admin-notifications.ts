@@ -1,20 +1,46 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
+import { smtpSend } from "@/lib/smtp-client";
 
 export const ADMIN_NOTIFICATION_RECIPIENT = "adnan.toprated@gmail.com";
 const DEFAULT_ADMIN_NOTIFICATION_EMAIL = ADMIN_NOTIFICATION_RECIPIENT;
 
 interface PlatformEmailConfig {
+  provider: "resend" | "smtp";
   apiKey: string;
   fromEmail: string;
+  host?: string;
+  port?: number;
+  secure?: boolean;
+  user?: string;
+  pass?: string;
 }
 
 async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
+  const smtpHost = process.env.PLATFORM_SMTP_HOST?.trim();
+  const smtpUser = process.env.PLATFORM_SMTP_USER?.trim();
+  const smtpPass = process.env.PLATFORM_SMTP_PASS?.trim();
+  const smtpFromEmail = process.env.PLATFORM_SMTP_FROM_EMAIL?.trim();
+  if (smtpHost && smtpUser && smtpPass && smtpFromEmail) {
+    const port = Number(process.env.PLATFORM_SMTP_PORT || 465);
+    return {
+      provider: "smtp",
+      apiKey: "",
+      fromEmail: smtpFromEmail,
+      host: smtpHost,
+      port: Number.isFinite(port) ? port : 465,
+      secure: process.env.PLATFORM_SMTP_SECURE !== "false",
+      user: smtpUser,
+      pass: smtpPass,
+    };
+  }
+
   const envApiKey = process.env.RESEND_API_KEY?.trim();
   const envFromEmail = process.env.RESEND_FROM_EMAIL?.trim();
 
   if (envApiKey) {
     return {
+      provider: "resend",
       apiKey: envApiKey,
       fromEmail: envFromEmail || "hello@icloseleads.com",
     };
@@ -29,6 +55,7 @@ async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
     if (!settings.resend_api_key) return null;
 
     return {
+      provider: "resend",
       apiKey: settings.resend_api_key,
       fromEmail: settings.resend_from_email || "hello@icloseleads.com",
     };
@@ -36,6 +63,51 @@ async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
     console.error("[admin-notification] Failed to read email settings", error);
     return null;
   }
+}
+
+export async function getPlatformEmailStatus() {
+  const config = await getPlatformEmailConfig();
+  return {
+    configured: Boolean(config),
+    provider: config?.provider ?? null,
+    fromEmail: config?.fromEmail ?? "hello@icloseleads.com",
+  };
+}
+
+export async function sendPlatformEmail(params: {
+  recipient: string;
+  subject: string;
+  html: string;
+  text: string;
+  fromName?: string;
+}) {
+  const config = await getPlatformEmailConfig();
+  if (!config) return { success: false as const, skipped: true as const };
+
+  const fromName = params.fromName || "iCloseLeads";
+  if (config.provider === "smtp") {
+    await smtpSend({
+      host: config.host!,
+      port: config.port!,
+      secure: config.secure!,
+      user: config.user!,
+      pass: config.pass!,
+      fromEmail: config.fromEmail,
+      fromName,
+    }, params.recipient, params.subject, params.text, params.html);
+    return { success: true as const, provider: "smtp" as const };
+  }
+
+  const client = new Resend(config.apiKey);
+  const { data, error } = await client.emails.send({
+    from: `${fromName} <${config.fromEmail}>`,
+    to: [params.recipient],
+    subject: params.subject,
+    html: params.html,
+    text: params.text,
+  });
+  if (error) throw new Error(error.message);
+  return { success: true as const, provider: "resend" as const, id: data?.id };
 }
 
 function escapeHtml(value: string): string {
@@ -69,21 +141,13 @@ export async function sendAccountNotification(params: {
   title: string;
   lines: string[];
 }) {
-  const config = await getPlatformEmailConfig();
-  if (!config) return { success: false, skipped: true };
-
-  const client = new Resend(config.apiKey);
   const text = params.lines.map((line) => line.replace(/<[^>]+>/g, "")).join("\n");
-  const { data, error } = await client.emails.send({
-    from: `iCloseLeads <${config.fromEmail}>`,
-    to: [params.recipient],
+  return sendPlatformEmail({
+    recipient: params.recipient,
     subject: params.subject,
     html: notificationHtml(params.title, params.lines, "iCloseLeads Account Update"),
     text,
   });
-
-  if (error) throw new Error(error.message);
-  return { success: true, id: data?.id };
 }
 
 export async function sendAdminNotification(params: {
@@ -92,26 +156,16 @@ export async function sendAdminNotification(params: {
   lines: string[];
   recipient?: string;
 }) {
-  const config = await getPlatformEmailConfig();
-  if (!config) {
-    console.warn("[admin-notification] Resend is not configured; skipped:", params.subject);
-    return { success: false, skipped: true };
-  }
-
   const recipient = params.recipient || process.env.ADMIN_NOTIFICATION_EMAIL || DEFAULT_ADMIN_NOTIFICATION_EMAIL;
-  const client = new Resend(config.apiKey);
   const text = params.lines.map((line) => line.replace(/<[^>]+>/g, "")).join("\n");
-
-  const { data, error } = await client.emails.send({
-    from: `iCloseLeads <${config.fromEmail}>`,
-    to: [recipient],
+  const result = await sendPlatformEmail({
+    recipient,
     subject: params.subject,
     html: notificationHtml(params.title, params.lines),
     text,
   });
-
-  if (error) throw new Error(error.message);
-  return { success: true, id: data?.id };
+  if (!result.success) console.warn("[admin-notification] Email provider is not configured; skipped:", params.subject);
+  return result;
 }
 
 export async function notifyNewUserSignup(user: {
