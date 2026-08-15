@@ -12,6 +12,7 @@ import {
 import EmailChart from "@/components/charts/EmailChart";
 import DashboardStats from "@/components/DashboardStats";
 import CmdKButton from "@/components/CmdKButton";
+import MarketingEmailOptIn from "@/components/MarketingEmailOptIn";
 import { LeadStatusBadge, EmailStatusBadge } from "@/components/Badge";
 import { formatRelativeTime } from "@/lib/utils";
 import { DashboardBottomAd } from "@/components/AdSenseUnit";
@@ -164,6 +165,7 @@ export default async function DashboardPage() {
 
   let data: DashboardData;
   let dashboardDataError = false;
+  let marketingConsent = true;
 
   try {
     data = await getDashboardData(session.user.id);
@@ -171,6 +173,16 @@ export default async function DashboardPage() {
     dashboardDataError = true;
     data = getEmptyDashboardData();
     console.error("[dashboard] Failed to load overview data", error);
+  }
+
+  try {
+    const preferences = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { marketingConsent: true },
+    });
+    marketingConsent = preferences?.marketingConsent ?? true;
+  } catch (error) {
+    console.error("[dashboard] Failed to load email preferences", error);
   }
 
   const firstName = session.user.name?.split(" ")[0] ?? "there";
@@ -222,6 +234,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {!marketingConsent && <MarketingEmailOptIn />}
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)] gap-4">
         <DashboardStats stats={{

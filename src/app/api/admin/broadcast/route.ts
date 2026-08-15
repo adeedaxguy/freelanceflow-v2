@@ -41,15 +41,24 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Admin access required." }, { status: 403 });
 
-  const [sender, all, free, pro, agency] = await Promise.all([
+  const [sender, all, free, pro, agency, totalAll, totalFree, totalPro, totalAgency] = await Promise.all([
     getPlatformEmailStatus(),
     prisma.user.count({ where: recipientWhere("all") }),
     prisma.user.count({ where: recipientWhere("free") }),
     prisma.user.count({ where: recipientWhere("pro") }),
     prisma.user.count({ where: recipientWhere("agency") }),
+    prisma.user.count({ where: { suspended: false } }),
+    prisma.user.count({ where: { suspended: false, plan: "free" } }),
+    prisma.user.count({ where: { suspended: false, plan: "pro" } }),
+    prisma.user.count({ where: { suspended: false, plan: "agency" } }),
   ]);
 
-  return NextResponse.json({ sender, counts: { all, free, pro, agency }, maxBatchSize: MAX_BATCH_SIZE });
+  return NextResponse.json({
+    sender,
+    counts: { all, free, pro, agency },
+    totals: { all: totalAll, free: totalFree, pro: totalPro, agency: totalAgency },
+    maxBatchSize: MAX_BATCH_SIZE,
+  });
 }
 
 export async function POST(req: NextRequest) {

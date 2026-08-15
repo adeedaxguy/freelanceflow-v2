@@ -17,6 +17,7 @@ type Segment = "all" | "free" | "pro" | "agency";
 type Status = {
   sender: { configured: boolean; provider: "resend" | "smtp" | null; fromEmail: string };
   counts: Record<Segment, number>;
+  totals: Record<Segment, number>;
   maxBatchSize: number;
 };
 
@@ -84,7 +85,7 @@ const SEGMENTS: Array<{ key: Segment; label: string; description: string }> = [
 ];
 
 export default function AdminBroadcastPage() {
-  const [segment, setSegment] = useState<Segment>("free");
+  const [segment, setSegment] = useState<Segment>("all");
   const [subject, setSubject] = useState(PRODUCT_UPDATE_TEMPLATE.subject);
   const [message, setMessage] = useState(PRODUCT_UPDATE_TEMPLATE.body);
   const [status, setStatus] = useState<Status | null>(null);
@@ -96,6 +97,8 @@ export default function AdminBroadcastPage() {
   const [result, setResult] = useState<{ delivered: number; failed: number; skipped: number } | null>(null);
 
   const audienceCount = status?.counts[segment] ?? 0;
+  const totalAudienceCount = status?.totals[segment] ?? 0;
+  const excludedCount = Math.max(0, totalAudienceCount - audienceCount);
   const previewMessage = useMemo(() => message.replaceAll("{name}", "Alex"), [message]);
   const previewBlocks = useMemo(() => previewMessage.trim().split(/\n\s*\n/), [previewMessage]);
 
@@ -260,8 +263,10 @@ export default function AdminBroadcastPage() {
 
           <div>
             <div className="mb-3 flex items-center justify-between">
-              <label className="text-sm font-medium text-foreground">Consented audience</label>
-              <span className="text-sm font-semibold tabular-nums text-foreground">{audienceCount} recipients</span>
+              <label className="text-sm font-medium text-foreground">Email audience</label>
+              <span className="text-sm font-semibold tabular-nums text-foreground">
+                {audienceCount} eligible of {totalAudienceCount} active
+              </span>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
               {SEGMENTS.map((option) => (
@@ -277,12 +282,19 @@ export default function AdminBroadcastPage() {
                 >
                   <span className="flex items-center justify-between gap-3 text-sm font-medium text-foreground">
                     {option.label}
-                    <span className="tabular-nums text-muted-foreground">{status?.counts[option.key] ?? 0}</span>
+                    <span className="tabular-nums text-muted-foreground">
+                      {status?.counts[option.key] ?? 0} / {status?.totals[option.key] ?? 0}
+                    </span>
                   </span>
                   <span className="mt-1 block text-xs leading-5 text-muted-foreground">{option.description}</span>
                 </button>
               ))}
             </div>
+            {!loadingStatus && excludedCount > 0 && (
+              <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                {excludedCount} active {segment === "all" ? "accounts are" : `${segment} accounts are`} excluded because product emails are disabled. They become eligible immediately after opting in from their dashboard or Settings.
+              </p>
+            )}
           </div>
 
           {error && (
