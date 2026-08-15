@@ -18,6 +18,8 @@ const requestSchema = z.object({
   batchSize: z.number().int().min(1).max(FREE_ALLOWANCE_NOTICE_BATCH_SIZE).default(FREE_ALLOWANCE_NOTICE_BATCH_SIZE),
 });
 
+const wait = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || session.user.role !== "ADMIN") return null;
@@ -103,6 +105,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      if (delivered + failures.length > 0) await wait(650);
       const result = await sendAccountNotification({ recipient: user.email, ...notice });
       if (!result.success) throw new Error("Email delivery became unavailable.");
 

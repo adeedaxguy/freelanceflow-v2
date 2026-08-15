@@ -24,6 +24,7 @@ export default function AccountNoticesPage() {
   const [result, setResult] = useState<SendResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [batchSize, setBatchSize] = useState(20);
   const [error, setError] = useState("");
 
   const loadStatus = useCallback(async () => {
@@ -54,7 +55,7 @@ export default function AccountNoticesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           confirm: "SEND_FREE_ALLOWANCE_UPDATE",
-          batchSize: Math.min(status.batchSize, status.remaining),
+          batchSize: Math.min(batchSize, status.batchSize, status.remaining),
         }),
       });
       const data = await response.json();
@@ -120,6 +121,17 @@ export default function AccountNoticesPage() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3 border-t border-border pt-5">
+          <label className="flex min-h-11 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
+            Batch size
+            <input
+              type="number"
+              min={1}
+              max={Math.min(status?.batchSize ?? 20, status?.remaining ?? 20)}
+              value={batchSize}
+              onChange={(event) => setBatchSize(Math.max(1, Math.min(20, Number(event.target.value) || 1)))}
+              className="w-14 bg-transparent text-right font-semibold text-foreground outline-none"
+            />
+          </label>
           <button
             type="button"
             onClick={() => void sendNextBatch()}
@@ -127,7 +139,7 @@ export default function AccountNoticesPage() {
             className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
           >
             {sending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            {sending ? "Sending..." : `Send next ${Math.min(status?.batchSize ?? 20, status?.remaining ?? 20)}`}
+            {sending ? "Sending..." : `Send next ${Math.min(batchSize, status?.batchSize ?? 20, status?.remaining ?? 20)}`}
           </button>
           <button type="button" onClick={() => void loadStatus()} disabled={loading || sending} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground disabled:opacity-50">
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh counts
