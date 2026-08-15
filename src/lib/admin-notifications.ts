@@ -80,6 +80,7 @@ export async function sendPlatformEmail(params: {
   html: string;
   text: string;
   fromName?: string;
+  headers?: Record<string, string>;
 }) {
   const config = await getPlatformEmailConfig();
   if (!config) return { success: false as const, skipped: true as const };
@@ -105,6 +106,7 @@ export async function sendPlatformEmail(params: {
     subject: params.subject,
     html: params.html,
     text: params.text,
+    headers: params.headers,
   });
   if (error) throw new Error(error.message);
   return { success: true as const, provider: "resend" as const, id: data?.id };

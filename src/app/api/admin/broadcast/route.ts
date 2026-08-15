@@ -101,6 +101,10 @@ export async function POST(req: NextRequest) {
         subject: subject.replaceAll("{name}", user.name?.trim().split(/\s+/)[0] || "there"),
         html: rendered.html,
         text: rendered.text,
+        headers: {
+          "List-Unsubscribe": `<${rendered.unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
       });
       if (!delivery.success) throw new Error("Email delivery became unavailable.");
       delivered.push(user.id);

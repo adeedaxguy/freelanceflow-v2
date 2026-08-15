@@ -29,6 +29,21 @@ describe("marketing email", () => {
     expect(rendered.html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
     expect(rendered.html).not.toContain("<script>alert(1)</script>");
     expect(rendered.html).toContain("Unsubscribe");
+    expect(rendered.html).toContain("Run a focused lead search");
     expect(rendered.text).toContain("dashboard/local-leads");
+  });
+
+  it("renders numbered steps and first-party guide links", () => {
+    const rendered = renderMarketingEmail({
+      userId: "user-1",
+      name: "Alex Rivera",
+      email: "alex@example.com",
+      subject: "A useful update",
+      message: "1. Search one city\n2. Save three leads\n\nhttps://icloseleads.com/blog/600-free-leads-per-week-for-freelancers",
+    });
+
+    expect(rendered.html).toContain("<ol");
+    expect(rendered.html).toContain("Read the 600-lead weekly playbook");
+    expect(rendered.html).toContain("https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers");
   });
 });

@@ -24,3 +24,17 @@ export async function GET(req: NextRequest) {
   await prisma.user.update({ where: { id: user.id }, data: { marketingConsent: false } });
   return page("You are unsubscribed", "You will no longer receive optional iCloseLeads product and marketing emails. Account and security messages may still be sent when required.");
 }
+
+export async function POST(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token") || "";
+  const userId = token.slice(0, token.lastIndexOf("."));
+  if (!userId) return new NextResponse(null, { status: 400 });
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, email: true } });
+  if (!user || verifyUnsubscribeToken(token, user.email) !== user.id) {
+    return new NextResponse(null, { status: 400 });
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: { marketingConsent: false } });
+  return new NextResponse(null, { status: 200 });
+}

@@ -39,25 +39,41 @@ Best,
 The iCloseLeads team`,
 };
 
-const TEMPLATES = [
-  ACTIVATION_TEMPLATE,
-  {
-    label: "Product update",
-    subject: "A useful iCloseLeads update for your next search",
-    body: `Hi {name},
+const PRODUCT_UPDATE_TEMPLATE = {
+  label: "Product update",
+  subject: "600 free leads a week, plus a sharper way to use them",
+  body: `Hi {name},
 
-We have improved the iCloseLeads workflow so it is easier to move from a lead to a practical next step.
+A quick product update from iCloseLeads.
 
-What is new:
-• Clearer local business searches
-• Better owner and decision-maker research paths
-• Faster proposal preparation
+Free accounts now include 600 leads every week. That gives you enough room to test a niche properly, compare the results, and focus on the businesses or jobs that genuinely fit your service.
 
-Open your workspace and try one focused search today.
+What changed:
+
+• Local Business Leads is now the best place to start: search one niche and city, then filter by website and phone signals.
+• Find Owner opens the decision-maker workflow so you can verify a likely owner or manager path before outreach.
+• Remote Jobs and Live Jobs now widen the time window when a fresh search returns too few strong matches, and clearly show what was added.
+• Save the best leads, prepare a contextual proposal, and keep follow-up in the same workspace.
+
+A focused 10-minute workflow:
+
+1. Search one service in one city.
+2. Save three businesses you can genuinely help.
+3. Open one owner path.
+4. Draft one specific pitch.
+
+Read the 600-lead weekly playbook:
+
+https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers
 
 Best,
-The iCloseLeads team`,
-  },
+Adnan
+iCloseLeads`,
+};
+
+const TEMPLATES = [
+  PRODUCT_UPDATE_TEMPLATE,
+  ACTIVATION_TEMPLATE,
 ];
 
 const SEGMENTS: Array<{ key: Segment; label: string; description: string }> = [
@@ -69,8 +85,8 @@ const SEGMENTS: Array<{ key: Segment; label: string; description: string }> = [
 
 export default function AdminBroadcastPage() {
   const [segment, setSegment] = useState<Segment>("free");
-  const [subject, setSubject] = useState(ACTIVATION_TEMPLATE.subject);
-  const [message, setMessage] = useState(ACTIVATION_TEMPLATE.body);
+  const [subject, setSubject] = useState(PRODUCT_UPDATE_TEMPLATE.subject);
+  const [message, setMessage] = useState(PRODUCT_UPDATE_TEMPLATE.body);
   const [status, setStatus] = useState<Status | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -81,6 +97,7 @@ export default function AdminBroadcastPage() {
 
   const audienceCount = status?.counts[segment] ?? 0;
   const previewMessage = useMemo(() => message.replaceAll("{name}", "Alex"), [message]);
+  const previewBlocks = useMemo(() => previewMessage.trim().split(/\n\s*\n/), [previewMessage]);
 
   useEffect(() => {
     let active = true;
@@ -298,8 +315,22 @@ export default function AdminBroadcastPage() {
             <div className="px-6 py-6">
               <p className="mb-5 text-xs font-semibold uppercase tracking-wider text-[#716c80]">Subject</p>
               <p className="mb-6 font-semibold leading-6">{subject || "Your subject will appear here"}</p>
-              <div className="whitespace-pre-line text-sm leading-6 text-[#29263a]">{previewMessage || "Your message will appear here."}</div>
-              <span className="mt-6 inline-flex rounded-md bg-[#6842e8] px-4 py-2.5 text-sm font-semibold text-white">Open iCloseLeads</span>
+              <div className="space-y-4 text-sm leading-6 text-[#30313a]">
+                {previewBlocks.map((block, index) => {
+                  const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+                  if (lines.length > 0 && lines.every((line) => /^[•*-]\s+/.test(line))) {
+                    return <ul key={index} className="list-disc space-y-1 pl-5">{lines.map((line) => <li key={line}>{line.replace(/^[•*-]\s+/, "")}</li>)}</ul>;
+                  }
+                  if (lines.length > 0 && lines.every((line) => /^\d+\.\s+/.test(line))) {
+                    return <ol key={index} className="list-decimal space-y-1 pl-5">{lines.map((line) => <li key={line}>{line.replace(/^\d+\.\s+/, "")}</li>)}</ol>;
+                  }
+                  if (lines.length === 1 && lines[0] && /^https:\/\/icloseleads\.com\//.test(lines[0])) {
+                    return <p key={index} className="font-semibold text-[#5235b8] underline underline-offset-4">Read the 600-lead weekly playbook &rarr;</p>;
+                  }
+                  return <p key={index} className="whitespace-pre-line">{lines.join("\n")}</p>;
+                })}
+              </div>
+              <span className="mt-6 inline-flex rounded-md bg-[#17181d] px-4 py-2.5 text-sm font-semibold text-white">Run a focused lead search</span>
             </div>
             <div className="border-t border-[#ece9f2] bg-[#f8f7fb] px-6 py-4 text-xs leading-5 text-[#716c80]">
               Includes an unsubscribe link and email-preference notice for every recipient.
