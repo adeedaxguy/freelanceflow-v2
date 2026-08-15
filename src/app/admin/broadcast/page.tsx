@@ -67,8 +67,7 @@ Read the 600-lead weekly playbook:
 https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers
 
 Best,
-Adnan
-iCloseLeads`,
+The iCloseLeads team`,
 };
 
 const TEMPLATES = [
