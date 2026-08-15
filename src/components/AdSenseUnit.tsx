@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 declare global {
   interface Window {
@@ -46,7 +47,7 @@ function AdSenseUnit({
       <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         Advertisement
       </p>
-      <div className="min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card p-3">
+      <div className="min-h-[128px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card p-3">
         <ins
           ref={adRef}
           className="adsbygoogle"
@@ -60,6 +61,61 @@ function AdSenseUnit({
       </div>
     </aside>
   );
+}
+
+export function MarketingAdBand({ className = "" }: { className?: string }) {
+  return (
+    <section className={`border-y border-border bg-surface/25 px-4 py-10 sm:px-6 lg:px-8 ${className}`}>
+      <div className="mx-auto max-w-6xl">
+        <AdSenseUnit slot="1080749546" format="auto" fullWidthResponsive />
+      </div>
+    </section>
+  );
+}
+
+export function BlogInlineAd({ className = "" }: { className?: string }) {
+  return (
+    <AdSenseUnit
+      slot="1080749546"
+      format="auto"
+      fullWidthResponsive
+      className={`my-10 ${className}`}
+    />
+  );
+}
+
+const PUBLIC_AD_PATHS = new Set([
+  "/about",
+  "/affiliate",
+  "/blog",
+  "/careers",
+  "/changelog",
+  "/features",
+  "/lead-generation",
+  "/press",
+  "/pricing",
+  "/resources",
+  "/use-cases",
+]);
+
+const PUBLIC_AD_PREFIXES = [
+  "/features/",
+  "/for/",
+  "/lead-generation/",
+  "/resources/",
+  "/tools/",
+  "/use-cases/",
+];
+
+export function PublicFooterAd() {
+  const pathname = usePathname();
+  const isBlogPost = pathname.startsWith("/blog/");
+  const isEligible = PUBLIC_AD_PATHS.has(pathname)
+    || PUBLIC_AD_PREFIXES.some(prefix => pathname.startsWith(prefix));
+
+  if (!isEligible || isBlogPost) return null;
+
+  return <MarketingAdBand className="border-b-0" />;
 }
 
 export function LeadResultsAd() {

@@ -29,6 +29,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import TestimonialCard from "@/components/TestimonialCard";
+import { MarketingAdBand } from "@/components/AdSenseUnit";
 import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
 import { useAuthStatus } from "@/lib/use-auth-status";
 
@@ -499,6 +500,8 @@ export default function HomepageClient() {
         </section>
 
         <LeadEngineSection isAuthenticated={isAuthenticated} />
+
+        <MarketingAdBand />
 
         <section className="marketing-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

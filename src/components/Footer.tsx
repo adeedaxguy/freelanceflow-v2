@@ -14,6 +14,7 @@ import {
   Youtube,
 } from "lucide-react";
 import Logo from "./Logo";
+import { PublicFooterAd } from "./AdSenseUnit";
 
 const primaryLinks = [
   { label: "Local Business Leads", href: "/lead-generation/local-business-leads" },
@@ -116,7 +117,9 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-background/95" aria-label="Site footer">
+    <>
+      <PublicFooterAd />
+      <footer className="border-t border-border bg-background/95" aria-label="Site footer">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <div className="site-footer-panel overflow-hidden border border-border bg-surface/90">
           <div className="grid gap-0 lg:grid-cols-[0.92fr_1.58fr]">
@@ -274,6 +277,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }

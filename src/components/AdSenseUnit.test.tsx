@@ -1,5 +1,10 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { DashboardBottomAd, LeadResultsAd } from "./AdSenseUnit";
+import {
+  BlogInlineAd,
+  DashboardBottomAd,
+  LeadResultsAd,
+  MarketingAdBand,
+} from "./AdSenseUnit";
 
 function mockViewport(isMobile: boolean) {
   Object.defineProperty(window, "matchMedia", {
@@ -34,6 +39,26 @@ it("uses the mobile in-feed unit after mobile hydration", async () => {
 
 it("uses the responsive dashboard unit", async () => {
   render(<DashboardBottomAd />);
+
+  const ad = screen.getByLabelText("Advertisement").querySelector("ins");
+  expect(ad).toHaveAttribute("data-ad-slot", "1080749546");
+  expect(ad).toHaveAttribute("data-ad-format", "auto");
+  expect(ad).toHaveAttribute("data-full-width-responsive", "true");
+  await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
+});
+
+it("uses the responsive unit on public marketing pages", async () => {
+  render(<MarketingAdBand />);
+
+  const ad = screen.getByLabelText("Advertisement").querySelector("ins");
+  expect(ad).toHaveAttribute("data-ad-slot", "1080749546");
+  expect(ad).toHaveAttribute("data-ad-format", "auto");
+  expect(ad).toHaveAttribute("data-full-width-responsive", "true");
+  await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
+});
+
+it("uses the responsive unit inside blog articles", async () => {
+  render(<BlogInlineAd />);
 
   const ad = screen.getByLabelText("Advertisement").querySelector("ins");
   expect(ad).toHaveAttribute("data-ad-slot", "1080749546");

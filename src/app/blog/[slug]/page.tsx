@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
 import BlogComments from "@/components/BlogComments";
+import { BlogInlineAd } from "@/components/AdSenseUnit";
 import {
   BlogArticleRoadmap,
   BlogArticleVisuals,
@@ -295,7 +296,19 @@ function renderMarkdown(content: string): ReactNode {
     }
     i++;
   }
-  return <>{nodes}</>;
+  const readableIndexes = nodes.flatMap((node, index) => {
+    if (!React.isValidElement(node)) return [];
+    return ["p", "ul", "ol"].includes(String(node.type)) ? [index] : [];
+  });
+  const midpoint = readableIndexes[Math.floor(readableIndexes.length / 2)]
+    ?? Math.floor(nodes.length / 2);
+  const articleNodes = nodes.flatMap((node, index) => (
+    index === midpoint
+      ? [node, <BlogInlineAd key="article-midpoint-ad" />]
+      : [node]
+  ));
+
+  return <>{articleNodes}</>;
 }
 
 function dbPostToBlogPost(post: DbPost): BlogPost {
@@ -469,6 +482,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
             <BlogLeadSearchFunnel post={articleSource} />
+            <BlogInlineAd />
 
             {/* Body */}
             <div className="prose-content">
@@ -478,6 +492,7 @@ export default async function BlogPostPage({ params }: Props) {
             <BlogArticleVisuals post={articleSource} />
             <BlogConversionPanel post={articleSource} />
             <BlogTrustedReferences post={articleSource} />
+            <BlogInlineAd />
 
             {/* Author card */}
             <div className="mt-14 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
@@ -578,6 +593,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           <BlogArticleRoadmap post={articleSource} headings={articleHeadings} />
           <BlogLeadSearchFunnel post={articleSource} />
+          <BlogInlineAd />
 
           <div className="prose-content">
             {renderMarkdown(content)}
@@ -586,6 +602,7 @@ export default async function BlogPostPage({ params }: Props) {
           <BlogArticleVisuals post={articleSource} />
           <BlogConversionPanel post={articleSource} />
           <BlogTrustedReferences post={articleSource} />
+          <BlogInlineAd />
 
           <div className="mt-14 p-6 bg-gradient-card border border-border rounded-2xl flex items-start gap-4">
             <div className="w-12 h-12 rounded-full bg-gradient-hero flex items-center justify-center text-white font-bold flex-shrink-0">FF</div>
