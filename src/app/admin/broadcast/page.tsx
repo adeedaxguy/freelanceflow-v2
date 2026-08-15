@@ -369,7 +369,7 @@ export default function AdminBroadcastPage() {
             </p>
             <ul className="mt-3 space-y-2 text-xs leading-5 text-muted-foreground">
               <li>Only active users with marketing consent are included.</li>
-              <li>Each reviewed send has duplicate-delivery protection.</li>
+              <li>Identical campaign content cannot be sent twice within 24 hours.</li>
               <li>The current batch is capped at {status?.maxBatchSize ?? 200} recipients.</li>
             </ul>
           </div>

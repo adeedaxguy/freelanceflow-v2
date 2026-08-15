@@ -4,6 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import {
+  CAMPAIGN_DUPLICATE_WINDOW_MS,
+  campaignContentHash,
+  hasRecentMatchingCampaign,
+} from "@/lib/campaign-delivery";
 import { getPlatformEmailStatus, sendPlatformEmail } from "@/lib/admin-notifications";
 import { renderMarketingEmail } from "@/lib/marketing-email";
 import { prisma } from "@/lib/prisma";
@@ -65,16 +70,34 @@ export async function POST(req: NextRequest) {
 
   const { campaignId, subject, message, segment } = parsed.data;
   const deliveryKey = `marketing_broadcast_${campaignId}`;
+  const contentHash = campaignContentHash(subject, message);
+  const contentLockKey = `marketing_broadcast_content_${new Date().toISOString().slice(0, 10)}_${contentHash}`;
   const startedAt = new Date().toISOString();
+
+  const recentCampaigns = await prisma.platformSetting.findMany({
+    where: {
+      key: { startsWith: "marketing_broadcast_" },
+      updatedAt: { gte: new Date(Date.now() - CAMPAIGN_DUPLICATE_WINDOW_MS) },
+    },
+    select: { value: true, updatedAt: true },
+    orderBy: { updatedAt: "desc" },
+    take: 250,
+  });
+
+  if (hasRecentMatchingCampaign(recentCampaigns, subject, message)) {
+    return NextResponse.json({
+      error: "This campaign was already sent within the last 24 hours. Duplicate delivery was blocked.",
+    }, { status: 409 });
+  }
+
   try {
-    await prisma.platformSetting.create({
-      data: {
-        key: deliveryKey,
-        value: JSON.stringify({ status: "sending", subject, segment, delivered: [], startedAt }),
-      },
-    });
+    const initialState = JSON.stringify({ status: "sending", subject, segment, contentHash, delivered: [], startedAt });
+    await prisma.$transaction([
+      prisma.platformSetting.create({ data: { key: deliveryKey, value: initialState } }),
+      prisma.platformSetting.create({ data: { key: contentLockKey, value: initialState } }),
+    ]);
   } catch {
-    return NextResponse.json({ error: "This reviewed campaign was already started. Create a new preview before sending again." }, { status: 409 });
+    return NextResponse.json({ error: "This campaign was already started. Duplicate delivery was blocked." }, { status: 409 });
   }
 
   const users = await prisma.user.findMany({
@@ -108,10 +131,11 @@ export async function POST(req: NextRequest) {
       });
       if (!delivery.success) throw new Error("Email delivery became unavailable.");
       delivered.push(user.id);
-      await prisma.platformSetting.update({
-        where: { key: deliveryKey },
-        data: { value: JSON.stringify({ status: "sending", subject, segment, delivered, startedAt }) },
-      });
+      const progress = JSON.stringify({ status: "sending", subject, segment, contentHash, delivered, startedAt });
+      await prisma.$transaction([
+        prisma.platformSetting.update({ where: { key: deliveryKey }, data: { value: progress } }),
+        prisma.platformSetting.update({ where: { key: contentLockKey }, data: { value: progress } }),
+      ]);
     } catch (error) {
       failed.push({ email: user.email, error: error instanceof Error ? error.message : "Delivery failed" });
     }
@@ -120,21 +144,21 @@ export async function POST(req: NextRequest) {
   const eligibleCount = await prisma.user.count({ where: recipientWhere(segment) });
   const skipped = Math.max(0, eligibleCount - users.length);
   const completedAt = new Date().toISOString();
-  await prisma.platformSetting.update({
-    where: { key: deliveryKey },
-    data: {
-      value: JSON.stringify({
-        status: "completed",
-        subject,
-        segment,
-        delivered,
-        failed: failed.length,
-        skipped,
-        startedBy: session.user.email,
-        completedAt,
-      }),
-    },
+  const completedState = JSON.stringify({
+    status: "completed",
+    subject,
+    segment,
+    contentHash,
+    delivered,
+    failed: failed.length,
+    skipped,
+    startedBy: session.user.email,
+    completedAt,
   });
+  await prisma.$transaction([
+    prisma.platformSetting.update({ where: { key: deliveryKey }, data: { value: completedState } }),
+    prisma.platformSetting.update({ where: { key: contentLockKey }, data: { value: completedState } }),
+  ]);
 
   try {
     await prisma.$executeRawUnsafe(
