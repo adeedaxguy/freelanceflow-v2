@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -307,13 +308,36 @@ export default function AdminBroadcastPage() {
             {previewId && <span className="rounded-full bg-emerald-500/12 px-2.5 py-1 text-xs font-semibold text-emerald-500">Reviewed</span>}
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border bg-white text-[#171522] shadow-sm">
-            <div className="border-b border-[#ece9f2] px-6 py-5 text-lg font-bold">
-              iClose<span className="text-[#6842e8]">Leads</span>
+          <div className="overflow-hidden rounded-xl border border-[#dfe3ec] bg-white text-[#17181d] shadow-sm">
+            <div className="grid h-1.5 grid-cols-4" aria-hidden="true">
+              <span className="bg-[#6d4aff]" />
+              <span className="bg-[#2f80ed]" />
+              <span className="bg-[#16bfa5]" />
+              <span className="bg-[#a3e635]" />
+            </div>
+            <div className="bg-[#111329] px-6 py-5">
+              <Image
+                src="/brand/icloseleads-email-logo.png"
+                width={600}
+                height={144}
+                alt="iCloseLeads"
+                className="h-auto w-[170px]"
+              />
+            </div>
+            <div className="border-b border-[#dfd9ff] bg-[#f0edff] px-6 py-6">
+              <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#5b3de1]">Product update</p>
+              <p className="text-xl font-bold leading-7 tracking-tight text-[#17181d]">{subject || "Your subject will appear here"}</p>
+            </div>
+            <div className="px-6 pt-6">
+              <Image
+                src="/brand/client-acquisition-workflow.png"
+                width={1200}
+                height={320}
+                alt="Find, qualify, contact, and follow up in one iCloseLeads workflow"
+                className="h-auto w-full rounded-lg"
+              />
             </div>
             <div className="px-6 py-6">
-              <p className="mb-5 text-xs font-semibold uppercase tracking-wider text-[#716c80]">Subject</p>
-              <p className="mb-6 font-semibold leading-6">{subject || "Your subject will appear here"}</p>
               <div className="space-y-4 text-sm leading-6 text-[#30313a]">
                 {previewBlocks.map((block, index) => {
                   const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
@@ -329,9 +353,12 @@ export default function AdminBroadcastPage() {
                   return <p key={index} className="whitespace-pre-line">{lines.join("\n")}</p>;
                 })}
               </div>
-              <span className="mt-6 inline-flex rounded-md bg-[#17181d] px-4 py-2.5 text-sm font-semibold text-white">Run a focused lead search</span>
+              <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                <span className="inline-flex rounded-lg bg-[#5b3de1] px-4 py-3 text-sm font-semibold text-white">Log in to your workspace</span>
+                <span className="text-sm font-semibold text-[#4930bd] underline underline-offset-4">Find local business leads &rarr;</span>
+              </div>
             </div>
-            <div className="border-t border-[#ece9f2] bg-[#f8f7fb] px-6 py-4 text-xs leading-5 text-[#716c80]">
+            <div className="border-t border-[#e2e5ed] bg-[#f7f8fb] px-6 py-4 text-xs leading-5 text-[#697080]">
               Includes an unsubscribe link and email-preference notice for every recipient.
             </div>
           </div>

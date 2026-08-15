@@ -29,8 +29,12 @@ describe("marketing email", () => {
     expect(rendered.html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
     expect(rendered.html).not.toContain("<script>alert(1)</script>");
     expect(rendered.html).toContain("Unsubscribe");
-    expect(rendered.html).toContain("Run a focused lead search");
+    expect(rendered.html).toContain("Log in to your workspace");
+    expect(rendered.html).toContain("https://icloseleads.com/auth");
+    expect(rendered.html).toContain("icloseleads-email-logo.png");
+    expect(rendered.html).toContain("client-acquisition-workflow.png");
     expect(rendered.text).toContain("dashboard/local-leads");
+    expect(rendered.text).toContain("Log in to your workspace: https://icloseleads.com/auth");
   });
 
   it("renders numbered steps and first-party guide links", () => {
