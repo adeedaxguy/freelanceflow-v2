@@ -8,6 +8,7 @@ type NoticeStatus = {
   batchSize: number;
   eligible: number;
   delivered: number;
+  failed: number;
   remaining: number;
 };
 
@@ -89,10 +90,11 @@ export default function AccountNoticesPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           ["Eligible Free accounts", status?.eligible ?? "-"],
           ["Notice sent", status?.delivered ?? "-"],
+          ["Unreachable", status?.failed ?? "-"],
           ["Remaining", status?.remaining ?? "-"],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-border bg-card p-5">

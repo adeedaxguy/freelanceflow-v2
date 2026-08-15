@@ -26,17 +26,24 @@ async function requireAdmin() {
   return session;
 }
 
-async function deliveredUserIds() {
+async function noticeRecords() {
   const rows = await prisma.platformSetting.findMany({
     where: { key: { startsWith: `account_notice:${FREE_ALLOWANCE_NOTICE_ID}:` } },
-    select: { key: true },
+    select: { key: true, value: true },
   });
-  return rows.map(({ key }) => key.slice(key.lastIndexOf(":") + 1));
+  return rows.map(({ key, value }) => ({
+    userId: key.slice(key.lastIndexOf(":") + 1),
+    status: (() => {
+      try { return JSON.parse(value).status as string; } catch { return "unknown"; }
+    })(),
+  }));
 }
 
 async function noticeStatus() {
-  const deliveredIds = await deliveredUserIds();
-  const [eligible, delivered] = await Promise.all([
+  const records = await noticeRecords();
+  const deliveredIds = records.filter((record) => record.status === "sent").map((record) => record.userId);
+  const failedIds = records.filter((record) => record.status === "failed").map((record) => record.userId);
+  const [eligible, delivered, failed] = await Promise.all([
     prisma.user.count({ where: { plan: "free", suspended: false } }),
     prisma.user.count({
       where: {
@@ -45,8 +52,15 @@ async function noticeStatus() {
         ...(deliveredIds.length ? { id: { in: deliveredIds } } : { id: "__none__" }),
       },
     }),
+    prisma.user.count({
+      where: {
+        plan: "free",
+        suspended: false,
+        ...(failedIds.length ? { id: { in: failedIds } } : { id: "__none__" }),
+      },
+    }),
   ]);
-  return { eligible, delivered, remaining: Math.max(0, eligible - delivered) };
+  return { eligible, delivered, failed, remaining: Math.max(0, eligible - delivered - failed) };
 }
 
 export async function GET() {
@@ -76,16 +90,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Account email delivery is not configured." }, { status: 503 });
   }
 
-  const previouslyDelivered = await deliveredUserIds();
+  const processedIds = (await noticeRecords()).map((record) => record.userId);
   const users = await prisma.user.findMany({
     where: {
       plan: "free",
       suspended: false,
-      ...(previouslyDelivered.length ? { id: { notIn: previouslyDelivered } } : {}),
+      ...(processedIds.length ? { id: { notIn: processedIds } } : {}),
     },
     select: { id: true, email: true },
     orderBy: { createdAt: "asc" },
-    take: parsed.data.batchSize,
+    take: Math.min(parsed.data.batchSize * 3, FREE_ALLOWANCE_NOTICE_BATCH_SIZE * 3),
   });
 
   const notice = freeAllowanceNoticeContent();
@@ -94,6 +108,7 @@ export async function POST(req: NextRequest) {
   const failures: string[] = [];
 
   for (const user of users) {
+    if (delivered >= parsed.data.batchSize) break;
     const key = freeAllowanceNoticeKey(user.id);
     try {
       await prisma.platformSetting.create({
@@ -131,7 +146,10 @@ export async function POST(req: NextRequest) {
       }).catch(() => undefined);
       delivered += 1;
     } catch (error) {
-      await prisma.platformSetting.delete({ where: { key } }).catch(() => undefined);
+      await prisma.platformSetting.update({
+        where: { key },
+        data: { value: JSON.stringify({ status: "failed", failedAt: new Date().toISOString() }) },
+      }).catch(() => undefined);
       failures.push(error instanceof Error ? error.message : "Delivery failed");
     }
   }
