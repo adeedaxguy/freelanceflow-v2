@@ -33,10 +33,7 @@ export default function DeferredClientChrome() {
   const isDashboard = pathname?.startsWith("/dashboard");
   const isAuth = pathname?.startsWith("/auth");
   const isSitePreview = pathname?.startsWith("/site-preview");
-  const launcherOffsetClass = isDashboard ? "bottom-[88px] md:bottom-6" : "bottom-6";
-  const launcherVisibilityClass = isDashboard || showMobileLauncher
-    ? "flex"
-    : "hidden sm:flex";
+  const launcherVisibilityClass = showMobileLauncher ? "flex" : "hidden sm:flex";
 
   useEffect(() => {
     let cleanupIdle = () => {};
@@ -55,12 +52,7 @@ export default function DeferredClientChrome() {
   }, [pathname]);
 
   useEffect(() => {
-    if (isDashboard) {
-      setShowMobileLauncher(true);
-      return undefined;
-    }
-
-    if (isAuth) {
+    if (isDashboard || isAuth) {
       setShowMobileLauncher(false);
       return undefined;
     }
@@ -78,6 +70,10 @@ export default function DeferredClientChrome() {
     return null;
   }
 
+  if (isDashboard) {
+    return showCookieConsent ? <CookieConsent /> : null;
+  }
+
   if (chatRequested) {
     return (
       <>
@@ -92,7 +88,7 @@ export default function DeferredClientChrome() {
       {showCookieConsent && <CookieConsent />}
       <button
         onClick={() => setChatRequested(true)}
-        className={`fixed ${launcherOffsetClass} right-4 sm:right-6 z-50 h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95 ${launcherVisibilityClass}`}
+        className={`fixed bottom-6 right-4 sm:right-6 z-50 h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95 ${launcherVisibilityClass}`}
         aria-label="Open support chat"
       >
         <MessageCircle className="w-6 h-6 text-white" />

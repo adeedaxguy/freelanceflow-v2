@@ -10,6 +10,18 @@ declare global {
 }
 
 const AD_CLIENT = "ca-pub-7576940446912367";
+const ADSENSE_SCRIPT_ID = "google-adsense-script";
+
+function loadAdSense() {
+  if (document.getElementById(ADSENSE_SCRIPT_ID)) return;
+
+  const script = document.createElement("script");
+  script.id = ADSENSE_SCRIPT_ID;
+  script.async = true;
+  script.crossOrigin = "anonymous";
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`;
+  document.head.appendChild(script);
+}
 
 type AdSenseUnitProps = {
   slot: string;
@@ -26,24 +38,45 @@ function AdSenseUnit({
   fullWidthResponsive = false,
   className = "",
 }: AdSenseUnitProps) {
+  const containerRef = useRef<HTMLElement>(null);
   const adRef = useRef<HTMLModElement>(null);
   const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current || adRef.current?.dataset.adsbygoogleStatus) return;
+    const initialize = () => {
+      if (initialized.current || adRef.current?.dataset.adsbygoogleStatus) return;
 
-    initialized.current = true;
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.warn("AdSense unit could not initialize", error);
+      initialized.current = true;
+      loadAdSense();
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("AdSense unit could not initialize", error);
+        }
       }
+    };
+
+    if (!("IntersectionObserver" in window) || !containerRef.current) {
+      initialize();
+      return;
     }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        observer.disconnect();
+        initialize();
+      },
+      { rootMargin: "600px 0px" }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <aside aria-label="Advertisement" className={`min-w-0 ${className}`}>
+    <aside ref={containerRef} aria-label="Advertisement" className={`min-w-0 ${className}`}>
       <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         Advertisement
       </p>

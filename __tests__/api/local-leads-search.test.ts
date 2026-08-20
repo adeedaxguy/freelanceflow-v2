@@ -63,7 +63,7 @@ describe("POST /api/local-leads/search", () => {
     expect(res.status).toBe(429);
     expect(data.limit).toBe(100);
     expect(data.bonusAvailable).toBe(true);
-    expect(data.error).toContain("Daily limit reached");
+    expect(data.error).toContain("Weekly limit reached");
     expect(searchLocalBusinesses).not.toHaveBeenCalled();
     expect(checkAndIncrementLeads).not.toHaveBeenCalled();
   });

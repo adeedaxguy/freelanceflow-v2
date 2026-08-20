@@ -335,7 +335,7 @@ function LeadEngineSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                   </div>
                   <div className="flex gap-2">
                     <span className="inline-flex items-center rounded-md border border-border px-3 py-2 text-xs font-semibold text-muted-foreground">Save</span>
-                    <span className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-white">Draft pitch <Sparkles className="h-3 w-3" /></span>
+                    <span className="inline-flex items-center gap-1 rounded-md bg-blue-700 px-3 py-2 text-xs font-semibold text-white">Draft pitch <Sparkles className="h-3 w-3" /></span>
                   </div>
                 </div>
               ))}
@@ -615,17 +615,17 @@ export default function HomepageClient() {
         </section>
 
         <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="mx-auto grid max-w-7xl overflow-hidden rounded-lg border border-primary/30 bg-primary text-white lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="mx-auto grid max-w-7xl overflow-hidden rounded-lg border border-blue-700 bg-blue-800 text-white lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="p-7 sm:p-10 lg:p-12">
-              <p className="text-xs font-bold uppercase text-white/70">Your next client is already showing a signal</p>
+              <p className="text-xs font-bold uppercase text-blue-100">Your next client is already showing a signal</p>
               <h2 className="marketing-display mt-4 max-w-3xl text-4xl font-bold sm:text-5xl">Stop wondering where the next conversation will come from.</h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-white/75">Run one focused search, save the best opportunity, and write the first pitch from the same workspace.</p>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-blue-100">Run one focused search, save the best opportunity, and write the first pitch from the same workspace.</p>
             </div>
             <div className="border-t border-white/20 p-7 lg:border-l lg:border-t-0 lg:p-12">
-              <Link href={primaryHref} prefetch={false} className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-primary">
+              <Link href={primaryHref} prefetch={false} className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-blue-800">
                 {isAuthenticated ? "Open workspace" : "Start free"} <ArrowRight className="h-4 w-4" />
               </Link>
-              <p className="mt-3 text-xs text-white/65">No card. Cancel nothing.</p>
+              <p className="mt-3 text-xs text-blue-100">No card. Cancel nothing.</p>
             </div>
           </div>
         </section>

@@ -31,16 +31,16 @@ describe("getUsageStats", () => {
 
     expect(usage).toMatchObject({
       plan: "free",
-      limit: 400,
+      limit: 900,
       used: 100,
-      remaining: 300,
+      remaining: 800,
       bonusLeads: 300,
       shareBonusClaimed: true,
       unlimited: false,
     });
   });
 
-  it("keeps an unclaimed free account at the base 100 lead allowance", async () => {
+  it("keeps an unclaimed free account at the base 600 lead allowance", async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
       email: "free@example.com",
       plan: "free",
@@ -53,16 +53,16 @@ describe("getUsageStats", () => {
     const usage = await getUsageStats("user-free-1");
 
     expect(usage).toMatchObject({
-      limit: 100,
+      limit: 600,
       used: 100,
-      remaining: 0,
+      remaining: 500,
       bonusLeads: 0,
       shareBonusClaimed: false,
     });
   });
 
   it("shows expired usage as refreshed with a future reset time", async () => {
-    const expiredReset = new Date(Date.now() - 25 * 3_600_000);
+    const expiredReset = new Date(Date.now() - 8 * 24 * 3_600_000);
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
       email: "free@example.com",
       plan: "free",
@@ -76,9 +76,9 @@ describe("getUsageStats", () => {
     const usage = await getUsageStats("user-free-1");
 
     expect(usage).toMatchObject({
-      limit: 100,
+      limit: 600,
       used: 0,
-      remaining: 100,
+      remaining: 600,
     });
     expect(new Date(usage!.nextReset).getTime()).toBeGreaterThan(before);
   });

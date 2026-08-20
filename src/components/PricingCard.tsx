@@ -64,7 +64,7 @@ export default function PricingCard({ tier, index = 0 }: PricingCardProps) {
             )}>
               <Check className="w-3 h-3" />
             </div>
-            <span className={cn("text-sm", tier.comingSoon ? "text-muted-foreground/60" : "text-muted-foreground")}>
+            <span className="text-sm text-muted-foreground">
               {feature}
             </span>
           </li>

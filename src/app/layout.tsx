@@ -41,11 +41,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7576940446912367"
-          crossOrigin="anonymous"
-        />
         {/* Prevent flash of wrong theme — runs synchronously before first paint */}
         <script
           dangerouslySetInnerHTML={{
