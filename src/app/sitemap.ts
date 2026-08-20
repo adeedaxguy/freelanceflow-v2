@@ -116,5 +116,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
     .filter(entry => !dbBlogUrls.has(entry.url));
 
-  return [...staticEntries, ...blogEntries, ...staticBlogEntries];
+  const seenUrls = new Set<string>();
+
+  return [...staticEntries, ...blogEntries, ...staticBlogEntries].filter(entry => {
+    if (seenUrls.has(entry.url)) return false;
+    seenUrls.add(entry.url);
+    return true;
+  });
 }
