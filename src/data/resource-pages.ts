@@ -1,3 +1,4 @@
+import { AUGUST_20_2026_RESOURCE_PAGES } from "./resource-pages-2026-08-20";
 import { AUGUST_17_2026_RESOURCE_PAGES } from "./resource-pages-2026-08-17";
 import { AUGUST_15_2026_RESOURCE_PAGES } from "./resource-pages-2026-08-15";
 import { AUGUST_14_2026_RESOURCE_PAGES } from "./resource-pages-2026-08-14";
@@ -2125,6 +2126,7 @@ function buildJuly31ManualResearchResourcePages(): ResourcePage[] {
 }
 
 export const RESOURCE_PAGES: ResourcePage[] = [
+  ...AUGUST_20_2026_RESOURCE_PAGES,
   ...AUGUST_17_2026_RESOURCE_PAGES,
   ...AUGUST_15_2026_RESOURCE_PAGES,
   ...AUGUST_14_2026_RESOURCE_PAGES,

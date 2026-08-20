@@ -139,7 +139,7 @@ const audiences = [
 
 const faq = [
   ["What does iCloseLeads actually do?", "It brings local business leads, remote jobs, live opportunity signals, decision-maker research, AI proposals, outreach preparation, and CRM follow-up into one freelancer-focused workflow."],
-  ["Is it free to start?", "Yes. You can create an account and run your first lead searches without a credit card. Paid plans add higher limits and advanced workflows when they launch."],
+  ["Is it free to start?", "Yes. Free users can run up to 600 lead searches per week without a credit card. Paid plans will add higher limits and advanced workflows when they launch."],
   ["Where do the leads come from?", "iCloseLeads monitors public opportunity signals and business data paths, then normalizes and scores the results so you can search them from one place."],
   ["Does AI send messages automatically?", "No. AI helps create a stronger draft, but you review the message and stay in control of what is sent."],
   ["Can I find local business owners?", "The Decision Maker workflow helps you check possible owner or manager paths, public profiles, phone routes, social searches, and supporting proof before outreach."],
@@ -404,7 +404,7 @@ export default function HomepageClient() {
             <div className="max-w-2xl">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent"><Zap className="h-3 w-3" /></span>
-                Free early access - no card required
+                600 free leads per week - no card required
               </div>
               <h1 className="marketing-display text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
                 Find the lead. Know the angle. Start the conversation.
@@ -433,7 +433,7 @@ export default function HomepageClient() {
                   onClick={() => marketingEvent("homepage_gsc_insight_guide_click", { guide: "freelance-client-acquisition-system" })}
                   className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface/70 px-3 py-2 text-foreground transition-colors hover:border-primary/50 hover:text-primary-light"
                 >
-                  Popular guide: 21-day client acquisition system
+                  Popular guide: 21-day system using 600 free weekly leads
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
                 <Link
@@ -442,13 +442,13 @@ export default function HomepageClient() {
                   onClick={() => marketingEvent("homepage_gsc_insight_signup_click", { state: isAuthenticated ? "authenticated" : "guest" })}
                   className="inline-flex items-center gap-2 text-primary-light hover:text-foreground"
                 >
-                  Turn that plan into one lead search
+                  Turn that plan into this week&apos;s lead search
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
 
               <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                {["No credit card", "Real opportunity signals", "You approve every message"].map(item => (
+                {["600 weekly free leads", "Real opportunity signals", "You approve every message"].map(item => (
                   <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-accent" />{item}</span>
                 ))}
               </div>
