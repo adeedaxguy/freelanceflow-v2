@@ -36,10 +36,10 @@ export default function NotFound() {
               <Home className="w-4 h-4" /> Back to Home
             </Link>
             <Link
-              href="/dashboard"
+              href="/auth?mode=signup&intent=dashboard&source=404"
               className="inline-flex items-center gap-2 px-6 py-3 bg-surface border border-border hover:border-primary/30 text-foreground rounded-xl font-semibold transition-all"
             >
-              <Search className="w-4 h-4" /> Go to Dashboard
+              <Search className="w-4 h-4" /> Create Free Account
             </Link>
           </div>
 
@@ -47,8 +47,8 @@ export default function NotFound() {
             <p className="text-sm font-semibold text-foreground mb-3">You might be looking for:</p>
             <ul className="space-y-2">
               {[
-                { label: "Find freelance leads", href: "/dashboard/leads" },
-                { label: "Generate AI proposals", href: "/dashboard/proposal/new" },
+                { label: "Find freelance leads", href: "/auth?mode=signup&intent=freelance-leads&source=404" },
+                { label: "Generate AI proposals", href: "/features/ai-proposals" },
                 { label: "View pricing plans", href: "/pricing" },
                 { label: "Read the blog", href: "/blog" },
                 { label: "Contact support", href: "/contact" },

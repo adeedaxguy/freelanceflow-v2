@@ -29,6 +29,8 @@ const jobExample = `curl -G 'https://icloseleads.com/api/v1/remote-jobs' \\
   --data-urlencode 'max_hours=168' \\
   --data-urlencode 'min_confidence=55'`;
 
+const developerSignupHref = "/auth?mode=signup&intent=developer-api&source=developers-page";
+
 export default function DevelopersPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -43,7 +45,7 @@ export default function DevelopersPage() {
                 Search local businesses, remote roles, and fresh live opportunities through one stable JSON API. Build internal tools, alerts, research pipelines, or client acquisition workflows without rebuilding the search layer.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/dashboard/api" className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white">
+                <Link href={developerSignupHref} className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white">
                   Create an API key <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a href="/api/v1/openapi" className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground">
@@ -105,7 +107,7 @@ export default function DevelopersPage() {
         <section className="border-y border-border bg-surface/50 py-12">
           <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
             <div className="flex gap-3"><BookOpen className="mt-1 h-5 w-5 text-accent" /><div><h2 className="font-semibold">Stable contract, private sourcing</h2><p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Responses identify iCloseLeads as the data layer. Upstream credentials and supplier implementation details are never exposed.</p></div></div>
-            <Link href="/dashboard/api" className="inline-flex flex-none items-center gap-2 text-sm font-semibold text-primary-light">Manage keys <ArrowRight className="h-4 w-4" /></Link>
+            <Link href={developerSignupHref} className="inline-flex flex-none items-center gap-2 text-sm font-semibold text-primary-light">Create keys <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </section>
       </main>

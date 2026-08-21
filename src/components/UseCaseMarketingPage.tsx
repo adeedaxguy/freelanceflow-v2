@@ -16,6 +16,10 @@ import { USE_CASE_PAGES, type UseCasePageData } from "@/data/use-case-pages";
 
 const BASE_URL = "https://icloseleads.com";
 
+function signupHref(page: UseCasePageData, source: string) {
+  return `/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=${encodeURIComponent(source)}`;
+}
+
 function UseCaseJsonLd({ page }: { page: UseCasePageData }) {
   const url = `${BASE_URL}${page.path}`;
   const graph = [
@@ -127,7 +131,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
               </div>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=use-case-hero`}
+                  href={signupHref(page, "use-case-hero")}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
                   {page.primaryCta}
@@ -324,17 +328,17 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
               </p>
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
-                  href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=use-case-final-cta`}
+                  href={signupHref(page, "use-case-final-cta")}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
                 >
                   Run this workflow free
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href={page.dashboardPath}
+                  href={signupHref(page, "use-case-secondary-cta")}
                   className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-7 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Open Dashboard
+                  Create free account
                 </Link>
               </div>
             </div>

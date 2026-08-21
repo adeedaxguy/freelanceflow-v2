@@ -14,6 +14,17 @@ interface Props {
 
 type ResourcePageData = NonNullable<ReturnType<typeof getResourcePage>>;
 
+function publicResourceHref(href: string, page: ResourcePageData) {
+  if (!href.startsWith("/dashboard")) return href;
+  const basePath = href.split("?")[0] ?? href;
+  const intent = basePath
+    .split("/")
+    .filter(Boolean)
+    .slice(1)
+    .join("-") || page.slug;
+  return `/auth?mode=signup&intent=${encodeURIComponent(intent)}&source=${encodeURIComponent(`resource-${page.slug}`)}`;
+}
+
 function normalizeResourceMetaTitle(title: string) {
   return title.replace(/\s*\|\s*iCloseLeads\s*$/i, "");
 }
@@ -324,7 +335,7 @@ export default function ResourcePage({ params }: Props) {
                     Start Free and Run This Workflow
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href={page.internalLinks[0]?.href ?? "/features/lead-discovery"} className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
+                  <Link href={page.internalLinks[0] ? publicResourceHref(page.internalLinks[0].href, page) : "/features/lead-discovery"} className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
                     See the workflow
                   </Link>
                 </div>
@@ -497,7 +508,7 @@ export default function ResourcePage({ params }: Props) {
                   <h2 className="text-lg font-extrabold text-foreground">Use this next</h2>
                   <div className="mt-5 grid gap-3">
                     {page.internalLinks.map((link) => (
-                      <Link key={link.href} href={link.href} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
+                      <Link key={link.href} href={publicResourceHref(link.href, page)} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
                         {link.label}
                         <ArrowRight className="h-4 w-4 shrink-0" />
                       </Link>

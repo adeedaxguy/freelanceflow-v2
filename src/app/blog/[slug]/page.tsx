@@ -45,6 +45,26 @@ interface DbPost {
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
 
+function publicAppPath(href: string, source: string) {
+  const path = href.replace(/^https?:\/\/(?:www\.)?icloseleads\.com/i, "");
+  if (!path.startsWith("/dashboard")) return href;
+  const basePath = path.split("?")[0] ?? path;
+  const intent = basePath
+    .split("/")
+    .filter(Boolean)
+    .slice(1)
+    .join("-") || "dashboard";
+  return `/auth?mode=signup&intent=${encodeURIComponent(intent)}&source=${encodeURIComponent(source)}`;
+}
+
+function rewritePublicDashboardLinks(html: string) {
+  return html.replace(
+    /href=(["'])(https?:\/\/(?:www\.)?icloseleads\.com)?\/dashboard([^"']*)\1/g,
+    (_match, quote: string, _origin: string | undefined, suffix: string) =>
+      `href=${quote}${publicAppPath(`/dashboard${suffix}`, "blog-inline-link")}${quote}`,
+  );
+}
+
 // ── Data fetch ────────────────────────────────────────────────────────────────
 async function getDbPost(slug: string): Promise<DbPost | null> {
   if (isHiddenBlogSlug(slug)) return null;
@@ -264,7 +284,7 @@ function renderMarkdown(content: string): ReactNode {
       }
       nodes.push(
         <ul key={i} className="list-disc pl-6 space-y-1.5 mb-5 text-muted-foreground">
-          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>') }} />)}
+          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
         </ul>
       );
       continue;
@@ -276,7 +296,7 @@ function renderMarkdown(content: string): ReactNode {
       }
       nodes.push(
         <ol key={i} className="list-decimal pl-6 space-y-1.5 mb-5 text-muted-foreground">
-          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>') }} />)}
+          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
         </ol>
       );
       continue;
@@ -291,7 +311,7 @@ function renderMarkdown(content: string): ReactNode {
           .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
           .replace(/\*(.*?)\*/g,     '<em>$1</em>')
           .replace(/`(.*?)`/g,      '<code class="px-1.5 py-0.5 rounded bg-primary/10 text-primary-light text-sm font-mono">$1</code>');
-        nodes.push(<p key={i} className="text-muted-foreground leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: html }} />);
+        nodes.push(<p key={i} className="text-muted-foreground leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(html) }} />);
       }
     }
     i++;
