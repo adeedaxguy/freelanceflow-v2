@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import {
   BlogInlineAd,
   DashboardBottomAd,
@@ -14,6 +14,7 @@ function mockViewport(isMobile: boolean) {
 }
 
 beforeEach(() => {
+  jest.useRealTimers();
   window.adsbygoogle = [];
 });
 
@@ -65,4 +66,19 @@ it("uses the responsive unit inside blog articles", async () => {
   expect(ad).toHaveAttribute("data-ad-format", "auto");
   expect(ad).toHaveAttribute("data-full-width-responsive", "true");
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
+});
+
+it("collapses the ad shell when AdSense reports no fill", async () => {
+  render(<BlogInlineAd />);
+
+  const ad = screen.getByLabelText("Advertisement").querySelector("ins");
+  expect(ad).not.toBeNull();
+
+  act(() => {
+    ad?.setAttribute("data-ad-status", "unfilled");
+  });
+
+  await waitFor(() => {
+    expect(screen.queryByLabelText("Advertisement")).not.toBeInTheDocument();
+  });
 });

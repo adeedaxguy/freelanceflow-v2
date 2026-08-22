@@ -11,6 +11,7 @@ declare global {
 
 const AD_CLIENT = "ca-pub-7576940446912367";
 const ADSENSE_SCRIPT_ID = "google-adsense-script";
+const EMPTY_AD_COLLAPSE_DELAY_MS = 6500;
 
 function loadAdSense() {
   if (document.getElementById(ADSENSE_SCRIPT_ID)) return;
@@ -21,6 +22,14 @@ function loadAdSense() {
   script.crossOrigin = "anonymous";
   script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`;
   document.head.appendChild(script);
+}
+
+function adHasCreative(ad: HTMLModElement | null) {
+  return ad?.dataset.adStatus === "filled" || Boolean(ad?.querySelector("iframe"));
+}
+
+function adIsUnfilled(ad: HTMLModElement | null) {
+  return ad?.dataset.adStatus === "unfilled";
 }
 
 type AdSenseUnitProps = {
@@ -41,10 +50,58 @@ function AdSenseUnit({
   const containerRef = useRef<HTMLElement>(null);
   const adRef = useRef<HTMLModElement>(null);
   const initialized = useRef(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
+    let visibilityObserver: IntersectionObserver | undefined;
+    let statusObserver: MutationObserver | undefined;
+    let collapseTimer: number | undefined;
+
+    const clearCollapseTimer = () => {
+      if (!collapseTimer) return;
+      window.clearTimeout(collapseTimer);
+      collapseTimer = undefined;
+    };
+
+    const inspectAdStatus = () => {
+      if (adHasCreative(adRef.current)) {
+        clearCollapseTimer();
+        return;
+      }
+
+      if (adIsUnfilled(adRef.current)) {
+        setIsCollapsed(true);
+      }
+    };
+
+    const watchAdStatus = () => {
+      inspectAdStatus();
+
+      if ("MutationObserver" in window && adRef.current) {
+        statusObserver = new MutationObserver(inspectAdStatus);
+        statusObserver.observe(adRef.current, {
+          attributes: true,
+          attributeFilter: ["data-ad-status"],
+          childList: true,
+          subtree: true,
+        });
+      }
+
+      collapseTimer = window.setTimeout(() => {
+        if (!adHasCreative(adRef.current)) {
+          setIsCollapsed(true);
+        }
+      }, EMPTY_AD_COLLAPSE_DELAY_MS);
+    };
+
     const initialize = () => {
-      if (initialized.current || adRef.current?.dataset.adsbygoogleStatus) return;
+      if (initialized.current) return;
+
+      if (adRef.current?.dataset.adsbygoogleStatus) {
+        initialized.current = true;
+        watchAdStatus();
+        return;
+      }
 
       initialized.current = true;
       loadAdSense();
@@ -55,32 +112,39 @@ function AdSenseUnit({
           console.warn("AdSense unit could not initialize", error);
         }
       }
+      watchAdStatus();
     };
 
     if (!("IntersectionObserver" in window) || !containerRef.current) {
       initialize();
-      return;
+    } else {
+      visibilityObserver = new IntersectionObserver(
+        entries => {
+          if (!entries.some(entry => entry.isIntersecting)) return;
+          visibilityObserver?.disconnect();
+          initialize();
+        },
+        { rootMargin: "600px 0px" }
+      );
+
+      visibilityObserver.observe(containerRef.current);
     }
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (!entries.some(entry => entry.isIntersecting)) return;
-        observer.disconnect();
-        initialize();
-      },
-      { rootMargin: "600px 0px" }
-    );
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
+    return () => {
+      visibilityObserver?.disconnect();
+      statusObserver?.disconnect();
+      clearCollapseTimer();
+    };
   }, []);
+
+  if (isCollapsed) return null;
 
   return (
     <aside ref={containerRef} aria-label="Advertisement" className={`min-w-0 ${className}`}>
       <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         Advertisement
       </p>
-      <div className="min-h-[128px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card p-3">
+      <div className="min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card/70 p-2 sm:min-h-[128px] sm:p-3">
         <ins
           ref={adRef}
           className="adsbygoogle"
