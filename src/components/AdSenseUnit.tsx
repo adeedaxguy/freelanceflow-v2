@@ -24,8 +24,8 @@ function loadAdSense() {
   document.head.appendChild(script);
 }
 
-function adHasCreative(ad: HTMLModElement | null) {
-  return ad?.dataset.adStatus === "filled" || Boolean(ad?.querySelector("iframe"));
+function adIsFilled(ad: HTMLModElement | null) {
+  return ad?.dataset.adStatus === "filled";
 }
 
 function adIsUnfilled(ad: HTMLModElement | null) {
@@ -64,7 +64,7 @@ function AdSenseUnit({
     };
 
     const inspectAdStatus = () => {
-      if (adHasCreative(adRef.current)) {
+      if (adIsFilled(adRef.current)) {
         clearCollapseTimer();
         return;
       }
@@ -88,7 +88,7 @@ function AdSenseUnit({
       }
 
       collapseTimer = window.setTimeout(() => {
-        if (!adHasCreative(adRef.current)) {
+        if (!adIsFilled(adRef.current)) {
           setIsCollapsed(true);
         }
       }, EMPTY_AD_COLLAPSE_DELAY_MS);

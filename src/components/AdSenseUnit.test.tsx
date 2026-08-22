@@ -82,3 +82,18 @@ it("collapses the ad shell when AdSense reports no fill", async () => {
     expect(screen.queryByLabelText("Advertisement")).not.toBeInTheDocument();
   });
 });
+
+it("collapses a blank ad frame unless AdSense marks it filled", () => {
+  jest.useFakeTimers();
+  render(<BlogInlineAd />);
+
+  const ad = screen.getByLabelText("Advertisement").querySelector("ins");
+  expect(ad).not.toBeNull();
+
+  act(() => {
+    ad?.appendChild(document.createElement("iframe"));
+    jest.advanceTimersByTime(6600);
+  });
+
+  expect(screen.queryByLabelText("Advertisement")).not.toBeInTheDocument();
+});
