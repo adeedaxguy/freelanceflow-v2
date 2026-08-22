@@ -78,7 +78,6 @@ export default function DeferredClientChrome() {
     return (
       <>
         <FloatingChat initialOpen />
-        {showCookieConsent && <CookieConsent />}
       </>
     );
   }
@@ -88,7 +87,7 @@ export default function DeferredClientChrome() {
       {showCookieConsent && <CookieConsent />}
       <button
         onClick={() => setChatRequested(true)}
-        className={`fixed bottom-6 right-4 sm:right-6 z-50 h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95 ${launcherVisibilityClass}`}
+        className={`fixed bottom-6 right-4 sm:right-6 z-50 h-14 w-14 items-center justify-center rounded-2xl bg-gradient-hero shadow-glow-primary transition-all hover:scale-105 active:scale-95 ${showCookieConsent ? "hidden sm:flex" : launcherVisibilityClass}`}
         aria-label="Open support chat"
       >
         <MessageCircle className="w-6 h-6 text-white" />
