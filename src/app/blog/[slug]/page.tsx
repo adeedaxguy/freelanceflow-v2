@@ -461,8 +461,8 @@ export default async function BlogPostPage({ params }: Props) {
     return (
       <>
         <Navbar />
-        <main className="pt-16">
-          <article className="max-w-3xl mx-auto px-4 py-20">
+        <main className="overflow-x-hidden pt-16">
+          <article className="mx-auto min-w-0 max-w-[min(48rem,calc(100vw-2rem))] overflow-x-hidden py-16 sm:py-20">
             <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm mb-8 transition-colors">
               <ArrowLeft className="w-4 h-4" /> Back to Blog
             </Link>
@@ -472,7 +472,7 @@ export default async function BlogPostPage({ params }: Props) {
               <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary-light border border-primary/20 mb-4">
                 {dbPost.category}
               </span>
-              <h1 className="text-4xl font-extrabold text-foreground leading-tight mb-5">{dbPost.title}</h1>
+              <h1 className="mb-5 break-words text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">{dbPost.title}</h1>
               {dbPost.excerpt && <p className="text-muted-foreground text-xl leading-relaxed mb-5">{dbPost.excerpt}</p>}
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground border-t border-border pt-5">
                 {dbPost.author && (
@@ -588,8 +588,8 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <>
       <Navbar />
-      <main className="pt-16">
-        <article className="max-w-3xl mx-auto px-4 py-20">
+      <main className="overflow-x-hidden pt-16">
+        <article className="mx-auto min-w-0 max-w-[min(48rem,calc(100vw-2rem))] overflow-x-hidden py-16 sm:py-20">
           <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm mb-8 transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Blog
           </Link>
@@ -598,7 +598,7 @@ export default async function BlogPostPage({ params }: Props) {
             <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary-light border border-primary/20 mb-4">
               {post.category}
             </span>
-            <h1 className="text-4xl font-extrabold text-foreground leading-tight mb-5">{post.title}</h1>
+            <h1 className="mb-5 break-words text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">{post.title}</h1>
             {post.excerpt && <p className="text-muted-foreground text-xl leading-relaxed mb-5">{post.excerpt}</p>}
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground border-t border-border pt-5">
               <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" />{formatDate(postDate)}</span>

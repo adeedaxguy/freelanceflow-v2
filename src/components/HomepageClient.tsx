@@ -400,13 +400,13 @@ export default function HomepageClient() {
       <main>
         <section className="marketing-hero relative overflow-hidden border-b border-border pt-16">
           <div className="marketing-grid absolute inset-0 opacity-60" aria-hidden="true" />
-          <div className="relative mx-auto grid min-h-[760px] max-w-7xl items-center gap-14 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
-            <div className="max-w-2xl">
+          <div className="relative mx-auto grid min-h-[calc(100svh-7rem)] max-w-7xl items-center gap-14 px-4 py-14 sm:px-6 sm:py-20 lg:min-h-[760px] lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
+            <div className="min-w-0 max-w-2xl">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent"><Zap className="h-3 w-3" /></span>
                 600 free leads per week - no card required
               </div>
-              <h1 className="marketing-display text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
+              <h1 className="marketing-display break-words text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
                 Find the lead. Know the angle. Start the conversation.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">

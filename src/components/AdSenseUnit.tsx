@@ -51,6 +51,7 @@ function AdSenseUnit({
   const adRef = useRef<HTMLModElement>(null);
   const initialized = useRef(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isFilled, setIsFilled] = useState(false);
 
   useEffect(() => {
     let visibilityObserver: IntersectionObserver | undefined;
@@ -65,6 +66,7 @@ function AdSenseUnit({
 
     const inspectAdStatus = () => {
       if (adIsFilled(adRef.current)) {
+        setIsFilled(true);
         clearCollapseTimer();
         return;
       }
@@ -147,13 +149,13 @@ function AdSenseUnit({
       <div className="min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card/70 p-2 sm:min-h-[128px] sm:p-3">
         <ins
           ref={adRef}
-          className="adsbygoogle"
           style={{ display: "block" }}
           data-ad-client={AD_CLIENT}
           data-ad-slot={slot}
           data-ad-format={format}
           data-ad-layout-key={layoutKey}
           data-full-width-responsive={fullWidthResponsive ? "true" : undefined}
+          className={`adsbygoogle transition-opacity duration-200 ${isFilled ? "opacity-100" : "opacity-0"}`}
         />
       </div>
     </aside>

@@ -143,6 +143,7 @@
 @layer components {
   .marketing-shell {
     isolation: isolate;
+    overflow-x: clip;
   }
 
   .marketing-display {
@@ -174,6 +175,7 @@
   .marketing-hero h1 {
     letter-spacing: 0;
     text-wrap: balance;
+    overflow-wrap: break-word;
   }
 
   .marketing-hero .bg-clip-text {
@@ -199,6 +201,25 @@
     @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground;
   }
 
+  .prose-content {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .prose-content > * {
+    max-width: 100%;
+  }
+
+  .prose-content a,
+  .prose-content p,
+  .prose-content li,
+  .prose-content h2,
+  .prose-content h3,
+  .prose-content h4 {
+    overflow-wrap: anywhere;
+  }
+
   body.marketing-site .rounded-2xl,
   body.marketing-site .rounded-xl {
     border-radius: 0.5rem;
@@ -217,6 +238,49 @@
   html.light body.marketing-site .text-white\/70,
   html.light body.marketing-site .text-white\/65 {
     color: rgb(255 255 255 / 0.82);
+  }
+
+  body.marketing-site {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  body.marketing-site main,
+  body.marketing-site section,
+  body.marketing-site article {
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    body.marketing-site .marketing-display,
+    body.marketing-site .marketing-shell h1 {
+      max-width: 100%;
+      font-size: clamp(2.25rem, 9.3vw, 2.8rem);
+      line-height: 1.02;
+      text-wrap: normal;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+
+    body.marketing-site .marketing-kicker,
+    body.marketing-site .marketing-primary-cta,
+    body.marketing-site .marketing-secondary-cta {
+      max-width: 100%;
+      white-space: normal;
+    }
+
+    body.marketing-site .prose-content img,
+    body.marketing-site .prose-content video,
+    body.marketing-site .prose-content iframe {
+      max-width: 100%;
+      height: auto;
+    }
+
+    body.marketing-site .prose-content pre,
+    body.marketing-site .prose-content table {
+      max-width: 100%;
+      overflow-x: auto;
+    }
   }
 
   .gradient-text,

@@ -97,3 +97,19 @@ it("collapses a blank ad frame unless AdSense marks it filled", () => {
 
   expect(screen.queryByLabelText("Advertisement")).not.toBeInTheDocument();
 });
+
+it("keeps the ad creative hidden until AdSense reports a real fill", async () => {
+  render(<BlogInlineAd />);
+
+  const ad = screen.getByLabelText("Advertisement").querySelector("ins");
+  expect(ad).not.toBeNull();
+  expect(ad).toHaveClass("opacity-0");
+
+  act(() => {
+    ad?.setAttribute("data-ad-status", "filled");
+  });
+
+  await waitFor(() => {
+    expect(ad).toHaveClass("opacity-100");
+  });
+});
