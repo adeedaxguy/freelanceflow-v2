@@ -11,7 +11,18 @@ declare global {
 
 const AD_CLIENT = "ca-pub-7576940446912367";
 const ADSENSE_SCRIPT_ID = "google-adsense-script";
-const EMPTY_AD_COLLAPSE_DELAY_MS = 6500;
+const EMPTY_AD_COLLAPSE_DELAY_MS = 4500;
+const DISPLAY_AD_SLOT = "1080749546";
+const DESKTOP_IN_FEED_AD = {
+  slot: "1014084754",
+  format: "fluid" as const,
+  layoutKey: "-ex+5g+64-d5+3t",
+};
+const MOBILE_IN_FEED_AD = {
+  slot: "9482129532",
+  format: "fluid" as const,
+  layoutKey: "-6c+e7+1e-40+6x",
+};
 
 function loadAdSense() {
   if (document.getElementById(ADSENSE_SCRIPT_ID)) return;
@@ -32,12 +43,23 @@ function adIsUnfilled(ad: HTMLModElement | null) {
   return ad?.dataset.adStatus === "unfilled";
 }
 
+function adShouldCollapseAfterDelay(ad: HTMLModElement | null) {
+  if (!ad || adIsUnfilled(ad)) return true;
+  if (adIsFilled(ad)) return false;
+
+  const iframe = ad.querySelector("iframe");
+  if (!iframe) return true;
+
+  return iframe.clientWidth === 0 || iframe.clientHeight === 0;
+}
+
 type AdSenseUnitProps = {
   slot: string;
   format: "auto" | "fluid";
   layoutKey?: string;
   fullWidthResponsive?: boolean;
   className?: string;
+  shell?: "display" | "native";
 };
 
 function AdSenseUnit({
@@ -46,6 +68,7 @@ function AdSenseUnit({
   layoutKey,
   fullWidthResponsive = false,
   className = "",
+  shell = "display",
 }: AdSenseUnitProps) {
   const containerRef = useRef<HTMLElement>(null);
   const adRef = useRef<HTMLModElement>(null);
@@ -73,6 +96,7 @@ function AdSenseUnit({
 
       if (adIsUnfilled(adRef.current)) {
         setIsCollapsed(true);
+        clearCollapseTimer();
       }
     };
 
@@ -90,7 +114,7 @@ function AdSenseUnit({
       }
 
       collapseTimer = window.setTimeout(() => {
-        if (!adIsFilled(adRef.current)) {
+        if (adShouldCollapseAfterDelay(adRef.current)) {
           setIsCollapsed(true);
         }
       }, EMPTY_AD_COLLAPSE_DELAY_MS);
@@ -141,12 +165,16 @@ function AdSenseUnit({
 
   if (isCollapsed) return null;
 
+  const shellClass = shell === "native"
+    ? "min-h-[84px] min-w-0 overflow-hidden rounded-2xl border border-border/70 bg-card/55 p-2.5 sm:min-h-[112px] sm:p-3"
+    : "min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card/70 p-2 sm:min-h-[128px] sm:p-3";
+
   return (
     <aside ref={containerRef} aria-label="Advertisement" className={`min-w-0 ${className}`}>
       <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         Advertisement
       </p>
-      <div className="min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card/70 p-2 sm:min-h-[128px] sm:p-3">
+      <div className={shellClass}>
         <ins
           ref={adRef}
           style={{ display: "block" }}
@@ -162,25 +190,77 @@ function AdSenseUnit({
   );
 }
 
+function useAdViewport() {
+  const [viewport, setViewport] = useState<"mobile" | "desktop" | null>(null);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") {
+      setViewport("desktop");
+      return;
+    }
+
+    const query = window.matchMedia("(max-width: 767px)");
+    const updateViewport = () => setViewport(query.matches ? "mobile" : "desktop");
+
+    updateViewport();
+    query.addEventListener?.("change", updateViewport);
+
+    return () => {
+      query.removeEventListener?.("change", updateViewport);
+    };
+  }, []);
+
+  return viewport;
+}
+
+function ResponsiveNativeAd({ className = "" }: { className?: string }) {
+  const viewport = useAdViewport();
+
+  if (!viewport) return null;
+
+  const ad = viewport === "mobile" ? MOBILE_IN_FEED_AD : DESKTOP_IN_FEED_AD;
+
+  return (
+    <AdSenseUnit
+      key={`native-${viewport}`}
+      {...ad}
+      shell="native"
+      className={className}
+    />
+  );
+}
+
+function ResponsiveMarketingAd({ className = "" }: { className?: string }) {
+  const viewport = useAdViewport();
+
+  if (!viewport) return null;
+
+  if (viewport === "mobile") {
+    return <ResponsiveNativeAd className={className} />;
+  }
+
+  return (
+    <AdSenseUnit
+      slot={DISPLAY_AD_SLOT}
+      format="auto"
+      fullWidthResponsive
+      className={className}
+    />
+  );
+}
+
 export function MarketingAdBand({ className = "" }: { className?: string }) {
   return (
-    <section className={`border-y border-border bg-surface/25 px-4 py-10 sm:px-6 lg:px-8 ${className}`}>
+    <section className={`border-y border-border bg-surface/25 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 ${className}`}>
       <div className="mx-auto max-w-6xl">
-        <AdSenseUnit slot="1080749546" format="auto" fullWidthResponsive />
+        <ResponsiveNativeAd />
       </div>
     </section>
   );
 }
 
 export function BlogInlineAd({ className = "" }: { className?: string }) {
-  return (
-    <AdSenseUnit
-      slot="1080749546"
-      format="auto"
-      fullWidthResponsive
-      className={`my-10 ${className}`}
-    />
-  );
+  return <ResponsiveNativeAd className={`my-8 sm:my-10 ${className}`} />;
 }
 
 const PUBLIC_AD_PATHS = new Set([
@@ -218,38 +298,22 @@ export function PublicFooterAd() {
 }
 
 export function LeadResultsAd() {
-  const [viewport, setViewport] = useState<"mobile" | "desktop" | null>(null);
-
-  useEffect(() => {
-    setViewport(window.matchMedia("(max-width: 767px)").matches ? "mobile" : "desktop");
-  }, []);
+  const viewport = useAdViewport();
 
   if (!viewport) return null;
 
-  return viewport === "mobile" ? (
+  const ad = viewport === "mobile" ? MOBILE_IN_FEED_AD : DESKTOP_IN_FEED_AD;
+
+  return (
     <AdSenseUnit
-      slot="9482129532"
-      format="fluid"
-      layoutKey="-6c+e7+1e-40+6x"
-      className="my-7"
-    />
-  ) : (
-    <AdSenseUnit
-      slot="1014084754"
-      format="fluid"
-      layoutKey="-ex+5g+64-d5+3t"
+      key={`lead-results-${viewport}`}
+      {...ad}
+      shell="native"
       className="my-7"
     />
   );
 }
 
 export function DashboardBottomAd() {
-  return (
-    <AdSenseUnit
-      slot="1080749546"
-      format="auto"
-      fullWidthResponsive
-      className="mt-8"
-    />
-  );
+  return <ResponsiveMarketingAd className="mt-8" />;
 }
