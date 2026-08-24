@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCallingMinuteState } from "@/lib/calling-packages";
 import { prisma } from "@/lib/prisma";
 import {
   appUrl,
@@ -116,6 +117,14 @@ export async function POST(req: NextRequest) {
     return xml(response);
   }
 
+  const minuteState = await getCallingMinuteState(workspace.userId);
+  if (!minuteState.canCall) {
+    const response = new twilio.twiml.VoiceResponse();
+    response.say("Your monthly calling minutes are not active. Choose a calling package before dialing.");
+    response.hangup();
+    return xml(response);
+  }
+
   const callsToday = await prisma.voiceCall.count({
     where: { userId: workspace.userId, direction: "OUTBOUND", createdAt: { gte: new Date(Date.now() - 24 * 60 * 60_000) } },
   });
@@ -157,7 +166,8 @@ export async function POST(req: NextRequest) {
 
   const callback = appUrl(`/api/softphone/voice?mode=status&recordId=${encodeURIComponent(record.id)}`);
   const response = new twilio.twiml.VoiceResponse();
-  const dial = response.dial({ callerId, answerOnBridge: true, timeout: 30, timeLimit: 1800 });
+  const timeLimit = minuteState.unlimited ? 1800 : Math.max(1, Math.min(1800, minuteState.remainingSeconds));
+  const dial = response.dial({ callerId, answerOnBridge: true, timeout: 30, timeLimit });
   dial.number({ statusCallback: callback, statusCallbackMethod: "POST", statusCallbackEvent: ["initiated", "ringing", "answered", "completed"] }, destination);
   return xml(response);
 }

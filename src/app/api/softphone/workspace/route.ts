@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import {
+  callingPackagePlan,
+  getCallingMinuteState,
+  getCallingPackage,
+  getCallingPackages,
+} from "@/lib/calling-packages";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
 import {
@@ -18,11 +24,12 @@ import {
   verifyNumberQuote,
 } from "@/lib/telephony";
 import {
-  getLemonSqueezyConfig,
-  lemonSqueezyRequest,
-} from "@/lib/lemonsqueezy";
+  createStripeSubscriptionCheckout,
+  getStripeConfig,
+} from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
+const STRIPE_NUMBER_VARIANT = "stripe_softphone_number";
 
 const requestSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("provision") }),
@@ -37,6 +44,10 @@ const requestSchema = z.discriminatedUnion("action", [
     quote: z.string().min(20).max(3000),
     confirmation: z.literal("PURCHASE"),
     complianceAccepted: z.literal(true),
+  }),
+  z.object({
+    action: z.literal("checkout-minutes"),
+    packageId: z.string().trim().min(1).max(40),
   }),
   z.object({ action: z.literal("token") }),
 ]);
@@ -54,7 +65,7 @@ export async function GET() {
   const auth = await context();
   if ("error" in auth) return auth.error;
 
-  const [workspace, purchase, numbers, calls] = await Promise.all([
+  const [workspace, purchase, numbers, calls, minutes] = await Promise.all([
     prisma.telephonyWorkspace.findUnique({ where: { userId: auth.session.user.id } }),
     latestPhonePurchase(auth.session.user.id),
     listWorkspacePhoneNumbers(auth.session.user.id),
@@ -73,6 +84,7 @@ export async function GET() {
         outcome: true,
       },
     }),
+    getCallingMinuteState(auth.session.user.id),
   ]);
 
   return NextResponse.json({
@@ -80,12 +92,10 @@ export async function GET() {
     workspace: publicWorkspace(workspace),
     purchase,
     numbers,
+    minutes,
+    callingPackages: getCallingPackages(),
     calls,
   });
-}
-
-interface CheckoutResponse {
-  data: { attributes: { url: string } };
 }
 
 export async function POST(req: NextRequest) {
@@ -124,14 +134,13 @@ export async function POST(req: NextRequest) {
 
     if (parsed.data.action === "checkout-number") {
       const [config, user] = await Promise.all([
-        getLemonSqueezyConfig(),
+        getStripeConfig(),
         prisma.user.findUnique({
           where: { id: auth.session.user.id },
           select: { email: true, name: true, role: true },
         }),
       ]);
-      const variantId = config.softphoneVariantId;
-      if (!config.apiKey || !/^\d+$/.test(config.storeId) || !/^\d+$/.test(variantId)) {
+      if (!config.secretKey) {
         return NextResponse.json({ error: "Secure number checkout is not configured yet" }, { status: 503 });
       }
       if (config.testMode && user?.role !== "ADMIN") {
@@ -142,7 +151,7 @@ export async function POST(req: NextRequest) {
       const purchase = await createPhonePurchaseIntent(
         auth.session.user.id,
         parsed.data.quote,
-        variantId,
+        STRIPE_NUMBER_VARIANT,
       );
       const appUrl = (
         process.env.NEXT_PUBLIC_APP_URL
@@ -151,45 +160,23 @@ export async function POST(req: NextRequest) {
       ).replace(/\/$/, "");
 
       try {
-        const checkout = await lemonSqueezyRequest<CheckoutResponse>(config, "/checkouts", {
-          method: "POST",
-          body: JSON.stringify({
-            data: {
-              type: "checkouts",
-              attributes: {
-                custom_price: quote.monthlyPriceCents,
-                product_options: {
-                  redirect_url: `${appUrl}/dashboard/softphone?checkout=success&purchase=${purchase.id}`,
-                  enabled_variants: [Number(variantId)],
-                },
-                checkout_options: {
-                  embed: false,
-                  media: true,
-                  logo: true,
-                  desc: true,
-                  discount: false,
-                  subscription_preview: true,
-                  button_color: "#7c3aed",
-                },
-                checkout_data: {
-                  email: user?.email || undefined,
-                  name: user?.name || undefined,
-                  custom: {
-                    purchase_type: "softphone_number",
-                    telephony_purchase_id: purchase.id,
-                    user_id: auth.session.user.id,
-                  },
-                },
-                test_mode: config.testMode,
-              },
-              relationships: {
-                store: { data: { type: "stores", id: config.storeId } },
-                variant: { data: { type: "variants", id: variantId } },
-              },
-            },
-          }),
+        const checkout = await createStripeSubscriptionCheckout(config, {
+          customerEmail: user?.email,
+          productName: `iCloseLeads number ${quote.phoneNumber}`,
+          description: `Dedicated ${quote.country} calling number`,
+          amountCents: quote.monthlyPriceCents,
+          currency: quote.currency,
+          successUrl: `${appUrl}/dashboard/softphone?checkout=success&purchase=${purchase.id}`,
+          cancelUrl: `${appUrl}/dashboard/softphone?checkout=cancelled&purchase=${purchase.id}`,
+          metadata: {
+            purchase_type: "softphone_number",
+            telephony_purchase_id: purchase.id,
+            user_id: auth.session.user.id,
+            phone_number: quote.phoneNumber,
+          },
         });
-        return NextResponse.json({ url: checkout.data.attributes.url, purchaseId: purchase.id });
+        if (!checkout.url) throw new Error("Stripe checkout did not return a payment link");
+        return NextResponse.json({ url: checkout.url, purchaseId: purchase.id });
       } catch (error) {
         await prisma.telephonyPurchase.update({
           where: { id: purchase.id },
@@ -200,6 +187,53 @@ export async function POST(req: NextRequest) {
         });
         throw error;
       }
+    }
+
+    if (parsed.data.action === "checkout-minutes") {
+      const pkg = getCallingPackage(parsed.data.packageId);
+      if (!pkg) return NextResponse.json({ error: "Choose a valid calling package" }, { status: 400 });
+
+      const [config, user, phoneNumbers] = await Promise.all([
+        getStripeConfig(),
+        prisma.user.findUnique({
+          where: { id: auth.session.user.id },
+          select: { email: true, role: true },
+        }),
+        listWorkspacePhoneNumbers(auth.session.user.id),
+      ]);
+      if (!config.secretKey) {
+        return NextResponse.json({ error: "Secure minutes checkout is not configured yet" }, { status: 503 });
+      }
+      if (config.testMode && user?.role !== "ADMIN") {
+        return NextResponse.json({ error: "Calling package checkout is still in private testing" }, { status: 503 });
+      }
+      if (!phoneNumbers.some(number => number.callable)) {
+        return NextResponse.json({ error: "Choose an active calling number before buying minutes" }, { status: 409 });
+      }
+
+      const appUrl = (
+        process.env.NEXT_PUBLIC_APP_URL
+        || process.env.NEXTAUTH_URL
+        || req.nextUrl.origin
+      ).replace(/\/$/, "");
+      const plan = callingPackagePlan(pkg.id);
+      const checkout = await createStripeSubscriptionCheckout(config, {
+        customerEmail: user?.email,
+        productName: `iCloseLeads ${pkg.name}`,
+        description: `${pkg.minutes} outbound softphone minutes per month`,
+        amountCents: pkg.priceCents,
+        currency: pkg.currency,
+        successUrl: `${appUrl}/dashboard/softphone?checkout=minutes`,
+        cancelUrl: `${appUrl}/dashboard/softphone?checkout=cancelled`,
+        metadata: {
+          purchase_type: "softphone_minutes",
+          package_id: pkg.id,
+          plan,
+          user_id: auth.session.user.id,
+        },
+      });
+      if (!checkout.url) throw new Error("Stripe checkout did not return a payment link");
+      return NextResponse.json({ url: checkout.url });
     }
 
     const workspace = await provisionWorkspace(auth.session.user.id);

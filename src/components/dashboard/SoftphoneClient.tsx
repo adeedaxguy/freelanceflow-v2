@@ -10,6 +10,7 @@ import {
   Bot,
   Check,
   Clock3,
+  CreditCard,
   Loader2,
   Mic,
   MicOff,
@@ -81,6 +82,22 @@ type OwnedNumber = {
   callable: boolean;
 };
 
+type CallingPackage = {
+  id: string;
+  name: string;
+  minutes: number;
+  priceCents: number;
+  currency: string;
+};
+
+type CallingMinutes = {
+  canCall: boolean;
+  unlimited: boolean;
+  usedSeconds: number;
+  remainingSeconds: number;
+  package: CallingPackage | null;
+};
+
 type AiAgentCall = {
   id: string;
   from: string;
@@ -135,6 +152,8 @@ export default function SoftphoneClient() {
   const [selectedFrom, setSelectedFrom] = useState("");
   const [showNumberSearch, setShowNumberSearch] = useState(false);
   const [purchaseStatus, setPurchaseStatus] = useState<PhonePurchase | null>(null);
+  const [minutes, setMinutes] = useState<CallingMinutes | null>(null);
+  const [callingPackages, setCallingPackages] = useState<CallingPackage[]>([]);
   const [calls, setCalls] = useState<CallHistory[]>([]);
   const [configured, setConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -170,6 +189,8 @@ export default function SoftphoneClient() {
         : nextNumbers.find(number => number.callable)?.phoneNumber || ""
     ));
     setPurchaseStatus((data.purchase as PhonePurchase | null) ?? null);
+    setMinutes((data.minutes as CallingMinutes | null) ?? null);
+    setCallingPackages((data.callingPackages as CallingPackage[]) ?? []);
     setCalls((data.calls as CallHistory[]) ?? []);
   }, []);
 
@@ -343,7 +364,25 @@ export default function SoftphoneClient() {
     } finally { setBusy(null); }
   }
 
+  async function buyMinutes(packageId: string) {
+    setBusy(`minutes:${packageId}`);
+    try {
+      const data = await api({ action: "checkout-minutes", packageId });
+      const url = typeof data.url === "string" ? data.url : "";
+      if (!url) throw new Error("Secure checkout did not return a payment link");
+      window.location.assign(url);
+    } catch (error) {
+      toast({ title: "Checkout could not start", description: error instanceof Error ? error.message : "Please try again", type: "error" });
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function startCall() {
+    if (!minutes?.canCall) {
+      toast({ title: "Calling minutes required", description: "Choose a monthly calling package before dialing.", type: "error" });
+      return;
+    }
     setBusy("call");
     try {
       const device = await connectDevice();
@@ -399,6 +438,12 @@ export default function SoftphoneClient() {
   }
 
   if (loading) return <div className="p-6 lg:p-8"><div className="h-72 rounded-lg border border-border bg-card animate-pulse" /></div>;
+  const canPlaceOutboundCall = Boolean(minutes?.canCall);
+  const minuteLabel = minutes?.unlimited
+    ? "Unlimited test minutes"
+    : minutes?.package
+      ? `${Math.ceil(minutes.remainingSeconds / 60)} of ${minutes.package.minutes} min left`
+      : "Monthly calling package required";
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
@@ -431,7 +476,7 @@ export default function SoftphoneClient() {
       {purchaseStatus?.status === "PAID_TEST" && (
         <section className="rounded-lg border border-gold/30 bg-gold/5 p-4">
           <h2 className="font-semibold text-foreground">Test payment verified</h2>
-          <p className="mt-1 text-sm text-muted-foreground">The Lemon Squeezy test webhook worked. No real Twilio number was purchased or charged.</p>
+          <p className="mt-1 text-sm text-muted-foreground">The Stripe test webhook worked. No real Twilio number was purchased or charged.</p>
         </section>
       )}
 
@@ -534,6 +579,26 @@ export default function SoftphoneClient() {
                 <div className="rounded-lg bg-accent/10 p-2.5"><Phone className="h-5 w-5 text-accent" /></div>
               </div>
               {ownedNumbers.length < 3 && <button onClick={() => setShowNumberSearch(true)} className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-primary-light hover:underline"><Plus className="h-3.5 w-3.5" /> Add another number</button>}
+              <div className="mt-5 border-t border-border pt-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase text-muted-foreground">Calling minutes</p>
+                    <p className={`mt-1 text-sm font-semibold ${canPlaceOutboundCall ? "text-accent" : "text-gold"}`}>{minuteLabel}</p>
+                  </div>
+                  <Clock3 className="h-5 w-5 text-muted-foreground" />
+                </div>
+                {!minutes?.unlimited && (!minutes?.package || !minutes.canCall) && callingPackages.length > 0 && (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {callingPackages.map(pkg => (
+                      <button key={pkg.id} onClick={() => void buyMinutes(pkg.id)} disabled={Boolean(busy)} className="rounded-lg border border-border bg-background p-3 text-left text-xs hover:border-primary/50 disabled:opacity-50">
+                        <span className="block font-semibold text-foreground">{pkg.name}</span>
+                        <span className="mt-1 block text-muted-foreground">{pkg.minutes} min/mo · {money(pkg.priceCents, pkg.currency)}</span>
+                        <span className="mt-2 inline-flex items-center gap-1 font-semibold text-primary-light">{busy === `minutes:${pkg.id}` ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CreditCard className="h-3.5 w-3.5" />} Buy</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <div className="mt-5 grid grid-cols-2 rounded-lg border border-border bg-muted p-1" aria-label="Calling mode">
                 <button onClick={() => setCallMode("manual")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "manual" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><PhoneCall className="h-4 w-4" /> Manual call</button>
                 <button onClick={() => setCallMode("agent")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "agent" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><Bot className="h-4 w-4" /> AI agent</button>
@@ -545,7 +610,7 @@ export default function SoftphoneClient() {
                   {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}
                 </div>
                 <div className="mt-4 flex gap-2">
-                  {!activeCall ? <button onClick={() => void startCall()} disabled={!phone.trim() || Boolean(busy)} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground disabled:opacity-50">{busy === "call" || busy === "device" ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />} Call</button> : <>
+                  {!activeCall ? <button onClick={() => void startCall()} disabled={!phone.trim() || Boolean(busy) || !canPlaceOutboundCall} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground disabled:opacity-50">{busy === "call" || busy === "device" ? <Loader2 className="h-4 w-4 animate-spin" /> : <PhoneCall className="h-4 w-4" />} Call</button> : <>
                     <button onClick={() => { activeCall.mute(!muted); setMuted(!muted); }} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">{muted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}{muted ? "Unmute" : "Mute"}</button>
                     <button onClick={() => activeCall.disconnect()} className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-destructive px-4 py-3 text-sm font-semibold text-white"><PhoneOff className="h-4 w-4" /> End</button>
                   </>}
@@ -567,7 +632,7 @@ export default function SoftphoneClient() {
                 <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Reason for calling</span><textarea value={campaignContext} onChange={event => setCampaignContext(event.target.value)} placeholder="Ask whether they want more local appointment enquiries and offer a short website conversion review." rows={3} className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm leading-6 text-foreground outline-none focus:border-primary" /></label>
                 <label className="block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Consent basis</span><textarea value={consentBasis} onChange={event => setConsentBasis(event.target.value)} placeholder="Where and when this contact agreed to receive an automated sales call." rows={2} className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-sm leading-6 text-foreground outline-none focus:border-primary" /></label>
                 <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-background p-3 text-xs leading-5 text-muted-foreground"><input type="checkbox" checked={consentConfirmed} onChange={event => setConsentConfirmed(event.target.checked)} className="mt-0.5 h-4 w-4 accent-primary" /><span>I confirm this contact gave prior permission for an automated or AI-assisted sales call and is not on our do-not-call list.</span></label>
-                <button onClick={() => void startAgentCall()} disabled={!phone.trim() || !companyName.trim() || campaignContext.trim().length < 20 || consentBasis.trim().length < 10 || !consentConfirmed || Boolean(busy) || Boolean(agentCalls[0] && !agentCalls[0].endedAt)} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "agent-call" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />} Start disclosed AI call</button>
+                <button onClick={() => void startAgentCall()} disabled={!phone.trim() || !companyName.trim() || campaignContext.trim().length < 20 || consentBasis.trim().length < 10 || !consentConfirmed || Boolean(busy) || !canPlaceOutboundCall || Boolean(agentCalls[0] && !agentCalls[0].endedAt)} className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white disabled:opacity-40">{busy === "agent-call" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />} Start disclosed AI call</button>
 
                 {agentCalls[0] && <div className="rounded-lg border border-border bg-background p-4">
                   <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-foreground">{agentCalls[0].companyName}</p><p className="mt-1 text-xs text-muted-foreground">{agentCalls[0].status} · {agentCalls[0].outcome || "ACTIVE"}</p></div>{!agentCalls[0].endedAt && <button onClick={() => void stopAgentCall(agentCalls[0]!.id)} disabled={busy === "agent-stop"} className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/40 px-3 py-2 text-xs font-semibold text-destructive"><PhoneOff className="h-3.5 w-3.5" /> Stop</button>}</div>

@@ -457,7 +457,7 @@ export function verifyNumberQuote(token: string): NumberQuote {
 export function hasPhoneSubscriptionAccess(status: string | null | undefined, endsAt?: Date | string | null) {
   if (!status) return false;
   const normalized = status.toLowerCase();
-  if (["active", "on_trial", "past_due"].includes(normalized)) return true;
+  if (["active", "trialing", "on_trial", "past_due"].includes(normalized)) return true;
   if (normalized !== "cancelled" || !endsAt) return false;
   return new Date(endsAt).getTime() > Date.now();
 }
