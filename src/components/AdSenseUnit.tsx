@@ -74,12 +74,41 @@ function AdSenseUnit({
   const adRef = useRef<HTMLModElement>(null);
   const initialized = useRef(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isRequested, setIsRequested] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
   useEffect(() => {
     let visibilityObserver: IntersectionObserver | undefined;
+
+    if (isRequested) return;
+
+    const requestAd = () => setIsRequested(true);
+
+    if (!("IntersectionObserver" in window) || !containerRef.current) {
+      requestAd();
+    } else {
+      visibilityObserver = new IntersectionObserver(
+        entries => {
+          if (!entries.some(entry => entry.isIntersecting)) return;
+          visibilityObserver?.disconnect();
+          requestAd();
+        },
+        { rootMargin: "600px 0px" }
+      );
+
+      visibilityObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      visibilityObserver?.disconnect();
+    };
+  }, [isRequested]);
+
+  useEffect(() => {
     let statusObserver: MutationObserver | undefined;
     let collapseTimer: number | undefined;
+
+    if (!isRequested) return;
 
     const clearCollapseTimer = () => {
       if (!collapseTimer) return;
@@ -141,29 +170,19 @@ function AdSenseUnit({
       watchAdStatus();
     };
 
-    if (!("IntersectionObserver" in window) || !containerRef.current) {
-      initialize();
-    } else {
-      visibilityObserver = new IntersectionObserver(
-        entries => {
-          if (!entries.some(entry => entry.isIntersecting)) return;
-          visibilityObserver?.disconnect();
-          initialize();
-        },
-        { rootMargin: "600px 0px" }
-      );
-
-      visibilityObserver.observe(containerRef.current);
-    }
+    initialize();
 
     return () => {
-      visibilityObserver?.disconnect();
       statusObserver?.disconnect();
       clearCollapseTimer();
     };
-  }, []);
+  }, [isRequested]);
 
   if (isCollapsed) return null;
+
+  if (!isRequested) {
+    return <aside ref={containerRef} aria-hidden="true" className={`h-px min-w-0 ${className}`} />;
+  }
 
   const shellClass = shell === "native"
     ? "min-h-[84px] min-w-0 overflow-hidden rounded-2xl border border-border/70 bg-card/55 p-2.5 sm:min-h-[112px] sm:p-3"
