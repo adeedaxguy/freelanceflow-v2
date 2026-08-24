@@ -427,6 +427,116 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
       description: "Estimate how many qualified leads you need based on close rate and project value.",
     },
   ],
+  "free-leads-for-freelancers-qualification-workflow": [
+    {
+      href: "/blog/600-free-leads-per-week-for-freelancers",
+      label: "600 free leads per week",
+      description: "Use the larger free allowance as a weekly client-acquisition sprint.",
+    },
+    {
+      href: "/resources/free-b2b-leads-for-freelancers",
+      label: "Free B2B leads for freelancers",
+      description: "Route free-lead searchers into a signup-ready B2B lead workflow.",
+    },
+    {
+      href: "/blog/freelance-client-acquisition-system",
+      label: "Freelance client acquisition system",
+      description: "Connect free leads to qualification, proposals, and follow-up.",
+    },
+    {
+      href: "/features/crm-pipeline",
+      label: "CRM pipeline",
+      description: "Save qualified prospects and keep follow-up from disappearing.",
+    },
+  ],
+  "google-maps-listing-pitch-examples-for-freelancers": [
+    {
+      href: "/resources/google-maps-listing-pitch-for-freelancers",
+      label: "Google Maps listing pitch",
+      description: "Turn a local profile signal into a respectful first message.",
+    },
+    {
+      href: "/resources/google-maps-prospecting-tool-for-freelancers",
+      label: "Google Maps prospecting for freelancers",
+      description: "Use the freelancer workflow for local profile, website, and contact checks.",
+    },
+    {
+      href: "/use-cases/local-business-leads",
+      label: "Local business leads",
+      description: "Search one city and niche before saving local prospects.",
+    },
+    {
+      href: "/resources/how-to-find-businesses-without-websites-on-google-maps",
+      label: "Businesses without websites",
+      description: "Qualify no-website map signals before adding them to outreach.",
+    },
+  ],
+  "agency-google-maps-prospecting-recovery-plan": [
+    {
+      href: "/blog/google-maps-prospecting-tool-for-agencies",
+      label: "Google Maps prospecting tool for agencies",
+      description: "Use the core agency page as the hub for local lead list intent.",
+    },
+    {
+      href: "/resources/client-acquisition-dashboard-for-agencies",
+      label: "Client acquisition dashboard for agencies",
+      description: "Move qualified agency leads into a clearer follow-up workflow.",
+    },
+    {
+      href: "/resources/agency-lead-search-workflow",
+      label: "Agency lead search workflow",
+      description: "Search, qualify, save proof, and assign the next action.",
+    },
+    {
+      href: "/use-cases/local-business-leads",
+      label: "Local business leads",
+      description: "Use local business signals instead of raw list volume.",
+    },
+  ],
+  "upwork-leads-vs-direct-freelance-leads": [
+    {
+      href: "/resources/upwork-lead-generation-alternative",
+      label: "Upwork lead generation alternative",
+      description: "Compare marketplace demand with direct prospecting control.",
+    },
+    {
+      href: "/resources/lead-generation-freelancer-upwork",
+      label: "Lead generation freelancer Upwork",
+      description: "Support Upwork-intent searchers with a more specific workflow.",
+    },
+    {
+      href: "/features/lead-discovery",
+      label: "Lead Discovery",
+      description: "Build a direct pipeline beside marketplace applications.",
+    },
+    {
+      href: "/blog/freelance-client-acquisition-system",
+      label: "Freelance client acquisition system",
+      description: "Use the broader system to combine marketplaces, direct leads, and follow-up.",
+    },
+  ],
+  "600-free-leads-weekly-sprint-for-web-designers": [
+    {
+      href: "/resources/free-local-business-leads-for-web-designers",
+      label: "Free local business leads",
+      description: "Turn free searches into web design prospects with visible proof.",
+    },
+    {
+      href: "/resources/businesses-without-websites",
+      label: "Businesses without websites",
+      description: "Use no-website signals as one of the clearest web design lead paths.",
+    },
+    {
+      href: "/blog/web-design-client-finder-workflow",
+      label: "Web design client finder workflow",
+      description: "Connect local search to proof, pitch, and follow-up.",
+    },
+    {
+      href: "/for/web-designers",
+      label: "Web designers",
+      description: "Send high-intent readers into the web-designer signup path.",
+    },
+  ],
   "freelance-niche-research": [
     {
       href: "/blog/data-science-freelancer-find-clients",

@@ -1,4 +1,5 @@
 import type { BlogPost } from "@/types";
+import { AUGUST_25_2026_BLOG_POSTS } from "@/data/blog-posts-2026-08-25";
 import { AUGUST_15_2026_BLOG_POSTS } from "@/data/blog-posts-2026-08-15";
 import { SEO_LONGFORM_POSTS } from "@/data/seo-longform-posts";
 import { SEO_CONTENT_CLUSTER } from "@/data/seo-content-cluster";
@@ -277,6 +278,7 @@ Open iCloseLeads, pick one lead type, run a focused search, and save ten prospec
       "freelance cold outreach",
     ],
   },
+  ...AUGUST_25_2026_BLOG_POSTS,
   ...AUGUST_15_2026_BLOG_POSTS,
   ...PILLAR_POSTS,
   ...SEO_LONGFORM_POSTS,
