@@ -112,6 +112,43 @@ type AiAgentCall = {
   transcript: Array<{ speaker: "agent" | "prospect"; text: string; at: string }>;
 };
 
+type NumberCountry = "US" | "GB" | "CA";
+
+const NUMBER_SEARCH_SUGGESTIONS: Record<NumberCountry, Array<{ label: string; value: string }>> = {
+  US: [
+    { label: "New York 212", value: "212" },
+    { label: "Los Angeles 213", value: "213" },
+    { label: "San Francisco 415", value: "415" },
+    { label: "Chicago 312", value: "312" },
+    { label: "Dallas 214", value: "214" },
+    { label: "Miami 305", value: "305" },
+    { label: "Austin 512", value: "512" },
+    { label: "Atlanta 404", value: "404" },
+  ],
+  GB: [
+    { label: "London", value: "London" },
+    { label: "Manchester", value: "Manchester" },
+    { label: "Birmingham", value: "Birmingham" },
+    { label: "Leeds", value: "Leeds" },
+    { label: "Glasgow", value: "Glasgow" },
+    { label: "Liverpool", value: "Liverpool" },
+  ],
+  CA: [
+    { label: "Toronto 416", value: "416" },
+    { label: "Vancouver 604", value: "604" },
+    { label: "Montreal 514", value: "514" },
+    { label: "Calgary 403", value: "403" },
+    { label: "Ottawa 613", value: "613" },
+    { label: "Edmonton 780", value: "780" },
+  ],
+};
+
+function areaPlaceholder(country: NumberCountry) {
+  if (country === "GB") return "Try London, Manchester, or Birmingham";
+  if (country === "CA") return "Try Toronto, Vancouver, or 416";
+  return "Try 415, New York, or Austin";
+}
+
 async function api(body?: object) {
   const response = await fetch("/api/softphone/workspace", body ? {
     method: "POST",
@@ -158,7 +195,7 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
   const [configured, setConfigured] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const [country, setCountry] = useState<"US" | "GB" | "CA">("US");
+  const [country, setCountry] = useState<NumberCountry>("US");
   const [area, setArea] = useState("");
   const [numbers, setNumbers] = useState<AvailableNumber[]>([]);
   const [purchase, setPurchase] = useState<AvailableNumber | null>(null);
@@ -444,6 +481,7 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
     : minutes?.package
       ? `${Math.ceil(minutes.remainingSeconds / 60)} of ${minutes.package.minutes} min left`
       : "Monthly calling package required";
+  const areaSuggestions = NUMBER_SEARCH_SUGGESTIONS[country];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
@@ -549,9 +587,16 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
           </div>}
           <div className="rounded-lg border border-border bg-card p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-end">
-              <label className="block md:w-48"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Country</span><select value={country} onChange={event => setCountry(event.target.value as "US" | "GB" | "CA")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground"><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option></select></label>
-              <label className="block flex-1"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">City or area code</span><input value={area} onChange={event => setArea(event.target.value)} placeholder={country === "GB" ? "London" : "e.g. 415 or Toronto"} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary" /></label>
+              <label className="block md:w-48"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Country</span><select value={country} onChange={event => { setCountry(event.target.value as NumberCountry); setArea(""); setNumbers([]); }} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground"><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option></select></label>
+              <label className="block flex-1"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">City or area code</span><input value={area} onChange={event => { setArea(event.target.value); setNumbers([]); }} list={`softphone-area-options-${country}`} placeholder={areaPlaceholder(country)} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary" /><datalist id={`softphone-area-options-${country}`}>{areaSuggestions.map(option => <option key={option.value} value={option.value} label={option.label} />)}</datalist></label>
               <button onClick={() => void searchNumbers()} disabled={busy === "search"} className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50">{busy === "search" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />} Search numbers</button>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2" aria-label="Popular city and area code suggestions">
+              {areaSuggestions.slice(0, 6).map(option => (
+                <button key={option.value} type="button" onClick={() => { setArea(option.value); setNumbers([]); }} className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground">
+                  {option.label}
+                </button>
+              ))}
             </div>
             <p className="mt-3 text-xs text-muted-foreground">Only voice-enabled numbers without address-registration requirements are shown. Availability is checked live, and the displayed monthly price includes your iCloseLeads calling workspace.</p>
           </div>
