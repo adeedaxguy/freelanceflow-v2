@@ -85,7 +85,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
   const market = marketFromLocation(data.location);
   const common = baseIdentity(data);
 
-  if (/\b(auto|car|body|collision|mechanic|garage|repair)\b/.test(text)) {
+  if (/\b(auto|car|body|collision|mechanic|garage|repair|tire|tyre|detailing|mot)\b/.test(text)) {
     return {
       ...common,
       primaryCta: data.phone ? "Request an estimate" : "Get an estimate",
@@ -125,7 +125,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(clean|maid|janitorial|housekeeping|carpet)\b/.test(text)) {
+  if (/\b(clean|maid|janitorial|housekeeping|carpet|pressure washing|window cleaning)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Get a cleaning quote",
@@ -165,7 +165,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(cafe|coffee|restaurant|bakery|bake|bread|pastry|cake|food|pizza|bar|grill|diner|catering)\b/.test(text)) {
+  if (/\b(cafe|coffee|restaurant|bakery|bake|bread|pastry|cake|food|pizza|bar|grill|diner|catering|brunch|takeaway|takeout)\b/.test(text)) {
     const isBakery = /\b(bakery|bake|bread|pastry|cake|patisserie)\b/.test(text);
     return {
       ...common,
@@ -233,7 +233,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(salon|barber|spa|nail|beauty|massage|stylist)\b/.test(text)) {
+  if (/\b(salon|barber|spa|nail|beauty|massage|stylist|lashes|brows|makeup|aesthetic)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Book an appointment",
@@ -273,7 +273,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(plumb|electric|roof|handyman|hvac|landscap|painter|locksmith|contractor)\b/.test(text)) {
+  if (/\b(plumb\w*|electric\w*|roof\w*|handyman|hvac|landscap\w*|painter|locksmith|contractor|builder|construction|flooring|renovation|garage door|pest control|fence|pool service)\b/.test(text)) {
     return {
       ...common,
       primaryCta: data.phone ? "Request service" : "Get a quote",
@@ -313,7 +313,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet)\b/.test(text)) {
+  if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet|orthodontist|dermatology)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Book an appointment",
@@ -393,7 +393,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|advisor|financial)\b/.test(text)) {
+  if (/\b(law|lawyer|attorney|solicitor|legal|accountant|bookkeeping|cpa|tax|consultant|insurance|advisor|adviser|financial|wealth|mortgage)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Book a consultation",
@@ -473,7 +473,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio)\b/.test(text)) {
+  if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio|crossfit)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Start a trial",
@@ -513,7 +513,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning)\b/.test(text)) {
+  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning|daycare|nursery|preschool|childcare)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "View classes",
@@ -553,7 +553,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(event|events|wedding|venue|party|entertainment|music|photobooth|conference|birthday)\b/.test(text)) {
+  if (/\b(event|events|wedding|venue|party|entertainment|music|photobooth|photo booth|conference|birthday|decor|dj)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Check availability",
@@ -633,7 +633,7 @@ export function getSiteDraftIdentity(data: SiteDraftData, creativeBrief = ""): S
     };
   }
 
-  if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion)\b/.test(text)) {
+  if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion|furniture|apparel)\b/.test(text)) {
     return {
       ...common,
       primaryCta: "Browse the collection",

@@ -44,6 +44,7 @@ export type SiteDesignVariation = {
   rhythm: string;
   texture: string;
   keywords: string[];
+  categoryKeywords: string[];
   style: DesignStyle;
   theme: DesignTheme;
   sections: DesignSections;
@@ -69,6 +70,7 @@ type Archetype = {
   badge: string;
   rhythm: string;
   keywords: string[];
+  categoryKeywords?: string[];
   style: DesignStyle;
   theme: DesignTheme;
   sections: DesignSections;
@@ -112,6 +114,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Premium local brand",
     rhythm: "quiet, premium, editorial",
     keywords: ["premium", "luxury", "high end", "elegant", "studio", "salon", "spa", "interior", "boutique"],
+    categoryKeywords: ["salon", "barber", "spa", "nail", "beauty", "massage", "stylist", "lashes", "brows", "interior design", "med spa"],
     style: "premium",
     theme: "light",
     sections: "9",
@@ -128,6 +131,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Fast response",
     rhythm: "direct, bold, action-heavy",
     keywords: ["urgent", "emergency", "same day", "fast", "call", "plumber", "locksmith", "hvac", "roof", "auto"],
+    categoryKeywords: ["auto", "car", "body shop", "collision", "mechanic", "garage", "tire", "tyre", "detailing", "mot"],
     style: "bold",
     theme: "dark",
     sections: "7",
@@ -144,6 +148,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Neighbourhood favourite",
     rhythm: "warm, human, reassuring",
     keywords: ["family", "friendly", "neighborhood", "neighbourhood", "warm", "local feel", "cleaning", "cafe", "bakery"],
+    categoryKeywords: ["cleaning", "maid", "janitorial", "housekeeping", "carpet cleaning", "pressure washing"],
     style: "friendly",
     theme: "light",
     sections: "7",
@@ -191,7 +196,8 @@ const ARCHETYPES: Archetype[] = [
     summary: "Visual-first layout for work examples, transformations, food, beauty, repairs, and before-after proof.",
     badge: "Show the work",
     rhythm: "visual, proof-heavy, confident",
-    keywords: ["portfolio", "gallery", "photos", "before after", "transformation", "show work", "restaurant", "beauty"],
+    keywords: ["portfolio", "gallery", "photos", "before after", "transformation", "show work"],
+    categoryKeywords: ["photography", "creative agency", "design studio", "marketing agency", "tattoo", "artist", "portfolio"],
     style: "creative",
     theme: "dark",
     sections: "9",
@@ -208,6 +214,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Consultation-ready",
     rhythm: "premium, calm, authority-led",
     keywords: ["consultation", "advisor", "clinic", "specialist", "b2b", "high value", "premium", "estimate"],
+    categoryKeywords: ["consulting", "consultant", "advisor", "adviser", "specialist", "b2b"],
     style: "premium",
     theme: "dark",
     sections: "11",
@@ -256,6 +263,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Menu and visit path",
     rhythm: "visual, warm, visit-led",
     keywords: ["restaurant", "cafe", "coffee", "bakery", "pizza", "diner", "bar", "grill", "menu", "catering", "food", "takeaway", "takeout"],
+    categoryKeywords: ["restaurant", "cafe", "coffee", "bakery", "pizza", "diner", "bar", "grill", "menu", "catering", "food", "takeaway", "takeout", "brunch"],
     style: "friendly",
     theme: "light",
     sections: "9",
@@ -272,6 +280,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Care pathway",
     rhythm: "calm, clear, reassuring",
     keywords: ["clinic", "medical", "dental", "dentist", "doctor", "physio", "therapy", "chiropractor", "optician", "veterinary", "vet", "wellness"],
+    categoryKeywords: ["clinic", "medical", "dental", "dentist", "doctor", "physio", "therapy", "chiropractor", "optician", "veterinary", "vet", "orthodontist", "dermatology"],
     style: "professional",
     theme: "light",
     sections: "9",
@@ -288,6 +297,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Call-ready trade",
     rhythm: "urgent, direct, proof-led",
     keywords: ["plumber", "electrician", "roof", "roofer", "hvac", "locksmith", "handyman", "builder", "construction", "contractor", "repair", "emergency"],
+    categoryKeywords: ["plumber", "electrician", "roof", "roofer", "hvac", "locksmith", "handyman", "builder", "construction", "contractor", "landscaping", "painter", "flooring", "renovation", "garage door", "pest control", "fence", "pool service"],
     style: "bold",
     theme: "dark",
     sections: "7",
@@ -304,6 +314,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Property enquiries",
     rhythm: "premium, structured, trust-led",
     keywords: ["real estate", "estate agent", "realtor", "property", "homes", "apartments", "lettings", "rentals", "mortgage", "valuation"],
+    categoryKeywords: ["real estate", "estate agent", "realtor", "property", "homes", "apartments", "lettings", "rentals", "valuation"],
     style: "premium",
     theme: "light",
     sections: "11",
@@ -320,6 +331,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Product discovery",
     rhythm: "visual, organised, shopping-led",
     keywords: ["shop", "store", "retail", "ecommerce", "commerce", "fashion", "jewelry", "jewellery", "florist", "boutique", "product", "collection"],
+    categoryKeywords: ["shop", "store", "retail", "ecommerce", "e-commerce", "fashion", "jewelry", "jewellery", "florist", "boutique", "product", "collection", "furniture", "apparel"],
     style: "creative",
     theme: "light",
     sections: "9",
@@ -336,6 +348,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Trial session path",
     rhythm: "energetic, structured, membership-led",
     keywords: ["gym", "fitness", "yoga", "pilates", "trainer", "martial", "dance", "studio", "membership", "class", "schedule"],
+    categoryKeywords: ["gym", "fitness", "yoga", "pilates", "trainer", "martial arts", "dance", "crossfit", "class", "schedule"],
     style: "bold",
     theme: "dark",
     sections: "9",
@@ -352,6 +365,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Consultation trust",
     rhythm: "serious, calm, authoritative",
     keywords: ["law", "lawyer", "attorney", "solicitor", "legal", "accountant", "tax", "compliance", "practice", "case"],
+    categoryKeywords: ["law", "lawyer", "attorney", "solicitor", "legal", "accountant", "tax", "bookkeeping", "cpa", "compliance"],
     style: "professional",
     theme: "light",
     sections: "9",
@@ -368,6 +382,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Advisory pipeline",
     rhythm: "measured, premium, proof-led",
     keywords: ["finance", "financial", "advisor", "adviser", "insurance", "consulting", "consultant", "wealth", "mortgage", "business advisor"],
+    categoryKeywords: ["finance", "financial", "insurance", "wealth", "mortgage", "business advisor"],
     style: "premium",
     theme: "dark",
     sections: "11",
@@ -384,6 +399,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Enrolment flow",
     rhythm: "clear, supportive, outcome-led",
     keywords: ["education", "school", "course", "training", "academy", "tutor", "tuition", "class", "workshop", "learning", "enrol", "enroll"],
+    categoryKeywords: ["education", "school", "course", "training", "academy", "tutor", "tuition", "workshop", "learning", "daycare", "nursery", "preschool", "childcare"],
     style: "friendly",
     theme: "light",
     sections: "9",
@@ -400,6 +416,7 @@ const ARCHETYPES: Archetype[] = [
     badge: "Booking moments",
     rhythm: "expressive, visual, date-led",
     keywords: ["event", "events", "wedding", "venue", "party", "entertainment", "music", "photobooth", "catering", "decor", "birthday", "conference"],
+    categoryKeywords: ["event", "events", "wedding", "venue", "party", "entertainment", "music", "photobooth", "photo booth", "decor", "birthday", "conference", "dj"],
     style: "creative",
     theme: "dark",
     sections: "11",
@@ -494,7 +511,20 @@ function normalize(value?: string) {
 }
 
 function scoreTerms(haystack: string, terms: string[]) {
-  return terms.reduce((score, term) => score + (haystack.includes(term.toLowerCase()) ? 1 : 0), 0);
+  return terms.reduce((score, term) => score + (termMatches(haystack, term) ? 1 : 0), 0);
+}
+
+function escapeRegex(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function termMatches(haystack: string, term: string) {
+  const normalized = term.toLowerCase();
+  if (!normalized) return false;
+  if (/^[a-z0-9]+$/.test(normalized)) {
+    return new RegExp(`\\b${escapeRegex(normalized)}\\b`).test(haystack);
+  }
+  return haystack.includes(normalized);
 }
 
 function compositionForTemplate(template: DesignTemplate): DesignComposition {
@@ -539,6 +569,7 @@ export const DESIGN_VARIATIONS: SiteDesignVariation[] = ARCHETYPES.flatMap(arche
     rhythm: archetype.rhythm,
     texture: motif.texture,
     keywords: [...archetype.keywords, ...motif.keywords],
+    categoryKeywords: archetype.categoryKeywords ?? [],
     style: archetype.style,
     theme: motif.theme ?? archetype.theme,
     sections: archetype.sections,
@@ -576,14 +607,17 @@ export function resolveDesignVariation({
   const haystack = normalize(`${prompt} ${company} ${category} ${location}`);
   if (!haystack) return DESIGN_VARIATIONS[0]!;
 
-  let best = DESIGN_VARIATIONS[stableHash(haystack) % DESIGN_VARIATIONS.length]!;
-  let bestScore = 0;
+  let best = DESIGN_VARIATIONS[0]!;
+  let bestScore = -1;
+  let bestTie = Number.POSITIVE_INFINITY;
 
   for (const variation of DESIGN_VARIATIONS) {
-    const score = scoreTerms(haystack, variation.keywords);
-    if (score > bestScore) {
+    const score = (scoreTerms(haystack, variation.categoryKeywords) * 5) + scoreTerms(haystack, variation.keywords);
+    const tie = stableHash(`${haystack}:${variation.id}`);
+    if (score > bestScore || (score === bestScore && tie < bestTie)) {
       best = variation;
       bestScore = score;
+      bestTie = tie;
     }
   }
 

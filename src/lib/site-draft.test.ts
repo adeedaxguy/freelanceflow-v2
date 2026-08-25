@@ -29,4 +29,13 @@ describe("site draft identity", () => {
     expect(identity.segment).toBe("auto");
     expect(identity.primaryCta).toContain("estimate");
   });
+
+  it.each([
+    ["Little Steps", "Daycare", "education"],
+    ["FreshJet", "Pressure washing", "cleaning"],
+    ["Ledger North", "CPA accountant", "professional"],
+    ["Northline Plumbing", "Plumber", "trade"],
+  ])("recognizes common local categories for %s", (company, category, segment) => {
+    expect(getSiteDraftIdentity({ company, category, location: "Denver, CO" }).segment).toBe(segment);
+  });
 });

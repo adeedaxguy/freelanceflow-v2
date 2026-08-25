@@ -421,23 +421,24 @@ function WebDesignBuilderContent() {
     pitch: clean(searchParams.get("pitch"), "A cleaner, faster website can turn local searches into calls, quote requests, and booked work."),
     status: clean(searchParams.get("status"), "unknown"),
   }), [searchParams]);
-  const generatedIdentity = useMemo(() => getSiteDraftIdentity(data), [data]);
-
-  const [style, setStyle] = useState(() => optionValue(searchParams.get("style"), STYLE_OPTIONS, "professional"));
-  const [theme, setTheme] = useState(() => optionValue(searchParams.get("theme"), THEME_OPTIONS, "dark"));
-  const [sections, setSections] = useState(() => optionValue(searchParams.get("sections"), SECTION_OPTIONS, "7"));
-  const [images, setImages] = useState(() => optionValue(searchParams.get("images"), IMAGE_OPTIONS, "gallery"));
-  const [contentDepth, setContentDepth] = useState(() => optionValue(searchParams.get("contentDepth"), CONTENT_OPTIONS, "balanced"));
-  const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, "quotes"));
-  const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, "conversion"));
-  const [designPrompt, setDesignPrompt] = useState(() => promptInputValue(searchParams.get("prompt")));
-  const [variation, setVariation] = useState(() => resolveDesignVariation({
+  const initialVariation = resolveDesignVariation({
     variationId: clean(searchParams.get("variation")),
     prompt: cleanPrompt(searchParams.get("prompt")),
     company: data.company,
     category: data.category,
     location: data.location,
-  }).id);
+  });
+  const initialPatch = variationToOptionPatch(initialVariation);
+
+  const [style, setStyle] = useState(() => optionValue(searchParams.get("style"), STYLE_OPTIONS, initialPatch.style));
+  const [theme, setTheme] = useState(() => optionValue(searchParams.get("theme"), THEME_OPTIONS, initialPatch.theme));
+  const [sections, setSections] = useState(() => optionValue(searchParams.get("sections"), SECTION_OPTIONS, initialPatch.sections));
+  const [images, setImages] = useState(() => optionValue(searchParams.get("images"), IMAGE_OPTIONS, initialPatch.images));
+  const [contentDepth, setContentDepth] = useState(() => optionValue(searchParams.get("contentDepth"), CONTENT_OPTIONS, initialPatch.contentDepth));
+  const [conversionGoal, setConversionGoal] = useState(() => optionValue(searchParams.get("conversionGoal"), GOAL_OPTIONS, initialPatch.conversionGoal));
+  const [layout, setLayout] = useState(() => optionValue(searchParams.get("layout"), LAYOUT_OPTIONS, initialPatch.layout));
+  const [designPrompt, setDesignPrompt] = useState(() => promptInputValue(searchParams.get("prompt")));
+  const [variation, setVariation] = useState(() => initialVariation.id);
   const [headline, setHeadline] = useState(() => clean(searchParams.get("headline")));
   const [subheadline, setSubheadline] = useState(() => clean(searchParams.get("subheadline")));
   const [cta, setCta] = useState(() => clean(searchParams.get("cta")));
@@ -472,6 +473,7 @@ function WebDesignBuilderContent() {
     category: data.category,
     location: data.location,
   }), [data.category, data.company, data.location, designPrompt, variation]);
+  const generatedIdentity = useMemo(() => getSiteDraftIdentity(data, designPrompt), [data, designPrompt]);
   const identity = useMemo(() => {
     return {
       ...generatedIdentity,

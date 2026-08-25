@@ -227,23 +227,24 @@ function compositionForBlueprint(id: PreviewBlueprint["id"], fallback: DesignCom
 function templateFromBusiness(text: string, fallback: DesignTemplate): PreviewBlueprint["id"] {
   const value = text.toLowerCase();
   if (/\b(auto|car|body|collision|mechanic|garage|repair|tire|tyre|detailing|mot)\b/.test(value)) return "auto-estimate";
-  if (/\b(clean|maid|janitorial|housekeeping|carpet|pressure washing)\b/.test(value)) return "cleaning-plan";
-  if (/\b(cafe|coffee|restaurant|bakery|food|pizza|bar|grill|diner|catering|takeaway|takeout)\b/.test(value)) return "menu-visit";
-  if (/\b(salon|barber|spa|nail|beauty|massage|stylist|lashes|brows|makeup)\b/.test(value)) return "beauty-booking";
-  if (/\b(plumb|electric|roof|handyman|hvac|landscap|painter|locksmith|contractor|builder|construction)\b/.test(value)) return "trade-emergency";
-  if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet)\b/.test(value)) return "clinic-trust";
-  if (/\b(law|lawyer|attorney|accountant|consultant|insurance|advisor|financial)\b/.test(value)) return "professional-consult";
-  if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio)\b/.test(value)) return "fitness-membership";
-  if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion)\b/.test(value)) return "retail-showcase";
+  if (/\b(clean|maid|janitorial|housekeeping|carpet|pressure washing|window cleaning)\b/.test(value)) return "cleaning-plan";
+  if (/\b(cafe|coffee|restaurant|bakery|food|pizza|bar|grill|diner|catering|takeaway|takeout|brunch)\b/.test(value)) return "menu-visit";
+  if (/\b(salon|barber|spa|nail|beauty|massage|stylist|lashes|brows|makeup|aesthetic)\b/.test(value)) return "beauty-booking";
+  if (/\b(plumb\w*|electric\w*|roof\w*|handyman|hvac|landscap\w*|painter|locksmith|contractor|builder|construction|flooring|renovation|garage door|pest control|fence|pool service)\b/.test(value)) return "trade-emergency";
+  if (/\b(dentist|dental|doctor|clinic|medical|physio|therapy|chiropractor|optician|veterinary|vet|orthodontist|dermatology)\b/.test(value)) return "clinic-trust";
+  if (/\b(law|lawyer|attorney|solicitor|legal|accountant|bookkeeping|cpa|tax|consultant|insurance|advisor|adviser|financial|wealth|mortgage)\b/.test(value)) return "professional-consult";
+  if (/\b(gym|fitness|yoga|pilates|trainer|martial|dance|studio|crossfit)\b/.test(value)) return "fitness-membership";
+  if (/\b(retail|shop|store|boutique|florist|jewelry|jewellery|pet|groom|fashion|furniture|apparel)\b/.test(value)) return "retail-showcase";
   if (/\b(photo|photography|creative|design|agency|marketing|tattoo|artist|portfolio)\b/.test(value)) return "creative-portfolio";
   if (/\b(real estate|estate agent|realtor|property|homes|apartment|lettings|rental|valuation)\b/.test(value)) return "real-estate-listings";
   if (/\b(ecommerce|e-commerce|online store|shopify|product|collection|catalogue|catalog)\b/.test(value)) return "ecommerce-showroom";
-  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning)\b/.test(value)) return "education-course";
-  if (/\b(event|wedding|venue|party|entertainment|music|photobooth|conference|birthday)\b/.test(value)) return "event-booking";
+  if (/\b(school|course|training|academy|tutor|tuition|class|workshop|education|learning|daycare|nursery|preschool|childcare)\b/.test(value)) return "education-course";
+  if (/\b(event|wedding|venue|party|entertainment|music|photobooth|photo booth|conference|birthday|decor|dj)\b/.test(value)) return "event-booking";
   if (/\b(hotel|travel|tour|tourism|stay|guesthouse|airbnb|holiday|vacation)\b/.test(value)) return "travel-booking";
 
   if (fallback === "boutique-booking") return "beauty-booking";
   if (fallback === "urgent-repair") return "trade-emergency";
+  if (fallback === "trade-emergency") return "trade-emergency";
   if (fallback === "neighborhood-commerce") return "menu-visit";
   if (fallback === "visual-proof") return "creative-portfolio";
   if (fallback === "consult-authority") return "professional-consult";
