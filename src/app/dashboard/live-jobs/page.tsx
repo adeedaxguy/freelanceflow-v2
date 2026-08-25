@@ -243,7 +243,7 @@ export default function LiveJobsPage() {
   const [hasEmail,        setHasEmail]        = useState(false);
   const [minScore,        setMinScore]        = useState(0);
   const [showFilter,      setShowFilter]      = useState(false);
-  const [sortBy,          setSortBy]          = useState<"newest"|"bestMatch"|"confidence">("newest");
+  const [sortBy,          setSortBy]          = useState<"newest"|"bestMatch"|"confidence">("bestMatch");
   const [countdown,       setCountdown]       = useState(0);
   const [seenIds,         setSeenIds]         = useState<Set<string>>(new Set());
   const [prefs,           setPrefs]           = useState<BestMatchPrefs>(DEFAULT_PREFS);
