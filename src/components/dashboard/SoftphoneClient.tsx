@@ -143,7 +143,7 @@ function duration(seconds: number | null) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-export default function SoftphoneClient() {
+export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean }) {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const deviceRef = useRef<VoiceDevice | null>(null);
@@ -450,7 +450,7 @@ export default function SoftphoneClient() {
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-accent">
-            <ShieldCheck className="h-4 w-4" /> Admin beta
+            <ShieldCheck className="h-4 w-4" /> {isAdmin ? "Admin beta" : "Softphone"}
           </div>
           <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Softphone</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Buy a dedicated business number, call leads inside iCloseLeads, receive callbacks, and keep a clean activity history.</p>
@@ -538,7 +538,7 @@ export default function SoftphoneClient() {
               <button onClick={() => { setShowNumberSearch(false); setNumbers([]); }} className="rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground">Back to softphone</button>
             </div>
           )}
-          {!workspace.phoneNumber && <div className="flex flex-col gap-3 rounded-lg border border-accent/25 bg-accent/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+          {isAdmin && !workspace.phoneNumber && <div className="flex flex-col gap-3 rounded-lg border border-accent/25 bg-accent/5 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-semibold text-foreground">Use the number already owned by Twilio</h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Admin recovery only. This keeps messaging untouched, connects the existing number to iCloseLeads voice, and does not create another purchase.</p>
@@ -599,12 +599,12 @@ export default function SoftphoneClient() {
                   </div>
                 )}
               </div>
-              <div className="mt-5 grid grid-cols-2 rounded-lg border border-border bg-muted p-1" aria-label="Calling mode">
+              <div className={`mt-5 grid rounded-lg border border-border bg-muted p-1 ${isAdmin ? "grid-cols-2" : "grid-cols-1"}`} aria-label="Calling mode">
                 <button onClick={() => setCallMode("manual")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "manual" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><PhoneCall className="h-4 w-4" /> Manual call</button>
-                <button onClick={() => setCallMode("agent")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "agent" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><Bot className="h-4 w-4" /> AI agent</button>
+                {isAdmin && <button onClick={() => setCallMode("agent")} className={`inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold ${callMode === "agent" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}><Bot className="h-4 w-4" /> AI agent</button>}
               </div>
 
-              {callMode === "manual" ? <>
+              {!isAdmin || callMode === "manual" ? <>
                 <label className="mt-6 block"><span className="mb-1.5 block text-xs font-semibold uppercase text-muted-foreground">Number to call</span><input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+1 415 555 0123" className="w-full rounded-lg border border-border bg-background px-3 py-3 text-lg font-semibold text-foreground outline-none focus:border-primary" /></label>
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   {"123456789*0#".split("").map(key => <button key={key} onClick={() => pressKey(key)} aria-label={activeCall ? `Send ${key}` : `Enter ${key}`} className="h-11 rounded-lg border border-border bg-background text-sm font-semibold text-foreground hover:border-primary/40">{key}</button>)}

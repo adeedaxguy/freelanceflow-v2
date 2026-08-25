@@ -61,11 +61,8 @@ export function isTelephonyConfigured() {
   );
 }
 
-export function isSoftphoneAllowed(role: string | undefined, plan: string | undefined) {
-  return role === "ADMIN" || (
-    process.env.TWILIO_SOFTPHONE_ENABLED === "true" &&
-    ["pro", "agency"].includes((plan || "").toLowerCase())
-  );
+export function isSoftphoneAllowed(role: string | undefined, _plan: string | undefined) {
+  return role === "ADMIN" || (role === "USER" && process.env.TWILIO_SOFTPHONE_ENABLED === "true");
 }
 
 function parentClient() {

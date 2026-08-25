@@ -88,12 +88,13 @@ describe("telephony security helpers", () => {
     expect(() => usageAlertSettingKey(" ")).toThrow("idempotency token");
   });
 
-  it("keeps the beta admin-only until explicitly released", () => {
+  it("allows signed-in users when the softphone is released", () => {
     expect(isSoftphoneAllowed("ADMIN", "free")).toBe(true);
     expect(isSoftphoneAllowed("USER", "agency")).toBe(false);
     process.env.TWILIO_SOFTPHONE_ENABLED = "true";
     expect(isSoftphoneAllowed("USER", "agency")).toBe(true);
-    expect(isSoftphoneAllowed("USER", "free")).toBe(false);
+    expect(isSoftphoneAllowed("USER", "free")).toBe(true);
+    expect(isSoftphoneAllowed(undefined, "free")).toBe(false);
   });
 
   it("requires both parent credentials and the dedicated API key", () => {

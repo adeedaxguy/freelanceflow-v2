@@ -40,7 +40,7 @@ const NAV_GROUPS = [
     label: "Outreach",
     items: [
       { href: "/dashboard/campaigns",  label: "Campaigns",   icon: Megaphone },
-      { href: "/dashboard/softphone",  label: "Softphone",   icon: PhoneCall,    badge: "SOON" },
+      { href: "/dashboard/softphone",  label: "Softphone",   icon: PhoneCall },
       { href: "/dashboard/whatsapp",   label: "WhatsApp",    icon: MessageCircle, badge: "SOON" },
       { href: "/dashboard/templates",  label: "Templates",   icon: FileText },
       { href: "/dashboard/sent",       label: "Outreach History", icon: Send },

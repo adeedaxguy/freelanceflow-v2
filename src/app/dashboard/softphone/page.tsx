@@ -3,14 +3,16 @@ import { PhoneCall } from "lucide-react";
 import BetaFeaturePage from "@/components/dashboard/BetaFeaturePage";
 import SoftphoneClient from "@/components/dashboard/SoftphoneClient";
 import { authOptions } from "@/lib/auth";
+import { isSoftphoneAllowed } from "@/lib/telephony";
 
 export const dynamic = "force-dynamic";
 
 export default async function SoftphonePage() {
   const session = await getServerSession(authOptions);
   const isAdmin = session?.user?.role === "ADMIN";
+  const isAllowed = isSoftphoneAllowed(session?.user?.role, session?.user?.plan);
 
-  if (isAdmin) return <SoftphoneClient />;
+  if (isAllowed) return <SoftphoneClient isAdmin={isAdmin} />;
 
   return (
     <BetaFeaturePage
