@@ -311,6 +311,10 @@ function detectUrgency(text: string): boolean {
   return /\b(asap|urgent(?:ly)?|immediately|right\s*away|start\s*(?:today|now|asap|immediately)|quick(?:ly)?|rush(?:\s*job)?|time[\s-]sensitive|need\s*(?:it\s*)?(?:done\s*)?(?:today|now|asap)|deadline\s*soon)\b/i.test(text);
 }
 
+function isJobSeekerPost(text: string): boolean {
+  return /\b(open\s+to\s+work|hire\s+me|available\s+for\s+(?:hire|work)|need\s+(?:a\s+)?job|looking\s+for\b.{0,80}\b(?:job|work|role|position|opportunit(?:y|ies)))\b/i.test(text);
+}
+
 /**
  * Lenient keyword scorer.
  * Title hits weigh more than body hits. Generic freelance/hiring signals add bonus.
@@ -440,6 +444,7 @@ async function fetchRedditSub(
     const titleRaw = entry.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i)?.[1] ?? "";
     const title    = stripHtml(titleRaw).trim();
     if (!title) continue;
+    if (isJobSeekerPost(title)) continue;
 
     // Skip posts that don't match the "hiring" filter for this subreddit
     if (!isHiringFilter(title)) continue;
@@ -461,6 +466,7 @@ async function fetchRedditSub(
     // Body content
     const contentRaw = entry.match(/<content[^>]*>([\s\S]*?)<\/content>/i)?.[1] ?? "";
     const body       = stripHtml(contentRaw);
+    if (isJobSeekerPost(`${title} ${body}`)) continue;
 
     // Author
     const author = entry.match(/<name[^>]*>([\s\S]*?)<\/name>/i)?.[1]?.trim() ?? "";
