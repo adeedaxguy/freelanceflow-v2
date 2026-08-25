@@ -136,6 +136,22 @@ function businessScaleSignal(lead: Pick<LocalBizLead,
   };
 }
 
+const NON_BUSINESS_OSM_KEYS = new Set([
+  "highway", "place", "boundary", "waterway", "railway", "natural",
+  "landuse", "route", "public_transport", "addr:street",
+]);
+const NON_BUSINESS_OSM_VALUES = new Set([
+  "street", "road", "residential", "primary", "secondary", "tertiary",
+  "service", "unclassified", "living_street", "neighbourhood", "suburb",
+  "city", "town", "village", "hamlet",
+]);
+
+function isLikelyBusinessOsmFeature(key: string | undefined, value: string | undefined): boolean {
+  const k = key?.toLowerCase() ?? "";
+  const v = value?.toLowerCase() ?? "";
+  return !NON_BUSINESS_OSM_KEYS.has(k) && !NON_BUSINESS_OSM_VALUES.has(v);
+}
+
 // ── OSM Keyword → Tag mapping (100+ business types) ───────────────────────────
 type OsmTag = { key: string; value: string };
 const OSM_MAP: Record<string, OsmTag[]> = {
@@ -500,6 +516,7 @@ async function fetchFromPhoton(keyword: string, bbox: BBox): Promise<Partial<Loc
       const p    = f.properties;
       const name = p.name?.trim();
       if (!name) continue;
+      if (!isLikelyBusinessOsmFeature(p.osm_key, p.osm_value)) continue;
 
       // Filter with generous slack
       const [lon, lat] = f.geometry.coordinates;

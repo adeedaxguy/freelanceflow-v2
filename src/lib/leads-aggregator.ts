@@ -1918,6 +1918,11 @@ const SOURCE_RANK_BOOST: Partial<Record<LeadSource, number>> = {
   workingnomads:  1,
 };
 
+function leadDisplayRank(lead: AggregatedLead): number {
+  const freshnessPenalty = Math.min(24, Math.floor(lead.hoursAgo / 12));
+  return lead.qualityScore + lead.confidence + (SOURCE_RANK_BOOST[lead.source] ?? 0) - freshnessPenalty;
+}
+
 export async function aggregateLeads(niche: string | string[], options: AggregateOptions = {}): Promise<AggregatedLead[]> {
   const { leads } = await aggregateLeadsWithDiagnostics(niche, options);
   return leads;
@@ -1967,13 +1972,11 @@ export async function aggregateLeadsWithDiagnostics(
   all = all.filter(l => l.confidence >= minConfidence);
   const totalAfterMinConfidence = all.length;
 
-  // Sort: freshest → quality → confidence
+  // Sort: best fit first, with freshness as a light penalty.
   all.sort((a, b) => {
-    if (a.hoursAgo !== b.hoursAgo) return a.hoursAgo - b.hoursAgo;
-    const aq = a.qualityScore + (SOURCE_RANK_BOOST[a.source] ?? 0);
-    const bq = b.qualityScore + (SOURCE_RANK_BOOST[b.source] ?? 0);
-    if (bq !== aq) return bq - aq;
-    return b.confidence - a.confidence;
+    const rankDiff = leadDisplayRank(b) - leadDisplayRank(a);
+    if (rankDiff !== 0) return rankDiff;
+    return a.hoursAgo - b.hoursAgo;
   });
 
   // Deduplicate — three-key strategy to catch all duplicate shapes:
