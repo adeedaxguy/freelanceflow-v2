@@ -55,11 +55,11 @@ function adShouldCollapseAfterDelay(ad: HTMLModElement | null) {
 
 type AdSenseUnitProps = {
   slot: string;
-  format: "auto" | "fluid";
+  format: "auto" | "fluid" | "horizontal";
   layoutKey?: string;
   fullWidthResponsive?: boolean;
   className?: string;
-  shell?: "display" | "native";
+  shell?: "banner" | "display" | "native";
 };
 
 function AdSenseUnit({
@@ -185,18 +185,26 @@ function AdSenseUnit({
   }
 
   const shellClass = shell === "native"
-    ? "min-h-[84px] min-w-0 overflow-hidden rounded-2xl border border-border/70 bg-card/55 p-2.5 sm:min-h-[112px] sm:p-3"
-    : "min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/70 bg-card/70 p-2 sm:min-h-[128px] sm:p-3";
+    ? "min-h-[84px] min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card/45 p-2.5 sm:min-h-[112px] sm:p-3"
+    : shell === "banner"
+      ? "min-h-[90px] min-w-0 overflow-hidden rounded-lg border border-border/55 bg-background/35 p-1.5 sm:min-h-[104px] sm:p-2"
+      : "min-h-[96px] min-w-0 overflow-hidden rounded-xl border border-border/60 bg-card/55 p-2 sm:min-h-[128px] sm:p-3";
+  const labelClass = shell === "banner"
+    ? "mb-2 text-left text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/75"
+    : "mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground";
+  const adStyle = shell === "banner"
+    ? { display: "block", minHeight: 90 }
+    : { display: "block" };
 
   return (
     <aside ref={containerRef} aria-label="Advertisement" className={`min-w-0 ${className}`}>
-      <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+      <p className={labelClass}>
         Advertisement
       </p>
       <div className={shellClass}>
         <ins
           ref={adRef}
-          style={{ display: "block" }}
+          style={adStyle}
           data-ad-client={AD_CLIENT}
           data-ad-slot={slot}
           data-ad-format={format}
@@ -268,11 +276,27 @@ function ResponsiveMarketingAd({ className = "" }: { className?: string }) {
   );
 }
 
+function ResponsiveBannerAd({ className = "" }: { className?: string }) {
+  const viewport = useAdViewport();
+
+  if (!viewport) return null;
+
+  return (
+    <AdSenseUnit
+      slot={DISPLAY_AD_SLOT}
+      format="horizontal"
+      fullWidthResponsive
+      shell="banner"
+      className={className}
+    />
+  );
+}
+
 export function MarketingAdBand({ className = "" }: { className?: string }) {
   return (
-    <section className={`border-y border-border bg-surface/25 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 ${className}`}>
-      <div className="mx-auto max-w-6xl">
-        <ResponsiveNativeAd />
+    <section className={`border-y border-border bg-surface/20 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 ${className}`}>
+      <div className="mx-auto max-w-5xl">
+        <ResponsiveBannerAd />
       </div>
     </section>
   );

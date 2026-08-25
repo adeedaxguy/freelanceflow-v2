@@ -65,14 +65,14 @@ it("uses the mobile in-feed unit on mobile dashboard placements", async () => {
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
 });
 
-it("uses the desktop in-feed unit on public marketing pages", async () => {
+it("uses a horizontal display unit on public marketing pages", async () => {
   mockViewport(false);
   render(<MarketingAdBand />);
 
   const ad = screen.getByLabelText("Advertisement").querySelector("ins");
-  expect(ad).toHaveAttribute("data-ad-slot", "1014084754");
-  expect(ad).toHaveAttribute("data-ad-format", "fluid");
-  expect(ad).toHaveAttribute("data-ad-layout-key", "-ex+5g+64-d5+3t");
+  expect(ad).toHaveAttribute("data-ad-slot", "1080749546");
+  expect(ad).toHaveAttribute("data-ad-format", "horizontal");
+  expect(ad).toHaveAttribute("data-full-width-responsive", "true");
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
 });
 
