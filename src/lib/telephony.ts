@@ -62,7 +62,7 @@ export function isTelephonyConfigured() {
 }
 
 export function isSoftphoneAllowed(role: string | undefined, _plan: string | undefined) {
-  return role === "ADMIN" || (role === "USER" && process.env.TWILIO_SOFTPHONE_ENABLED === "true");
+  return role === "ADMIN" || role === "USER";
 }
 
 function parentClient() {

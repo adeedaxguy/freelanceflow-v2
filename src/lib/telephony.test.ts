@@ -16,7 +16,6 @@ describe("telephony security helpers", () => {
   beforeEach(() => {
     process.env.TWILIO_ENCRYPTION_KEY = "test-encryption-key";
     process.env.NEXTAUTH_SECRET = "test-signing-secret";
-    delete process.env.TWILIO_SOFTPHONE_ENABLED;
     delete process.env.TWILIO_NUMBER_MARKUP_PERCENT;
     delete process.env.TWILIO_NUMBER_MIN_MARGIN_CENTS;
   });
@@ -88,10 +87,8 @@ describe("telephony security helpers", () => {
     expect(() => usageAlertSettingKey(" ")).toThrow("idempotency token");
   });
 
-  it("allows signed-in users when the softphone is released", () => {
+  it("allows signed-in users to access the softphone", () => {
     expect(isSoftphoneAllowed("ADMIN", "free")).toBe(true);
-    expect(isSoftphoneAllowed("USER", "agency")).toBe(false);
-    process.env.TWILIO_SOFTPHONE_ENABLED = "true";
     expect(isSoftphoneAllowed("USER", "agency")).toBe(true);
     expect(isSoftphoneAllowed("USER", "free")).toBe(true);
     expect(isSoftphoneAllowed(undefined, "free")).toBe(false);

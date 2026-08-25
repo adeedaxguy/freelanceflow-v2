@@ -889,7 +889,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
           {canUseSoftphone && lead.phone && (
             <Link
               href={softphoneHref}
-              title="Call this business from the admin softphone"
+              title="Call this business from the iCloseLeads softphone"
               className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-emerald-400/25 bg-emerald-400/10 text-emerald-300 text-xs font-semibold hover:bg-emerald-400/15 transition-all">
               <PhoneCall className="w-3.5 h-3.5"/> Call
             </Link>
@@ -1685,7 +1685,7 @@ export default function LocalLeadsPage() {
                   <Fragment key={lead.id}>
                   <LeadCard lead={lead} onSave={handleSave}
                     isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}
-                    searchLocation={location} canUseSoftphone={session?.user?.role === "ADMIN"}/>
+                    searchLocation={location} canUseSoftphone={Boolean(session?.user)}/>
                   {index === 5 && <LeadResultsAd />}
                   </Fragment>
                 ))}
