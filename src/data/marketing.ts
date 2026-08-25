@@ -5,7 +5,7 @@ export interface Testimonial {
 
 export interface PricingTier {
   name: string; price: string; period?: string; description: string;
-  features: string[]; cta: string; href: string; highlight?: boolean; badge?: string; comingSoon?: boolean;
+  features: string[]; cta: string; href: string; highlight?: boolean; badge?: string;
   limit?: string;
 }
 
@@ -28,14 +28,14 @@ export const PRICING_TIERS: PricingTier[] = [
   {
     name: "Free",
     price: "$0",
-    description: "Full early access to core lead, proposal, CRM tools, and optional softphone add-ons.",
+    description: "Start with the core workflow. Add calling only when you need it.",
     limit: "600 leads/week",
     features: [
-      "600 leads per week during Early Access",
+      "600 leads per week",
       "5 AI proposals per week",
       "3 free tools (Rate Calc, Subject Gen, Red Flag)",
       "Live job and local lead discovery",
-      "Softphone option with number and minute add-ons",
+      "Softphone option with paid number and minute add-ons",
       "3 active campaigns",
       "Community + email support",
     ],
@@ -47,21 +47,20 @@ export const PRICING_TIERS: PricingTier[] = [
     price: "$29",
     period: "mo",
     description: "Everything you need to land clients consistently.",
-    limit: "500 leads/week",
+    limit: "1,000 leads/week",
     features: [
       "1,000 leads per week",
-      "Unlimited AI proposals (Groq-powered)",
+      "Unlimited AI proposals",
       "Priority freshness across lead discovery",
-      "Softphone option with number and minute add-ons",
+      "Softphone option with paid number and minute add-ons",
       "10 active campaigns",
       "CSV export + CRM sync",
       "Analytics dashboard",
       "Priority email support",
       "Custom proposal templates",
     ],
-    comingSoon: true,
-    cta: "Join Waitlist — $29/mo",
-    href: "#waitlist",
+    cta: "Upgrade to Pro",
+    href: "/dashboard/upgrade?plan=pro",
     highlight: true,
     badge: "Most Popular",
   },
@@ -75,7 +74,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Unlimited leads",
       "Unlimited AI proposals",
       "White-label templates",
-      "Softphone option with number and minute add-ons",
+      "Softphone option with paid number and minute add-ons",
       "Unlimited campaigns",
       "5 team seats",
       "Dedicated account manager",
@@ -83,8 +82,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Custom integrations",
       "SLA support",
     ],
-    cta: "Join Waitlist",
-    href: "#waitlist",
-    comingSoon: true,
+    cta: "Upgrade to Agency",
+    href: "/dashboard/upgrade?plan=agency",
   },
 ];

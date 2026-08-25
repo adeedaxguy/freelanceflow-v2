@@ -138,7 +138,7 @@ const faqs = [
     questions: [
       {
         q: "How does billing work?",
-        a: "Free early access is available without a card. Monthly and annual paid plans are being prepared, and subscription changes will be managed from the secure billing portal after launch.",
+        a: "Free access is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
       },
       {
         q: "What payment methods do you accept?",

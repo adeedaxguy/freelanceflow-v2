@@ -9,7 +9,6 @@ interface Props {
   currentPlan: string;
   userEmail: string;
   billingReady: boolean;
-  billingProvider: "LEMONSQUEEZY" | "PADDLE";
   billingTestMode: boolean;
   canCheckout: boolean;
   hasBillingSubscription: boolean;
@@ -27,7 +26,6 @@ export default function UpgradeClient({
   userEmail,
   pricing,
   billingReady,
-  billingProvider,
   billingTestMode,
   canCheckout,
   hasBillingSubscription,
@@ -37,7 +35,7 @@ export default function UpgradeClient({
   const [loading, setLoading] = useState<string | null>(null);
   const [message, setMessage] = useState(
     checkoutReturned
-      ? "Checkout completed. Your plan activates after the signed payment confirmation arrives. This normally takes a few seconds."
+      ? "Checkout completed. Your plan activates after Stripe confirms the subscription. This normally takes a few seconds."
       : "",
   );
 
@@ -91,15 +89,16 @@ export default function UpgradeClient({
       name: "Free",
       icon: <Zap className="w-5 h-5" />,
       price: { monthly: 0, annual: 0 },
-      description: "Get started and test the waters",
+      description: "Test the core workflow before you pay",
       color: "border-border",
       badge: null,
       features: [
-        `${pricing.proLeads === "100" ? "20" : "20"} leads per week`,
-        "16 lead sources",
-        "Basic AI proposals",
-        "CRM pipeline (3 stages)",
-        "Email outreach",
+        "600 leads per week",
+        "5 AI proposals per week",
+        "Live job and local lead discovery",
+        "3 active campaigns",
+        "CRM pipeline and saved leads",
+        "Softphone option with paid number and minute add-ons",
         "Community support",
       ],
       cta: "Current Plan",
@@ -109,18 +108,19 @@ export default function UpgradeClient({
       name: "Pro",
       icon: <Zap className="w-5 h-5 text-primary-light" />,
       price: { monthly: proMonthly, annual: proAnnual },
-      description: "For serious freelancers scaling fast",
+      description: "For freelancers landing clients consistently",
       color: "border-primary/40 shadow-glow-primary",
       badge: "Most Popular",
       features: [
         `${pricing.proLeads} leads per week`,
-        "Priority lead quality scoring",
-        "Advanced AI proposals (GPT-quality)",
-        "Full 6-stage CRM pipeline",
-        "Bulk email campaigns",
-        "Analytics & reporting",
+        "Unlimited AI proposals",
+        "Priority freshness across lead discovery",
+        "10 active campaigns",
+        "CSV export and CRM sync",
+        "Analytics dashboard",
+        "Custom proposal templates",
+        "Softphone option with paid number and minute add-ons",
         "Priority email support",
-        "Export leads to CSV",
       ],
       cta: "Upgrade to Pro",
     },
@@ -129,18 +129,19 @@ export default function UpgradeClient({
       name: "Agency",
       icon: <Crown className="w-5 h-5 text-gold" />,
       price: { monthly: agencyMonthly, annual: agencyAnnual },
-      description: "For agencies managing multiple clients",
+      description: "For teams running outreach at scale",
       color: "border-gold/30",
       badge: "Best Value",
       features: [
-        `${pricing.agencyLeads} leads per week`,
+        "Unlimited leads",
+        "Unlimited AI proposals",
+        "Unlimited campaigns",
         "White-label proposals",
-        "Multi-client workspace",
-        "Team collaboration (5 seats)",
-        "Custom email domains",
+        "5 team seats",
         "API access",
-        "Dedicated account manager",
+        "Softphone option with paid number and minute add-ons",
         "Custom integrations",
+        "Dedicated account manager",
         "SLA guarantee",
       ],
       cta: "Upgrade to Agency",
@@ -155,7 +156,7 @@ export default function UpgradeClient({
             <h1 className="text-3xl font-extrabold text-foreground">Plans and billing</h1>
             <p className="text-muted-foreground mt-2">
               You&apos;re currently on the <span className="text-foreground font-semibold capitalize">{currentPlan}</span> plan.
-              Unlock more leads, stronger automation, and higher limits.
+              Upgrade through Stripe for higher limits, more campaigns, and stronger outreach workflows.
             </p>
             <p className="text-xs text-muted-foreground mt-1">Account: {userEmail}</p>
           </div>
@@ -176,13 +177,13 @@ export default function UpgradeClient({
       {!canCheckout && (
         <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
           {billingReady && billingTestMode
-            ? "Paid plans are in private checkout testing. Free early access remains fully available while we finish verification."
-            : "Paid plans are being prepared. You can keep using free early access without a card."}
+            ? "Paid plans are in private Stripe checkout testing. Free access remains available while we finish verification."
+            : "Stripe checkout is being configured. You can keep using the Free plan without a card."}
         </div>
       )}
       {canCheckout && billingTestMode && (
         <div className="mb-6 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-sm text-muted-foreground">
-          Admin test mode is active. These checkouts do not change production plan access.
+          Stripe test mode is active for admins. These checkouts do not change production plan access.
         </div>
       )}
 
@@ -296,7 +297,7 @@ export default function UpgradeClient({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <Shield className="w-4 h-4 text-accent" />
-          Secure {billingProvider === "PADDLE" ? "Paddle" : "Lemon Squeezy"} checkout
+          Secure Stripe checkout
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />

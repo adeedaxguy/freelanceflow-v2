@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLemonSqueezyConfig, lemonSqueezyRequest } from "@/lib/lemonsqueezy";
 import { getPaddleConfig, paddleRequest } from "@/lib/paddle";
+import { createStripeBillingPortalSession, getStripeConfig } from "@/lib/stripe";
 
 interface SubscriptionResponse {
   data: {
@@ -36,6 +37,18 @@ export async function POST() {
   }
 
   try {
+    if (subscription.provider === "STRIPE") {
+      if (!subscription.externalCustomerId) {
+        throw new Error("The customer portal is not available yet.");
+      }
+      const appUrl = (process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").replace(/\/$/, "");
+      const response = await createStripeBillingPortalSession(await getStripeConfig(), {
+        customerId: subscription.externalCustomerId,
+        returnUrl: `${appUrl}/dashboard/upgrade`,
+      });
+      return NextResponse.json({ url: response.url });
+    }
+
     if (subscription.provider === "PADDLE") {
       if (!subscription.externalCustomerId) {
         throw new Error("The customer portal is not available yet.");

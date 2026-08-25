@@ -5,28 +5,34 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
-  getLemonSqueezyConfig,
-  getVariantId,
-  lemonSqueezyRequest,
-  type BillingInterval,
-  type PaidPlan,
-} from "@/lib/lemonsqueezy";
-import {
-  getPaddleConfig,
-  getPaddlePriceId,
-  paddleRequest,
-} from "@/lib/paddle";
+  createStripeSubscriptionCheckout,
+  getStripeConfig,
+  isStripeCheckoutConfigured,
+} from "@/lib/stripe";
 
-interface CheckoutResponse {
-  data: {
-    attributes: { url: string };
-  };
+type PaidPlan = "pro" | "agency";
+type BillingInterval = "monthly" | "annual";
+
+const PLAN_LABELS: Record<PaidPlan, string> = {
+  pro: "Pro",
+  agency: "Agency",
+};
+
+const DEFAULT_MONTHLY_PRICES: Record<PaidPlan, number> = {
+  pro: 29,
+  agency: 79,
+};
+
+function priceCents(value: string | null | undefined, fallbackDollars: number) {
+  const dollars = Number(value);
+  return Math.round((Number.isFinite(dollars) && dollars > 0 ? dollars : fallbackDollars) * 100);
 }
 
-interface PaddleCheckoutResponse {
-  data: {
-    checkout?: { url?: string | null } | null;
-  };
+async function monthlyPriceCents(plan: PaidPlan) {
+  const setting = await prisma.platformSetting.findUnique({
+    where: { key: `${plan}_price_monthly` },
+  }).catch(() => null);
+  return priceCents(setting?.value, DEFAULT_MONTHLY_PRICES[plan]);
 }
 
 export async function POST(req: NextRequest) {
@@ -47,73 +53,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const provider = process.env.BILLING_PROVIDER === "paddle" ? "paddle" : "lemonsqueezy";
-    if (provider === "paddle") {
-      const [config, user] = await Promise.all([
-        Promise.resolve(getPaddleConfig()),
-        prisma.user.findUnique({
-          where: { id: session.user.id },
-          select: { email: true, role: true },
-        }),
-      ]);
-      const priceId = getPaddlePriceId(config, plan, billing);
-      if (
-        !config.apiKey
-        || !config.clientToken
-        || !/^pri_[a-z0-9]+$/.test(priceId)
-      ) {
-        return NextResponse.json({
-          error: "Paid plans are not open yet. The secure checkout is still being configured.",
-        }, { status: 503 });
-      }
-      if (config.environment === "sandbox" && user?.role !== "ADMIN") {
-        return NextResponse.json({
-          error: "Paid plans are still in private testing. Your free early-access account remains active.",
-        }, { status: 503 });
-      }
-
-      const appUrl = (
-        process.env.NEXT_PUBLIC_APP_URL
-        || process.env.NEXTAUTH_URL
-        || req.nextUrl.origin
-      ).replace(/\/$/, "");
-      const checkout = await paddleRequest<PaddleCheckoutResponse>(config, "/transactions", {
-        method: "POST",
-        body: JSON.stringify({
-          items: [{ price_id: priceId, quantity: 1 }],
-          custom_data: {
-            user_id: session.user.id,
-            requested_plan: plan,
-            billing_interval: billing,
-          },
-          checkout: {
-            url: `${appUrl}/checkout/paddle`,
-          },
-        }),
-      });
-      const url = checkout.data.checkout?.url;
-      if (!url) throw new Error("Paddle checkout is not available yet.");
-      return NextResponse.json({ url });
-    }
-
     const [config, user] = await Promise.all([
-      getLemonSqueezyConfig(),
+      getStripeConfig(),
       prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { email: true, name: true, role: true },
+        select: { email: true, role: true },
       }),
     ]);
-    const variantId = getVariantId(config, plan, billing);
 
-    if (!config.apiKey || !/^\d+$/.test(config.storeId) || !/^\d+$/.test(variantId)) {
+    if (!isStripeCheckoutConfigured(config)) {
       return NextResponse.json({
-        error: "Paid plans are not open yet. The secure checkout is still being configured.",
+        error: "Stripe checkout is still being configured.",
       }, { status: 503 });
     }
 
     if (config.testMode && user?.role !== "ADMIN") {
       return NextResponse.json({
-        error: "Paid plans are still in private testing. Your free early-access account remains active.",
+        error: "Paid plans are still in private checkout testing. Your free account remains active.",
       }, { status: 503 });
     }
 
@@ -123,45 +79,26 @@ export async function POST(req: NextRequest) {
       || req.nextUrl.origin
     ).replace(/\/$/, "");
 
-    const checkout = await lemonSqueezyRequest<CheckoutResponse>(config, "/checkouts", {
-      method: "POST",
-      body: JSON.stringify({
-        data: {
-          type: "checkouts",
-          attributes: {
-            product_options: {
-              redirect_url: `${appUrl}/dashboard/upgrade?checkout=success`,
-              enabled_variants: [Number(variantId)],
-            },
-            checkout_options: {
-              embed: false,
-              media: true,
-              logo: true,
-              desc: true,
-              discount: true,
-              subscription_preview: true,
-              button_color: "#7c3aed",
-            },
-            checkout_data: {
-              email: user?.email || undefined,
-              name: user?.name || undefined,
-              custom: {
-                user_id: session.user.id,
-                requested_plan: plan,
-                billing_interval: billing,
-              },
-            },
-            test_mode: config.testMode,
-          },
-          relationships: {
-            store: { data: { type: "stores", id: config.storeId } },
-            variant: { data: { type: "variants", id: variantId } },
-          },
-        },
-      }),
+    const monthly = await monthlyPriceCents(plan);
+    const amountCents = billing === "annual" ? monthly * 10 : monthly;
+    const checkout = await createStripeSubscriptionCheckout(config, {
+      customerEmail: user?.email,
+      productName: `iCloseLeads ${PLAN_LABELS[plan]}`,
+      description: `${PLAN_LABELS[plan]} plan subscription`,
+      amountCents,
+      interval: billing === "annual" ? "year" : "month",
+      successUrl: `${appUrl}/dashboard/upgrade?checkout=success`,
+      cancelUrl: `${appUrl}/dashboard/upgrade?checkout=cancelled`,
+      metadata: {
+        purchase_type: "plan",
+        user_id: session.user.id,
+        plan,
+        billing_interval: billing,
+      },
     });
 
-    return NextResponse.json({ url: checkout.data.attributes.url });
+    if (!checkout.url) throw new Error("Stripe checkout did not return a payment link.");
+    return NextResponse.json({ url: checkout.url });
   } catch (error) {
     console.error("Billing checkout error:", error);
     return NextResponse.json({

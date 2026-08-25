@@ -78,6 +78,7 @@ type CheckoutInput = {
   description?: string;
   amountCents: number;
   currency?: string;
+  interval?: "month" | "year";
   successUrl: string;
   cancelUrl: string;
   metadata: Record<string, string | number | boolean | null | undefined>;
@@ -95,7 +96,7 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
     "line_items[0][quantity]": "1",
     "line_items[0][price_data][currency]": (input.currency || "USD").toLowerCase(),
     "line_items[0][price_data][unit_amount]": String(input.amountCents),
-    "line_items[0][price_data][recurring][interval]": "month",
+    "line_items[0][price_data][recurring][interval]": input.interval || "month",
     "line_items[0][price_data][product_data][name]": input.productName,
   });
   if (input.description) {
@@ -108,4 +109,19 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
     body.set(`subscription_data[metadata][${key}]`, String(value));
   }
   return stripeRequest<{ id: string; url: string | null }>(config, "/checkout/sessions", body);
+}
+
+export function isStripeCheckoutConfigured(config: StripeConfig) {
+  return Boolean(config.secretKey && config.webhookSecret);
+}
+
+export async function createStripeBillingPortalSession(
+  config: StripeConfig,
+  input: { customerId: string; returnUrl: string },
+) {
+  const body = new URLSearchParams({
+    customer: input.customerId,
+    return_url: input.returnUrl,
+  });
+  return stripeRequest<{ id: string; url: string }>(config, "/billing_portal/sessions", body);
 }

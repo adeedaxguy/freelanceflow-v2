@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 };
 
 const billingFAQ = [
-  { q: "Can I change plans anytime?", a: "Yes. Once paid plans launch, subscription changes and cancellations will be available through the secure customer billing portal." },
+  { q: "Can I change plans anytime?", a: "Yes. Paid subscriptions are managed through the secure Stripe billing portal." },
   { q: "Can every plan use the softphone?", a: "Yes. Every plan can access the softphone option. Phone numbers and monthly calling minute packages are separate paid add-ons, so calling costs stay tied to actual phone usage." },
-  { q: "How will payments be handled?", a: "Softphone number subscriptions and calling-minute packages use secure Stripe Checkout. Paid plan subscriptions will show their checkout provider clearly before purchase when plan billing opens." },
-  { q: "Is there a free trial for paid plans?", a: "Paid-plan launch terms will be shown clearly before checkout. Free early access requires no card and remains the best way to try iCloseLeads today." },
-  { q: "What happens when I hit my monthly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
-  { q: "Do you offer annual billing?", a: "Monthly and annual subscriptions are being prepared. Final annual savings will be displayed before purchase." },
+  { q: "How are payments handled?", a: "Pro, Agency, softphone number subscriptions, and calling-minute packages use secure Stripe Checkout. iCloseLeads does not store card details." },
+  { q: "Is there a free trial for paid plans?", a: "You can start on the Free plan without a card. Upgrade through Stripe when you need higher limits or agency features." },
+  { q: "What happens when I hit my weekly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
+  { q: "Do you offer annual billing?", a: "Yes. Annual billing is available from the dashboard upgrade page and is shown before checkout." },
 ];
 
 export default function PricingPage() {
@@ -47,8 +47,8 @@ export default function PricingPage() {
                 <Shield className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <div className="text-foreground font-semibold">Free early access, no card required</div>
-                <div className="text-muted-foreground text-sm">Try the core workflow now. Softphone number and minute add-ons use secure Stripe checkout when you activate calling.</div>
+                <div className="text-foreground font-semibold">Start free, upgrade through Stripe</div>
+                <div className="text-muted-foreground text-sm">Try the core workflow without a card. Paid plans, softphone numbers, and calling minutes use secure Stripe checkout.</div>
               </div>
             </div>
 

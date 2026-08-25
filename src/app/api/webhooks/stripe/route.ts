@@ -44,6 +44,10 @@ function planFromMetadata(metadata: Metadata) {
   return pkg ? callingPackagePlan(pkg.id) : null;
 }
 
+function paidPlan(value: string | null | undefined) {
+  return value === "pro" || value === "agency" ? value : null;
+}
+
 function subscriptionDates(subscription: Record<string, unknown>) {
   const status = stripeStatus(subscription);
   return {
@@ -60,6 +64,28 @@ function hasLivePhoneAccess(status: string, endsAt: Date | null) {
   const normalized = status.toLowerCase();
   if (["active", "trialing", "past_due"].includes(normalized)) return true;
   return normalized === "canceled" && Boolean(endsAt && endsAt.getTime() > Date.now());
+}
+
+function hasPlanAccess(status: string, endsAt: Date | null) {
+  const normalized = status.toLowerCase();
+  if (["active", "trialing", "past_due", "unpaid"].includes(normalized)) return true;
+  return normalized === "canceled" && Boolean(endsAt && endsAt.getTime() > Date.now());
+}
+
+async function updateEffectivePlan(userId: string) {
+  const subscriptions = await prisma.billingSubscription.findMany({
+    where: { userId, testMode: false, plan: { in: ["pro", "agency"] } },
+    select: { plan: true, status: true, endsAt: true },
+  });
+  const activePlans = subscriptions
+    .filter(subscription => hasPlanAccess(subscription.status, subscription.endsAt))
+    .map(subscription => subscription.plan);
+  const nextPlan = activePlans.includes("agency")
+    ? "agency"
+    : activePlans.includes("pro")
+      ? "pro"
+      : "free";
+  await prisma.user.update({ where: { id: userId }, data: { plan: nextPlan } });
 }
 
 async function rejectNonAdminTest(userId: string, testMode: boolean) {
@@ -246,6 +272,102 @@ async function handleMinutesSubscription(subscription: Record<string, unknown>, 
   return NextResponse.json({ received: true, softphone: "minutes_subscription_updated" });
 }
 
+async function handlePlanCheckout(session: Record<string, unknown>, event: StripeEvent) {
+  const metadata = metadataOf(session);
+  const userId = metadata.user_id || metadata.userId;
+  const plan = paidPlan(metadata.plan);
+  const subscriptionId = stringValue(session.subscription);
+  if (!userId || !plan || !subscriptionId) {
+    return NextResponse.json({ received: true, ignored: "incomplete_plan_checkout" }, { status: 202 });
+  }
+
+  const testMode = !(session.livemode ?? event.livemode ?? false);
+  if (await rejectNonAdminTest(userId, testMode)) {
+    return NextResponse.json({ received: true, ignored: "test_mode_non_admin" }, { status: 202 });
+  }
+
+  const status = ["paid", "no_payment_required"].includes(String(session.payment_status || ""))
+    ? "active"
+    : String(session.payment_status || "checkout_completed");
+  await prisma.billingSubscription.upsert({
+    where: { externalSubscriptionId: subscriptionId },
+    create: {
+      userId,
+      provider: "STRIPE",
+      externalSubscriptionId: subscriptionId,
+      externalCustomerId: stringValue(session.customer),
+      externalOrderId: stringValue(session.id),
+      plan,
+      variantId: plan,
+      status,
+      testMode,
+    },
+    update: {
+      provider: "STRIPE",
+      externalCustomerId: stringValue(session.customer),
+      externalOrderId: stringValue(session.id),
+      plan,
+      variantId: plan,
+      status,
+      testMode,
+    },
+  });
+
+  if (!testMode && hasPlanAccess(status, null)) await updateEffectivePlan(userId);
+  return NextResponse.json({ received: true, plan: "checkout_completed" });
+}
+
+async function handlePlanSubscription(subscription: Record<string, unknown>, event: StripeEvent, fallbackPlan?: string | null) {
+  const metadata = metadataOf(subscription);
+  const subscriptionId = stringValue(subscription.id);
+  if (!subscriptionId) return NextResponse.json({ received: true, ignored: "missing_subscription_id" }, { status: 202 });
+
+  const existing = await prisma.billingSubscription.findUnique({ where: { externalSubscriptionId: subscriptionId } });
+  const userId = metadata.user_id || metadata.userId || existing?.userId;
+  const plan = paidPlan(metadata.plan) || paidPlan(existing?.plan) || paidPlan(fallbackPlan);
+  if (!userId || !plan) {
+    return NextResponse.json({ received: true, ignored: "unmapped_plan_subscription" }, { status: 202 });
+  }
+
+  const testMode = !(subscription.livemode ?? event.livemode ?? false);
+  if (await rejectNonAdminTest(userId, testMode)) {
+    return NextResponse.json({ received: true, ignored: "test_mode_non_admin" }, { status: 202 });
+  }
+
+  const status = stripeStatus(subscription, event.type === "customer.subscription.deleted" ? "canceled" : "unknown");
+  const dates = subscriptionDates({ ...subscription, status });
+  await prisma.billingSubscription.upsert({
+    where: { externalSubscriptionId: subscriptionId },
+    create: {
+      userId,
+      provider: "STRIPE",
+      externalSubscriptionId: subscriptionId,
+      externalCustomerId: stringValue(subscription.customer),
+      plan,
+      variantId: priceIdOf(subscription) || plan,
+      status,
+      testMode,
+      renewsAt: dates.renewsAt,
+      endsAt: dates.endsAt,
+      trialEndsAt: dates.trialEndsAt,
+    },
+    update: {
+      provider: "STRIPE",
+      externalCustomerId: stringValue(subscription.customer),
+      plan,
+      variantId: priceIdOf(subscription) || plan,
+      status,
+      testMode,
+      renewsAt: dates.renewsAt,
+      endsAt: dates.endsAt,
+      trialEndsAt: dates.trialEndsAt,
+    },
+  });
+
+  if (!testMode) await updateEffectivePlan(userId);
+  return NextResponse.json({ received: true, plan: "subscription_updated" });
+}
+
 async function getPlanFromPriceId(priceId: string): Promise<string | null> {
   try {
     const [proSetting, agencySetting] = await Promise.all([
@@ -286,11 +408,12 @@ export async function POST(req: NextRequest) {
       const metadata = metadataOf(session);
       if (metadata.purchase_type === "softphone_number") return handleNumberCheckout(session, event);
       if (metadata.purchase_type === "softphone_minutes") return handleMinutesCheckout(session, event);
+      if (metadata.purchase_type === "plan") return handlePlanCheckout(session, event);
 
       const userId = metadata.userId || metadata.user_id;
       const plan = metadata.plan;
       if (userId && plan && session.payment_status === "paid" && !packageIdFromCallingPlan(plan)) {
-        await prisma.user.update({ where: { id: userId }, data: { plan } });
+        return handlePlanCheckout(session, event);
       }
     }
 
@@ -302,7 +425,7 @@ export async function POST(req: NextRequest) {
 
       const subscriptionId = stringValue(subscription.id);
       if (subscriptionId) {
-        const [phonePurchase, minutesSubscription] = await Promise.all([
+        const [phonePurchase, minutesSubscription, planSubscription] = await Promise.all([
           prisma.telephonyPurchase.findUnique({
             where: { externalSubscriptionId: subscriptionId },
             select: { id: true },
@@ -315,20 +438,28 @@ export async function POST(req: NextRequest) {
             },
             select: { id: true },
           }),
+          prisma.billingSubscription.findFirst({
+            where: {
+              externalSubscriptionId: subscriptionId,
+              provider: "STRIPE",
+              plan: { in: ["pro", "agency"] },
+            },
+            select: { id: true },
+          }),
         ]);
         if (phonePurchase) return handleNumberSubscription(subscription, event);
         if (minutesSubscription) return handleMinutesSubscription(subscription, event);
+        if (planSubscription) return handlePlanSubscription(subscription, event);
       }
 
       const userId = metadata.userId || metadata.user_id;
-      if (event.type === "customer.subscription.deleted") {
-        if (userId) await prisma.user.update({ where: { id: userId }, data: { plan: "free" } });
-      } else {
-        const priceId = priceIdOf(subscription);
-        if (userId && priceId) {
-          const plan = await getPlanFromPriceId(priceId);
-          if (plan) await prisma.user.update({ where: { id: userId }, data: { plan } });
-        }
+      if (userId && paidPlan(metadata.plan)) {
+        return handlePlanSubscription(subscription, event);
+      }
+      const priceId = priceIdOf(subscription);
+      if (userId && priceId) {
+        const plan = await getPlanFromPriceId(priceId);
+        if (plan) return handlePlanSubscription(subscription, event, plan);
       }
     }
   } catch (error) {

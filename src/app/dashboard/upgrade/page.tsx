@@ -4,8 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { getLemonSqueezyConfig, isCheckoutConfigured } from "@/lib/lemonsqueezy";
-import { getPaddleConfig, isPaddleCheckoutConfigured } from "@/lib/paddle";
+import { getStripeConfig, isStripeCheckoutConfigured } from "@/lib/stripe";
 import UpgradeClient from "./UpgradeClient";
 
 async function getPlatformPricing() {
@@ -20,11 +19,11 @@ async function getPlatformPricing() {
     return {
       proPrice:        map["pro_price_monthly"] ?? "29",
       agencyPrice:     map["agency_price_monthly"] ?? "79",
-      proLeads:        map["pro_leads_per_week"] ?? "100",
-      agencyLeads:     map["agency_leads_per_week"] ?? "500",
+      proLeads:        "1,000",
+      agencyLeads:     "Unlimited",
     };
   } catch {
-    return { proPrice: "29", agencyPrice: "79", proLeads: "100", agencyLeads: "500" };
+    return { proPrice: "29", agencyPrice: "79", proLeads: "1,000", agencyLeads: "Unlimited" };
   }
 }
 
@@ -45,25 +44,17 @@ export default async function UpgradePage({
     },
   });
 
-  const provider = process.env.BILLING_PROVIDER === "paddle" ? "PADDLE" : "LEMONSQUEEZY";
   const [pricing, hasBillingSubscription] = await Promise.all([
     getPlatformPricing(),
     prisma.billingSubscription.findFirst({
-      where: { userId: session.user.id, provider },
+      where: { userId: session.user.id, provider: "STRIPE" },
       select: { id: true },
     }).then(Boolean).catch(() => false),
   ]);
-  const billingConfig = provider === "PADDLE"
-    ? getPaddleConfig()
-    : await getLemonSqueezyConfig();
+  const billingConfig = await getStripeConfig();
   const currentPlan = (user?.plan ?? "free") as string;
-  const billingReady = provider === "PADDLE"
-    ? isPaddleCheckoutConfigured(billingConfig as ReturnType<typeof getPaddleConfig>)
-    : isCheckoutConfigured(billingConfig as Awaited<ReturnType<typeof getLemonSqueezyConfig>>)
-      && Boolean(billingConfig.webhookSecret);
-  const billingTestMode = provider === "PADDLE"
-    ? (billingConfig as ReturnType<typeof getPaddleConfig>).environment === "sandbox"
-    : (billingConfig as Awaited<ReturnType<typeof getLemonSqueezyConfig>>).testMode;
+  const billingReady = isStripeCheckoutConfigured(billingConfig);
+  const billingTestMode = billingConfig.testMode;
   const canCheckout = billingReady && (!billingTestMode || user?.role === "ADMIN");
 
   return (
@@ -72,7 +63,6 @@ export default async function UpgradePage({
       userEmail={user?.email ?? ""}
       pricing={pricing}
       billingReady={billingReady}
-      billingProvider={provider}
       billingTestMode={billingTestMode}
       canCheckout={canCheckout}
       hasBillingSubscription={hasBillingSubscription}

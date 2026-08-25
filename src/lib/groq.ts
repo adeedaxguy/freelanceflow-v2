@@ -172,7 +172,7 @@ function hasAny(text: string, terms: string[]): boolean {
   return terms.some(term => text.includes(term));
 }
 
-function withSignupFlow(answer: string, nextStep = "Create a free early access account, run one real search, and save the first lead worth pursuing. No card is needed while Pro and Agency plans are being prepared."): string {
+function withSignupFlow(answer: string, nextStep = "Create a free account, run one real search, and save the first lead worth pursuing. No card is needed to start; Pro and Agency upgrades are available when you need higher limits."): string {
   return `${answer}
 
 Best next step: ${nextStep}`;
@@ -232,15 +232,15 @@ function buildLocalSupportReply(messages: Array<{ role: "user" | "assistant"; co
 
   if (!urgentBug && hasAny(lower, ["sign up", "signup", "create account", "get started", "start free", "free account", "join", "try it"])) {
     return {
-      reply: `Yes - the best move is to start with the free early access account.
+      reply: `Yes - the best move is to start with the free account.
 
-You do not need a card right now. Inside, you can test the real workflow:
+You do not need a card to start. Inside, you can test the real workflow:
 1. Find remote job leads, local business leads, or live job signals.
 2. Save the leads that look worth pursuing.
 3. Generate a draft proposal or pitch.
 4. Prepare Gmail outreach and track follow-up.
 
-Pro and Agency plans are coming later, so free early access is the cleanest way to try the platform before paid plans launch.`,
+Pro and Agency are available when you need higher limits, more campaigns, or agency features.`,
       shouldCreateTicket: false,
     };
   }
@@ -301,16 +301,16 @@ Try this:
 
   if (hasAny(lower, ["free", "price", "pricing", "plan", "paid", "cost", "agency", "pro", "card", "trial"])) {
     return {
-      reply: `Right now, the right path is free early access.
+      reply: `The cleanest path is to start free, then upgrade when the limits matter.
 
-No card is needed. Pro and Agency are being prepared, but they are not the main thing to worry about yet. The free account is meant to let you test the core product honestly:
+No card is needed for the Free plan. Pro and Agency upgrades use secure Stripe checkout, and softphone numbers and calling minutes are separate paid add-ons. The free account lets you test the core product honestly:
 1. Remote job lead discovery.
 2. Local business lead discovery.
 3. Live job signals.
 4. AI proposals and pitch drafts.
 5. Saved leads, Gmail-ready outreach, and follow-up tracking.
 
-Best next step: start free, run one search in your niche, and see if the leads are useful before any paid plan launches.`,
+Best next step: start free, run one search in your niche, and upgrade only when you need higher limits or agency workflows.`,
       shouldCreateTicket: false,
     };
   }
@@ -373,14 +373,14 @@ Common issues and fixes:
 - "No leads found" → Try a broader niche, a longer date range, or switch between Remote Jobs, Local Business Leads, and Live Jobs
 - "AI proposal not working" → Try regenerate, verify the lead has enough context, and use the template fallback if needed
 - "Can't log in" → Try resetting password; check email/password are correct; if OAuth fails, ask for the provider and error
-- "Lead limit reached" → Explain the current plan limit and suggest waiting for reset or upgrading when plans are active
+- "Lead limit reached" → Explain the current plan limit and suggest waiting for reset or upgrading to Pro or Agency
 - "Email not sending" → iCloseLeads prepares Gmail drafts by default; users review and send inside Gmail
 
 Conversion guidance:
 - Answer the user's actual question first.
 - Then suggest the best next step inside iCloseLeads.
-- Until Pro and Agency plans launch, guide qualified users toward free early access signup.
-- Do not imply paid plans are live. Say Pro and Agency are coming soon or being prepared.
+- Free is available without a card. Pro and Agency upgrades use secure Stripe checkout.
+- Softphone access is available on every plan, but phone numbers and calling minutes are separate paid add-ons.
 - Do not tell users to buy or configure an external AI API.
 - Do not name raw data providers or imply the platform is built from free sources.
 - Avoid fake guarantees, fake revenue claims, and pushy language.

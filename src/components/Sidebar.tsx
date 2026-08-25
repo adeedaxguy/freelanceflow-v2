@@ -65,9 +65,8 @@ type PlanCfg = {
   icon: React.ElementType; leadsPerWeek: string; showUpgrade: boolean;
 };
 const PLAN_CONFIG: Record<string, PlanCfg> = {
-  // Launch phase: all features free, no upgrade pressure
-  free:   { label: "Free",   color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "All features free", showUpgrade: false },
-  pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "500 leads / week", showUpgrade: false },
+  free:   { label: "Free",   color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "600 / week", showUpgrade: true },
+  pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "1,000 / week", showUpgrade: false },
   agency: { label: "Agency", color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Shield, leadsPerWeek: "Unlimited leads", showUpgrade: false },
 };
 
@@ -339,6 +338,17 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </CollapseTooltip>
+        {plan.showUpgrade && (
+          <CollapseTooltip label="Upgrade plan">
+            <Link
+              href="/dashboard/upgrade"
+              onClick={onLinkClick}
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary text-white transition-opacity hover:opacity-90"
+            >
+              <Crown className="w-3.5 h-3.5" />
+            </Link>
+          </CollapseTooltip>
+        )}
       </div>
     );
   }
@@ -372,6 +382,20 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
+
+        {plan.showUpgrade && (
+          <Link
+            href="/dashboard/upgrade"
+            onClick={onLinkClick}
+            className="mx-3 mb-2 flex items-center justify-between gap-2 rounded-md bg-primary px-3 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90"
+          >
+            <span className="inline-flex min-w-0 items-center gap-1.5">
+              <Crown className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">Upgrade to Pro</span>
+            </span>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+          </Link>
+        )}
 
         <div className="flex border-t border-border/60">
           <Link href="/dashboard/profile" onClick={onLinkClick}
