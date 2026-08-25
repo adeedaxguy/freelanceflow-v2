@@ -4,6 +4,7 @@ import {
   BarChart2,
   CheckCircle2,
   Layers,
+  PhoneCall,
   Search,
   Sparkles,
   Mail,
@@ -35,6 +36,7 @@ const ICONS: Record<IconName, React.ElementType> = {
   Zap,
   Users: Layers,
   MessageSquare: Mail,
+  PhoneCall,
 };
 
 function Icon({ name, className }: { name: IconName; className?: string }) {
@@ -52,7 +54,7 @@ function OverviewJsonLd() {
       operatingSystem: "Web",
       url: BASE_URL,
       description:
-        "Client acquisition software for freelancers with lead discovery, AI proposals, Gmail-ready outreach, CRM pipeline, analytics, and free tools.",
+        "Client acquisition software for freelancers with lead discovery, AI proposals, Gmail-ready outreach, softphone calling, CRM pipeline, analytics, and free tools.",
       offers: {
         "@type": "Offer",
         price: "0",
@@ -100,6 +102,7 @@ const comparisonRows = [
   ["Check owner or manager contact paths", true, false, false, false],
   ["Generate lead-specific proposals", true, false, false, false],
   ["Prepare Gmail drafts safely", true, false, false, true],
+  ["Call leads from the same platform", true, false, false, false],
   ["Track saved leads in CRM", true, true, false, false],
   ["Review prospecting analytics", true, true, false, false],
   ["Avoid marketplace bidding wars", true, false, false, true],
@@ -125,12 +128,12 @@ export default function FeatureOverviewPage() {
               </div>
               <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 Features that turn lead signals{" "}
-                <span className="bg-gradient-to-r from-primary-light via-accent to-blue-400 bg-clip-text text-transparent">
+                <span className="text-primary-light">
                   into client conversations
                 </span>
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                iCloseLeads connects discovery, decision maker checks, AI proposals, Gmail-ready outreach, CRM tracking, analytics, and freelancer tools into one focused workflow for winning direct clients.
+                iCloseLeads connects discovery, decision maker checks, AI proposals, Gmail-ready outreach, softphone calling, CRM tracking, analytics, and freelancer tools into one focused workflow for winning direct clients.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -156,7 +159,7 @@ export default function FeatureOverviewPage() {
           <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               ["3", "Discovery paths"],
-              ["6", "Core feature areas"],
+              ["7", "Core feature areas"],
               ["1", "CRM-backed workflow"],
               ["0", "Credit card required"],
             ].map(([value, label]) => (
@@ -176,7 +179,7 @@ export default function FeatureOverviewPage() {
                 Every page has one job: move a lead closer to revenue
               </h2>
               <p className="mt-4 text-base leading-7 text-muted-foreground">
-                The platform is not a loose collection of AI widgets. Each feature sits in the same acquisition loop: find the prospect, write the pitch, prepare the outreach, track the follow-up, and learn what worked.
+                The platform is not a loose collection of AI widgets. Each feature sits in the same acquisition loop: find the prospect, write the pitch, email or call from the workspace, track the follow-up, and learn what worked.
               </p>
             </div>
             <div className="mt-12 grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">

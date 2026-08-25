@@ -4,6 +4,7 @@ export type FeatureSlug =
   | "lead-discovery"
   | "ai-proposals"
   | "email-outreach"
+  | "softphone"
   | "crm-pipeline"
   | "analytics"
   | "free-tools";
@@ -23,7 +24,8 @@ export type IconName =
   | "CheckCircle2"
   | "Zap"
   | "Users"
-  | "MessageSquare";
+  | "MessageSquare"
+  | "PhoneCall";
 
 export interface FeatureItem {
   title: string;
@@ -546,6 +548,157 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       subheading:
         "Write the message, review the context, open Gmail, and send only when it feels right.",
       button: "Prepare Outreach Free",
+    },
+  },
+  {
+    slug: "softphone",
+    path: "/features/softphone",
+    eyebrow: "Softphone",
+    icon: "PhoneCall",
+    title: "Softphone for Freelancers",
+    accentTitle: "That Turns Leads Into Live Calls",
+    description:
+      "Call prospects from the same workspace where you found and qualified them. iCloseLeads lets every plan access the softphone option, buy a dedicated number, add a monthly minute package, and keep calling tied to the lead workflow.",
+    shortDescription:
+      "Buy a dedicated number, choose monthly minutes, and call leads from the iCloseLeads dashboard.",
+    titleTag:
+      "Softphone for Freelancers | Call Leads from iCloseLeads",
+    metaDescription:
+      "Use the iCloseLeads softphone to buy a dedicated number, add monthly calling minutes, and call prospects from the lead workspace.",
+    keywords: [
+      "softphone for freelancers",
+      "call leads from CRM",
+      "freelance sales softphone",
+      "browser softphone for outreach",
+      "Twilio softphone for lead generation",
+      "call prospects from dashboard",
+      "lead generation softphone",
+      "freelance cold calling software",
+    ],
+    theme: {
+      accentText: "text-accent",
+      accentBg: "bg-accent/10",
+      accentBorder: "border-accent/25",
+      gradientText: "from-accent via-primary-light to-blue-400",
+      heroWash: "from-accent/10 via-transparent to-primary/10",
+      hoverBorder: "hover:border-accent/40",
+    },
+    audience:
+      "Freelancers and agencies who want to call promising prospects without copying phone numbers into a separate dialer.",
+    promise:
+      "Keep the call close to the context. A saved lead, phone route, pitch angle, and follow-up stage can live beside the softphone instead of being split across notes, spreadsheets, and a separate calling app.",
+    proof: [
+      "The softphone sits inside the authenticated dashboard, not on a separate sales tool.",
+      "Phone number checkout and monthly minute packages are handled as dedicated calling add-ons.",
+      "Lead research, phone route checks, proposal context, and CRM follow-up stay in the same product.",
+    ],
+    stats: [
+      { value: "All plans", label: "Softphone option available" },
+      { value: "1 number", label: "Dedicated calling identity" },
+      { value: "Monthly", label: "Minute packages" },
+      { value: "In app", label: "Call from the dashboard" },
+    ],
+    workflow: [
+      {
+        title: "Find a call-worthy lead",
+        description:
+          "Start from a local business, decision maker route, or saved prospect where a phone conversation makes sense.",
+        icon: "Search",
+      },
+      {
+        title: "Activate your number",
+        description:
+          "Buy a dedicated calling number through secure checkout so prospects see a consistent business identity.",
+        icon: "PhoneCall",
+      },
+      {
+        title: "Add monthly minutes",
+        description:
+          "Choose a calling minute package before dialing so usage stays clear and separated from plan access.",
+        icon: "Clock",
+      },
+      {
+        title: "Call from the lead workflow",
+        description:
+          "Dial from iCloseLeads while the business context, notes, and next follow-up action are still visible.",
+        icon: "Layers",
+      },
+    ],
+    capabilities: [
+      {
+        title: "Dedicated phone number",
+        description:
+          "Set up a business calling number for outreach instead of using a personal line.",
+        icon: "PhoneCall",
+      },
+      {
+        title: "Minute package checkout",
+        description:
+          "Buy monthly calling minutes separately from your core plan so calling costs track actual usage.",
+        icon: "Clock",
+      },
+      {
+        title: "Browser-based dialing",
+        description:
+          "Place calls from inside iCloseLeads without switching to another dialer.",
+        icon: "Zap",
+      },
+      {
+        title: "CRM-adjacent calling",
+        description:
+          "Use the lead record, notes, and follow-up stage as the call context.",
+        icon: "Layers",
+      },
+    ],
+    useCases: [
+      {
+        title: "Local business outreach",
+        description:
+          "Call businesses after checking their website, owner route, phone path, and pitch angle.",
+        icon: "Users",
+      },
+      {
+        title: "Agency prospecting",
+        description:
+          "Let a team find leads, qualify them, and move the strongest prospects into a calling workflow.",
+        icon: "Layers",
+      },
+      {
+        title: "Follow-up after email",
+        description:
+          "Call prospects who have already received a proposal or need a human follow-up.",
+        icon: "Mail",
+      },
+    ],
+    differentiators: [
+      "Calling is tied to the lead workflow instead of living in a disconnected dialer.",
+      "Every plan can access the softphone option, with phone number and minutes purchased separately.",
+      "It supports the same direct-client motion as lead discovery, proposals, outreach, and CRM.",
+      "The user stays in control of when to activate calling and how many minutes to buy.",
+    ],
+    faqs: [
+      {
+        q: "Is the softphone available on every plan?",
+        a: "Yes. Every plan can access the softphone option. Phone numbers and monthly calling minute packages are separate paid add-ons, so the core plan and calling usage stay easy to understand.",
+      },
+      {
+        q: "Do I need to buy a number before calling?",
+        a: "Yes. The softphone flow starts by activating a dedicated calling number, then adding a monthly minute package before dialing.",
+      },
+      {
+        q: "Is this meant to replace email outreach?",
+        a: "No. It complements email. Use email when a written pitch is best, and use the softphone when a timely call can move a qualified lead forward faster.",
+      },
+      {
+        q: "Are number and minute payments part of my main plan subscription?",
+        a: "No. Calling add-ons are separate from plan access. That keeps phone number and usage costs tied to the people who actually use calling.",
+      },
+    ],
+    cta: {
+      heading: "Call the lead while the context is fresh",
+      subheading:
+        "Find the prospect, verify the route, activate calling, and keep the next follow-up inside iCloseLeads.",
+      button: "Open Softphone",
     },
   },
   {

@@ -8,6 +8,7 @@ import {
   Layers,
   Mail,
   MessageSquare,
+  PhoneCall,
   Search,
   Shield,
   Sparkles,
@@ -41,6 +42,7 @@ const ICONS: Record<IconName, React.ElementType> = {
   Zap,
   Users,
   MessageSquare,
+  PhoneCall,
 };
 
 function FeatureIcon({ name, className }: { name: IconName; className?: string }) {
@@ -175,7 +177,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
               </div>
               <h1 className="max-w-4xl text-4xl font-black leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                 {page.title}{" "}
-                <span className={cn("bg-gradient-to-r bg-clip-text text-transparent", page.theme.gradientText)}>
+                <span className={page.theme.accentText}>
                   {page.accentTitle}
                 </span>
               </h1>

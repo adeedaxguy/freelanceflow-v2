@@ -8,13 +8,14 @@ import { PRICING_TIERS } from "@/data/marketing";
 
 export const metadata: Metadata = {
   title: "iCloseLeads Pricing — Affordable Plans for Freelancers",
-  description: "Start free, upgrade when ready. iCloseLeads offers plans from $0 to $79/mo with AI proposals, lead discovery, and email outreach.",
+  description: "Start free, upgrade when ready. iCloseLeads offers plans from $0 to $79/mo with lead discovery, AI proposals, outreach, CRM, and optional softphone add-ons.",
   alternates: { canonical: "https://icloseleads.com/pricing" },
 };
 
 const billingFAQ = [
   { q: "Can I change plans anytime?", a: "Yes. Once paid plans launch, subscription changes and cancellations will be available through the secure customer billing portal." },
-  { q: "How will payments be handled?", a: "Paid subscriptions will use Lemon Squeezy's secure hosted checkout. It acts as merchant of record and handles payment processing and applicable sales tax or VAT." },
+  { q: "Can every plan use the softphone?", a: "Yes. Every plan can access the softphone option. Phone numbers and monthly calling minute packages are separate paid add-ons, so calling costs stay tied to actual phone usage." },
+  { q: "How will payments be handled?", a: "Softphone number subscriptions and calling-minute packages use secure Stripe Checkout. Paid plan subscriptions will show their checkout provider clearly before purchase when plan billing opens." },
   { q: "Is there a free trial for paid plans?", a: "Paid-plan launch terms will be shown clearly before checkout. Free early access requires no card and remains the best way to try iCloseLeads today." },
   { q: "What happens when I hit my monthly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
   { q: "Do you offer annual billing?", a: "Monthly and annual subscriptions are being prepared. Final annual savings will be displayed before purchase." },
@@ -32,7 +33,7 @@ export default function PricingPage() {
                 Simple Pricing, <span className="gradient-text">No Surprises</span>
               </h1>
               <p className="text-muted-foreground text-xl max-w-xl mx-auto">
-                Start free. Upgrade as you grow. Cancel anytime.
+                Start free. Upgrade as you grow. Add softphone calling when you are ready.
               </p>
             </div>
 
@@ -47,7 +48,7 @@ export default function PricingPage() {
               </div>
               <div>
                 <div className="text-foreground font-semibold">Free early access, no card required</div>
-                <div className="text-muted-foreground text-sm">Try the core workflow now. Paid checkout stays closed until billing verification is complete.</div>
+                <div className="text-muted-foreground text-sm">Try the core workflow now. Softphone number and minute add-ons use secure Stripe checkout when you activate calling.</div>
               </div>
             </div>
 

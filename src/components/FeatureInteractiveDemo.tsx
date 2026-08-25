@@ -8,6 +8,7 @@ import {
   FileText,
   Layers,
   Mail,
+  PhoneCall,
   Search,
   Shield,
   Sparkles,
@@ -426,6 +427,70 @@ function AnalyticsDemo() {
   );
 }
 
+function SoftphoneDemo() {
+  const [packageSize, setPackageSize] = useState<"200" | "500">("200");
+  const remaining = packageSize === "200" ? 182 : 486;
+
+  return (
+    <div className={cn(basePanel, "overflow-hidden rounded-lg")}>
+      <MiniHeader title="Softphone workspace" subtitle="Lead context beside the dialer" />
+      <div className="p-4">
+        <div className="grid gap-4 sm:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-lg border border-border bg-background p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Current lead</p>
+            <h3 className="mt-2 text-lg font-extrabold text-foreground">Northline Dental</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Outdated booking flow, public phone route, owner path ready.
+            </p>
+            <div className="mt-4 rounded-lg border border-accent/20 bg-accent/10 p-3 text-xs text-accent">
+              Best call angle: booking friction and missed appointment requests.
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border bg-background p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground">Calling from</p>
+                <p className="text-sm font-bold text-foreground">Dedicated business number</p>
+              </div>
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <PhoneCall className="h-5 w-5" />
+              </span>
+            </div>
+            <p className="mt-4 rounded-lg border border-border bg-surface px-3 py-3 text-center text-xl font-bold text-foreground">
+              (713) 555-0148
+            </p>
+            <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-accent px-4 py-3 text-sm font-bold text-background">
+              <PhoneCall className="h-4 w-4" />
+              Call lead
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="flex flex-wrap gap-2">
+            {(["200", "500"] as const).map(option => (
+              <button
+                key={option}
+                onClick={() => setPackageSize(option)}
+                className={cn(chip, packageSize === option && activeChip)}
+              >
+                {option} monthly minutes
+              </button>
+            ))}
+          </div>
+          <p className="text-xs font-semibold text-muted-foreground">
+            {remaining} minutes remaining
+          </p>
+        </div>
+        <div className="mt-3">
+          <ScoreBar score={packageSize === "200" ? 91 : 97} color="bg-accent" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ToolsDemo() {
   const [monthly, setMonthly] = useState(4000);
   const [hours, setHours] = useState(80);
@@ -495,6 +560,8 @@ export default function FeatureInteractiveDemo({ type }: { type: DemoType }) {
       return <ProposalDemo />;
     case "email-outreach":
       return <OutreachDemo />;
+    case "softphone":
+      return <SoftphoneDemo />;
     case "crm-pipeline":
       return <CRMDemo />;
     case "analytics":

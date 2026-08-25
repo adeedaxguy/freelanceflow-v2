@@ -17,9 +17,9 @@ import {
   Layers3,
   Mail,
   MapPin,
+  PhoneCall,
   Radio,
   Search,
-  Send,
   Sparkles,
   Target,
   UserRoundSearch,
@@ -113,11 +113,11 @@ const workflow = [
     note: "Know who and why.",
   },
   {
-    icon: Send,
+    icon: PhoneCall,
     number: "04",
-    title: "Pitch and follow up",
-    description: "Draft the proposal, prepare outreach, save the lead, and keep the next action visible in CRM.",
-    note: "From signal to conversation.",
+    title: "Call, pitch, and follow up",
+    description: "Draft the proposal, prepare outreach, call from the softphone when useful, and keep the next action visible in CRM.",
+    note: "From signal to live conversation.",
   },
 ];
 
@@ -125,6 +125,7 @@ const features = [
   [UserRoundSearch, "Decision maker paths", "Move from a local business name to owner, manager, social, phone, and proof checks."],
   [Sparkles, "Context-aware proposals", "Start from the actual lead signal so your first draft sounds researched, not mass-produced."],
   [Mail, "Review-first outreach", "Prepare a Gmail-ready message, check every line yourself, and keep the activity attached to the lead."],
+  [PhoneCall, "Built-in softphone", "Buy a dedicated number and monthly minutes, then call leads from the same workspace."],
   [Layers3, "A freelancer CRM", "Track saved, contacted, replied, follow-up, won, and lost without adopting an enterprise sales stack."],
   [BarChart3, "Useful analytics", "See which searches, niches, and outreach actions are creating real pipeline movement."],
   [FileText, "Client-ready website concepts", "Turn a qualified local lead into a tailored website direction you can share in the sales conversation."],
@@ -138,8 +139,9 @@ const audiences = [
 ] as const;
 
 const faq = [
-  ["What does iCloseLeads actually do?", "It brings local business leads, remote jobs, live opportunity signals, decision-maker research, AI proposals, outreach preparation, and CRM follow-up into one freelancer-focused workflow."],
+  ["What does iCloseLeads actually do?", "It brings local business leads, remote jobs, live opportunity signals, decision-maker research, AI proposals, outreach preparation, softphone calling, and CRM follow-up into one freelancer-focused workflow."],
   ["Is it free to start?", "Yes. Free users can run up to 600 lead searches per week without a credit card. Paid plans will add higher limits and advanced workflows when they launch."],
+  ["Can I call leads from iCloseLeads?", "Yes. Every plan can access the softphone option. You can buy a dedicated phone number and monthly calling minutes, then call prospects from the dashboard while keeping the lead context nearby."],
   ["Where do the leads come from?", "iCloseLeads monitors public opportunity signals and business data paths, then normalizes and scores the results so you can search them from one place."],
   ["Does AI send messages automatically?", "No. AI helps create a stronger draft, but you review the message and stay in control of what is sent."],
   ["Can I find local business owners?", "The Decision Maker workflow helps you check possible owner or manager paths, public profiles, phone routes, social searches, and supporting proof before outreach."],
@@ -359,6 +361,105 @@ function LeadEngineSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   );
 }
 
+function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const steps = [
+    [Search, "Find", "Local lead or remote prospect"],
+    [UserRoundSearch, "Verify", "Owner, manager, or phone route"],
+    [PhoneCall, "Call", "Browser softphone in iCloseLeads"],
+    [Layers3, "Follow up", "Notes and status stay in CRM"],
+  ] as const;
+
+  return (
+    <section id="softphone" className="marketing-section border-y border-border bg-background">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <div>
+            <Eyebrow>Built-in softphone</Eyebrow>
+            <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">
+              Call from the same place you found the lead.
+            </h2>
+            <p className="mt-5 max-w-xl text-base leading-8 text-muted-foreground">
+              Every plan can access the softphone option. Activate a dedicated phone number, choose a monthly minute package, and call prospects without leaving the lead workflow.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={isAuthenticated ? "/dashboard/softphone" : signupHref("softphone", "homepage-softphone")}
+                prefetch={false}
+                onClick={() => marketingEvent("homepage_softphone_cta", { state: isAuthenticated ? "authenticated" : "guest" })}
+                className="marketing-primary-cta"
+              >
+                {isAuthenticated ? "Open softphone" : "Start free, add calling later"}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/features/softphone" className="marketing-secondary-cta">
+                See softphone feature
+              </Link>
+            </div>
+            <p className="mt-4 text-xs leading-5 text-muted-foreground">
+              Phone numbers and calling minute packages are billed separately through secure checkout.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-border bg-surface p-4 shadow-card sm:p-5">
+            <div className="grid gap-3 sm:grid-cols-4">
+              {steps.map(([StepIcon, title, detail], index) => (
+                <div key={title} className="relative rounded-lg border border-border bg-background p-4">
+                  {index < steps.length - 1 && (
+                    <div className="absolute left-[calc(100%-0.25rem)] top-9 hidden h-px w-4 bg-border sm:block" aria-hidden="true" />
+                  )}
+                  <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                    <StepIcon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-sm font-bold text-foreground">{title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">{detail}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-lg border border-border bg-background p-5">
+                <p className="text-xs font-bold uppercase text-muted-foreground">Lead context</p>
+                <h3 className="mt-2 text-xl font-bold text-foreground">Northline Dental</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Outdated booking flow. Public phone available. Owner route ready for review.
+                </p>
+                <div className="mt-5 space-y-2 text-xs text-muted-foreground">
+                  {["Best angle: appointment friction", "Status: qualified", "Next step: call or email"].map(item => (
+                    <p key={item} className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-accent" />
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-accent/25 bg-accent/10 p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold uppercase text-accent">Softphone ready</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Dedicated number + monthly minutes</p>
+                  </div>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-background text-accent">
+                    <PhoneCall className="h-5 w-5" />
+                  </span>
+                </div>
+                <div className="mt-5 rounded-lg border border-border bg-background px-4 py-5 text-center">
+                  <p className="text-xs font-semibold text-muted-foreground">Calling</p>
+                  <p className="mt-1 text-2xl font-extrabold text-foreground">(713) 555-0148</p>
+                </div>
+                <div className="mt-4 flex items-center justify-between rounded-lg border border-border bg-background px-4 py-3">
+                  <span className="text-xs font-semibold text-muted-foreground">Minutes remaining</span>
+                  <span className="text-sm font-bold text-accent">182</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Testimonials() {
   const ref = useRef<HTMLDivElement>(null);
   const move = (direction: number) => ref.current?.scrollBy({ left: direction * 420, behavior: "smooth" });
@@ -404,13 +505,13 @@ export default function HomepageClient() {
             <div className="min-w-0 max-w-2xl">
               <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent"><Zap className="h-3 w-3" /></span>
-                600 free leads per week - no card required
+                600 free leads per week - softphone option available
               </div>
               <h1 className="marketing-display break-words text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
                 Find the lead. Know the angle. Start the conversation.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-                iCloseLeads helps freelancers find local businesses, remote jobs, and live demand, then verify the contact path, draft the pitch, and track every follow-up.
+                iCloseLeads helps freelancers find local businesses, remote jobs, and live demand, then verify the contact path, draft the pitch, call from the platform, and track every follow-up.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -448,7 +549,7 @@ export default function HomepageClient() {
               </div>
 
               <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                {["600 weekly free leads", "Real opportunity signals", "You approve every message"].map(item => (
+                {["600 weekly free leads", "Real opportunity signals", "Built-in softphone option"].map(item => (
                   <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-accent" />{item}</span>
                 ))}
               </div>
@@ -501,6 +602,8 @@ export default function HomepageClient() {
 
         <LeadEngineSection isAuthenticated={isAuthenticated} />
 
+        <SoftphoneInfographic isAuthenticated={isAuthenticated} />
+
         <MarketingAdBand />
 
         <section className="marketing-section">
@@ -525,7 +628,7 @@ export default function HomepageClient() {
                 <div className="bg-primary/[0.06] p-6">
                   <p className="text-xs font-bold uppercase text-primary-light">The iCloseLeads way</p>
                   <div className="mt-6 space-y-5">
-                    {["Search three lead engines in one place", "Score and save only the pitchable leads", "Draft from the real opportunity context", "Keep every next step visible"].map(item => (
+                    {["Search three lead engines in one place", "Score and save only the pitchable leads", "Draft or call from the real opportunity context", "Keep every next step visible"].map(item => (
                       <p key={item} className="flex gap-3 text-sm font-medium leading-6 text-foreground"><Check className="mt-1 h-4 w-4 shrink-0 text-accent" />{item}</p>
                     ))}
                   </div>
@@ -541,7 +644,7 @@ export default function HomepageClient() {
               <div className="min-w-0 max-w-xl">
                 <p className="text-xs font-bold uppercase text-muted-foreground">One connected workspace</p>
                 <h2 className="marketing-display mt-5 break-words text-4xl font-bold sm:text-5xl">The lead is only useful if you know what to do next.</h2>
-                <p className="mt-5 text-base leading-8 text-muted-foreground">Every feature supports the same motion: find, understand, contact, and follow up.</p>
+                <p className="mt-5 text-base leading-8 text-muted-foreground">Every feature supports the same motion: find, understand, email or call, and follow up.</p>
               </div>
               <div className="grid min-w-0 divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
                 {features.map(([Icon, title, description], index) => (
@@ -582,7 +685,7 @@ export default function HomepageClient() {
             <div className="mx-auto max-w-3xl text-center">
               <Eyebrow>Start before you subscribe</Eyebrow>
               <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">Find out if the leads are worth pitching first.</h2>
-              <p className="mt-5 text-base leading-8 text-muted-foreground">The free plan is a real starting point. No credit card and no long setup before your first search.</p>
+              <p className="mt-5 text-base leading-8 text-muted-foreground">The free plan is a real starting point. Every plan can add softphone calling when you are ready for a dedicated number and monthly minutes.</p>
             </div>
             <div className="mx-auto mt-12 grid max-w-6xl gap-5 lg:grid-cols-3">
               {PRICING_TIERS.map((tier, index) => <PricingCard key={tier.name} tier={tier} index={index} />)}
@@ -619,7 +722,7 @@ export default function HomepageClient() {
             <div className="p-7 sm:p-10 lg:p-12">
               <p className="text-xs font-bold uppercase text-blue-100">Your next client is already showing a signal</p>
               <h2 className="marketing-display mt-4 max-w-3xl text-4xl font-bold sm:text-5xl">Stop wondering where the next conversation will come from.</h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-blue-100">Run one focused search, save the best opportunity, and write the first pitch from the same workspace.</p>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-blue-100">Run one focused search, save the best opportunity, and write or call from the same workspace.</p>
             </div>
             <div className="border-t border-white/20 p-7 lg:border-l lg:border-t-0 lg:p-12">
               <Link href={primaryHref} prefetch={false} className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-blue-800">
