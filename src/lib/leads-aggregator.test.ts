@@ -73,4 +73,69 @@ describe("remote lead ranking", () => {
 
     expect(leads.map(lead => lead.url)).toEqual(["https://reddit.com/r/forhire/comments/hiring"]);
   });
+
+  it("maps RemoteJobs.org listings into leads", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [
+          {
+            id: "remotejobs-1",
+            title: "Senior React Developer",
+            url: "https://remotejobs.org/remote-jobs/senior-react-developer",
+            apply_url: "https://remotejobs.org/remote-jobs/senior-react-developer",
+            company: { name: "Remote Co", website: "https://remote.example" },
+            category: { name: "Programming", slug: "programming" },
+            type: "Contract",
+            description: "Contract React and TypeScript web app project. Budget: $6,000.",
+            posted_at: "2026-08-26T10:00:00Z",
+            salary_text: "$6,000 project",
+          },
+        ],
+      }),
+    });
+
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "remotejobsorg",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(leads[0]).toMatchObject({
+      id: "rjo-remotejobs-1",
+      source: "remotejobsorg",
+      company: "Remote Co",
+      title: "Senior React Developer",
+    });
+  });
+
+  it("uses the current Jobicy API without the stale worldwide geo filter", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        jobs: [
+          {
+            id: 1,
+            jobTitle: "Remote React Engineer",
+            companyName: "Jobicy Co",
+            jobIndustry: ["Software Engineering"],
+            jobDescription: "React and TypeScript remote engineering role.",
+            url: "https://jobicy.com/jobs/react-engineer",
+            pubDate: "2026-08-26T10:00:00Z",
+          },
+        ],
+      }),
+    });
+
+    await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "jobicy",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain("https://jobicy.com/api/v2/remote-jobs?count=100");
+    expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain("geo=worldwide");
+  });
 });

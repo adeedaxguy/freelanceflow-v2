@@ -7,18 +7,20 @@
  *  3.  Reddit              — r/forhire, r/hiring, r/freelance_forhire, r/slavelabour  (Atom RSS)
  *  4.  WeWorkRemotely      — general + category RSS feeds
  *  5.  Arbeitnow           — https://www.arbeitnow.com/api/job-board-api
- *  6.  Jobicy              — JSON API + RSS fallback
- *  7.  Working Nomads      — https://www.workingnomads.com/api/exposed_jobs
- *  8.  HackerNews          — Algolia "Who is hiring?" / freelancer threads
- *  9.  YC Jobs             — hacker-news.firebaseio.com/v0/jobstories          [replaces Remote.co]
- *  10. Authentic Jobs      — https://authenticjobs.com/feed/                  [replaces Craigslist]
- *  11. GitHub Bounties     — open issues labelled bounty/paid
- *  12. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/
- *  13. Dribbble Jobs       — https://dribbble.com/jobs.rss
- *  14. Jobspresso          — https://jobspresso.co/feed/                      [replaces Freelancermap]
- *  15. Greenhouse boards   — selected public startup/company boards
- *  16. Lever boards        — selected public startup/company boards
- *  17. Ashby boards        — selected public startup/company boards
+ *  6.  RemoteJobs.org      — https://remotejobs.org/api/v1/jobs
+ *  7.  Jobicy              — https://jobicy.com/api/v2/remote-jobs
+ *  8.  Working Nomads      — https://www.workingnomads.com/api/exposed_jobs
+ *  9.  HackerNews          — Algolia "Who is hiring?" / freelancer threads
+ *  10. YC Jobs             — hacker-news.firebaseio.com/v0/jobstories          [replaces Remote.co]
+ *  11. Authentic Jobs      — https://authenticjobs.com/feed/                  [replaces Craigslist]
+ *  12. GitHub Bounties     — open issues labelled bounty/paid
+ *  13. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/
+ *  14. Dribbble Jobs       — https://dribbble.com/jobs.rss
+ *  15. Jobspresso          — https://jobspresso.co/feed/                      [replaces Freelancermap]
+ *  16. Himalayas           — https://himalayas.app/jobs/api/search
+ *  17. Greenhouse boards   — selected public startup/company boards
+ *  18. Lever boards        — selected public startup/company boards
+ *  19. Ashby boards        — selected public startup/company boards
  *
  * v5 changes:
  *  - Reddit switched to public Atom RSS (no OAuth, 100% reliable)
@@ -37,6 +39,7 @@ export type LeadSource =
   | "reddit"
   | "weworkremotely"
   | "arbeitnow"
+  | "remotejobsorg"
   | "jobicy"
   | "workingnomads"
   | "hackernews"
@@ -59,7 +62,8 @@ export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
   reddit:        "Community Leads",
   weworkremotely:"Remote Jobs C",
   arbeitnow:     "Startup Jobs A",
-  jobicy:        "Remote Jobs D",
+  remotejobsorg: "Remote Jobs D",
+  jobicy:        "Remote Jobs G",
   workingnomads: "Remote Jobs E",
   hackernews:    "Founder Hiring",
   ycjobs:        "Startup Jobs B",
@@ -1094,7 +1098,71 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
   return { leads, raw: inWindow };
 }
 
-// ─── Source 6: Jobicy ─────────────────────────────────────────────────────────
+// ─── Source 6: RemoteJobs.org ─────────────────────────────────────────────────
+
+interface RemoteJobsOrgJob {
+  id?: string; title?: string; url?: string; apply_url?: string;
+  company?: { name?: string; website?: string };
+  category?: { name?: string; slug?: string };
+  type?: string; description?: string; posted_at?: string;
+  salary_text?: string | null;
+}
+interface RemoteJobsOrgResponse { data?: RemoteJobsOrgJob[]; }
+
+async function fetchRemoteJobsOrg(niche: string, keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const categoryMap: Record<string, string> = {
+    "web-development": "programming", "mobile-apps": "programming",
+    "wordpress": "programming", "shopify": "programming",
+    "ui-ux-design": "design", "graphic-design": "design",
+    "copywriting": "writing", "technical-writing": "writing",
+    "seo": "marketing", "social-media": "marketing", "email-marketing": "marketing", "meta-ads": "marketing",
+    "data-science": "data-science", "devops": "devops",
+    "business-consulting": "product-management",
+  };
+  const params = new URLSearchParams({ limit: "50" });
+  const category = categoryMap[niche];
+  if (category) params.set("category", category);
+  else if (keywords[0]) params.set("q", keywords[0]);
+
+  const res = await withTimeout(
+    fetch(`https://remotejobs.org/api/v1/jobs?${params.toString()}`, {
+      headers: { "User-Agent": "iCloseLeads/6.0", "Accept": "application/json" },
+      ...cacheOpts(freshOnly, 900),
+    }),
+    9000,
+  );
+  if (!res.ok) throw new Error(`RemoteJobs.org ${res.status}`);
+  const data = await res.json() as RemoteJobsOrgResponse;
+  let inWindow = 0;
+  const leads = (data.data ?? []).flatMap((job): AggregatedLead[] => {
+    if (!job.title || !job.company?.name) return [];
+    const posted = job.posted_at ? new Date(job.posted_at) : null;
+    if (!posted || isNaN(posted.getTime())) return [];
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) return [];
+    inWindow++;
+    const desc = stripHtml(job.description ?? "");
+    const tags = [job.category?.name ?? "", job.type ?? ""].filter(Boolean);
+    const confidence = scoreMatch(job.title, desc, tags, keywords);
+    if (confidence < SOURCE_FLOOR) return [];
+    const budget = job.salary_text ?? extractBudget(desc);
+    const urgency = detectUrgency(`${job.title} ${desc}`);
+    const email = extractEmail(desc);
+    const domain = job.company.website ? extractDomain(job.company.website) : companyToDomain(job.company.name);
+    return [{
+      id: `rjo-${job.id ?? Math.random()}`,
+      company: job.company.name.trim(), domain, email, title: job.title.trim(),
+      description: truncate(desc), url: job.apply_url ?? job.url ?? "https://remotejobs.org",
+      source: "remotejobsorg", sourceLabel: "RemoteJobs.org",
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags: tags.slice(0, 8), confidence, budget: budget ?? undefined, urgency,
+      qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.title, budget: budget ?? undefined, urgency }),
+    }];
+  });
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 7: Jobicy ─────────────────────────────────────────────────────────
 // Uses browser-like headers to bypass Cloudflare. Falls back to their RSS feed
 // if the JSON API returns a 4xx (common from Vercel/serverless IPs).
 
@@ -1110,7 +1178,7 @@ async function fetchJobicy(keywords: string[], maxHours: number, freshOnly: bool
   // ── Try JSON API first ────────────────────────────────────────────────────
   try {
     const res = await withTimeout(
-      fetch("https://jobicy.com/api/v2/remote-jobs?count=50&geo=worldwide", {
+      fetch("https://jobicy.com/api/v2/remote-jobs?count=100", {
         headers: {
           "User-Agent": BROWSER_UA,
           "Accept":     "application/json, text/plain, */*",
@@ -1740,69 +1808,76 @@ async function fetchDribbbleJobs(keywords: string[], maxHours: number, freshOnly
   return { leads, raw: inWindow };
 }
 
-// ─── Source 15: Himalayas App (RSS) ──────────────────────────────────────────
-// himalayas.app — curated startup/remote jobs board with open RSS feed.
+// ─── Source 15: Himalayas App (JSON) ─────────────────────────────────────────
+// himalayas.app — curated startup/remote jobs board with open JSON API.
 
-async function fetchHimalayas(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+interface HimalayasJob {
+  title?: string; excerpt?: string; companyName?: string; companySlug?: string;
+  description?: string; pubDate?: string | number; applicationLink?: string; guid?: string;
+  categories?: string[]; parentCategories?: string[]; employmentType?: string;
+  minSalary?: number | null; maxSalary?: number | null; currency?: string | null; salaryPeriod?: string | null;
+}
+interface HimalayasResponse { jobs?: HimalayasJob[]; }
+
+async function fetchHimalayas(niche: string, keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const queryMap: Record<string, string> = {
+    "web-development": "web developer", "mobile-apps": "mobile developer",
+    "ui-ux-design": "product designer", "graphic-design": "graphic designer",
+    "copywriting": "copywriter", "seo": "seo", "social-media": "social media",
+    "email-marketing": "email marketing", "meta-ads": "paid social",
+    "data-science": "data analyst", "devops": "devops", "wordpress": "wordpress",
+    "shopify": "shopify", "business-consulting": "business operations",
+  };
+  const params = new URLSearchParams({
+    q: queryMap[niche] ?? keywords[0] ?? "remote",
+    sort: "recent",
+    page: "1",
+  });
   const res = await withTimeout(
-    fetch("https://himalayas.app/jobs/feed", {
+    fetch(`https://himalayas.app/jobs/api/search?${params.toString()}`, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/5.0)",
-        "Accept":     "application/rss+xml, text/xml, */*",
+        "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/6.0)",
+        "Accept":     "application/json, */*",
       },
       ...cacheOpts(freshOnly, 1800),
     }),
     10000
   );
   if (!res.ok) throw new Error(`Himalayas ${res.status}`);
-  const xml   = await res.text();
-  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
-  const leads: AggregatedLead[] = [];
+  const data = await res.json() as HimalayasResponse;
   let inWindow = 0;
-
-  for (const m of items) {
-    const item    = m[1] ?? "";
-    const title   = stripHtml(extractRSS(item, "title"));
-    const link    = extractRSS(item, "link") || extractRSS(item, "guid");
-    const pubDate = extractRSS(item, "pubDate");
-    const desc    = extractRSS(item, "description") || extractRSS(item, "content:encoded");
-    if (!title || !link) continue;
-    const posted = new Date(pubDate);
-    if (isNaN(posted.getTime())) continue;
+  const leads = (data.jobs ?? []).flatMap((job): AggregatedLead[] => {
+    if (!job.title || !job.companyName) return [];
+    const posted = typeof job.pubDate === "number" ? new Date(job.pubDate * 1000) : job.pubDate ? new Date(job.pubDate) : null;
+    if (!posted || isNaN(posted.getTime())) return [];
     const hrs = hoursAgo(posted);
-    if (hrs > maxHours) continue;
+    if (hrs > maxHours) return [];
     inWindow++;
-    const cleanDesc  = stripHtml(desc);
-    const confidence = scoreMatch(title, cleanDesc, [], keywords);
-    if (confidence < SOURCE_FLOOR) continue;
-
-    let company = ""; let cleanTitle = title;
-    const atMatch   = title.match(/^(.+?)\s+at\s+(.+?)(?:\s*[-|,]|$)/i);
-    const dashMatch = title.match(/^(.+?)\s*[—–-]\s*(.+)$/);
-    if (atMatch?.[2])   { cleanTitle = atMatch[1]?.trim() ?? title; company = atMatch[2].trim(); }
-    else if (dashMatch) { company = dashMatch[1]?.trim() ?? ""; cleanTitle = dashMatch[2]?.trim() ?? title; }
-    if (!company) {
-      const catM = item.match(/<category[^>]*>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?<\/category>/i);
-      company = catM?.[1]?.trim() ?? "Himalayas";
+    const desc = stripHtml(job.description ?? job.excerpt ?? "");
+    const tags = [...(job.parentCategories ?? []), ...(job.categories ?? []), job.employmentType ?? ""].filter(Boolean).slice(0, 8);
+    const confidence = scoreMatch(job.title, desc, tags, keywords);
+    if (confidence < SOURCE_FLOOR) return [];
+    let budget = extractBudget(desc);
+    if (!budget && (job.minSalary || job.maxSalary)) {
+      const currency = job.currency ?? "USD";
+      const min = job.minSalary ? `${currency} ${job.minSalary.toLocaleString()}` : "";
+      const max = job.maxSalary ? `${currency} ${job.maxSalary.toLocaleString()}` : "";
+      budget = [min, max].filter(Boolean).join(" - ");
     }
-    company = company.slice(0, 80);
-
-    const budget  = extractBudget(title + " " + cleanDesc);
-    const urgency = detectUrgency(title + " " + cleanDesc);
-    const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "himalayas.app" ? extractDomain(link) : companyToDomain(company);
-    const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
-
-    leads.push({
-      id: `him-${slug}`,
-      company, domain, email, title: cleanTitle || title,
-      description: truncate(cleanDesc || "Startup remote job — view full details on Himalayas."),
-      url: link, source: "himalayas", sourceLabel: "Himalayas",
+    const url = job.applicationLink ?? job.guid ?? `https://himalayas.app/companies/${job.companySlug ?? ""}`;
+    const urgency = detectUrgency(`${job.title} ${desc}`);
+    const email = extractEmail(desc);
+    const domain = companyToDomain(job.companyName);
+    return [{
+      id: `him-${job.guid ?? url}`,
+      company: job.companyName.trim().slice(0, 80), domain, email, title: job.title.trim(),
+      description: truncate(desc || "Startup remote job — view full details on Himalayas."),
+      url, source: "himalayas", sourceLabel: "Himalayas",
       postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
-      tags: ["startup", "remote"], confidence, budget, urgency,
-      qualityScore: calcQuality({ email, description: cleanDesc, domain, title, budget, urgency }),
-    });
-  }
+      tags, confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.title, budget, urgency }),
+    }];
+  });
   return { leads, raw: inWindow };
 }
 
@@ -1885,6 +1960,7 @@ const SOURCE_RUNNERS: Array<{
   { name: "reddit",        run: (_n, k, h, f) => fetchReddit(k, h, f) },
   { name: "weworkremotely",run: (n, k, h, f)  => fetchWeWorkRemotely(n, k, h, f) },
   { name: "arbeitnow",     run: (_n, k, h, f) => fetchArbeitnow(k, h, f) },
+  { name: "remotejobsorg", run: (n, k, h, f)  => fetchRemoteJobsOrg(n, k, h, f) },
   { name: "jobicy",        run: (_n, k, h, f) => fetchJobicy(k, h, f) },
   { name: "workingnomads", run: (_n, k, h, f) => fetchWorkingNomads(k, h, f) },
   { name: "hackernews",    run: (_n, k, h, f) => fetchHackerNews(k, h, f) },
@@ -1894,7 +1970,7 @@ const SOURCE_RUNNERS: Array<{
   { name: "freelancermap", run: (_n, k, h, f) => fetchFreelancermap(k, h, f) }, // new
   { name: "smashingjobs",  run: (_n, k, h, f) => fetchSmashingJobs(k, h, f) },
   { name: "dribbble",      run: (_n, k, h, f) => fetchDribbbleJobs(k, h, f) },
-  { name: "himalayas",     run: (_n, k, h, f) => fetchHimalayas(k, h, f) },
+  { name: "himalayas",     run: (n, k, h, f)  => fetchHimalayas(n, k, h, f) },
   { name: "nodesk",        run: (_n, k, h, f) => fetchNoDesk(k, h, f) },
   { name: "greenhouse",    run: (_n, k, h, f) => fetchGreenhouseBoards(k, h, f) },
   { name: "lever",         run: (_n, k, h, f) => fetchLeverBoards(k, h, f) },
@@ -1905,10 +1981,8 @@ const DEFAULT_DISABLED_SOURCES = new Set<LeadSource>([
   // These public feeds currently return hard errors in production probes. Keep
   // them callable through explicit source filters so we can re-test recovery,
   // but do not spend normal user searches on broken channels.
-  "jobicy",
   "githubissues",
   "freelancermap",
-  "himalayas",
   "nodesk",
 ]);
 
@@ -1919,6 +1993,9 @@ const SOURCE_RANK_BOOST: Partial<Record<LeadSource, number>> = {
   weworkremotely: 3,
   arbeitnow:      2,
   remotive:       2,
+  remotejobsorg:  2,
+  jobicy:         2,
+  himalayas:      2,
   reddit:         2,
   remoteok:       1,
   workingnomads:  1,

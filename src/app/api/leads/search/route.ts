@@ -26,7 +26,7 @@ const searchSchema = z.object({
 
 const VALID_SOURCES: LeadSource[] = [
   "remoteok", "remotive", "reddit", "weworkremotely",
-  "arbeitnow", "jobicy", "workingnomads", "hackernews",
+  "arbeitnow", "remotejobsorg", "jobicy", "workingnomads", "hackernews",
   "ycjobs", "authenticjobs", "githubissues",
   "freelancermap", "smashingjobs", "dribbble",
   "himalayas", "nodesk", "greenhouse", "lever", "ashby",
