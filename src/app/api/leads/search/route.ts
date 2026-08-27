@@ -8,6 +8,7 @@ import {
   type AggregatedLead,
 } from "@/lib/leads-aggregator";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
+import { FREE_TRIAL_LEAD_LIMIT } from "@/lib/plan-limits";
 import { z } from "zod";
 
 // Accept either `niche: "web-development"` (legacy) or `niches: ["web-development", "shopify"]`.
@@ -74,11 +75,13 @@ export async function POST(req: NextRequest) {
     // Usage stats — agency/pro bypass first; fall back to free defaults if DB unavailable.
     let usage = {
       plan: isUnlimitedUser ? "agency" : "free",
-      limit: isUnlimitedUser ? 99999 : 600,
+      limit: isUnlimitedUser ? 99999 : FREE_TRIAL_LEAD_LIMIT,
       used: 0,
-      remaining: isUnlimitedUser ? 99999 : 600,
-      nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+      remaining: isUnlimitedUser ? 99999 : FREE_TRIAL_LEAD_LIMIT,
+      nextReset: new Date(Date.now() + 3 * 86_400_000).toISOString(),
       percentage: 0,
+      trialEndsAt: isUnlimitedUser ? null : new Date(Date.now() + 3 * 86_400_000).toISOString(),
+      trialExpired: false,
     };
     if (!isUnlimitedUser) {
       try {
@@ -89,12 +92,15 @@ export async function POST(req: NextRequest) {
 
     if (usage.remaining === 0) {
       return NextResponse.json({
-        error:     `Weekly limit reached. You have used your ${usage.limit} free leads for this week. Share iCloseLeads to unlock bonus leads instantly.`,
+        error:     usage.trialExpired
+          ? "Your 3-day trial has ended. Upgrade to Pro or Agency to keep finding leads."
+          : `Trial limit reached. You have used your ${usage.limit} included leads.`,
         plan:      usage.plan,
         limit:     usage.limit,
         nextReset: usage.nextReset,
         upgrade:   true,
-        bonusAvailable: true,
+        bonusAvailable: !usage.trialExpired,
+        trialExpired: usage.trialExpired,
       }, { status: 429 });
     }
 
@@ -184,7 +190,7 @@ export async function POST(req: NextRequest) {
     }
     if (hasEmail) leads = leads.filter(l => !!l.email);
 
-    // Respect the user's daily cap exactly. Bonus claims increase this value
+    // Respect the user's current cap exactly. Bonus claims increase this value
     // through getUsageStats, so the UI and API always share one threshold.
     const cap = usage.remaining;
     const toReturn = leads.slice(0, cap);

@@ -1,4 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import {
+  FREE_TRIAL_LEAD_LIMIT,
+  getFreeTrialWindow,
+  PRO_WEEKLY_LEAD_LIMIT,
+  UNLIMITED_LEAD_LIMIT,
+} from "@/lib/plan-limits";
 
 // Unlimited accounts — bypasses all lead limits
 const UNLIMITED_EMAILS = [
@@ -9,9 +15,9 @@ const UNLIMITED_EMAILS = [
 ];
 
 export const PLAN_LIMITS = {
-  free:   { leadsPerDay: 600,    proposalsPerMonth: 10,  campaigns: 3 },
-  pro:    { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 10 },
-  agency: { leadsPerDay: 999999, proposalsPerMonth: 999, campaigns: 999 },
+  free:   { leadsPerDay: FREE_TRIAL_LEAD_LIMIT,  proposalsPerMonth: 10,  campaigns: 3 },
+  pro:    { leadsPerDay: PRO_WEEKLY_LEAD_LIMIT,  proposalsPerMonth: 999, campaigns: 10 },
+  agency: { leadsPerDay: UNLIMITED_LEAD_LIMIT,   proposalsPerMonth: 999, campaigns: 999 },
 } as const;
 
 const FREE_LEAD_RESET_HOURS = 7 * 24;
@@ -48,6 +54,7 @@ export async function checkAndIncrementLeads(
       weeklyLeadReset: true,
       bonusLeads: true,
       bonusClaimed: true,
+      createdAt: true,
     },
   });
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
@@ -59,13 +66,37 @@ export async function checkAndIncrementLeads(
 
   const plan = (user.plan as Plan) in PLAN_LIMITS ? (user.plan as Plan) : "free";
   const limit = getDailyLeadLimit(plan, user.bonusLeads ?? 0);
-
-  // Free lead counters reset weekly during the 600-lead early access offer.
   const now = new Date();
   let resetDate = new Date(user.weeklyLeadReset);
+  let currentCount = user.weeklyLeads;
+
+  if (plan === "free") {
+    const trial = getFreeTrialWindow(user.createdAt);
+    if (now >= trial.endsAt) {
+      return { allowed: false, remaining: 0, plan, resetAt: trial.endsAt.toISOString() };
+    }
+    if (resetDate < trial.startsAt) {
+      resetDate = trial.startsAt;
+      currentCount = 0;
+      await prisma.user.update({
+        where: { id: userId },
+        data: { weeklyLeads: 0, weeklyLeadReset: trial.startsAt },
+      });
+    }
+    const remaining = Math.max(0, limit - currentCount);
+    if (remaining === 0) return { allowed: false, remaining: 0, plan, resetAt: trial.endsAt.toISOString() };
+
+    const toAdd = Math.min(count, remaining);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { weeklyLeads: { increment: toAdd } },
+    });
+    return { allowed: true, remaining: remaining - toAdd, plan, resetAt: trial.endsAt.toISOString() };
+  }
+
+  // Paid-plan lead counters reset weekly.
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
 
-  let currentCount = user.weeklyLeads;
   if (hoursSinceReset >= FREE_LEAD_RESET_HOURS) {
     currentCount = 0;
     resetDate = now;
@@ -91,7 +122,7 @@ export async function checkAndIncrementLeads(
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true, bonusClaimed: true },
+    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true, bonusClaimed: true, createdAt: true },
   });
   if (!user) return null;
 
@@ -107,6 +138,8 @@ export async function getUsageStats(userId: string) {
       unlimited: true,
       bonusLeads: user.bonusLeads ?? 0,
       shareBonusClaimed: hasShareBonusClaim(user.bonusClaimed),
+      trialEndsAt: null,
+      trialExpired: false,
     };
   }
 
@@ -114,6 +147,26 @@ export async function getUsageStats(userId: string) {
   const limit = getDailyLeadLimit(plan, user.bonusLeads ?? 0);
   const now = new Date();
   const resetDate = new Date(user.weeklyLeadReset);
+
+  if (plan === "free") {
+    const trial = getFreeTrialWindow(user.createdAt);
+    const used = resetDate < trial.startsAt ? 0 : user.weeklyLeads;
+    const trialExpired = now >= trial.endsAt;
+    return {
+      plan,
+      limit,
+      used,
+      remaining: trialExpired ? 0 : Math.max(0, limit - used),
+      nextReset: trial.endsAt.toISOString(),
+      percentage: trialExpired ? 100 : Math.round((used / limit) * 100),
+      unlimited: false,
+      bonusLeads: user.bonusLeads ?? 0,
+      shareBonusClaimed: hasShareBonusClaim(user.bonusClaimed),
+      trialEndsAt: trial.endsAt.toISOString(),
+      trialExpired,
+    };
+  }
+
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
   const dailyLeads = hoursSinceReset >= FREE_LEAD_RESET_HOURS ? 0 : user.weeklyLeads;
   const nextReset = new Date(
@@ -131,5 +184,7 @@ export async function getUsageStats(userId: string) {
     unlimited: isUnlimited,
     bonusLeads: user.bonusLeads ?? 0,
     shareBonusClaimed: hasShareBonusClaim(user.bonusClaimed),
+    trialEndsAt: null,
+    trialExpired: false,
   };
 }

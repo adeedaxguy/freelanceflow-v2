@@ -86,15 +86,15 @@ export default function UpgradeClient({
   const plans = [
     {
       id: "free",
-      name: "Free",
+      name: "3-Day Trial",
       icon: <Zap className="w-5 h-5" />,
       price: { monthly: 0, annual: 0 },
-      description: "Test the core workflow before you pay",
+      description: "Explore the core workflow without a card",
       color: "border-border",
       badge: null,
       features: [
-        "600 leads per week",
-        "5 AI proposals per week",
+        "600 lead results during your 3-day trial",
+        "AI proposal drafting during the trial",
         "Live job and local lead discovery",
         "3 active campaigns",
         "CRM pipeline and saved leads",
@@ -114,6 +114,7 @@ export default function UpgradeClient({
       features: [
         `${pricing.proLeads} leads per week`,
         "Unlimited AI proposals",
+        "Multi-niche lead scans",
         "Priority freshness across lead discovery",
         "10 active campaigns",
         "CSV export and CRM sync",
@@ -270,7 +271,7 @@ export default function UpgradeClient({
                 </button>
               ) : plan.id === "free" ? (
                 <div className="w-full py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium text-center">
-                  Free Forever
+                  Trial access only
                 </div>
               ) : (
                 <button

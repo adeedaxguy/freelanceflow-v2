@@ -5,9 +5,8 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { sendAccountNotification } from "@/lib/admin-notifications";
+import { FREE_TRIAL_LEAD_LIMIT, getFreeTrialWindow } from "@/lib/plan-limits";
 import { prisma } from "@/lib/prisma";
-
-const FREE_BASE_LIMIT = 600;
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -22,28 +21,38 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Confirmation required" }, { status: 400 });
   }
 
-  const candidates = await prisma.user.findMany({
+  const now = new Date();
+  const candidatePool = await prisma.user.findMany({
     where: {
       plan: "free",
       suspended: false,
-      weeklyLeads: { gte: FREE_BASE_LIMIT },
-      bonusLeads: 0,
+      OR: [
+        { weeklyLeads: { gte: FREE_TRIAL_LEAD_LIMIT } },
+        { createdAt: { lte: new Date(now.getTime() - 3 * 86_400_000) } },
+      ],
     },
     select: {
       id: true,
       name: true,
       email: true,
-      weeklyLeadReset: true,
+      weeklyLeads: true,
+      bonusLeads: true,
+      createdAt: true,
     },
-    take: 200,
+    take: 500,
   });
+  const candidates = candidatePool.filter(user =>
+    user.weeklyLeads >= FREE_TRIAL_LEAD_LIMIT + user.bonusLeads
+    || now >= getFreeTrialWindow(user.createdAt).endsAt
+  );
 
   const sent: string[] = [];
   const skipped: string[] = [];
   const failed: { email: string; error: string }[] = [];
 
   for (const user of candidates) {
-    const noticeKey = `free_limit_notice:${user.id}:${user.weeklyLeadReset.getTime()}`;
+    const trialExpired = now >= getFreeTrialWindow(user.createdAt).endsAt;
+    const noticeKey = `free_trial_upgrade_notice:${user.id}`;
     const alreadySent = await prisma.platformSetting.findUnique({
       where: { key: noticeKey },
       select: { id: true },
@@ -56,12 +65,14 @@ export async function POST(req: NextRequest) {
     try {
       const result = await sendAccountNotification({
         recipient: user.email,
-        subject: "Your 300 extra iCloseLeads leads are ready to unlock",
-        title: `You reached the 100-lead free allowance${user.name ? `, ${user.name.split(" ")[0]}` : ""}`,
+        subject: trialExpired ? "Your iCloseLeads trial has ended" : "You reached your iCloseLeads trial limit",
+        title: `${trialExpired ? "Your 3-day trial has ended" : "You reached your included lead allowance"}${user.name ? `, ${user.name.split(" ")[0]}` : ""}`,
         lines: [
-          "During a recent iCloseLeads search, you used the 100 leads included in your free daily allowance. That allowance refreshes automatically every 24 hours.",
-          "You can unlock 300 additional leads across Local Business Leads, Remote Jobs, and Live Jobs by completing the verified share flow.",
-          '<a href="https://icloseleads.com/dashboard/local-leads" style="display:inline-block;margin-top:6px;padding:12px 18px;border-radius:9px;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;">Unlock 300 leads</a>',
+          trialExpired
+            ? "Your 3-day iCloseLeads trial has ended. Your saved leads and CRM data remain available."
+            : "You have used the lead results included in your 3-day iCloseLeads trial.",
+          "Choose Pro or Agency to continue finding new remote and local leads, with secure billing through Stripe.",
+          '<a href="https://icloseleads.com/dashboard/upgrade" style="display:inline-block;margin-top:6px;padding:12px 18px;border-radius:9px;background:#7c3aed;color:#ffffff;text-decoration:none;font-weight:700;">Choose a paid plan</a>',
           'Optional product emails are controlled separately in <a href="https://icloseleads.com/dashboard/settings" style="color:#9f67ff;">Settings</a>.',
         ],
       });

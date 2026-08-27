@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { searchLocalBusinesses, checkRateLimit, type LocalBizLead } from "@/lib/local-leads-engine";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
+import { FREE_TRIAL_LEAD_LIMIT, PRO_WEEKLY_LEAD_LIMIT } from "@/lib/plan-limits";
 
 // Re-export the type so the dashboard page can import it from this route
 export type { LocalBizLead as LocalLead };
@@ -48,12 +49,14 @@ export async function POST(req: NextRequest) {
 
   let usage = {
     plan: userPlan,
-    limit: isAgencyPlan ? 99999 : 600,
+    limit: isAgencyPlan ? 99999 : userPlan === "pro" ? PRO_WEEKLY_LEAD_LIMIT : FREE_TRIAL_LEAD_LIMIT,
     used: 0,
-    remaining: isAgencyPlan ? 99999 : 600,
+    remaining: isAgencyPlan ? 99999 : userPlan === "pro" ? PRO_WEEKLY_LEAD_LIMIT : FREE_TRIAL_LEAD_LIMIT,
     nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
     percentage: 0,
     unlimited: isAgencyPlan,
+    trialEndsAt: userPlan === "free" ? new Date(Date.now() + 3 * 86_400_000).toISOString() : null,
+    trialExpired: false,
   };
 
   try {
@@ -65,12 +68,14 @@ export async function POST(req: NextRequest) {
 
   if (usage.remaining === 0) {
     return NextResponse.json({
-      error: "Weekly limit reached. You have used your free lead allowance for this week. Share iCloseLeads to unlock bonus leads instantly.",
+      error: usage.trialExpired
+        ? "Your 3-day trial has ended. Upgrade to Pro or Agency to keep finding leads."
+        : "Trial limit reached. You have used your included lead allowance.",
       plan: usage.plan,
       limit: usage.limit,
       nextReset: usage.nextReset,
       upgrade: true,
-      bonusAvailable: true,
+      bonusAvailable: !usage.trialExpired,
       usage,
     }, { status: 429 });
   }

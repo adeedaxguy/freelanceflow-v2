@@ -44,11 +44,12 @@ describe("POST /api/local-leads/search", () => {
   it("returns 429 when the free user has no remaining lead allowance", async () => {
     (getUsageStats as jest.Mock).mockResolvedValue({
       plan: "free",
-      limit: 100,
-      used: 100,
+      limit: 600,
+      used: 600,
       remaining: 0,
       nextReset: "2026-07-02T00:00:00.000Z",
       percentage: 100,
+      trialExpired: false,
     });
 
     const { POST } = await import("@/app/api/local-leads/search/route");
@@ -61,9 +62,9 @@ describe("POST /api/local-leads/search", () => {
     const data = await res.json() as { error: string; limit: number; bonusAvailable: boolean };
 
     expect(res.status).toBe(429);
-    expect(data.limit).toBe(100);
+    expect(data.limit).toBe(600);
     expect(data.bonusAvailable).toBe(true);
-    expect(data.error).toContain("Weekly limit reached");
+    expect(data.error).toContain("Trial limit reached");
     expect(searchLocalBusinesses).not.toHaveBeenCalled();
     expect(checkAndIncrementLeads).not.toHaveBeenCalled();
   });

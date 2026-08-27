@@ -34,7 +34,9 @@ describe("POST /api/admin/marketing/notify-limit", () => {
       id: "user-1",
       name: "A User",
       email: "user@example.com",
-      weeklyLeadReset: new Date(),
+      weeklyLeads: 600,
+      bonusLeads: 0,
+      createdAt: new Date("2026-08-30T00:00:00.000Z"),
     }]);
     (prisma.platformSetting.findUnique as jest.Mock).mockResolvedValue(null);
     (prisma.platformSetting.create as jest.Mock).mockResolvedValue({ id: "notice-1" });

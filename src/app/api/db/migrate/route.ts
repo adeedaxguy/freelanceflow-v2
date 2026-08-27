@@ -8,6 +8,19 @@ export const dynamic = 'force-dynamic';
 // PostgreSQL-compatible migrations. Safe to run repeatedly.
 const TABLE_MIGRATIONS = [
   {
+    name: "AuditLog",
+    sql: `CREATE TABLE IF NOT EXISTS "AuditLog" (
+      "id" TEXT PRIMARY KEY,
+      "adminId" TEXT NOT NULL,
+      "adminEmail" TEXT NOT NULL,
+      "action" TEXT NOT NULL,
+      "targetType" TEXT,
+      "targetId" TEXT,
+      "details" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+  },
+  {
     name: "ApiKey",
     sql: `CREATE TABLE IF NOT EXISTS "ApiKey" (
       "id" TEXT PRIMARY KEY,
@@ -215,6 +228,7 @@ const TABLE_MIGRATIONS = [
   { name: "ApiKey.keyHash_key", sql: `CREATE UNIQUE INDEX IF NOT EXISTS "ApiKey_keyHash_key" ON "ApiKey"("keyHash")` },
   { name: "ApiKey.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_userId_idx" ON "ApiKey"("userId")` },
   { name: "ApiKey.revokedAt_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_revokedAt_idx" ON "ApiKey"("revokedAt")` },
+  { name: "AuditLog.createdAt_idx", sql: `CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt")` },
 ];
 
 const MIGRATIONS = [

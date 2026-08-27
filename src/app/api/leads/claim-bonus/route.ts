@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { FREE_SHARE_BONUS_LEADS, FREE_TRIAL_LEAD_LIMIT } from "@/lib/plan-limits";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
 const genCode = () => randomBytes(4).toString("hex").toUpperCase();
 
-const DEFAULT_BONUS = 300;
-const FREE_LOCAL_BASE_LIMIT = 100;
+const DEFAULT_BONUS = FREE_SHARE_BONUS_LEADS;
+const FREE_LOCAL_BASE_LIMIT = FREE_TRIAL_LEAD_LIMIT;
 
 const schema = z.object({
   action:             z.literal("share"),

@@ -80,7 +80,7 @@ const faqs = [
       },
       {
         q: "What's the difference between the free and Pro plans?",
-        a: "Free users get lead search, AI proposals, and safe Gmail compose outreach with monthly safety limits. Pro and Agency plans add higher usage, more advanced workflows, and priority support as those plans roll out.",
+        a: "The 3-day trial includes up to 600 lead results, AI proposals, and safe Gmail compose outreach. After the trial, Pro and Agency keep lead discovery active with higher limits and advanced workflows.",
       },
     ],
   },
@@ -138,7 +138,7 @@ const faqs = [
     questions: [
       {
         q: "How does billing work?",
-        a: "Free access is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
+        a: "The 3-day trial is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
       },
       {
         q: "What payment methods do you accept?",
@@ -150,7 +150,7 @@ const faqs = [
       },
       {
         q: "What happens to my leads if I downgrade to Free?",
-        a: "Your saved leads are retained. However, your weekly search quota will drop to 100 leads and multi-niche search will be limited to 1 niche.",
+        a: "Your saved leads are retained. Your account moves to the current Free allowance, and phone numbers or calling minutes remain separate paid add-ons.",
       },
     ],
   },

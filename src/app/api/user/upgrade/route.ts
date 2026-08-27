@@ -9,6 +9,7 @@ import {
   getStripeConfig,
   isStripeCheckoutConfigured,
 } from "@/lib/stripe";
+import { recordAuditLog } from "@/lib/audit-log";
 
 type PaidPlan = "pro" | "agency";
 type BillingInterval = "monthly" | "annual";
@@ -100,6 +101,20 @@ export async function POST(req: NextRequest) {
     if (!checkout.url) throw new Error("Stripe checkout did not return a payment link.");
     return NextResponse.json({ url: checkout.url });
   } catch (error) {
+    await recordAuditLog({
+      action: "payment_checkout_failed",
+      actorId: session.user.id,
+      actorEmail: session.user.email,
+      targetType: "BillingSubscription",
+      targetId: plan,
+      details: {
+        gateway: "stripe",
+        purchaseType: "plan",
+        plan,
+        billing,
+        error: error instanceof Error ? error.message : "Could not start secure checkout.",
+      },
+    });
     console.error("Billing checkout error:", error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : "Could not start secure checkout.",

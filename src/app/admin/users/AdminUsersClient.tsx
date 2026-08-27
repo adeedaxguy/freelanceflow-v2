@@ -51,7 +51,7 @@ export default function AdminUsersClient({ users }: { users: User[] }) {
           <Shield className="w-6 h-6 text-primary-light" /> User Management
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">{localUsers.length} total users</p>
-        <p className="text-muted-foreground mt-1 text-xs">"Used / Limit" tracks the shared daily allowance across remote, live, and local lead tools. "Saved" counts leads stored in CRM.</p>
+        <p className="text-muted-foreground mt-1 text-xs">"Used / Limit" tracks the shared allowance across remote, live, and local lead tools. Free accounts receive 600 leads for three days. "Saved" counts leads stored in CRM.</p>
       </div>
 
       {/* Filters */}

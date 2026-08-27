@@ -26,20 +26,20 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const PRICING_TIERS: PricingTier[] = [
   {
-    name: "Free",
+    name: "3-Day Trial",
     price: "$0",
-    description: "Start with the core workflow. Add calling only when you need it.",
-    limit: "600 leads/week",
+    description: "Try the complete lead workflow without a card. Add calling only when you need it.",
+    limit: "600 leads for 3 days",
     features: [
-      "600 leads per week",
-      "5 AI proposals per week",
+      "600 lead results during your 3-day trial",
+      "AI proposal drafting during the trial",
       "3 free tools (Rate Calc, Subject Gen, Red Flag)",
       "Live job and local lead discovery",
       "Softphone option with paid number and minute add-ons",
       "3 active campaigns",
       "Community + email support",
     ],
-    cta: "Start for Free",
+    cta: "Start 3-Day Trial",
     href: "/auth?mode=signup",
   },
   {
@@ -51,6 +51,7 @@ export const PRICING_TIERS: PricingTier[] = [
     features: [
       "1,000 leads per week",
       "Unlimited AI proposals",
+      "Multi-niche lead scans",
       "Priority freshness across lead discovery",
       "Softphone option with paid number and minute add-ons",
       "10 active campaigns",

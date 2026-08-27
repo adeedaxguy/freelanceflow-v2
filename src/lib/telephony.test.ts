@@ -58,6 +58,7 @@ describe("telephony security helpers", () => {
     expect(hasPhoneSubscriptionAccess("active")).toBe(true);
     expect(hasPhoneSubscriptionAccess("trialing")).toBe(true);
     expect(hasPhoneSubscriptionAccess("expired")).toBe(false);
+    expect(hasPhoneSubscriptionAccess("canceled", new Date(Date.now() + 60_000))).toBe(true);
     expect(hasPhoneSubscriptionAccess("cancelled", new Date(Date.now() + 60_000))).toBe(true);
     expect(hasPhoneSubscriptionAccess("cancelled", new Date(Date.now() - 60_000))).toBe(false);
   });

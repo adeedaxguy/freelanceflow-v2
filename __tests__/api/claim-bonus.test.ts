@@ -95,7 +95,7 @@ describe("/api/leads/claim-bonus", () => {
       success: true,
       bonusAdded: 300,
       bonusLeads: 300,
-      newLimit: 400,
+      newLimit: 900,
     });
     expect(prisma.user.updateMany).toHaveBeenCalledWith({
       where: expect.objectContaining({ id: "user-free-1" }),

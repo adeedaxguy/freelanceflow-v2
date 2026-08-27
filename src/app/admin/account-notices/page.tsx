@@ -76,7 +76,7 @@ export default function AccountNoticesPage() {
         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-primary-light">Account communication</p>
         <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Free allowance notice</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          A factual service notice confirming the Free plan&apos;s 600-lead weekly allowance. This is not a marketing campaign.
+          A factual service notice confirming the 600-lead, 3-day trial allowance. This is not a marketing campaign.
         </p>
       </header>
 
@@ -111,9 +111,9 @@ export default function AccountNoticesPage() {
               <ShieldCheck className="h-5 w-5 text-emerald-500" />
               <h2 className="font-semibold">Fixed account-update copy</h2>
             </div>
-            <p className="mt-3 text-sm font-medium text-foreground">Your iCloseLeads Free plan now includes 600 leads per week</p>
+            <p className="mt-3 text-sm font-medium text-foreground">Your iCloseLeads 3-day trial includes 600 lead results</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Confirms the new allowance, seven-day reset, that no action is required, and that the account remains free. It contains no promotion or upgrade request.
+              Confirms the trial allowance, its three-day timeline, and the paid access required afterward.
             </p>
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs text-muted-foreground">

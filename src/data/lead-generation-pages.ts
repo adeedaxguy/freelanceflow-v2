@@ -132,16 +132,16 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "freelance-client-leads",
     path: "/lead-generation/freelance-client-leads",
     primaryKeyword: "freelance client leads",
-    metaTitle: "Freelance Client Leads | 600 Free Weekly Leads for Freelancers",
+    metaTitle: "Freelance Client Leads | 600 Leads in a 3-Day Trial",
     metaDescription:
-      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Free users get 600 leads/week.",
+      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Start with 600 leads for three days.",
     eyebrow: "Freelance Client Leads",
     title: "Find freelance client leads",
     accentTitle: "without living inside job boards",
     summary:
-      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. Free users can run up to 600 lead searches per week instead of juggling tabs, lists, and generic templates.",
+      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. The 3-day trial includes up to 600 lead results instead of forcing you to juggle tabs, lists, and generic templates.",
     directAnswer:
-      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets free users search up to 600 leads per week and turn those signals into a smaller, better list of prospects.",
+      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets trial users search up to 600 leads over three days and turn those signals into a smaller, better list of prospects.",
     primaryCta: "Find 600 Leads Free",
     secondaryCta: "Explore use cases",
     dashboardPath: "/dashboard/leads",
@@ -150,7 +150,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A repeatable prospecting workflow that moves from search to saved lead to draft to follow-up.",
     proofPoints: [
-      "Free users can run up to 600 lead searches per week before upgrading.",
+      "Trial users can run up to 600 lead searches over three days before upgrading.",
       "Remote, local, and live job lead paths in one product.",
       "AI proposal drafting uses the lead context so messages are less generic.",
     ],
@@ -160,7 +160,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { group: "Software intent", terms: ["freelance lead generation software", "freelance CRM", "AI proposal tool"] },
     ],
     workflow: [
-      { title: "Use the weekly free allowance", description: "Start with the 600 free weekly searches and split them across one service, one niche, or one local market." },
+      { title: "Use the 3-day trial allowance", description: "Start with 600 lead searches and focus them on one service, niche, or local market." },
       { title: "Filter by fit", description: "Use niche, freshness, location, website status, budget clues, or contact signals to cut weak prospects before saving them." },
       { title: "Save only pitchable leads", description: "Keep the leads where you can explain the problem and first message in one sentence." },
       { title: "Prepare outreach and follow-up", description: "Draft the email, review it, and track the next step without losing context." },

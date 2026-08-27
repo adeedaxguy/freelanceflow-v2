@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
+import { getUsageStats } from "@/lib/usage";
 import { z } from "zod";
 
 const schema = z.object({
@@ -93,6 +94,10 @@ async function callGroqAPI(
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const usage = await getUsageStats(session.user.id).catch(() => null);
+  if (usage?.plan === "free" && usage.trialExpired) {
+    return NextResponse.json({ error: "Your 3-day trial has ended. Upgrade to generate new proposals.", upgrade: true }, { status: 403 });
+  }
 
   // Rate limit: 15 proposal generations per minute per user
   const rl = rateLimit(`proposal:${session.user.id}`, 15, 60_000);

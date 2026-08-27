@@ -21,6 +21,7 @@ export async function GET() {
       plan: "agency", limit: 99999, used: 0, remaining: 99999,
       nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
       percentage: 0, unlimited: true, bonusLeads: 0, shareBonusClaimed: false,
+      trialEndsAt: null, trialExpired: false,
     });
   }
 

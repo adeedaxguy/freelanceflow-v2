@@ -57,7 +57,7 @@ export default function AdminMarketingPage() {
   useEffect(() => { void load(); }, []);
 
   async function notifyLimitUsers() {
-    if (!window.confirm("Send one account notice to free users who reached 100 leads and have not claimed the bonus?")) return;
+    if (!window.confirm("Send one upgrade notice to free users who reached their 600-lead trial limit?")) return;
     setNotifying(true);
     setNoticeResult("");
     try {
@@ -131,7 +131,7 @@ export default function AdminMarketingPage() {
             className="flex items-center gap-2 rounded-xl border border-gold/30 bg-gold/10 px-4 py-2 text-sm font-semibold text-gold transition-colors hover:bg-gold/15 disabled:opacity-50"
           >
             <Bell className="h-4 w-4" />
-            {notifying ? "Sending…" : "Notify users who reached 100"}
+            {notifying ? "Sending…" : "Notify trial limit users"}
           </button>
           <button onClick={() => void load()} disabled={loading}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-colors">
@@ -240,7 +240,7 @@ export default function AdminMarketingPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className={s.reachedFreeLimit ? "font-semibold text-gold" : "text-muted-foreground"}>
-                        {s.weeklyLeads}{s.reachedFreeLimit ? " · reached 100" : ""}
+                        {s.weeklyLeads}{s.reachedFreeLimit ? " · reached 600" : ""}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-accent font-semibold">+{s.bonusLeads}</td>

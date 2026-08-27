@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { callingPackagePlan, getCallingPackage, packageIdFromCallingPlan } from "@/lib/calling-packages";
+import { recordAuditLog } from "@/lib/audit-log";
 import { prisma } from "@/lib/prisma";
 import { getStripeConfig, verifyStripeSignature } from "@/lib/stripe";
 import { provisionPhoneNumber } from "@/lib/telephony";
@@ -9,6 +10,7 @@ import { provisionPhoneNumber } from "@/lib/telephony";
 type Metadata = Record<string, string | undefined>;
 
 interface StripeEvent {
+  id?: string;
   type: string;
   livemode?: boolean;
   data: { object: Record<string, unknown> };
@@ -32,6 +34,19 @@ function dateValue(value: unknown) {
 function priceIdOf(subscription: Record<string, unknown>) {
   const items = subscription.items as { data?: Array<{ price?: { id?: string } }> } | undefined;
   return items?.data?.[0]?.price?.id || null;
+}
+
+function failureMessage(value: Record<string, unknown>) {
+  const error = value.last_payment_error as Record<string, unknown> | undefined;
+  return stringValue(error?.message)
+    || stringValue(value.failure_message)
+    || stringValue(value.status)
+    || "Payment did not complete";
+}
+
+function subscriptionIdFromInvoice(invoice: Record<string, unknown>) {
+  const parent = invoice.parent as { subscription_details?: { subscription?: unknown } } | undefined;
+  return stringValue(invoice.subscription) || stringValue(parent?.subscription_details?.subscription);
 }
 
 function stripeStatus(subscription: Record<string, unknown>, fallback = "unknown") {
@@ -68,15 +83,18 @@ function hasLivePhoneAccess(status: string, endsAt: Date | null) {
 
 function hasPlanAccess(status: string, endsAt: Date | null) {
   const normalized = status.toLowerCase();
-  if (["active", "trialing", "past_due", "unpaid"].includes(normalized)) return true;
+  if (["active", "trialing", "past_due"].includes(normalized)) return true;
   return normalized === "canceled" && Boolean(endsAt && endsAt.getTime() > Date.now());
 }
 
 async function updateEffectivePlan(userId: string) {
-  const subscriptions = await prisma.billingSubscription.findMany({
-    where: { userId, testMode: false, plan: { in: ["pro", "agency"] } },
-    select: { plan: true, status: true, endsAt: true },
-  });
+  const [subscriptions, user] = await Promise.all([
+    prisma.billingSubscription.findMany({
+      where: { userId, testMode: false, plan: { in: ["pro", "agency"] } },
+      select: { plan: true, status: true, endsAt: true },
+    }),
+    prisma.user.findUnique({ where: { id: userId }, select: { plan: true } }),
+  ]);
   const activePlans = subscriptions
     .filter(subscription => hasPlanAccess(subscription.status, subscription.endsAt))
     .map(subscription => subscription.plan);
@@ -85,7 +103,14 @@ async function updateEffectivePlan(userId: string) {
     : activePlans.includes("pro")
       ? "pro"
       : "free";
-  await prisma.user.update({ where: { id: userId }, data: { plan: nextPlan } });
+  const activatingPaidPlan = user?.plan === "free" && nextPlan !== "free";
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      plan: nextPlan,
+      ...(activatingPaidPlan ? { weeklyLeads: 0, weeklyLeadReset: new Date() } : {}),
+    },
+  });
 }
 
 async function rejectNonAdminTest(userId: string, testMode: boolean) {
@@ -368,6 +393,103 @@ async function handlePlanSubscription(subscription: Record<string, unknown>, eve
   return NextResponse.json({ received: true, plan: "subscription_updated" });
 }
 
+async function handleCheckoutIssue(session: Record<string, unknown>, event: StripeEvent, status: "failed" | "expired") {
+  const metadata = metadataOf(session);
+  const purchaseType = metadata.purchase_type || "unknown";
+  const userId = metadata.user_id || metadata.userId;
+  const sessionId = stringValue(session.id);
+  const message = status === "expired" ? "Checkout session expired before payment was completed" : failureMessage(session);
+
+  if (purchaseType === "softphone_number" && metadata.telephony_purchase_id) {
+    await prisma.telephonyPurchase.updateMany({
+      where: { id: metadata.telephony_purchase_id },
+      data: {
+        status: status === "expired" ? "CHECKOUT_EXPIRED" : "CHECKOUT_FAILED",
+        lastError: message.slice(0, 500),
+      },
+    });
+  }
+
+  await recordAuditLog({
+    action: status === "expired" ? "payment_checkout_expired" : "payment_failed",
+    actorId: userId,
+    actorEmail: stringValue(session.customer_email),
+    targetType: "StripeCheckout",
+    targetId: sessionId || event.id || null,
+    details: {
+      gateway: "stripe",
+      eventType: event.type,
+      purchaseType,
+      userId,
+      checkoutSessionId: sessionId,
+      paymentStatus: stringValue(session.payment_status),
+      customerId: stringValue(session.customer),
+      subscriptionId: stringValue(session.subscription),
+      message,
+    },
+  });
+
+  return NextResponse.json({ received: true, stripe: status === "expired" ? "checkout_expired_logged" : "checkout_failed_logged" });
+}
+
+async function handleInvoicePaymentFailed(invoice: Record<string, unknown>, event: StripeEvent) {
+  const subscriptionId = subscriptionIdFromInvoice(invoice);
+  const customerId = stringValue(invoice.customer);
+  const testMode = !(invoice.livemode ?? event.livemode ?? false);
+  const message = failureMessage(invoice);
+  const amountDue = typeof invoice.amount_due === "number" ? invoice.amount_due : null;
+  const attemptCount = typeof invoice.attempt_count === "number" ? invoice.attempt_count : null;
+  const nextPaymentAttempt = dateValue(invoice.next_payment_attempt)?.toISOString() ?? null;
+
+  const [phonePurchase, billingSubscription] = subscriptionId
+    ? await Promise.all([
+        prisma.telephonyPurchase.findUnique({ where: { externalSubscriptionId: subscriptionId } }),
+        prisma.billingSubscription.findUnique({ where: { externalSubscriptionId: subscriptionId } }),
+      ])
+    : [null, null] as const;
+  const userId = phonePurchase?.userId || billingSubscription?.userId || metadataOf(invoice).user_id || metadataOf(invoice).userId;
+
+  if (phonePurchase) {
+    await prisma.telephonyPurchase.update({
+      where: { id: phonePurchase.id },
+      data: {
+        subscriptionStatus: "past_due",
+        lastError: message.slice(0, 500),
+        testMode,
+      },
+    });
+  }
+  if (billingSubscription) {
+    await prisma.billingSubscription.update({
+      where: { id: billingSubscription.id },
+      data: { status: "past_due", testMode },
+    });
+  }
+
+  await recordAuditLog({
+    action: "payment_failed",
+    actorId: userId,
+    actorEmail: "stripe",
+    targetType: phonePurchase ? "TelephonyPurchase" : billingSubscription ? "BillingSubscription" : "StripeInvoice",
+    targetId: phonePurchase?.id || billingSubscription?.id || stringValue(invoice.id) || event.id || null,
+    details: {
+      gateway: "stripe",
+      eventType: event.type,
+      userId,
+      invoiceId: stringValue(invoice.id),
+      subscriptionId,
+      customerId,
+      amountDue,
+      currency: stringValue(invoice.currency),
+      attemptCount,
+      nextPaymentAttempt,
+      message,
+    },
+  });
+
+  return NextResponse.json({ received: true, stripe: "invoice_payment_failed_logged" });
+}
+
 async function getPlanFromPriceId(priceId: string): Promise<string | null> {
   try {
     const [proSetting, agencySetting] = await Promise.all([
@@ -417,6 +539,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (event.type === "checkout.session.async_payment_failed") {
+      return handleCheckoutIssue(event.data.object, event, "failed");
+    }
+
+    if (event.type === "checkout.session.expired") {
+      return handleCheckoutIssue(event.data.object, event, "expired");
+    }
+
+    if (event.type === "invoice.payment_failed") {
+      return handleInvoicePaymentFailed(event.data.object, event);
+    }
+
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
       const subscription = event.data.object;
       const metadata = metadataOf(subscription);
@@ -463,6 +597,17 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error) {
+    await recordAuditLog({
+      action: "payment_webhook_error",
+      actorEmail: "stripe",
+      targetType: "StripeEvent",
+      targetId: event.id || event.type,
+      details: {
+        gateway: "stripe",
+        eventType: event.type,
+        error: error instanceof Error ? error.message : "Handler failed",
+      },
+    });
     console.error("Stripe webhook handler error:", error);
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }

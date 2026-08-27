@@ -11,14 +11,14 @@ interface UpgradeModalProps {
 }
 
 const REASON_MESSAGES: Record<string, { title: string; body: string; emoji: string }> = {
-  leads:     { emoji: "🔍", title: "Weekly Lead Limit Reached", body: "You've used this week's free lead allowance. Share iCloseLeads from the lead tool to unlock bonus leads instantly." },
+  leads:     { emoji: "🔍", title: "Trial Lead Limit Reached", body: "You've used the leads included in your 3-day trial. Upgrade to keep lead discovery active." },
   proposals: { emoji: "✉️", title: "Proposal Limit Reached",    body: "You've hit your monthly proposal limit. Upgrade to Pro for unlimited AI proposals every month." },
   campaigns: { emoji: "📣", title: "Campaign Limit Reached",    body: "Free plan allows 1 campaign. Upgrade to Pro to run up to 10 simultaneous campaigns." },
   generic:   { emoji: "⚡", title: "Upgrade to iCloseLeads Pro", body: "Unlock the full power of iCloseLeads with Pro. More leads, unlimited proposals, and priority support." },
 };
 
 const PRO_FEATURES = [
-  "Higher daily lead limits",
+  "1,000 leads per week",
   "Unlimited AI proposals",
   "10 simultaneous campaigns",
   "Priority email support",
@@ -64,7 +64,7 @@ export default function UpgradeModal({ isOpen, onClose, reason = "generic", rese
             <p className="text-muted-foreground text-sm leading-relaxed">{msg.body}</p>
             {resetStr && (
               <p className="text-xs text-muted-foreground bg-muted/40 border border-border rounded-lg px-3 py-2 inline-block">
-                🔄 Your free limit resets on <strong className="text-foreground">{resetStr}</strong>
+                Your trial access ends on <strong className="text-foreground">{resetStr}</strong>
               </p>
             )}
           </div>
@@ -96,7 +96,7 @@ export default function UpgradeModal({ isOpen, onClose, reason = "generic", rese
 
           {/* Trust signal */}
           <p className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
-            <Lock className="w-3 h-3" /> Secure checkout · Cancel anytime · 14-day money-back
+            <Lock className="w-3 h-3" /> Secure Stripe checkout · Cancel anytime
           </p>
         </div>
       </div>

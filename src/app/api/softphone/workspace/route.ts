@@ -27,6 +27,7 @@ import {
   createStripeSubscriptionCheckout,
   getStripeConfig,
 } from "@/lib/stripe";
+import { recordAuditLog } from "@/lib/audit-log";
 
 export const dynamic = "force-dynamic";
 const STRIPE_NUMBER_VARIANT = "stripe_softphone_number";
@@ -178,11 +179,25 @@ export async function POST(req: NextRequest) {
         if (!checkout.url) throw new Error("Stripe checkout did not return a payment link");
         return NextResponse.json({ url: checkout.url, purchaseId: purchase.id });
       } catch (error) {
+        const message = error instanceof Error ? error.message : "Checkout failed";
         await prisma.telephonyPurchase.update({
           where: { id: purchase.id },
           data: {
             status: "CHECKOUT_FAILED",
-            lastError: error instanceof Error ? error.message.slice(0, 500) : "Checkout failed",
+            lastError: message.slice(0, 500),
+          },
+        });
+        await recordAuditLog({
+          action: "payment_checkout_failed",
+          actorId: auth.session.user.id,
+          actorEmail: user?.email,
+          targetType: "TelephonyPurchase",
+          targetId: purchase.id,
+          details: {
+            gateway: "stripe",
+            purchaseType: "softphone_number",
+            phoneNumber: quote.phoneNumber,
+            error: message,
           },
         });
         throw error;
@@ -217,23 +232,40 @@ export async function POST(req: NextRequest) {
         || req.nextUrl.origin
       ).replace(/\/$/, "");
       const plan = callingPackagePlan(pkg.id);
-      const checkout = await createStripeSubscriptionCheckout(config, {
-        customerEmail: user?.email,
-        productName: `iCloseLeads ${pkg.name}`,
-        description: `${pkg.minutes} outbound softphone minutes per month`,
-        amountCents: pkg.priceCents,
-        currency: pkg.currency,
-        successUrl: `${appUrl}/dashboard/softphone?checkout=minutes`,
-        cancelUrl: `${appUrl}/dashboard/softphone?checkout=cancelled`,
-        metadata: {
-          purchase_type: "softphone_minutes",
-          package_id: pkg.id,
-          plan,
-          user_id: auth.session.user.id,
-        },
-      });
-      if (!checkout.url) throw new Error("Stripe checkout did not return a payment link");
-      return NextResponse.json({ url: checkout.url });
+      try {
+        const checkout = await createStripeSubscriptionCheckout(config, {
+          customerEmail: user?.email,
+          productName: `iCloseLeads ${pkg.name}`,
+          description: `${pkg.minutes} outbound softphone minutes per month`,
+          amountCents: pkg.priceCents,
+          currency: pkg.currency,
+          successUrl: `${appUrl}/dashboard/softphone?checkout=minutes`,
+          cancelUrl: `${appUrl}/dashboard/softphone?checkout=cancelled`,
+          metadata: {
+            purchase_type: "softphone_minutes",
+            package_id: pkg.id,
+            plan,
+            user_id: auth.session.user.id,
+          },
+        });
+        if (!checkout.url) throw new Error("Stripe checkout did not return a payment link");
+        return NextResponse.json({ url: checkout.url });
+      } catch (error) {
+        await recordAuditLog({
+          action: "payment_checkout_failed",
+          actorId: auth.session.user.id,
+          actorEmail: user?.email,
+          targetType: "BillingSubscription",
+          targetId: plan,
+          details: {
+            gateway: "stripe",
+            purchaseType: "softphone_minutes",
+            packageId: pkg.id,
+            error: error instanceof Error ? error.message : "Checkout failed",
+          },
+        });
+        throw error;
+      }
     }
 
     const workspace = await provisionWorkspace(auth.session.user.id);

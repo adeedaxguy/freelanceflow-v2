@@ -16,6 +16,10 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
   user_suspend:   { label: "User Suspended",  color: "text-red-400"    },
   user_restore:   { label: "User Restored",   color: "text-green-400"  },
   plan_change:    { label: "Plan Changed",    color: "text-primary-light" },
+  payment_failed: { label: "Payment Failed",  color: "text-red-400" },
+  payment_checkout_failed: { label: "Checkout Failed", color: "text-red-400" },
+  payment_checkout_expired: { label: "Checkout Expired", color: "text-yellow-400" },
+  payment_webhook_error: { label: "Stripe Webhook Error", color: "text-red-400" },
 };
 
 export default function AdminAuditPage() {

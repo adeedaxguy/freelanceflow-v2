@@ -20,7 +20,7 @@ import { LeadResultsAd } from "@/components/AdSenseUnit";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
-const FREE_PLAN_LIMIT      = 600;          // 600 leads per week
+const FREE_PLAN_LIMIT      = 600;
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
 const SS_LOCAL_KEY         = "ff_ss_local_results";
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
@@ -52,6 +52,8 @@ type UsageStats = {
   unlimited?: boolean;
   bonusLeads?: number;
   shareBonusClaimed?: boolean;
+  trialEndsAt?: string | null;
+  trialExpired?: boolean;
 };
 
 const PHONE_TYPE_FILTERS: Array<{ value: PhoneTypeFilter; label: string; title: string }> = [
@@ -567,9 +569,9 @@ function DailyLimitBanner({ resetAt }: { resetAt: Date | null }) {
         <Clock className="w-7 h-7 text-gold"/>
       </div>
       <div>
-        <h3 className="text-foreground font-bold text-lg">You&apos;ve used today&apos;s free local leads</h3>
+        <h3 className="text-foreground font-bold text-lg">You&apos;ve used your included local leads</h3>
         <p className="text-muted-foreground text-sm mt-1 max-w-md mx-auto leading-relaxed">
-          Free plan resets every 24 hours.
+          Your free lead access ends with the 3-day trial.
           {resetAt && (
             <> Your next leads unlock at <strong className="text-foreground">{resetAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</strong>.</>
           )}
@@ -988,6 +990,8 @@ export default function LocalLeadsPage() {
   const [userPlan,       setUserPlan]       = useState<string>("free");
   const [usageResetAt,   setUsageResetAt]   = useState<string | null>(null);
   const [shareBonusClaimed, setShareBonusClaimed] = useState(false);
+  const [trialExpired,  setTrialExpired]  = useState(false);
+  const [trialEndsAt,   setTrialEndsAt]   = useState<string | null>(null);
   const [showBonus,      setShowBonus]      = useState(false);
   const [limitNotice,    setLimitNotice]    = useState("");
   const [yelpKey,        setYelpKey]        = useState("");
@@ -1008,6 +1012,8 @@ export default function LocalLeadsPage() {
     setLeadsViewed(Number.isFinite(usage.used) ? usage.used : 0);
     setUsageResetAt(typeof usage.nextReset === "string" ? usage.nextReset : null);
     setShareBonusClaimed(Boolean(usage.shareBonusClaimed));
+    setTrialExpired(Boolean(usage.trialExpired));
+    setTrialEndsAt(typeof usage.trialEndsAt === "string" ? usage.trialEndsAt : null);
   }, []);
 
   // Load persisted state and latest server-side usage
@@ -1110,6 +1116,7 @@ export default function LocalLeadsPage() {
       if (!res.ok) {
         setError(data.error ?? "Search failed");
         if (res.status === 429) {
+          syncUsage(data.usage ?? null);
           if (typeof data.limit === "number") setDailyLimit(data.limit);
           if (typeof data.nextReset === "string") setUsageResetAt(data.nextReset);
           if (typeof data.limit === "number") setLeadsViewed(data.limit);
@@ -1123,7 +1130,7 @@ export default function LocalLeadsPage() {
       const newResults = data.results ?? [];
       if (!isPaidPlan && data.capped) {
         setLimitNotice(
-          `Showing the first ${newResults.length} businesses available in your free daily allowance. Claim bonus leads to keep searching.`
+          `Showing the first ${newResults.length} businesses available in your trial allowance. Claim bonus leads to keep searching.`
         );
       } else {
         setLimitNotice("");
@@ -1306,8 +1313,8 @@ export default function LocalLeadsPage() {
         <div className="dashboard-control-panel rounded-xl px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-xs font-semibold text-foreground">Weekly free leads</p>
-              <p className="text-xs text-muted-foreground">{leadsViewed} / {dailyLimit} this week</p>
+              <p className="text-xs font-semibold text-foreground">3-day trial leads</p>
+              <p className="text-xs text-muted-foreground">{leadsViewed} / {dailyLimit}</p>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div
@@ -1324,22 +1331,33 @@ export default function LocalLeadsPage() {
             <Sparkles className="w-3.5 h-3.5" />
             {shareBonusClaimed ? "+300 bonus active" : "Unlock +300"}
           </button>
+          {trialEndsAt && <span className="hidden text-xs text-muted-foreground lg:inline">Ends {new Date(trialEndsAt).toLocaleDateString([], { month: "short", day: "numeric" })}</span>}
         </div>
       )}
 
       {/* Daily limit hit */}
       {isOverLimit && (
         <div className="bg-surface border border-border rounded-2xl p-6 text-center">
-          <p className="text-foreground font-semibold mb-2">You've used your {dailyLimit} free local leads this week</p>
-          <p className="text-muted-foreground text-sm mb-4">
-            {shareBonusClaimed
-              ? "Your share bonus is active. Request a larger allowance and we will review it."
-              : "Unlock +300 more leads instantly — free."}
+          <p className="text-foreground font-semibold mb-2">
+            {trialExpired ? "Your 3-day trial has ended" : `You've used your ${dailyLimit} trial leads`}
           </p>
-          <button onClick={() => setShowBonus(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
-            {shareBonusClaimed ? "Request More Leads" : "Unlock +300 Free Leads"}
-          </button>
+          <p className="text-muted-foreground text-sm mb-4">
+            {trialExpired
+              ? "Upgrade to Pro or Agency to keep finding leads. Your saved leads and CRM remain available."
+              : shareBonusClaimed
+                ? "Your share bonus is active. Upgrade for continued lead access."
+                : "Unlock +300 more leads before your trial ends."}
+          </p>
+          {trialExpired ? (
+            <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-light">
+              <Zap className="h-4 w-4" /> Choose a paid plan
+            </Link>
+          ) : (
+            <button onClick={() => setShowBonus(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
+              {shareBonusClaimed ? "Upgrade for More Leads" : "Unlock +300 Free Leads"}
+            </button>
+          )}
         </div>
       )}
 

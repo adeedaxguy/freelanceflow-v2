@@ -65,7 +65,7 @@ type PlanCfg = {
   icon: React.ElementType; leadsPerWeek: string; showUpgrade: boolean;
 };
 const PLAN_CONFIG: Record<string, PlanCfg> = {
-  free:   { label: "Free",   color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "600 / week", showUpgrade: true },
+  free:   { label: "3-Day Trial", color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "600 total", showUpgrade: true },
   pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "1,000 / week", showUpgrade: false },
   agency: { label: "Agency", color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Shield, leadsPerWeek: "Unlimited leads", showUpgrade: false },
 };

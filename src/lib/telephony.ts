@@ -455,7 +455,7 @@ export function hasPhoneSubscriptionAccess(status: string | null | undefined, en
   if (!status) return false;
   const normalized = status.toLowerCase();
   if (["active", "trialing", "on_trial", "past_due"].includes(normalized)) return true;
-  if (normalized !== "cancelled" || !endsAt) return false;
+  if (!["canceled", "cancelled"].includes(normalized) || !endsAt) return false;
   return new Date(endsAt).getTime() > Date.now();
 }
 

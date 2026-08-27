@@ -77,6 +77,8 @@ interface UsageStats {
   percentage: number;
   bonusLeads?: number;
   shareBonusClaimed?: boolean;
+  trialEndsAt?: string | null;
+  trialExpired?: boolean;
 }
 interface SourceDiag {
   source: string;
@@ -234,7 +236,7 @@ export default function LiveJobsPage() {
   const [leads,           setLeads]           = useState<AggregatedLead[]>([]);
   const [loading,         setLoading]         = useState(false);
   const [error,           setError]           = useState("");
-  const [limitHit,        setLimitHit]        = useState<{nextReset:string|null}|null>(null);
+  const [limitHit,        setLimitHit]        = useState<{nextReset:string|null;trialExpired:boolean}|null>(null);
   const [showBonus,       setShowBonus]       = useState(false);
   const [page,            setPage]            = useState(1);
   const [savedIds,        setSavedIds]        = useState<Set<string>>(new Set());
@@ -334,10 +336,10 @@ export default function LiveJobsPage() {
       });
 
       if (!res.ok) {
-        const d = await res.json().catch(()=>({})) as {error?:string; nextReset?:string};
+        const d = await res.json().catch(()=>({})) as {error?:string; nextReset?:string; trialExpired?:boolean};
         if (res.status === 429) {
-          setLimitHit({ nextReset: d.nextReset ?? null });
-          setShowBonus(true);
+          setLimitHit({ nextReset: d.nextReset ?? null, trialExpired: Boolean(d.trialExpired) });
+          if (!d.trialExpired) setShowBonus(true);
         } else {
           setError(d.error ?? "Failed to fetch leads. Please try again.");
         }
@@ -649,21 +651,28 @@ export default function LiveJobsPage() {
                     <AlertCircle className="w-5 h-5 text-gold" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 600} free leads this week</p>
-                    <p className="text-muted-foreground text-sm mb-3">
-                      Free plan resets weekly.
-                      {limitHit.nextReset && (
-                        <> Next reset: <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleDateString([], { month: "short", day: "numeric" })}</strong>.</>
-                      )}
+                    <p className="font-bold text-foreground mb-1">
+                      {limitHit.trialExpired ? "Your 3-day trial has ended" : `You've used your ${usage?.limit ?? 600} trial leads`}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => setShowBonus(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
-                    </button>
+                    <p className="text-muted-foreground text-sm mb-3">
+                      {limitHit.trialExpired
+                        ? "Upgrade to Pro or Agency to continue scanning live jobs. Your saved leads remain available."
+                        : "Upgrade now or unlock the share bonus before your trial ends."}
+                    </p>
+                    {limitHit.trialExpired ? (
+                      <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light">
+                        <Zap className="h-4 w-4" /> Choose a paid plan
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowBonus(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

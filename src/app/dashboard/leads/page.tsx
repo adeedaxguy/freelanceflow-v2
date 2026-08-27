@@ -49,6 +49,8 @@ interface UsageStats {
   percentage: number;
   bonusLeads?: number;
   shareBonusClaimed?: boolean;
+  trialEndsAt?: string | null;
+  trialExpired?: boolean;
 }
 interface SourceDiag { source: string; ok: boolean; fetched: number; kept: number; errorMessage?: string; }
 interface SearchDiagnostics {
@@ -271,7 +273,7 @@ export default function LeadsPage() {
   const [leads,           setLeads]          = useState<AggregatedLead[]>([]);
   const [loading,         setLoading]        = useState(false);
   const [error,           setError]          = useState("");
-  const [limitHit,        setLimitHit]       = useState<{ nextReset: string | null } | null>(null);
+  const [limitHit,        setLimitHit]       = useState<{ nextReset: string | null; trialExpired: boolean } | null>(null);
   const [usage,           setUsage]          = useState<UsageStats | null>(null);
   const [showBonus,       setShowBonus]      = useState(false);
   const [fetchedAt,       setFetchedAt]      = useState("");
@@ -411,13 +413,14 @@ export default function LeadsPage() {
         error?: string;
         upgrade?: boolean;
         nextReset?: string;
+        trialExpired?: boolean;
         diagnostics?: SearchDiagnostics;
       };
       const data = await res.json() as SearchResponse;
 
       if (res.status === 429) {
-        setLimitHit({ nextReset: data.nextReset ?? null });
-        setShowBonus(true);
+        setLimitHit({ nextReset: data.nextReset ?? null, trialExpired: Boolean(data.trialExpired) });
+        if (!data.trialExpired) setShowBonus(true);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
@@ -506,17 +509,25 @@ export default function LeadsPage() {
         <div className="dashboard-control-panel rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground capitalize">{usage.plan} Plan</span>
-            <span className="text-xs text-muted-foreground">{usage.used} / {usage.limit} leads today</span>
+            <span className="text-xs text-muted-foreground">
+              {usage.used} / {usage.limit} {usage.plan === "free" ? "trial leads" : "leads this week"}
+            </span>
           </div>
           <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
             <div className={`h-full rounded-full transition-all ${usage.percentage > 80 ? "bg-destructive" : "bg-gradient-hero"}`}
               style={{ width: `${Math.min(100, usage.percentage)}%` }} />
           </div>
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-muted-foreground">{usage.remaining} remaining</span>
+            <span className="text-xs text-muted-foreground">
+              {usage.trialExpired
+                ? "Trial ended"
+                : usage.plan === "free" && usage.trialEndsAt
+                  ? `Ends ${new Date(usage.trialEndsAt).toLocaleDateString([], { month: "short", day: "numeric" })}`
+                  : `${usage.remaining} remaining`}
+            </span>
             {usage.plan === "free" && (
               <Link href="/dashboard/upgrade" className="text-xs text-primary-light hover:underline font-medium">
-                Upgrade for higher daily limits →
+                {usage.trialExpired ? "Choose a paid plan →" : "Upgrade now →"}
               </Link>
             )}
           </div>
@@ -649,21 +660,28 @@ export default function LeadsPage() {
               <AlertCircle className="w-5 h-5 text-gold" />
             </div>
             <div className="flex-1">
-              <p className="font-bold text-foreground mb-1">You&apos;ve used your {usage?.limit ?? 600} free leads this week</p>
-              <p className="text-muted-foreground text-sm mb-3">
-                Free plan resets weekly.
-                {limitHit.nextReset && (
-                  <> Next reset: <strong className="text-foreground">{new Date(limitHit.nextReset).toLocaleDateString([], { month: "short", day: "numeric" })}</strong>.</>
-                )}
+              <p className="font-bold text-foreground mb-1">
+                {limitHit.trialExpired ? "Your 3-day trial has ended" : `You've used your ${usage?.limit ?? 600} trial leads`}
               </p>
-              <button
-                type="button"
-                onClick={() => setShowBonus(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
-              >
-                <Sparkles className="w-4 h-4" />
-                {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
-              </button>
+              <p className="text-muted-foreground text-sm mb-3">
+                {limitHit.trialExpired
+                  ? "Upgrade to Pro or Agency to continue finding new leads. Your saved leads and CRM stay available."
+                  : "Upgrade now or unlock the share bonus before your trial ends."}
+              </p>
+              {limitHit.trialExpired ? (
+                <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light">
+                  <Zap className="w-4 h-4" /> Choose a paid plan
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowBonus(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary-light text-sm font-semibold transition-all hover:bg-primary/15"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
+                </button>
+              )}
             </div>
           </div>
         </div>
