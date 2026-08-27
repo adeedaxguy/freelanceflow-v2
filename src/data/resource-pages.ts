@@ -2203,10 +2203,12 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "Hi, I found your business while checking local search results and noticed your website presence could be doing more to turn nearby searches into calls. I have a short idea for improving the site and quote flow if you are open to seeing it.",
     internalLinks: [
+      { label: "Web design leads workflow", href: "/blog/web-design-leads-data-led-workflow" },
+      { label: "Web design lead generation workflow", href: "/resources/web-design-lead-generation" },
+      { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
+      { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
       { label: "Find local business leads", href: "/use-cases/local-business-leads" },
-      { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
-      { label: "Decision maker email workflow", href: "/resources/find-decision-maker-email-small-business" },
-      { label: "AI proposal generator", href: "/features/ai-proposals" },
+      { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
     ],
     faqs: [
       {
@@ -2327,10 +2329,11 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "Hi, I noticed your business is visible locally but does not seem to have a dedicated website attached to the listing. A simple site could help people check services, trust you faster, and call with less friction.",
     internalLinks: [
+      { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
+      { label: "Web design leads workflow", href: "/blog/web-design-leads-data-led-workflow" },
+      { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
       { label: "Local business leads use case", href: "/use-cases/local-business-leads" },
       { label: "Web design proposal template", href: "/resources/web-design-proposal-template" },
-      { label: "Find decision maker email", href: "/resources/find-decision-maker-email-small-business" },
-      { label: "Track saved leads", href: "/features/crm-pipeline" },
     ],
     faqs: [
       {
@@ -2404,11 +2407,11 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     pitch:
       "Hi, I found your post/profile while researching companies that may need help with [specific issue]. I noticed [signal]. I can help with a small first step that would make this easier to solve.",
     internalLinks: [
+      { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
+      { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
+      { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
       { label: "Cold outreach use case", href: "/use-cases/freelance-cold-outreach" },
       { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },
-      { label: "Local business leads", href: "/use-cases/local-business-leads" },
-      { label: "Cold outreach CRM for freelancers", href: "/resources/cold-outreach-crm-for-freelancers" },
-      { label: "Freelance proposal subject lines", href: "/resources/freelance-proposal-subject-lines" },
     ],
     faqs: [
       {
@@ -5206,16 +5209,20 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   pitch: "Hi, I found your business while checking local website opportunities and noticed one public website gap that may be affecting calls or quote requests. I can send over the specific idea if useful.",
   internalLinks: [
     {
-      label: "Web design leads",
-      href: "/lead-generation/web-design-leads"
+      label: "Web design leads workflow",
+      href: "/blog/web-design-leads-data-led-workflow"
     },
     {
-      label: "Local business leads",
-      href: "/use-cases/local-business-leads"
+      label: "600 free leads weekly sprint",
+      href: "/blog/600-free-leads-week-client-acquisition-plan"
     },
     {
-      label: "Google Maps prospecting tool",
-      href: "/resources/google-maps-prospecting-tool-for-freelancers"
+      label: "Local business leads scorecard",
+      href: "/blog/local-business-leads-scorecard-for-freelancers"
+    },
+    {
+      label: "Proposal-ready leads",
+      href: "/blog/proposal-ready-leads-for-freelancers"
     }
   ],
   faqs: [
@@ -6671,10 +6678,11 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       pitchAngle: "turn the Google Maps listing into a specific website or local SEO suggestion instead of a generic cold email or redesign claim",
       competitorGap: "Most Google Maps pitch advice is generic or spammy; this page should show a proof-led workflow that routes the lead into signup, proposal drafting, and follow-up.",
       internalLinks: [
+        { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
+        { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
         { label: "Google Maps prospecting tool for agencies", href: "/blog/google-maps-prospecting-tool-for-agencies" },
         { label: "Google Maps prospecting tool", href: "/resources/google-maps-prospecting-tool-for-freelancers" },
         { label: "Local business leads", href: "/use-cases/local-business-leads" },
-        { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },
       ],
     },
     {

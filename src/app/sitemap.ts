@@ -18,6 +18,19 @@ const INDUSTRY_PAGES = [
   "/for/shopify-developers",
 ] as const;
 
+const RESOURCE_PRIORITY_OVERRIDES: Record<string, number> = {
+  "web-design-lead-generation": 0.84,
+};
+
+const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
+  "freelance-client-acquisition-system": 0.86,
+  "600-free-leads-week-client-acquisition-plan": 0.84,
+  "web-design-leads-data-led-workflow": 0.84,
+  "local-business-leads-scorecard-for-freelancers": 0.84,
+  "proposal-ready-leads-for-freelancers": 0.84,
+  "client-acquisition-software-free-plan-test": 0.83,
+};
+
 const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number }[] = [
   // Marketing
   { url: "",             changeFrequency: "weekly",  priority: 1.0  },
@@ -45,7 +58,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   ...RESOURCE_PAGES.map(page => ({
     url: `/resources/${page.slug}`,
     changeFrequency: "weekly" as const,
-    priority: 0.78,
+    priority: RESOURCE_PRIORITY_OVERRIDES[page.slug] ?? 0.78,
   })),
   { url: "/tools/lead-calculator", changeFrequency: "monthly", priority: 0.72 },
   { url: "/about",       changeFrequency: "monthly", priority: 0.8  },
@@ -101,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${BASE_URL}/blog/${post.slug}`,
         lastModified: post.updatedAt,
         changeFrequency: "weekly" as const,
-        priority: 0.8,
+        priority: BLOG_PRIORITY_OVERRIDES[post.slug] ?? 0.8,
       }));
   } catch { /* blog table may not exist yet */ }
 
@@ -112,7 +125,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE_URL}/blog/${post.slug}`,
       lastModified: post.updatedAt,
       changeFrequency: "weekly" as const,
-      priority: 0.8,
+      priority: BLOG_PRIORITY_OVERRIDES[post.slug] ?? 0.8,
     }))
     .filter(entry => !dbBlogUrls.has(entry.url));
 

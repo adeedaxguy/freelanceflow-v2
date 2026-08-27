@@ -336,29 +336,139 @@ const DEFAULT_INTERNAL_LINKS: BlogLinkItem[] = [
 const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   "freelance-client-acquisition-system": [
     {
-      href: "/blog/600-free-leads-per-week-for-freelancers",
-      label: "600 free leads per week workflow",
-      description: "Use the free iCloseLeads allowance as a focused weekly client-acquisition sprint.",
+      href: "/blog/600-free-leads-week-client-acquisition-plan",
+      label: "600 free leads weekly sprint",
+      description: "Use the new iCloseLeads allowance page to turn free searches into a focused weekly acquisition sprint.",
     },
     {
-      href: "/blog/how-to-get-more-freelance-clients",
-      label: "How to get more freelance clients",
-      description: "Use this as the broader acquisition playbook before choosing a specific lead source.",
+      href: "/blog/web-design-leads-data-led-workflow",
+      label: "Web design leads workflow",
+      description: "Move web design searchers from local business signals to proof notes, saved leads, and first pitches.",
     },
     {
-      href: "/blog/best-freelance-client-acquisition-software-2025",
-      label: "Best freelance client acquisition software",
-      description: "Compare tools by source quality, follow-up workflow, proposal support, and pipeline fit.",
+      href: "/blog/local-business-leads-scorecard-for-freelancers",
+      label: "Local business leads scorecard",
+      description: "Qualify local prospects by fit, visible need, proof quality, contact route, and follow-up potential.",
     },
     {
-      href: "/blog/get-freelance-clients-without-cold-calling",
-      label: "Get freelance clients without cold calling",
-      description: "Build a warmer acquisition path using search, proof, referrals, and targeted outreach.",
+      href: "/blog/proposal-ready-leads-for-freelancers",
+      label: "Proposal-ready leads",
+      description: "Turn raw search results into proof-backed proposal context before outreach.",
     },
     {
-      href: "/blog/cold-email-templates-freelancers-2025",
-      label: "Cold email templates for freelancers",
-      description: "Turn the acquisition plan into first messages that reference a real reason to talk.",
+      href: "/resources/web-design-lead-generation",
+      label: "Web design lead generation resource",
+      description: "Use the resource page when readers need a more structured web design prospecting workflow.",
+    },
+  ],
+  "web-design-leads-data-led-workflow": [
+    {
+      href: "/resources/web-design-lead-generation",
+      label: "Web design lead generation resource",
+      description: "See the resource-page workflow for finding, qualifying, pitching, and following up with web design prospects.",
+    },
+    {
+      href: "/blog/local-business-leads-scorecard-for-freelancers",
+      label: "Local business leads scorecard",
+      description: "Score local prospects before saving them into outreach.",
+    },
+    {
+      href: "/blog/proposal-ready-leads-for-freelancers",
+      label: "Proposal-ready leads",
+      description: "Turn qualified web design prospects into better first offers.",
+    },
+    {
+      href: "/blog/600-free-leads-week-client-acquisition-plan",
+      label: "600 free leads weekly sprint",
+      description: "Use the free allowance to test one web design market before expanding.",
+    },
+  ],
+  "600-free-leads-week-client-acquisition-plan": [
+    {
+      href: "/blog/web-design-leads-data-led-workflow",
+      label: "Web design leads workflow",
+      description: "Use one free weekly batch to test web design prospects with public website gaps.",
+    },
+    {
+      href: "/blog/local-business-leads-scorecard-for-freelancers",
+      label: "Local business leads scorecard",
+      description: "Reject weak local prospects before spending the free allowance on outreach.",
+    },
+    {
+      href: "/blog/proposal-ready-leads-for-freelancers",
+      label: "Proposal-ready leads",
+      description: "Move the strongest saved leads into proposal prep.",
+    },
+    {
+      href: "/resources/web-design-lead-generation",
+      label: "Web design lead generation resource",
+      description: "Use the resource page for a web-design-specific qualification path.",
+    },
+  ],
+  "local-business-leads-scorecard-for-freelancers": [
+    {
+      href: "/blog/web-design-leads-data-led-workflow",
+      label: "Web design leads workflow",
+      description: "Apply the scorecard to local website and booking-flow prospects.",
+    },
+    {
+      href: "/resources/web-design-lead-generation",
+      label: "Web design lead generation resource",
+      description: "Use a structured web design workflow after the lead passes the scorecard.",
+    },
+    {
+      href: "/blog/proposal-ready-leads-for-freelancers",
+      label: "Proposal-ready leads",
+      description: "Turn the best local business leads into proof-led proposals.",
+    },
+    {
+      href: "/blog/600-free-leads-week-client-acquisition-plan",
+      label: "600 free leads weekly sprint",
+      description: "Use the scorecard to keep free-plan lead searches focused.",
+    },
+  ],
+  "proposal-ready-leads-for-freelancers": [
+    {
+      href: "/blog/local-business-leads-scorecard-for-freelancers",
+      label: "Local business leads scorecard",
+      description: "Use the qualification scorecard before drafting a proposal.",
+    },
+    {
+      href: "/blog/web-design-leads-data-led-workflow",
+      label: "Web design leads workflow",
+      description: "Start from a specific web design prospecting path when the offer is website work.",
+    },
+    {
+      href: "/blog/600-free-leads-week-client-acquisition-plan",
+      label: "600 free leads weekly sprint",
+      description: "Use the free allowance to find enough leads to reject weak matches.",
+    },
+    {
+      href: "/resources/web-design-lead-generation",
+      label: "Web design lead generation resource",
+      description: "Connect proposal prep to the web design resource page.",
+    },
+  ],
+  "client-acquisition-software-free-plan-test": [
+    {
+      href: "/blog/600-free-leads-week-client-acquisition-plan",
+      label: "600 free leads weekly sprint",
+      description: "Use the free-plan page to test whether the software creates useful saved leads.",
+    },
+    {
+      href: "/blog/web-design-leads-data-led-workflow",
+      label: "Web design leads workflow",
+      description: "Run a niche-specific software test around web design prospects.",
+    },
+    {
+      href: "/blog/local-business-leads-scorecard-for-freelancers",
+      label: "Local business leads scorecard",
+      description: "Judge whether the free-plan leads are worth saving.",
+    },
+    {
+      href: "/blog/proposal-ready-leads-for-freelancers",
+      label: "Proposal-ready leads",
+      description: "Check whether the tool helps turn raw leads into proposal context.",
     },
   ],
   "how-to-get-more-freelance-clients": [

@@ -1,12 +1,12 @@
 import type { ResourcePage } from "./resource-pages";
 
 const internalLinks = [
-  { label: "600 free leads per week", href: "/blog/600-free-leads-per-week-for-freelancers" },
+  { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
+  { label: "Web design leads workflow", href: "/blog/web-design-leads-data-led-workflow" },
+  { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
+  { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
   { label: "Freelance client acquisition system", href: "/blog/freelance-client-acquisition-system" },
-  { label: "Find freelance client leads", href: "/lead-generation/freelance-client-leads" },
   { label: "Lead discovery", href: "/features/lead-discovery" },
-  { label: "AI proposals", href: "/features/ai-proposals" },
-  { label: "CRM pipeline", href: "/features/crm-pipeline" },
 ];
 
 type ResourceInput = {

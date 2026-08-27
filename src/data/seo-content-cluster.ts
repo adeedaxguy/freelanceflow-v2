@@ -1907,8 +1907,24 @@ function getInternalLinkLabel(path: string): string {
   return "the iCloseLeads platform";
 }
 
+function getSupportPageSection(topic: SeoTopic) {
+  if (topic.slug !== "freelance-client-acquisition-system") return "";
+
+  return `## High-Intent Pages to Open Next
+
+This article is the strategy hub. The next best page depends on the lead source the freelancer is ready to test.
+
+- Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly sprint</a> when the reader wants to test the free allowance before paying.
+- Use the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> or <a href="/resources/web-design-lead-generation">web design lead generation resource</a> when the offer is website, redesign, booking-flow, or local SEO work.
+- Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects from a city or category search.
+- Use <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready leads</a> when the visitor already has prospects but needs proof, context, and a first-offer angle before outreach.
+
+Those pages keep the topic graph practical: client acquisition system -> free lead search -> web design or local-business qualification -> proposal-ready outreach -> follow-up.`;
+}
+
 function buildArticle(topic: SeoTopic): string {
   const internalLinkLabel = getInternalLinkLabel(topic.internalPath);
+  const supportPageSection = getSupportPageSection(topic);
 
   return `# ${topic.title}
 
@@ -1994,6 +2010,8 @@ Use the first month to learn, not to spray messages everywhere. The goal is to b
 **Week 3: send a small batch.** Contact a limited set of qualified prospects. Ten thoughtful messages will teach you more than one hundred generic ones. Track who opened a conversation, which subject lines felt natural, and where the offer was unclear.
 
 **Week 4: refine the system.** Keep the source, angle, and offer that produced replies. Cut the rest. A serious freelance pipeline is built from this feedback loop: find, qualify, save, pitch, follow up, and improve.
+
+${supportPageSection}
 
 ## Qualification Scorecard
 

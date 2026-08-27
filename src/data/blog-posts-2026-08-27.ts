@@ -1,6 +1,30 @@
-import type { BlogPost } from "@/types";
+import type { BlogConversionFunnel, BlogPost } from "@/types";
 
 const publishedAt = new Date("2026-08-27T00:05:00+05:00");
+
+function funnel(input: {
+  slug: string;
+  title: string;
+  summary: string;
+  ctaLabel?: string;
+  intent?: string;
+}): BlogConversionFunnel {
+  return {
+    eyebrow: "Organic reader to signup",
+    title: input.title,
+    summary: input.summary,
+    ctaLabel: input.ctaLabel ?? "Run a free lead search",
+    ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(input.intent ?? input.slug)}&source=august-27-seo-run`,
+    proofNote:
+      "Built from the saved iCloseLeads GSC and DataForSEO run priorities around web design leads, local business leads, proposal-ready leads, client acquisition software, and the 600-free-leads offer.",
+    steps: [
+      { title: "Choose one market", detail: "Pick the service, niche, city, or buyer signal before spending the weekly allowance." },
+      { title: "Search and qualify", detail: "Keep only leads with visible proof, business fit, and a respectful contact path." },
+      { title: "Save the reason", detail: "Attach the website gap, local signal, source page, or proposal angle before outreach." },
+      { title: "Draft and follow up", detail: "Turn the saved lead into a reviewed proposal or outreach draft, then schedule the next step." },
+    ],
+  };
+}
 
 function post(input: {
   id: string;
@@ -12,6 +36,9 @@ function post(input: {
   tags: string[];
   readTime: number;
   content: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  conversionFunnel?: BlogConversionFunnel;
 }): BlogPost {
   return {
     ...input,
@@ -19,8 +46,8 @@ function post(input: {
     coverImage: null,
     createdAt: publishedAt,
     updatedAt: publishedAt,
-    metaTitle: `${input.title} | iCloseLeads`,
-    metaDescription: input.excerpt,
+    metaTitle: input.metaTitle ?? `${input.title} | iCloseLeads`,
+    metaDescription: input.metaDescription ?? input.excerpt,
     author: "iCloseLeads SEO Team",
   };
 }
@@ -36,6 +63,16 @@ export const AUGUST_27_2026_BLOG_POSTS: BlogPost[] = [
     focusKeyword: "web design leads",
     tags: ["web design leads", "local business leads", "freelance client acquisition"],
     readTime: 7,
+    metaTitle: "Web Design Leads Workflow | Find, Save, and Pitch Local Prospects",
+    metaDescription:
+      "Find web design leads with local business signals, website-gap proof, saved lead notes, proposal drafts, and follow-up inside iCloseLeads.",
+    conversionFunnel: funnel({
+      slug: "web-design-leads-data-led-workflow",
+      intent: "web-design-leads",
+      title: "Turn web design lead searches into saved prospects",
+      summary:
+        "Use this page to move from web design lead research into one local search, proof-backed qualification, a saved lead, and a proposal draft built from the website gap.",
+    }),
     content: `
 Search Console and DataForSEO both point to the same opportunity for iCloseLeads: people are not only searching for generic freelance leads. They are searching for **web design leads**, **web design lead generation**, **local business leads for web designers**, and practical ways to turn a website gap into a real sales conversation.
 
@@ -85,6 +122,10 @@ Weak signs:
 5. Draft the outreach from the saved proof.
 6. Offer a small next step, such as a short audit, landing-page idea, or booking-path fix.
 
+## Product paths to open next
+
+Use the <a href="/resources/web-design-lead-generation">web design lead generation workflow</a> when you want the resource-page version of this process. Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects, then move the best matches into <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead prep</a>. If you are testing the free offer first, start with the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a>.
+
 ## Example first message
 
 Hi, I found your business while researching local web design opportunities. Your profile shows active demand, but the website path could make it easier for mobile visitors to request a quote. I help local businesses turn that kind of search traffic into calls and enquiries. Would it be useful if I sent a short 3-point audit?
@@ -111,6 +152,17 @@ That is a real acquisition sprint, not a random list export.
     focusKeyword: "600 free leads per week",
     tags: ["free leads", "client acquisition", "freelance leads"],
     readTime: 6,
+    metaTitle: "600 Free Leads Per Week | Client Acquisition Sprint for Freelancers",
+    metaDescription:
+      "Use iCloseLeads' 600 free weekly leads to test one niche, qualify prospects, save proof, draft outreach, and follow up without buying a list.",
+    conversionFunnel: funnel({
+      slug: "600-free-leads-week-client-acquisition-plan",
+      intent: "600-free-leads-week",
+      title: "Turn 600 free weekly leads into one focused sprint",
+      summary:
+        "Use the free allowance to test one market at a time: search, reject weak matches, save the strongest proof-backed leads, draft outreach, and measure which niche deserves next week.",
+      ctaLabel: "Start the free lead sprint",
+    }),
     content: `
 iCloseLeads now gives free users a large weekly lead allowance. The right way to use it is not to collect the biggest possible spreadsheet. The right way is to run a narrow acquisition sprint where every saved lead has fit, proof, and a next action.
 
@@ -151,6 +203,10 @@ A prospect should pass at least three checks:
 4. You can describe the first improvement in one sentence.
 5. The opportunity is specific enough for a personal message.
 
+## Choose the right sprint path
+
+If you sell websites, point the allowance at <a href="/blog/web-design-leads-data-led-workflow">web design leads</a> and use the <a href="/resources/web-design-lead-generation">web design lead generation workflow</a> for qualification. If you sell local marketing, score prospects with the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a>. When a saved lead has enough proof, move it into <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead prep</a> before outreach.
+
 ## Turn the free allowance into action
 
 After you save the best leads, open the proposal path and write from evidence. A strong pitch says what you noticed, why it matters, and what small next step you can offer. It does not pretend you know private numbers or insult the current website.
@@ -179,6 +235,16 @@ That data tells you where the next week's 600 free leads should go.
     focusKeyword: "local business leads",
     tags: ["local business leads", "lead qualification", "freelancer outreach"],
     readTime: 6,
+    metaTitle: "Local Business Leads Scorecard | Qualify Prospects Before Outreach",
+    metaDescription:
+      "Score local business leads by fit, visible need, proof, contact route, and follow-up potential before drafting outreach in iCloseLeads.",
+    conversionFunnel: funnel({
+      slug: "local-business-leads-scorecard-for-freelancers",
+      intent: "local-business-leads",
+      title: "Score local business leads before you save them",
+      summary:
+        "Use the scorecard to keep local searches honest: fit, visible need, proof quality, contact route, and follow-up potential all need to be clear before outreach.",
+    }),
     content: `
 Local business leads can be excellent for freelancers, but only when they are qualified. A random plumber, dentist, remodeler, or salon is not automatically a good prospect. The lead becomes useful when you can connect the business to a specific problem you can solve.
 
@@ -227,6 +293,10 @@ Can the lead become a polite two or three touch follow-up sequence? If the value
 
 That is a lead worth saving.
 
+## Where this scorecard sends the lead
+
+For website projects, connect the scorecard to the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> and the <a href="/resources/web-design-lead-generation">web design lead generation resource</a>. For free-plan testing, use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a>. When the lead passes the scorecard, turn it into a <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead</a> instead of sending a generic pitch.
+
 ## How iCloseLeads helps
 
 iCloseLeads is strongest when you treat it as a qualification system, not only a search tool. Search local businesses, save the proof, tag the market, draft a pitch, and keep the follow-up attached to the reason the lead was saved.
@@ -242,6 +312,17 @@ iCloseLeads is strongest when you treat it as a qualification system, not only a
     focusKeyword: "proposal ready leads",
     tags: ["proposal ready leads", "freelance proposals", "lead management"],
     readTime: 7,
+    metaTitle: "Proposal-Ready Leads | Turn Search Into Specific Freelance Pitches",
+    metaDescription:
+      "Make leads proposal-ready with buyer fit, visible proof, service relevance, contact route, and a first-offer angle before outreach.",
+    conversionFunnel: funnel({
+      slug: "proposal-ready-leads-for-freelancers",
+      intent: "proposal-ready-leads",
+      title: "Make the lead proposal-ready before outreach",
+      summary:
+        "Use this workflow after lead search: verify fit, save proof, choose the first offer, draft from context, and keep the next follow-up tied to the same lead record.",
+      ctaLabel: "Draft from a saved lead",
+    }),
     content: `
 Most freelancers jump from finding a lead to writing a pitch. That is why the message often sounds generic. There is a missing step: make the lead proposal-ready.
 
@@ -282,6 +363,10 @@ Do not pitch a full redesign immediately. Offer a lower-friction next step:
 - A local SEO service-page suggestion.
 - A small conversion fix.
 
+## Build the proposal-ready path
+
+Start with a focused source such as <a href="/blog/web-design-leads-data-led-workflow">web design leads</a> or the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a>. If you are using the free plan, the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads sprint</a> gives you enough room to reject weak prospects before drafting. For the resource-page version, use <a href="/resources/web-design-lead-generation">web design lead generation</a>.
+
 ## Use the saved lead workflow
 
 In iCloseLeads, save the best prospects, keep the reason attached, then draft a proposal from the saved context. The AI draft is a starting point, not the final message. Edit it until it sounds like a human who actually looked at the business.
@@ -303,6 +388,17 @@ Search leads, qualify proof, save the lead, draft outreach, follow up, and measu
     focusKeyword: "client acquisition software for freelancers",
     tags: ["client acquisition software", "freelance CRM", "lead generation tools"],
     readTime: 6,
+    metaTitle: "Client Acquisition Software Free Plan | What Freelancers Should Test",
+    metaDescription:
+      "Compare free client acquisition software by whether it helps you find leads, save proof, draft outreach, follow up, and measure one market.",
+    conversionFunnel: funnel({
+      slug: "client-acquisition-software-free-plan-test",
+      intent: "client-acquisition-software-free-plan",
+      title: "Test client acquisition software by the first useful workflow",
+      summary:
+        "Before paying for more features, test whether one search can become one qualified saved lead, one reviewed pitch, and one follow-up plan.",
+      ctaLabel: "Test the free workflow",
+    }),
     content: `
 If you are comparing client acquisition software for freelancers, do not start with the longest feature list. Start with the workflow you need to prove.
 
@@ -338,6 +434,10 @@ If the tool cannot help with that loop, more features will not fix the problem.
 - Proposal drafting from context.
 - Follow-up tracking.
 - A free allowance that encourages testing before spending.
+
+## Related tests inside the free plan
+
+Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a> to structure the test. If your service is web design, start with <a href="/blog/web-design-leads-data-led-workflow">web design leads</a>. If your search is local, use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a>. If a prospect passes, make it <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready</a> before outreach.
 
 ## Why iCloseLeads fits this search
 
