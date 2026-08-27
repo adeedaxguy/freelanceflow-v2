@@ -1,5 +1,5 @@
 /**
- * iCloseLeads Lead Aggregator v5
+ * iCloseLeads Lead Aggregator v6
  *
  * Sources:
  *  1.  RemoteOK            — https://remoteok.com/api
@@ -8,19 +8,25 @@
  *  4.  WeWorkRemotely      — general + category RSS feeds
  *  5.  Arbeitnow           — https://www.arbeitnow.com/api/job-board-api
  *  6.  RemoteJobs.org      — https://remotejobs.org/api/v1/jobs
- *  7.  Jobicy              — https://jobicy.com/api/v2/remote-jobs
- *  8.  Working Nomads      — https://www.workingnomads.com/api/exposed_jobs
- *  9.  HackerNews          — Algolia "Who is hiring?" / freelancer threads
- *  10. YC Jobs             — hacker-news.firebaseio.com/v0/jobstories          [replaces Remote.co]
- *  11. Authentic Jobs      — https://authenticjobs.com/feed/                  [replaces Craigslist]
- *  12. GitHub Bounties     — open issues labelled bounty/paid
- *  13. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/
- *  14. Dribbble Jobs       — https://dribbble.com/jobs.rss
- *  15. Jobspresso          — https://jobspresso.co/feed/                      [replaces Freelancermap]
- *  16. Himalayas           — https://himalayas.app/jobs/api/search
- *  17. Greenhouse boards   — selected public startup/company boards
- *  18. Lever boards        — selected public startup/company boards
- *  19. Ashby boards        — selected public startup/company boards
+ *  7.  Job Opportunities   — https://api.jobopportunitiesapi.org/public/jobs
+ *  8.  Jobicy              — https://jobicy.com/api/v2/remote-jobs
+ *  9.  Working Nomads      — https://www.workingnomads.com/api/exposed_jobs
+ *  10. HackerNews          — Algolia "Who is hiring?" / freelancer threads
+ *  11. YC Jobs             — hacker-news.firebaseio.com/v0/jobstories          [replaces Remote.co]
+ *  12. Authentic Jobs      — https://authenticjobs.com/feed/                  [disabled: WAF]
+ *  13. GitHub Bounties     — open issues labelled bounty/paid
+ *  14. Smashing Jobs       — https://jobs.smashingmagazine.com/feed/          [disabled: retired]
+ *  15. Dribbble Jobs       — https://dribbble.com/jobs.rss
+ *  16. Jobspresso          — https://jobspresso.co/feed/                      [disabled: empty]
+ *  17. Himalayas           — https://himalayas.app/jobs/api/search
+ *  18. Greenhouse boards   — selected public startup/company boards
+ *  19. Lever boards        — selected public Lever boards
+ *  20. Ashby boards        — selected public Ashby boards
+ *
+ * v6 changes:
+ *  - Added Job Opportunities' keyless, employer-direct remote feed
+ *  - Default scans skip retired or consistently empty RSS feeds
+ *  - Source labels now name the provider users are opening
  *
  * v5 changes:
  *  - Reddit switched to public Atom RSS (no OAuth, 100% reliable)
@@ -40,6 +46,7 @@ export type LeadSource =
   | "weworkremotely"
   | "arbeitnow"
   | "remotejobsorg"
+  | "jobopportunities"
   | "jobicy"
   | "workingnomads"
   | "hackernews"
@@ -57,27 +64,37 @@ export type LeadSource =
 
 /** Canonical display labels for every source — used by the UI source-filter chips */
 export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
-  remoteok:      "Remote Jobs A",
-  remotive:      "Remote Jobs B",
-  reddit:        "Community Leads",
-  weworkremotely:"Remote Jobs C",
-  arbeitnow:     "Startup Jobs A",
-  remotejobsorg: "Remote Jobs D",
-  jobicy:        "Remote Jobs G",
-  workingnomads: "Remote Jobs E",
-  hackernews:    "Founder Hiring",
-  ycjobs:        "Startup Jobs B",
-  authenticjobs: "Verified Jobs",
-  githubissues:  "Developer Requests",
-  smashingjobs:  "Design & Dev Jobs",
-  dribbble:      "Design Jobs",
-  freelancermap: "Contract Jobs",
-  himalayas:    "Startup Remote",
-  nodesk:       "Remote Jobs F",
-  greenhouse:   "Verified Hiring A",
-  lever:        "Verified Hiring B",
-  ashby:        "Verified Hiring C",
+  remoteok:         "RemoteOK",
+  remotive:         "Remotive",
+  reddit:           "Reddit Hiring",
+  weworkremotely:   "We Work Remotely",
+  arbeitnow:        "Arbeitnow",
+  remotejobsorg:    "RemoteJobs.org",
+  jobopportunities: "Job Opportunities",
+  jobicy:           "Jobicy",
+  workingnomads:    "Working Nomads",
+  hackernews:       "Hacker News Hiring",
+  ycjobs:           "YC Jobs",
+  authenticjobs:    "Authentic Jobs",
+  githubissues:     "GitHub Bounties",
+  smashingjobs:     "Smashing Jobs",
+  dribbble:         "Dribbble Jobs",
+  freelancermap:    "Jobspresso",
+  himalayas:        "Himalayas",
+  nodesk:           "NoDesk",
+  greenhouse:       "Greenhouse Jobs",
+  lever:            "Lever Jobs",
+  ashby:            "Ashby Jobs",
 };
+
+// Callable for recovery probes, but excluded from normal user searches.
+export const DEFAULT_DISABLED_SOURCES = new Set<LeadSource>([
+  "githubissues",
+  "freelancermap",
+  "nodesk",
+  "authenticjobs",
+  "smashingjobs",
+]);
 
 export interface AggregatedLead {
   id:           string;
@@ -683,7 +700,87 @@ async function fetchReddit(
   return { leads, raw: leads.length };
 }
 
-// ─── Source 4: Public ATS feeds (Greenhouse, Lever, Ashby) ───────────────────
+// ─── Source 4: Job Opportunities API ─────────────────────────────────────────
+
+interface JobOpportunity {
+  id?: string;
+  title?: string;
+  company?: string;
+  company_slug?: string;
+  category?: string;
+  seniority?: string;
+  location?: string;
+  remote?: string;
+  posted_at?: string;
+  first_seen_at?: string;
+  apply_url?: string;
+  source?: string;
+  description?: string;
+}
+
+interface JobOpportunitiesResponse { data?: JobOpportunity[]; }
+
+async function fetchJobOpportunities(
+  keywords: string[],
+  maxHours: number,
+  freshOnly: boolean,
+): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  const params = new URLSearchParams({
+    remote: "remote",
+    posted_after: new Date(Date.now() - maxHours * 3_600_000).toISOString(),
+    include_description: "true",
+    limit: "50",
+  });
+  const res = await withTimeout(
+    fetch(`https://api.jobopportunitiesapi.org/public/jobs?${params.toString()}`, {
+      headers: { "User-Agent": "iCloseLeads/6.0", "Accept": "application/json" },
+      ...cacheOpts(freshOnly, 300),
+    }),
+    9000,
+  );
+  if (!res.ok) throw new Error(`Job Opportunities ${res.status}`);
+  const data = await res.json() as JobOpportunitiesResponse;
+
+  let inWindow = 0;
+  const leads = (data.data ?? []).flatMap((job): AggregatedLead[] => {
+    if (!job.id || !job.title || !job.apply_url) return [];
+    const posted = parsePostedDate(job.posted_at, job.first_seen_at);
+    if (!posted) return [];
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) return [];
+    inWindow++;
+
+    const tags = [job.category, job.seniority, job.remote, job.location, job.source]
+      .filter((value): value is string => Boolean(value))
+      .slice(0, 8);
+    const description = stripHtml(job.description ?? "");
+    const confidence = scoreMatch(job.title, description, tags, keywords);
+    if (confidence < SOURCE_FLOOR) return [];
+
+    const company = (job.company || job.company_slug || "Hiring company").trim().slice(0, 100);
+    const budget = extractBudget(description);
+    const urgency = detectUrgency(`${job.title} ${description}`);
+    const email = extractEmail(description);
+    const domain = extractDomain(job.apply_url);
+
+    return [{
+      id: `joa-${job.id}`,
+      company, domain, email,
+      title: job.title.trim(),
+      description: truncate(description || `${company} employer-direct job posting.`),
+      url: job.apply_url,
+      source: "jobopportunities",
+      sourceLabel: ALL_SOURCE_LABELS.jobopportunities,
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags, confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description, tags, domain, title: job.title, budget, urgency }),
+    }];
+  });
+
+  return { leads, raw: inWindow };
+}
+
+// ─── Source 5: Public ATS feeds (Greenhouse, Lever, Ashby) ───────────────────
 // These are public job-board APIs used by startups and software companies. They
 // do not require scraping or user API keys, and are treated as generic verified
 // hiring channels in the UI.
@@ -1961,6 +2058,7 @@ const SOURCE_RUNNERS: Array<{
   { name: "weworkremotely",run: (n, k, h, f)  => fetchWeWorkRemotely(n, k, h, f) },
   { name: "arbeitnow",     run: (_n, k, h, f) => fetchArbeitnow(k, h, f) },
   { name: "remotejobsorg", run: (n, k, h, f)  => fetchRemoteJobsOrg(n, k, h, f) },
+  { name: "jobopportunities", run: (_n, k, h, f) => fetchJobOpportunities(k, h, f) },
   { name: "jobicy",        run: (_n, k, h, f) => fetchJobicy(k, h, f) },
   { name: "workingnomads", run: (_n, k, h, f) => fetchWorkingNomads(k, h, f) },
   { name: "hackernews",    run: (_n, k, h, f) => fetchHackerNews(k, h, f) },
@@ -1977,16 +2075,8 @@ const SOURCE_RUNNERS: Array<{
   { name: "ashby",         run: (_n, k, h, f) => fetchAshbyBoards(k, h, f) },
 ];
 
-const DEFAULT_DISABLED_SOURCES = new Set<LeadSource>([
-  // These public feeds currently return hard errors in production probes. Keep
-  // them callable through explicit source filters so we can re-test recovery,
-  // but do not spend normal user searches on broken channels.
-  "githubissues",
-  "freelancermap",
-  "nodesk",
-]);
-
 const SOURCE_RANK_BOOST: Partial<Record<LeadSource, number>> = {
+  jobopportunities: 5,
   ashby:          5,
   greenhouse:     5,
   lever:          4,

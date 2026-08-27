@@ -5,10 +5,10 @@ import {
   Radio, RefreshCw, Clock, Globe, Mail, ExternalLink, Bookmark,
   CheckCircle, Sparkles, Star, Filter, ChevronDown, X,
   ChevronLeft, ChevronRight, Zap, AlertCircle, Copy, Target,
-  TrendingUp, Lock, Heart, Rss,
+  TrendingUp, Lock, Heart, Rss, Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import type { AggregatedLead } from "@/lib/leads-aggregator";
+import { ALL_SOURCE_LABELS, type AggregatedLead, type LeadSource } from "@/lib/leads-aggregator";
 import BonusLeadsModal from "@/components/BonusLeadsModal";
 import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 import { copyText } from "@/lib/clipboard";
@@ -30,29 +30,8 @@ const NICHE_LABELS: Record<string, string> = {
   "meta-ads": "Meta Ads",
 };
 
-// All possible sources with display labels
-const ALL_SOURCES: { id: string; label: string }[] = [
-  { id: "remoteok",      label: "Remote Jobs A" },
-  { id: "remotive",      label: "Remote Jobs B" },
-  { id: "reddit",        label: "Community Leads" },
-  { id: "weworkremotely",label: "Remote Jobs C" },
-  { id: "arbeitnow",     label: "Startup Jobs A" },
-  { id: "remotejobsorg", label: "Remote Jobs D" },
-  { id: "jobicy",        label: "Remote Jobs G" },
-  { id: "workingnomads", label: "Remote Jobs E" },
-  { id: "hackernews",    label: "Founder Hiring" },
-  { id: "ycjobs",        label: "Startup Jobs B" },
-  { id: "authenticjobs", label: "Verified Jobs" },
-  { id: "githubissues",  label: "Developer Requests" },
-  { id: "freelancermap", label: "Contract Jobs" },
-  { id: "smashingjobs",  label: "Design & Dev Jobs" },
-  { id: "dribbble",      label: "Design Jobs" },
-  { id: "himalayas",     label: "Startup Remote" },
-  { id: "nodesk",        label: "No Desk" },
-  { id: "greenhouse",    label: "Verified Hiring A" },
-  { id: "lever",         label: "Verified Hiring B" },
-  { id: "ashby",         label: "Verified Hiring C" },
-];
+const ALL_SOURCES = (Object.entries(ALL_SOURCE_LABELS) as Array<[LeadSource, string]>)
+  .map(([id, label]) => ({ id, label }));
 
 const PAGE_SIZE    = 25;
 const COOLDOWN_MS  = 2 * 60 * 1000;
@@ -254,8 +233,7 @@ export default function LiveJobsPage() {
   const [favIds,          setFavIds]          = useState<Set<string>>(new Set());
   const [selectedNiches,  setSelectedNiches]  = useState<string[]>(LIVE_NICHES);
   const [maxHours,        setMaxHours]        = useState(72);
-  const [activeSources,   setActiveSources]   = useState<string[]>([]);
-  const [totalFound,      setTotalFound]      = useState(0);
+  const [freshResultCount,setFreshResultCount]= useState(0);
   const [usage,           setUsage]           = useState<UsageStats | null>(null);
   const [diagnostics,     setDiagnostics]     = useState<SearchDiagnostics | null>(null);
   // Source filter — "all" or one specific source id
@@ -325,7 +303,7 @@ export default function LiveJobsPage() {
 
   const fetchLive = useCallback(async (force = false) => {
     if (!force && countdown > 0) return;
-    setLoading(true); setError(""); setActiveSources([]); setTotalFound(0); setDiagnostics(null);
+    setLoading(true); setError(""); setFreshResultCount(0); setDiagnostics(null);
     const nichesToFetch = selectedNiches.length > 0 ? selectedNiches : LIVE_NICHES;
 
     try {
@@ -348,8 +326,6 @@ export default function LiveJobsPage() {
 
       const data = await res.json() as {
         leads?: AggregatedLead[];
-        total?: number;
-        activeSources?: string[];
         usage?: UsageStats;
         diagnostics?: SearchDiagnostics;
         error?: string;
@@ -364,12 +340,11 @@ export default function LiveJobsPage() {
       };
       trackAnalyticsEvent("search", searchDetails);
       trackAnalyticsEvent("lead_search", searchDetails);
-      setTotalFound(data.total ?? fetched.length);
-      setActiveSources(data.activeSources ?? []);
       if (data.usage) setUsage(data.usage);
       setDiagnostics(data.diagnostics ?? null);
 
       const prev = prevSeenRef.current;
+      setFreshResultCount(fetched.filter(lead => !prev.has(lead.id)).length);
       fetched.sort((a, b) => {
         const aN = !prev.has(a.id), bN = !prev.has(b.id);
         if (aN && !bN) return -1; if (!aN && bN) return 1;
@@ -434,9 +409,11 @@ export default function LiveJobsPage() {
   const isOnCooldown = countdown > 0;
   const mins = Math.floor(countdown/60);
   const secs = countdown % 60;
-  const newCount = scored.filter(l=>!seenIds.has(l.id)).length;
   const bestMatchCount = scored.filter(l=>l.bmScore>=80).length;
   const emailCount = leads.filter(l=>!!l.email).length;
+  const checkedSourceCount = diagnostics?.sources.length ?? 0;
+  const matchingSourceCount = diagnostics?.sources.filter(source => source.kept > 0).length ?? 0;
+  const unavailableSourceCount = diagnostics?.sources.filter(source => !source.ok).length ?? 0;
 
   const handleSave = async (lead: AggregatedLead & { bmScore: number }) => {
     if (savedIds.has(lead.id)) return;
@@ -484,8 +461,8 @@ export default function LiveJobsPage() {
               Live Jobs Feed
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
-              Live feeds scanned simultaneously · 2 min cooldown
-              {newCount > 0 && <span className="ml-2 text-accent font-medium">· {newCount} new since last visit</span>}
+              Current remote roles from job boards and hiring feeds · 2 min refresh cooldown
+              {freshResultCount > 0 && <span className="ml-2 text-accent font-medium">· {freshResultCount} new since last scan</span>}
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
@@ -629,6 +606,15 @@ export default function LiveJobsPage() {
                 )}
                 <span>·</span>
                 <span>Updated {fetchedAt ? formatExact(fetchedAt) : "—"}</span>
+                {checkedSourceCount > 0 && (
+                  <>
+                    <span>·</span>
+                    <span>{checkedSourceCount} sources checked · {matchingSourceCount} supplied matches</span>
+                  </>
+                )}
+                {unavailableSourceCount > 0 && (
+                  <span className="text-gold">{unavailableSourceCount} temporarily unavailable</span>
+                )}
                 {saveError && <span className="text-destructive flex items-center gap-1 ml-auto"><AlertCircle className="w-3.5 h-3.5"/> {saveError}</span>}
               </div>
             )}
@@ -637,10 +623,10 @@ export default function LiveJobsPage() {
             {loading && (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center animate-pulse-glow">
-                  <Radio className="w-8 h-8 text-accent"/>
+                  <Loader2 className="w-8 h-8 animate-spin text-accent"/>
                 </div>
                 <p className="text-foreground font-semibold">Scanning live job feeds…</p>
-                <p className="text-muted-foreground text-sm">Aggregating from live feeds across {selectedNiches.length} niche{selectedNiches.length!==1?"s":""}</p>
+                <p className="text-muted-foreground text-sm">Checking sources across {selectedNiches.length || LIVE_NICHES.length} niche{(selectedNiches.length || LIVE_NICHES.length)!==1?"s":""}</p>
               </div>
             )}
 
@@ -840,9 +826,9 @@ export default function LiveJobsPage() {
             {!loading && leads.length === 0 && !error && (
               <div className="text-center py-16 border border-dashed border-border rounded-2xl">
                 <Radio className="w-12 h-12 text-muted-foreground mx-auto mb-3"/>
-                <h3 className="text-foreground font-semibold mb-2">Select niches and scan</h3>
-                <p className="text-muted-foreground text-sm mb-1">Pick your niches above, then hit Scan</p>
-                <p className="text-muted-foreground text-xs">Live feeds · sorted by post time</p>
+                <h3 className="text-foreground font-semibold mb-2">Choose specialties to scan</h3>
+                <p className="text-muted-foreground text-sm mb-1">Select at least one specialty, then scan for current remote roles.</p>
+                <p className="text-muted-foreground text-xs">Results show their source and posting time.</p>
                 <div className="flex items-center justify-center gap-3 mt-5">
                   <button onClick={()=>{setMaxHours(72);void fetchLive(true);}} disabled={loading||selectedNiches.length===0}
                     className="px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all disabled:opacity-50 flex items-center gap-2">

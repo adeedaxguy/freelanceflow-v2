@@ -138,4 +138,41 @@ describe("remote lead ranking", () => {
     expect(String(fetchMock.mock.calls[0]?.[0])).toContain("https://jobicy.com/api/v2/remote-jobs?count=100");
     expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain("geo=worldwide");
   });
+
+  it("maps fresh remote employer-direct jobs from Job Opportunities", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [
+          {
+            id: "opportunity-1",
+            title: "Contract React Developer",
+            company: "Direct Co",
+            category: "Engineering",
+            remote: "remote",
+            posted_at: "2026-08-26T10:00:00Z",
+            apply_url: "https://jobs.ashbyhq.com/direct-co/react-developer/application",
+            source: "ashby",
+            description: "Build a React and TypeScript web app for a remote client project.",
+          },
+        ],
+      }),
+    });
+
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "jobopportunities",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain("api.jobopportunitiesapi.org/public/jobs");
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain("remote=remote");
+    expect(leads[0]).toMatchObject({
+      id: "joa-opportunity-1",
+      source: "jobopportunities",
+      company: "Direct Co",
+      title: "Contract React Developer",
+    });
+  });
 });

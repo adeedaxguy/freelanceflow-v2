@@ -13,7 +13,7 @@ import BonusLeadsModal from "@/components/BonusLeadsModal";
 import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/components/LeadApplicationControls";
 import Link from "next/link";
 import type { AggregatedLead, LeadSource } from "@/lib/leads-aggregator";
-import { ALL_SOURCE_LABELS } from "@/lib/leads-aggregator";
+import { ALL_SOURCE_LABELS, DEFAULT_DISABLED_SOURCES } from "@/lib/leads-aggregator";
 import { NICHES } from "@/types";
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
@@ -156,6 +156,7 @@ const SOURCE_COLORS: Record<string, string> = {
   remotive:      "bg-violet-500/15 text-violet-400 border-violet-500/20",
   weworkremotely:"bg-green-500/15 text-green-400 border-green-500/20",
   arbeitnow:     "bg-sky-500/15 text-sky-400 border-sky-500/20",
+  jobopportunities: "bg-lime-500/15 text-lime-300 border-lime-500/20",
   jobicy:        "bg-indigo-500/15 text-indigo-400 border-indigo-500/20",
   workingnomads: "bg-teal-500/15 text-teal-400 border-teal-500/20",
   hackernews:    "bg-amber-500/15 text-amber-400 border-amber-500/20",
@@ -1205,12 +1206,14 @@ export default function LeadsPage() {
               : <>{niches.length} niche{niches.length === 1 ? "" : "s"} selected — hit <strong>Find Real Leads</strong></>}
           </p>
           <div className="flex flex-wrap gap-1.5 justify-center max-w-lg mx-auto">
-            {Object.entries(ALL_SOURCE_LABELS).map(([key, label]) => (
-              <span key={key}
-                className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${SOURCE_COLORS[key] ?? "bg-muted text-muted-foreground border-border"}`}>
-                {label}
-              </span>
-            ))}
+            {Object.entries(ALL_SOURCE_LABELS)
+              .filter(([key]) => !DEFAULT_DISABLED_SOURCES.has(key as LeadSource))
+              .map(([key, label]) => (
+                <span key={key}
+                  className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${SOURCE_COLORS[key] ?? "bg-muted text-muted-foreground border-border"}`}>
+                  {label}
+                </span>
+              ))}
           </div>
           <p className="text-xs text-muted-foreground mt-3">Scanning live channels in parallel</p>
         </div>
