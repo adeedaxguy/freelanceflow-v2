@@ -23,16 +23,39 @@ const MOBILE_IN_FEED_AD = {
   format: "fluid" as const,
   layoutKey: "-6c+e7+1e-40+6x",
 };
+let adSenseLoadPromise: Promise<void> | null = null;
 
 function loadAdSense() {
-  if (document.getElementById(ADSENSE_SCRIPT_ID)) return;
+  if (process.env.NODE_ENV === "test") return Promise.resolve();
 
-  const script = document.createElement("script");
-  script.id = ADSENSE_SCRIPT_ID;
-  script.async = true;
-  script.crossOrigin = "anonymous";
-  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`;
-  document.head.appendChild(script);
+  const existing = document.getElementById(ADSENSE_SCRIPT_ID) as HTMLScriptElement | null;
+  if (existing?.dataset.loaded === "true") return Promise.resolve();
+  if (adSenseLoadPromise) return adSenseLoadPromise;
+
+  adSenseLoadPromise = new Promise((resolve, reject) => {
+    const script = existing ?? document.createElement("script");
+    const onLoad = () => {
+      script.dataset.loaded = "true";
+      resolve();
+    };
+    const onError = () => {
+      adSenseLoadPromise = null;
+      reject(new Error("AdSense script failed to load"));
+    };
+
+    script.addEventListener("load", onLoad, { once: true });
+    script.addEventListener("error", onError, { once: true });
+
+    if (!existing) {
+      script.id = ADSENSE_SCRIPT_ID;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CLIENT}`;
+      document.head.appendChild(script);
+    }
+  });
+
+  return adSenseLoadPromise;
 }
 
 function adIsFilled(ad: HTMLModElement | null) {
@@ -107,6 +130,7 @@ function AdSenseUnit({
   useEffect(() => {
     let statusObserver: MutationObserver | undefined;
     let collapseTimer: number | undefined;
+    let cancelled = false;
 
     if (!isRequested) return;
 
@@ -149,30 +173,28 @@ function AdSenseUnit({
       }, EMPTY_AD_COLLAPSE_DELAY_MS);
     };
 
-    const initialize = () => {
-      if (initialized.current) return;
-
-      if (adRef.current?.dataset.adsbygoogleStatus) {
-        initialized.current = true;
-        watchAdStatus();
-        return;
-      }
-
-      initialized.current = true;
-      loadAdSense();
+    const initialize = async () => {
       try {
+        await loadAdSense();
+        if (cancelled || initialized.current || !adRef.current) return;
+        if (adRef.current.dataset.adsbygoogleStatus) {
+          initialized.current = true;
+          return;
+        }
+        initialized.current = true;
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (error) {
         if (process.env.NODE_ENV !== "production") {
           console.warn("AdSense unit could not initialize", error);
         }
       }
-      watchAdStatus();
     };
 
-    initialize();
+    watchAdStatus();
+    void initialize();
 
     return () => {
+      cancelled = true;
       statusObserver?.disconnect();
       clearCollapseTimer();
     };
