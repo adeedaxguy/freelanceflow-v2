@@ -45,6 +45,7 @@ coverage/
 score-check.ts
 
 # SEO private exports
+reports/
 seo/data/*.csv
 seo/data/*.tsv
 seo/data/*.xls
