@@ -484,7 +484,7 @@ function WebDesignBuilderContent() {
     }
 
     const source = cached ?? {
-      activeStep: 0,
+      activeStep: Number(params.get("step") || 0),
       style: params.get("style") || defaultPatch.style,
       theme: params.get("theme") || defaultPatch.theme,
       sections: params.get("sections") || defaultPatch.sections,
@@ -583,7 +583,7 @@ function WebDesignBuilderContent() {
     niche: "web-development",
     leadType: "local-business",
     url: data.maps || data.website,
-    returnTo: `/dashboard/web-design?${buildPreviewSearch(data, options)}`,
+    returnTo: `/dashboard/web-design?${buildPreviewSearch(data, options)}&step=${activeStep}`,
     returnLabel: "Web Design",
   }).toString()}`;
 

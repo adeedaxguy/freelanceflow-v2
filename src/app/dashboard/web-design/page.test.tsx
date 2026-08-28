@@ -78,5 +78,8 @@ describe("web design studio defaults", () => {
     expect(previewParams().get("sections")).toBe("11");
     expect(previewParams().get("headline")).toBe("Fresh from our ovens");
     expect(screen.getByText("Make the concept sound like this client")).toBeInTheDocument();
+    const proposalHref = screen.getByText("Write proposal").closest("a")?.getAttribute("href") ?? "";
+    const returnTo = new URLSearchParams(proposalHref.split("?")[1] ?? "").get("returnTo");
+    expect(returnTo).toContain("&step=2");
   });
 });
