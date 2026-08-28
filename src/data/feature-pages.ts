@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export type FeatureSlug =
   | "lead-discovery"
   | "ai-proposals"
+  | "web-design-generator"
   | "email-outreach"
   | "softphone"
   | "crm-pipeline"
@@ -393,6 +394,166 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       subheading:
         "Open a lead, add your strongest proof, and turn it into a clean proposal without staring at a blank page.",
       button: "Generate a Proposal",
+    },
+  },
+  {
+    slug: "web-design-generator",
+    path: "/features/web-design-generator",
+    eyebrow: "AI Web Design Generator",
+    icon: "Sparkles",
+    title: "AI Web Design Generator",
+    accentTitle: "for Turning Leads Into Client-Ready Concepts",
+    description:
+      "Turn a saved local business lead, prompt, and client requirements into a website direction you can review, refine, and use in a web design pitch. iCloseLeads helps freelancers move from prospect research to a visual website concept without losing the original business context.",
+    shortDescription:
+      "Create prompt-based website concepts from saved local business leads, service gaps, and client requirements.",
+    titleTag:
+      "AI Web Design Generator for Freelancers and Client Pitches",
+    metaDescription:
+      "Use iCloseLeads to create AI website concepts from prompts, local business leads, website gaps, and client requirements for stronger web design pitches.",
+    keywords: [
+      "AI web design generator",
+      "AI website design generator for freelancers",
+      "prompt to website design",
+      "website mockup generator for client pitch",
+      "web design proposal with mockup",
+      "create website design from prompt",
+      "web design client finder",
+      "web design leads",
+      "website redesign pitch",
+      "local business website mockup",
+    ],
+    theme: {
+      accentText: "text-cyan-300",
+      accentBg: "bg-cyan-500/10",
+      accentBorder: "border-cyan-400/25",
+      gradientText: "from-cyan-300 via-primary-light to-accent",
+      heroWash: "from-cyan-500/10 via-transparent to-primary/10",
+      hoverBorder: "hover:border-cyan-300/40",
+    },
+    audience:
+      "Freelance web designers, Webflow builders, WordPress developers, local SEO consultants, and small agencies that want a faster way to show prospects what a better site could look like.",
+    promise:
+      "Start from the lead, not a blank canvas. Use the business type, location, current website gap, conversion goal, and custom prompt to create a clearer website direction for the pitch.",
+    proof: [
+      "The web design workspace accepts prompt-based requirements, business details, style, theme, sections, images, content depth, conversion goal, and layout direction.",
+      "It connects naturally to high-intent SEO clusters around web design leads, businesses without websites, website redesign pitches, and local service website concepts.",
+      "The output can support a better first message because the freelancer can show a specific idea instead of sending generic portfolio links.",
+      "The feature sits beside lead discovery, AI proposals, softphone calling, and CRM so the pitch workflow stays connected.",
+    ],
+    stats: [
+      { value: "Prompt", label: "Start from requirements" },
+      { value: "5-11", label: "Homepage section options" },
+      { value: "Calls", label: "Quote, booking, or phone goals" },
+      { value: "1 flow", label: "Lead, concept, pitch, follow-up" },
+    ],
+    workflow: [
+      {
+        title: "Find a website lead",
+        description:
+          "Search one niche or city and save businesses with visible website, mobile, booking, quote, service-page, or trust gaps.",
+        icon: "Search",
+      },
+      {
+        title: "Write the prompt from proof",
+        description:
+          "Use the saved business context, current problem, desired style, sections, and conversion goal instead of asking AI for a random design.",
+        icon: "FileText",
+      },
+      {
+        title: "Choose the website direction",
+        description:
+          "Pick a professional, premium, bold, friendly, minimal, or creative direction, then tune theme, imagery, depth, and layout.",
+        icon: "Sparkles",
+      },
+      {
+        title: "Use it in the pitch",
+        description:
+          "Turn the concept into a low-friction proposal, email, or call opener and track the follow-up in the CRM.",
+        icon: "Target",
+      },
+    ],
+    capabilities: [
+      {
+        title: "Prompt-based website direction",
+        description:
+          "Describe the client requirements and generate a site direction around the service, market, and conversion goal.",
+        icon: "Sparkles",
+      },
+      {
+        title: "Lead context carried forward",
+        description:
+          "Use company, category, location, website, map, phone, and pitch angle from the prospecting workflow.",
+        icon: "Layers",
+      },
+      {
+        title: "Conversion goal controls",
+        description:
+          "Shape the site around calls, quote requests, bookings, store visits, or consultation enquiries.",
+        icon: "Target",
+      },
+      {
+        title: "Style and layout controls",
+        description:
+          "Adjust professional, premium, bold, friendly, minimal, or creative directions with section count, imagery, and content depth.",
+        icon: "Wrench",
+      },
+      {
+        title: "Pitch-ready export path",
+        description:
+          "Use the finished concept to support a proposal, follow-up, or softphone conversation with the prospect.",
+        icon: "FileText",
+      },
+    ],
+    useCases: [
+      {
+        title: "No-website local businesses",
+        description:
+          "Show how a simple homepage could explain services, trust, location, and calls without overwhelming the owner.",
+        icon: "Users",
+      },
+      {
+        title: "Outdated service websites",
+        description:
+          "Create a better direction for sites with weak mobile CTAs, thin service pages, or unclear booking paths.",
+        icon: "TrendingUp",
+      },
+      {
+        title: "Niche web design pitches",
+        description:
+          "Build concepts for dentists, med spas, roofers, remodelers, law firms, MSPs, and other service niches with clear buyer intent.",
+        icon: "Target",
+      },
+    ],
+    differentiators: [
+      "Starts from real lead context instead of a blank design prompt.",
+      "Helps web designers pitch a business outcome, not only a visual style.",
+      "Works with the same saved lead, proposal, softphone, and CRM workflow.",
+      "Supports niche-specific website selling without making freelancers build a full mockup before qualification.",
+    ],
+    faqs: [
+      {
+        q: "What is the AI web design generator for?",
+        a: "It helps freelancers turn a saved local business lead and prompt into a website direction that can support a pitch, proposal, or follow-up conversation.",
+      },
+      {
+        q: "Does it replace a full client website build?",
+        a: "No. It is a prospecting and proposal tool. Use it to show direction, clarify the offer, and start a client conversation before a full project scope is approved.",
+      },
+      {
+        q: "What should I include in the prompt?",
+        a: "Include the business type, location, website gap, desired sections, style, conversion goal, and any client requirements you already know.",
+      },
+      {
+        q: "Can I use it with local business leads?",
+        a: "Yes. It is strongest when used after lead discovery, because the concept can reference the real business category, location, contact path, and visible website opportunity.",
+      },
+    ],
+    cta: {
+      heading: "Turn a website lead into a concept",
+      subheading:
+        "Find one local business, save the proof, and create a website direction you can use in a sharper pitch.",
+      button: "Create a Website Concept",
     },
   },
   {

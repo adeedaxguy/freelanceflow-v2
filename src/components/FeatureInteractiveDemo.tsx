@@ -272,6 +272,73 @@ function ProposalDemo() {
   );
 }
 
+function WebDesignGeneratorDemo() {
+  const [style, setStyle] = useState<"premium" | "friendly" | "minimal">("premium");
+  const details = {
+    premium: {
+      lead: "Peak Dental Studio",
+      prompt: "Premium dental homepage, new-patient bookings, implants, Invisalign, trust proof.",
+      headline: "Confident care for your next smile decision",
+      sections: ["Hero", "Treatments", "Reviews", "Doctors", "Book"],
+    },
+    friendly: {
+      lead: "Cedar Roof Repair",
+      prompt: "Friendly roofing site, storm inspections, quote requests, service-area proof.",
+      headline: "Fast roof help from a local team",
+      sections: ["Hero", "Repairs", "Storm proof", "Gallery", "Quote"],
+    },
+    minimal: {
+      lead: "Northline IT Support",
+      prompt: "Clean MSP site, cybersecurity assessment, consultation CTA, B2B trust.",
+      headline: "Managed IT support without the noise",
+      sections: ["Hero", "Services", "Security", "Process", "Consult"],
+    },
+  }[style];
+
+  return (
+    <div className={cn(basePanel, "overflow-hidden rounded-lg")}>
+      <MiniHeader title="Web design generator" subtitle="Lead context into a pitch-ready concept" />
+      <div className="p-4">
+        <div className="mb-4 flex flex-wrap gap-2">
+          {(["premium", "friendly", "minimal"] as const).map(option => (
+            <button
+              key={option}
+              onClick={() => setStyle(option)}
+              className={cn(chip, style === option && activeChip)}
+            >
+              {option[0]!.toUpperCase() + option.slice(1)}
+            </button>
+          ))}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-[0.86fr_1.14fr]">
+          <div className="rounded-lg border border-border bg-background p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Saved lead</p>
+            <p className="mt-2 text-base font-extrabold text-foreground">{details.lead}</p>
+            <p className="mt-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">Prompt</p>
+            <p className="mt-2 rounded-lg border border-border bg-surface px-3 py-3 text-sm leading-6 text-foreground">
+              {details.prompt}
+            </p>
+          </div>
+          <div className="rounded-lg border border-primary/25 bg-primary/10 p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-primary-light">Generated direction</p>
+            <h3 className="mt-3 text-2xl font-black leading-tight text-foreground">{details.headline}</h3>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {details.sections.map(section => (
+                <span key={section} className="rounded-lg border border-border bg-background/70 px-3 py-2 text-xs font-semibold text-muted-foreground">
+                  {section}
+                </span>
+              ))}
+            </div>
+            <div className="mt-4 rounded-lg border border-accent/25 bg-accent/10 px-3 py-2 text-xs font-semibold text-accent">
+              Ready for proposal or softphone opener
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OutreachDemo() {
   const steps = ["Draft", "Review", "Prepare", "Follow up"];
   const [active, setActive] = useState(1);
@@ -558,6 +625,8 @@ export default function FeatureInteractiveDemo({ type }: { type: DemoType }) {
       return <LeadDiscoveryDemo />;
     case "ai-proposals":
       return <ProposalDemo />;
+    case "web-design-generator":
+      return <WebDesignGeneratorDemo />;
     case "email-outreach":
       return <OutreachDemo />;
     case "softphone":

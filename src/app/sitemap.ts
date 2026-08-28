@@ -24,6 +24,14 @@ const RESOURCE_PRIORITY_OVERRIDES: Record<string, number> = {
 
 const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
   "freelance-client-acquisition-system": 0.86,
+  "softphone-for-freelance-lead-outreach": 0.85,
+  "prompt-to-website-design-for-client-pitches": 0.85,
+  "dental-website-leads-for-freelancers": 0.84,
+  "med-spa-website-leads-for-web-designers": 0.84,
+  "roofing-company-website-leads": 0.84,
+  "kitchen-remodeling-website-leads": 0.84,
+  "family-law-firm-website-leads": 0.84,
+  "managed-it-service-provider-website-leads": 0.84,
   "600-free-leads-week-client-acquisition-plan": 0.84,
   "web-design-leads-data-led-workflow": 0.84,
   "local-business-leads-scorecard-for-freelancers": 0.84,
