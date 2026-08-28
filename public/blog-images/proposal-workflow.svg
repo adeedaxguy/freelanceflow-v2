@@ -1,0 +1,27 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Proposal workflow</title>
+  <desc id="desc">A workflow from saved proof to proposal, email, call, and CRM follow-up.</desc>
+  <rect width="1200" height="720" rx="32" fill="#F8F6FF"/>
+  <rect x="70" y="58" width="1060" height="604" rx="30" fill="#FFFFFF" stroke="#DDD6FE" stroke-width="2"/>
+  <text x="110" y="128" fill="#151129" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="850">Proposal workflow</text>
+  <text x="110" y="168" fill="#655F7D" font-family="Inter, Arial, sans-serif" font-size="22">Turn a saved reason into a specific outreach asset.</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="110" y="240" width="430" height="330" rx="24" fill="#211A3A"/>
+    <text x="144" y="300" fill="#A88BFF" font-size="18" font-weight="850">SAVED PROOF</text>
+    <text x="144" y="348" fill="#FFFFFF" font-size="28" font-weight="850">Website gap on mobile</text>
+    <text x="144" y="392" fill="#DAD4F7" font-size="20">Weak quote path, active reviews, clear phone route.</text>
+    <rect x="144" y="438" width="310" height="18" rx="9" fill="#A88BFF"/>
+    <rect x="144" y="476" width="220" height="18" rx="9" fill="#705BEA"/>
+    <rect x="144" y="514" width="270" height="18" rx="9" fill="#443193"/>
+    <path d="M572 405h74" stroke="#211A3A" stroke-width="8" stroke-linecap="round"/>
+    <path d="M626 378l30 27-30 27" stroke="#211A3A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="678" y="240" width="390" height="330" rx="24" fill="#F1EEFF" stroke="#C7BBFF" stroke-width="2"/>
+    <text x="712" y="300" fill="#563FDB" font-size="18" font-weight="850">NEXT ACTION</text>
+    <g fill="#151129" font-size="24" font-weight="800">
+      <text x="712" y="354">1. Short pitch</text>
+      <text x="712" y="414">2. Website concept</text>
+      <text x="712" y="474">3. Softphone call</text>
+      <text x="712" y="534">4. Follow-up task</text>
+    </g>
+  </g>
+</svg>

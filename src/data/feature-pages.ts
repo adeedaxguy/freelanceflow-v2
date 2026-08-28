@@ -408,11 +408,15 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     shortDescription:
       "Create prompt-based website concepts from saved local business leads, service gaps, and client requirements.",
     titleTag:
-      "AI Web Design Generator for Freelancers and Client Pitches",
+      "Best AI Website Builder for Small Business Pitches | iCloseLeads",
     metaDescription:
-      "Use iCloseLeads to create AI website concepts from prompts, local business leads, website gaps, and client requirements for stronger web design pitches.",
+      "Use iCloseLeads as an AI website builder workflow for small business pitches: find website leads, save proof, generate concepts, and pitch from context.",
     keywords: [
       "AI web design generator",
+      "best AI website builder for small business",
+      "AI website builder for small business",
+      "AI website maker for small business",
+      "free AI website builder for small business",
       "AI website design generator for freelancers",
       "prompt to website design",
       "website mockup generator for client pitch",
@@ -723,11 +727,15 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     shortDescription:
       "Buy a dedicated number, choose monthly minutes, and call leads from the iCloseLeads dashboard.",
     titleTag:
-      "Softphone for Freelancers | Call Leads from iCloseLeads",
+      "Softphone for Sales Teams and Freelancers | iCloseLeads",
     metaDescription:
-      "Use the iCloseLeads softphone to buy a dedicated number, add monthly calling minutes, and call prospects from the lead workspace.",
+      "Use the iCloseLeads softphone for sales teams, freelancers, and agencies: buy a dedicated number, add minutes, and call qualified leads from context.",
     keywords: [
       "softphone for freelancers",
+      "softphone for sales teams",
+      "sales team softphone",
+      "business softphone for lead generation",
+      "softphone for outbound sales",
       "call leads from CRM",
       "freelance sales softphone",
       "browser softphone for outreach",

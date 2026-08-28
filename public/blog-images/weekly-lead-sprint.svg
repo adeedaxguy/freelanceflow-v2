@@ -1,0 +1,27 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Weekly lead sprint</title>
+  <desc id="desc">A weekly 600 lead sprint split across search, qualify, pitch, follow-up, and review.</desc>
+  <rect width="1200" height="720" rx="32" fill="#071319"/>
+  <rect x="58" y="58" width="1084" height="604" rx="30" fill="#0F1A17" stroke="#24453C" stroke-width="2"/>
+  <text x="100" y="128" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="850">600 free leads weekly sprint</text>
+  <text x="100" y="168" fill="#B7D4CC" font-family="Inter, Arial, sans-serif" font-size="22">Use the allowance to learn one market, not to chase every prospect.</text>
+  <g transform="translate(100 235)" font-family="Inter, Arial, sans-serif">
+    <circle cx="80" cy="160" r="78" fill="#3AD8FF"/>
+    <text x="80" y="150" fill="#071319" font-size="42" font-weight="900" text-anchor="middle">150</text>
+    <text x="80" y="184" fill="#071319" font-size="18" font-weight="800" text-anchor="middle">search</text>
+    <circle cx="285" cy="160" r="78" fill="#9AE66E"/>
+    <text x="285" y="150" fill="#071319" font-size="42" font-weight="900" text-anchor="middle">150</text>
+    <text x="285" y="184" fill="#071319" font-size="18" font-weight="800" text-anchor="middle">qualify</text>
+    <circle cx="490" cy="160" r="78" fill="#FFD166"/>
+    <text x="490" y="150" fill="#071319" font-size="42" font-weight="900" text-anchor="middle">100</text>
+    <text x="490" y="184" fill="#071319" font-size="18" font-weight="800" text-anchor="middle">save</text>
+    <circle cx="695" cy="160" r="78" fill="#FF6B9A"/>
+    <text x="695" y="150" fill="#071319" font-size="42" font-weight="900" text-anchor="middle">100</text>
+    <text x="695" y="184" fill="#071319" font-size="18" font-weight="800" text-anchor="middle">pitch</text>
+    <circle cx="900" cy="160" r="78" fill="#A88BFF"/>
+    <text x="900" y="150" fill="#071319" font-size="42" font-weight="900" text-anchor="middle">100</text>
+    <text x="900" y="184" fill="#071319" font-size="18" font-weight="800" text-anchor="middle">review</text>
+  </g>
+  <rect x="100" y="540" width="1000" height="68" rx="20" fill="#172A24" stroke="#29493F"/>
+  <text x="132" y="583" fill="#DFF9EF" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="750">Best outcome: fewer saved leads, stronger proof, clearer replies, cleaner follow-up.</text>
+</svg>

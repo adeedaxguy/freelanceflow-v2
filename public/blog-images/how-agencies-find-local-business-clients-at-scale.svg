@@ -1,0 +1,30 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Agency local business client pipeline</title>
+  <desc id="desc">An agency pipeline for finding local businesses, assigning owners, preparing offers, and reviewing outcomes.</desc>
+  <rect width="1200" height="720" rx="32" fill="#F7FBFF"/>
+  <rect x="64" y="58" width="1072" height="604" rx="30" fill="#FFFFFF" stroke="#D8E6F0" stroke-width="2"/>
+  <text x="104" y="128" fill="#101820" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="850">Agency local client pipeline</text>
+  <text x="104" y="168" fill="#60717D" font-family="Inter, Arial, sans-serif" font-size="22">Research by niche, assign owners, pitch from proof, and review weekly.</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="104" y="234" width="236" height="308" rx="24" fill="#EAF7FF" stroke="#B9E6FF"/>
+    <text x="136" y="294" fill="#075985" font-size="26" font-weight="850">Research</text>
+    <text x="136" y="340" fill="#3B6276" font-size="18">Niche, city, and signal</text>
+    <rect x="136" y="384" width="150" height="16" rx="8" fill="#38BDF8"/>
+    <rect x="136" y="424" width="110" height="16" rx="8" fill="#7DD3FC"/>
+    <rect x="382" y="234" width="236" height="308" rx="24" fill="#F0FDF4" stroke="#BBF7D0"/>
+    <text x="414" y="294" fill="#166534" font-size="26" font-weight="850">Assign</text>
+    <text x="414" y="340" fill="#426651" font-size="18">Owner and next action</text>
+    <rect x="414" y="384" width="168" height="16" rx="8" fill="#22C55E"/>
+    <rect x="414" y="424" width="118" height="16" rx="8" fill="#86EFAC"/>
+    <rect x="660" y="234" width="236" height="308" rx="24" fill="#FFF7ED" stroke="#FED7AA"/>
+    <text x="692" y="294" fill="#9A3412" font-size="26" font-weight="850">Pitch</text>
+    <text x="692" y="340" fill="#76513C" font-size="18">Proof-led message</text>
+    <rect x="692" y="384" width="158" height="16" rx="8" fill="#FB923C"/>
+    <rect x="692" y="424" width="128" height="16" rx="8" fill="#FDBA74"/>
+    <rect x="938" y="234" width="148" height="308" rx="24" fill="#F5F3FF" stroke="#DDD6FE"/>
+    <text x="972" y="294" fill="#5B21B6" font-size="26" font-weight="850">Win</text>
+    <text x="972" y="340" fill="#66567A" font-size="18">Review</text>
+    <circle cx="1012" cy="420" r="48" fill="#8B5CF6"/>
+    <path d="M992 421l14 14 28-34" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -43,6 +43,8 @@ const footerGroups = [
     title: "Workflows",
     links: [
       { label: "AI Proposals", href: "/features/ai-proposals" },
+      { label: "AI Website Builder", href: "/features/web-design-generator" },
+      { label: "Softphone", href: "/features/softphone" },
       { label: "CRM Pipeline", href: "/features/crm-pipeline" },
       { label: "Email Outreach", href: "/features/email-outreach" },
       { label: "Lead Calculator", href: "/tools/lead-calculator" },
@@ -81,6 +83,8 @@ const mobileFooterLinks = [
   { label: "Live jobs", href: "/use-cases/live-job-leads" },
   { label: "Decision makers", href: "/features/lead-discovery#capabilities" },
   { label: "Web design leads", href: "/lead-generation/web-design-leads" },
+  { label: "AI site builder", href: "/features/web-design-generator" },
+  { label: "Softphone", href: "/features/softphone" },
   { label: "Pricing", href: "/pricing" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "/contact" },

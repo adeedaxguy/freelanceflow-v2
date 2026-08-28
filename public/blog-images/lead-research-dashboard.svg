@@ -1,0 +1,35 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Lead research dashboard</title>
+  <desc id="desc">A dashboard view showing keyword intent, niche, buyer signal, and saved proof.</desc>
+  <rect width="1200" height="720" rx="32" fill="#F7FBF9"/>
+  <rect x="54" y="56" width="1092" height="608" rx="28" fill="#FFFFFF" stroke="#D8E5DF" stroke-width="2"/>
+  <text x="92" y="124" fill="#0F1A17" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="850">Lead research before outreach</text>
+  <text x="92" y="164" fill="#63736D" font-family="Inter, Arial, sans-serif" font-size="22">Every saved lead needs a niche, a signal, and proof.</text>
+  <rect x="92" y="222" width="326" height="356" rx="20" fill="#0E1F2A"/>
+  <text x="124" y="274" fill="#9AE66E" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">TARGET QUERY</text>
+  <text x="124" y="318" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="850">web design leads</text>
+  <rect x="124" y="360" width="242" height="46" rx="23" fill="#183642"/>
+  <text x="150" y="391" fill="#BFEAF2" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Buyer intent: high</text>
+  <rect x="124" y="430" width="198" height="46" rx="23" fill="#183642"/>
+  <text x="150" y="461" fill="#BFEAF2" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Niche: clinics</text>
+  <rect x="124" y="500" width="214" height="46" rx="23" fill="#183642"/>
+  <text x="150" y="531" fill="#BFEAF2" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Offer: redesign</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="466" y="222" width="292" height="158" rx="20" fill="#ECF7F4" stroke="#B7DCD4"/>
+    <text x="498" y="272" fill="#0F1A17" font-size="24" font-weight="850">Website gap</text>
+    <text x="498" y="314" fill="#576760" font-size="19">Mobile CTA hidden</text>
+    <rect x="498" y="336" width="202" height="14" rx="7" fill="#20B486"/>
+    <rect x="466" y="420" width="292" height="158" rx="20" fill="#FFF7DF" stroke="#E9CC7D"/>
+    <text x="498" y="470" fill="#0F1A17" font-size="24" font-weight="850">Contact route</text>
+    <text x="498" y="512" fill="#6F613C" font-size="19">Phone and form present</text>
+    <rect x="498" y="534" width="232" height="14" rx="7" fill="#FFD166"/>
+    <rect x="806" y="222" width="292" height="158" rx="20" fill="#F2EEFF" stroke="#CABBFF"/>
+    <text x="838" y="272" fill="#0F1A17" font-size="24" font-weight="850">Value signal</text>
+    <text x="838" y="314" fill="#625B79" font-size="19">Active service demand</text>
+    <rect x="838" y="336" width="214" height="14" rx="7" fill="#8D6BFF"/>
+    <rect x="806" y="420" width="292" height="158" rx="20" fill="#FFEFF4" stroke="#FFC1D4"/>
+    <text x="838" y="470" fill="#0F1A17" font-size="24" font-weight="850">Saved proof</text>
+    <text x="838" y="512" fill="#745865" font-size="19">Reason attached</text>
+    <rect x="838" y="534" width="180" height="14" rx="7" fill="#FF6B9A"/>
+  </g>
+</svg>

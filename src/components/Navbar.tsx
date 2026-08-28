@@ -9,6 +9,7 @@ import {
   Building2,
   ChevronDown,
   Menu,
+  PhoneCall,
   Radio,
   Sparkles,
   UserRoundSearch,
@@ -54,6 +55,20 @@ const productLinks = [
     href: "/features/ai-proposals",
     icon: Sparkles,
     tone: "text-primary-light bg-primary/10",
+  },
+  {
+    label: "AI website builder",
+    description: "Create prompt-based concepts for web design leads.",
+    href: "/features/web-design-generator",
+    icon: Sparkles,
+    tone: "text-cyan-300 bg-cyan-500/10",
+  },
+  {
+    label: "Softphone",
+    description: "Call qualified leads from a dedicated business number.",
+    href: "/features/softphone",
+    icon: PhoneCall,
+    tone: "text-accent bg-accent/10",
   },
 ] as const;
 
@@ -217,7 +232,7 @@ export default function Navbar() {
         <div className="border-t border-border bg-background px-4 py-4 shadow-xl lg:hidden">
           <div className="mx-auto max-w-7xl space-y-1">
             <p className="px-3 pb-2 text-xs font-bold uppercase text-muted-foreground">Lead engines</p>
-            {productLinks.slice(0, 3).map(({ label, href, icon: Icon }) => (
+            {productLinks.map(({ label, href, icon: Icon }) => (
               <Link key={label} href={href} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary">
                 <Icon className="h-4 w-4 text-primary-light" />
                 {label}
