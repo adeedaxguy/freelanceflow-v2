@@ -98,8 +98,8 @@ const GENERIC_LEAD_WORKFLOW_VISUALS = (post: BlogArticleSource) => {
 const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
   title: "Turn this search into a 21-day client sprint",
   summary:
-    "Use this guide as a focused 21-day sprint: choose one market, run a local-business or hiring-led search, save only qualified leads with proof, then generate a proposal and follow-up from one workflow.",
-  ctaLabel: "Run a free lead search",
+    "Use this guide as a focused 21-day sprint: choose one market, use the free lead allowance, save only qualified leads with proof, then generate a proposal and follow-up from one workflow.",
+  ctaLabel: "Start with 600 leads free",
   proofNote:
     "Built for searchers who want a working client system, not generic advice. Start with one focused search, a saved proof note, and a reviewed pitch path that can keep moving for the next 30 days.",
   steps: [
@@ -333,14 +333,14 @@ export function BlogConversionPanel({ post }: { post: BlogArticleSource }) {
           </div>
           <h2 className="text-2xl font-bold text-foreground">Turn the article into a lead workflow</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Use the idea from this guide to find prospects, save only the best opportunities, prepare a specific pitch, and keep the follow-up attached to the original lead.
+            Use the idea from this guide to find prospects, save only the best opportunities, prepare a specific pitch, and keep the follow-up attached to the original lead. Free users can start with 600 lead searches, then use the first saved lead as the test.
           </p>
         </div>
         <Link
           href={`/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=blog-conversion-panel`}
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
         >
-          Run a free lead search
+          Start free with 600 leads
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

@@ -180,7 +180,7 @@ Free leads for freelancers work when the process is disciplined. Use the 600 wee
     id: "google-maps-listing-pitch-examples-for-freelancers",
     title: "Google Maps Listing Pitch Examples for Freelancers: Turn Local Profiles Into Better Outreach",
     slug: "google-maps-listing-pitch-examples-for-freelancers",
-    excerpt: "Use Google Maps listing signals to write better freelance outreach, qualify local business leads, and connect map profiles to website, SEO, or landing-page offers.",
+    excerpt: "Use Google Maps listing signals to write better freelance outreach, qualify local business leads, search 600 free weekly leads, and connect map profiles to website, SEO, or landing-page offers.",
     content: `Google Maps leads for freelancers are useful because the buyer signal is visible.
 
 You can see the business category, reviews, photos, phone route, website link, and sometimes the exact gap that makes your service relevant. That is why Google Maps prospecting keeps showing up in freelancer and agency searches. The local profile gives you context before you ever write the first message.
@@ -282,7 +282,7 @@ Google Maps listing pitch examples work when they are tied to real public eviden
     createdAt: publishedAt(6, 10),
     updatedAt: publishedAt(6, 10),
     metaTitle: "Google Maps Listing Pitch Examples for Freelancers",
-    metaDescription: "Use Google Maps listing pitch examples to turn local profile signals into better web design, SEO, copywriting, and automation outreach.",
+    metaDescription: "Use Google Maps listing pitch examples to qualify local business leads, search 600 free weekly leads, and write better web design or SEO outreach.",
     author: "iCloseLeads Team",
     tags: ["Google Maps leads for freelancers", "Google Maps listing pitch", "local business leads", "web design leads"],
     focusKeyword: "Google Maps leads for freelancers",

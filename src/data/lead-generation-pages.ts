@@ -39,17 +39,17 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "web-design-leads",
     path: "/lead-generation/web-design-leads",
     primaryKeyword: "web design leads",
-    metaTitle: "Web Design Leads for Freelancers | Free Local Leads and Website-Gap Prospects",
+    metaTitle: "Web Design Leads for Freelancers | Search 600 Leads Free",
     metaDescription:
-      "Find web design leads for free from local businesses, weak websites, businesses without websites, and remote hiring signals. Start free with iCloseLeads.",
+      "Find web design leads for free from local businesses, weak websites, businesses without websites, and remote hiring signals. Search 600 leads free with iCloseLeads.",
     eyebrow: "Web Design Leads",
     title: "Find web design leads",
     accentTitle: "with a real reason to pitch today",
     summary:
-      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals.",
+      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals. Start with 600 free lead searches before buying any list.",
     directAnswer:
-      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads brings those signals into one workflow so you can search, save, draft, and follow up.",
-    primaryCta: "Find Web Design Leads Free",
+      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads lets free users start with 600 lead searches and keeps those signals in one workflow so you can search, save, draft, and follow up.",
+    primaryCta: "Search 600 Leads Free",
     secondaryCta: "See local lead workflow",
     dashboardPath: "/dashboard/local-leads",
     audience:
@@ -57,6 +57,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A focused first search that produces website prospects with context, pitch angles, and a next action.",
     proofPoints: [
+      "Free users can start with 600 lead searches before buying a list or upgrading.",
       "Search local businesses by city and website status.",
       "Use remote job signals when companies are hiring for website, design, or marketing work.",
       "Move high-fit leads into AI proposals, owner checks, and CRM follow-up.",
@@ -103,7 +104,9 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     internalLinks: [
       { label: "Local Business Leads", href: "/lead-generation/local-business-leads", description: "Find businesses by city, category, website status, and phone signals." },
       { label: "Web design leads for free vs verified", href: "/resources/web-design-leads-for-free-vs-verified", description: "Compare free research with a safer verified workflow before you pitch." },
+      { label: "AI Website Builder", href: "/features/web-design-generator", description: "Create a visual website concept from the prospect's niche and pitch context." },
       { label: "AI Proposals", href: "/features/ai-proposals", description: "Turn a lead signal into a draft you can edit before sending." },
+      { label: "Softphone Calling", href: "/features/softphone", description: "Buy a US, Canada, or UK number package and call qualified prospects when phone outreach fits." },
     ],
     faqs: [
       {
@@ -116,7 +119,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       },
       {
         q: "Can I get web design leads for free?",
-        a: "Yes. A free workflow can work when you start with local business profiles, website gaps, and public hiring signals, then verify the context before you pitch. iCloseLeads is built to help you keep that verified context attached to the lead.",
+        a: "Yes. Free users can start with 600 lead searches. The best workflow is to focus those searches on one niche, verify the business context, save only pitchable prospects, and then draft outreach from the visible website gap.",
       },
       {
         q: "Is this only for web designers?",

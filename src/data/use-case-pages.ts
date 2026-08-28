@@ -283,9 +283,11 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "Find local business leads for web designers, SEO consultants, and marketers using website gaps, Google Maps listing signals, phone numbers, and owner or manager paths.",
     keywords: [
       "local business leads",
+      "free local business leads",
       "local business leads for web designers",
       "web design leads",
       "web design leads for free",
+      "600 free leads per week",
       "leads for web design",
       "exclusive web design leads",
       "businesses without websites",
@@ -301,7 +303,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Find local business leads that already show a reason to pitch: no website, outdated site, weak Google Maps-to-website flow, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into signup, a real local lead search, proposal drafting, and saved-lead follow-up without losing context or bouncing between tools.",
-    primaryCta: "Search Local Leads Free",
+    primaryCta: "Search 600 Local Leads Free",
     secondaryCta: "See Google Maps Pitch Workflow",
     dashboardPath: "/dashboard/local-leads",
     searchIntent:
@@ -323,9 +325,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     workflow: [
       {
-        title: "Pick a city, service category, and 21-day batch",
+        title: "Pick a city, service category, and 600-lead batch",
         description:
-          "Search practical categories like dentist, plumber, cleaning service, gym, salon, roofer, accountant, or restaurant.",
+          "Use the free allowance on practical categories like dentist, plumber, cleaning service, gym, salon, roofer, accountant, or restaurant.",
       },
       {
         title: "Filter by website opportunity",
@@ -351,6 +353,8 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     keywordsCluster: [
       { group: "Core", terms: ["local business leads", "small business leads", "local client leads"] },
       { group: "Web design", terms: ["businesses without websites", "outdated website leads", "find web design clients"] },
+      { group: "Free offer", terms: ["free local business leads", "600 free leads per week", "web design leads free"] },
+      { group: "Google Maps pitch", terms: ["the pitch google maps listing", "Google Maps listing pitch", "Google Maps prospecting tool"] },
       { group: "Decision makers", terms: ["business owner name finder", "find business owner contact", "decision maker finder for local business"] },
       { group: "Marketing", terms: ["local SEO client leads", "lead generation for local marketing agencies", "website redesign leads"] },
     ],

@@ -97,11 +97,28 @@ function SectionHeader({
 
 export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }) {
   const otherUseCases = USE_CASE_PAGES.filter(item => item.slug !== page.slug);
-  const shortAnswer = `${page.title} work best when you start from a real buyer signal, qualify the fit quickly, and move the best lead into a proposal and follow-up workflow. iCloseLeads gives freelancers one place to search, save, draft, and track that process.`;
+  const isLocalBusinessLeads = page.slug === "local-business-leads";
+  const shortAnswer = isLocalBusinessLeads
+    ? "Local business leads work best when you turn one public signal into one useful next step: a website gap, Google Maps listing issue, missing booking path, or weak local page. iCloseLeads lets free users start with 600 lead searches, save the strongest prospects, and move them into a pitch and follow-up workflow."
+    : `${page.title} work best when you start from a real buyer signal, qualify the fit quickly, and move the best lead into a proposal and follow-up workflow. iCloseLeads gives freelancers one place to search, save, draft, and track that process.`;
   const kickoffSteps = [
     `Open ${page.title.toLowerCase()} inside iCloseLeads and search one niche instead of broad prospecting.`,
     "Save only the leads you can explain in a sentence while the source context is still visible.",
     "Turn the best lead into a proposal draft or Gmail-ready follow-up before the timing advantage disappears.",
+  ];
+  const boostSteps = [
+    {
+      title: "Search 600 leads with one niche",
+      detail: "Pick one city and one buyer type so every result can be judged against the same website, booking, or local SEO gap.",
+    },
+    {
+      title: "Save the Google Maps proof",
+      detail: "Keep the listing, phone route, website status, and pitch reason together before opening a proposal.",
+    },
+    {
+      title: "Turn the signal into signup",
+      detail: "Start free, run the first local search, then use the saved lead as the reason to draft outreach instead of leaving with theory.",
+    },
   ];
 
   return (
@@ -194,6 +211,44 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
             </div>
           </div>
         </section>
+
+        {isLocalBusinessLeads && (
+          <section className="border-b border-border bg-accent/5 px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">GSC boost path</p>
+                <h2 className="mt-3 break-words text-3xl font-extrabold text-foreground">Start with the local searches people are already finding</h2>
+                <p className="mt-4 text-base leading-7 text-muted-foreground">
+                  Search Console is already showing interest around local business leads and Google Maps pitch language. This page now gives that visitor a simpler path: search free, save one qualified business, and build the first pitch from the public signal.
+                </p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href={signupHref(page, "gsc-local-business-boost")}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-bold text-background transition-all hover:bg-accent/90"
+                  >
+                    Start free with 600 leads
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/resources/google-maps-listing-pitch-for-freelancers"
+                    className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-6 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Open Google Maps pitch guide
+                  </Link>
+                </div>
+              </div>
+              <div className="grid gap-3">
+                {boostSteps.map((step, index) => (
+                  <div key={step.title} className="rounded-lg border border-border bg-background/75 p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary-light">Step {index + 1}</p>
+                    <h3 className="mt-2 text-base font-bold text-foreground">{step.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.9fr_1.1fr]">

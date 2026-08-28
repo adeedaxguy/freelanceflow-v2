@@ -117,6 +117,7 @@ function SectionHeader({
 export default function LeadGenerationMarketingPage({ page }: { page: LeadGenerationPageData }) {
   const relatedPages = LEAD_GENERATION_PAGES.filter(item => item.slug !== page.slug).slice(0, 3);
   const workflowIcons = [Search, Target, FileText, Layers];
+  const isWebDesignLeads = page.slug === "web-design-leads";
 
   return (
     <div className="marketing-shell min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -220,6 +221,47 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
             ))}
           </div>
         </section>
+
+        {isWebDesignLeads && (
+          <section className="border-y border-border bg-primary/5 px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary-light">From search to signup</p>
+                <h2 className="mt-3 break-words text-3xl font-extrabold text-foreground">Use the free allowance before buying a lead list</h2>
+                <p className="mt-4 text-base leading-7 text-muted-foreground">
+                  GSC is already showing commercial searches like web design leads, web design leads free, and web design leads for sale. This page now pushes that intent into a safer first action: search 600 free lead results, qualify the business gap, and only pitch the prospects with proof.
+                </p>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href={signupHref(page, "gsc-web-design-leads-boost")}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
+                  >
+                    Search 600 leads free
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    href="/features/web-design-generator"
+                    className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-6 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Build a website concept
+                  </Link>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                  ["Find", "Search one niche and city for businesses with no website, weak mobile UX, or unclear booking paths."],
+                  ["Qualify", "Save only leads where the pitch can mention a real public signal."],
+                  ["Pitch", "Use the AI proposal, web design generator, and CRM follow-up to turn the lead into a next step."],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-lg border border-border bg-background p-5">
+                    <p className="text-sm font-bold text-primary-light">{label}</p>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="border-y border-border bg-surface/35 px-4 py-20 sm:px-6 lg:px-8">
           <SectionHeader
