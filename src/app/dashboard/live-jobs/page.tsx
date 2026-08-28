@@ -14,6 +14,7 @@ import { AppliedButton, AppliedReturnPrompt, useLeadApplications } from "@/compo
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { LeadResultsAd } from "@/components/AdSenseUnit";
+import { DASHBOARD_SEARCH_CACHE_KEYS, prepareDashboardSearchCache } from "@/lib/dashboard-search-cache";
 
 const LIVE_NICHES = [
   "web-development","mobile-apps","ui-ux-design","data-science",
@@ -38,7 +39,7 @@ const COOLDOWN_MS  = 2 * 60 * 1000;
 const COOLDOWN_KEY = "ff_live_last_search";
 const SEEN_KEY     = "ff_seen_lead_ids";
 const PREFS_KEY    = "ff_best_match_prefs";
-const SS_LIVE_KEY  = "ff_ss_live_results";
+const SS_LIVE_KEY  = DASHBOARD_SEARCH_CACHE_KEYS.live;
 
 interface BestMatchPrefs {
   minConfidence: number;
@@ -254,13 +255,7 @@ export default function LiveJobsPage() {
 
   useEffect(() => {
     try {
-      // Clear stale lead caches on schema changes
-      if (sessionStorage.getItem("icl_cache_v") !== "4") {
-        sessionStorage.removeItem("ff_ss_live_results");
-        sessionStorage.removeItem("ff_ss_remote_results");
-        sessionStorage.removeItem("ff_ss_local_results");
-        sessionStorage.setItem("icl_cache_v", "4");
-      }
+      prepareDashboardSearchCache(sessionStorage);
       const p = localStorage.getItem(PREFS_KEY);
       if (p) setPrefs(JSON.parse(p) as BestMatchPrefs);
       const s = localStorage.getItem(SEEN_KEY);

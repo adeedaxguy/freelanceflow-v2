@@ -1,7 +1,7 @@
 "use client";
 
 import type { ElementType } from "react";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -15,6 +15,7 @@ import {
   FileText,
   Image as ImageIcon,
   LayoutTemplate,
+  Loader2,
   MapPin,
   Moon,
   Palette,
@@ -78,6 +79,10 @@ type BuilderStep = {
   title: string;
   description: string;
   icon: ElementType;
+};
+
+type WebDesignDraftCache = DesignOptions & {
+  activeStep: number;
 };
 
 const BUILDER_STEPS: BuilderStep[] = [
@@ -406,8 +411,10 @@ function VariationPicker({
 
 function WebDesignBuilderContent() {
   const searchParams = useSearchParams();
+  const incomingSearch = searchParams.toString();
   const [copied, setCopied] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [shareError, setShareError] = useState("");
   const [activeStep, setActiveStep] = useState(0);
 
   const data = useMemo<DraftData>(() => ({
@@ -446,6 +453,69 @@ function WebDesignBuilderContent() {
     const value = clean(searchParams.get("accent"));
     return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
   });
+  const [draftReady, setDraftReady] = useState(false);
+  const draftStorageKey = useMemo(
+    () => `ff_web_design_draft:${[data.company, data.location, data.phone].join("|").toLowerCase()}`,
+    [data.company, data.location, data.phone]
+  );
+
+  useEffect(() => {
+    setDraftReady(false);
+    const params = new URLSearchParams(incomingSearch);
+    const defaultVariation = resolveDesignVariation({
+      variationId: clean(params.get("variation")),
+      prompt: cleanPrompt(params.get("prompt")),
+      company: data.company,
+      category: data.category,
+      location: data.location,
+    });
+    const defaultPatch = variationToOptionPatch(defaultVariation);
+    const hasExplicitRecipe = [
+      "style", "theme", "sections", "images", "contentDepth", "conversionGoal",
+      "layout", "prompt", "variation", "headline", "subheadline", "cta", "accent",
+    ].some(key => params.has(key));
+
+    let cached: WebDesignDraftCache | null = null;
+    if (!hasExplicitRecipe) {
+      try {
+        const raw = sessionStorage.getItem(draftStorageKey);
+        if (raw) cached = JSON.parse(raw) as WebDesignDraftCache;
+      } catch {}
+    }
+
+    const source = cached ?? {
+      activeStep: 0,
+      style: params.get("style") || defaultPatch.style,
+      theme: params.get("theme") || defaultPatch.theme,
+      sections: params.get("sections") || defaultPatch.sections,
+      images: params.get("images") || defaultPatch.images,
+      contentDepth: params.get("contentDepth") || defaultPatch.contentDepth,
+      conversionGoal: params.get("conversionGoal") || defaultPatch.conversionGoal,
+      layout: params.get("layout") || defaultPatch.layout,
+      prompt: params.get("prompt") || "",
+      variation: params.get("variation") || defaultVariation.id,
+      headline: params.get("headline") || "",
+      subheadline: params.get("subheadline") || "",
+      cta: params.get("cta") || "",
+      accent: params.get("accent") || "",
+    };
+
+    setActiveStep(Number.isInteger(source.activeStep) && source.activeStep >= 0 && source.activeStep < BUILDER_STEPS.length ? source.activeStep : 0);
+    setStyle(optionValue(source.style, STYLE_OPTIONS, defaultPatch.style));
+    setTheme(optionValue(source.theme, THEME_OPTIONS, defaultPatch.theme));
+    setSections(optionValue(source.sections, SECTION_OPTIONS, defaultPatch.sections));
+    setImages(optionValue(source.images, IMAGE_OPTIONS, defaultPatch.images));
+    setContentDepth(optionValue(source.contentDepth, CONTENT_OPTIONS, defaultPatch.contentDepth));
+    setConversionGoal(optionValue(source.conversionGoal, GOAL_OPTIONS, defaultPatch.conversionGoal));
+    setLayout(optionValue(source.layout, LAYOUT_OPTIONS, defaultPatch.layout));
+    setDesignPrompt(promptInputValue(source.prompt));
+    setVariation(resolveDesignVariation({ variationId: clean(source.variation), company: data.company, category: data.category, location: data.location }).id);
+    setHeadline(clean(source.headline));
+    setSubheadline(clean(source.subheadline));
+    setCta(clean(source.cta));
+    setAccent(/^#[0-9a-f]{6}$/i.test(source.accent) ? source.accent : "");
+    setDraftReady(true);
+  }, [data.category, data.company, data.location, draftStorageKey, incomingSearch]);
 
   const options = useMemo<DesignOptions>(() => ({
     style,
@@ -462,6 +532,13 @@ function WebDesignBuilderContent() {
     cta,
     accent,
   }), [accent, contentDepth, conversionGoal, cta, designPrompt, headline, images, layout, sections, style, subheadline, theme, variation]);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    try {
+      sessionStorage.setItem(draftStorageKey, JSON.stringify({ ...options, activeStep } satisfies WebDesignDraftCache));
+    } catch {}
+  }, [activeStep, draftReady, draftStorageKey, options]);
 
   const previewHref = `/site-preview?${buildPreviewSearch(data, options)}`;
   const clientPreviewHref = `${previewHref}&client=1`;
@@ -506,10 +583,13 @@ function WebDesignBuilderContent() {
     niche: "web-development",
     leadType: "local-business",
     url: data.maps || data.website,
+    returnTo: `/dashboard/web-design?${buildPreviewSearch(data, options)}`,
+    returnLabel: "Web Design",
   }).toString()}`;
 
   async function copyPreviewLink() {
     setSharing(true);
+    setShareError("");
     try {
       let absoluteUrl = `${window.location.origin}${clientPreviewHref}`;
       const response = await fetch("/api/site-preview/share", {
@@ -526,6 +606,8 @@ function WebDesignBuilderContent() {
       await copyText(absoluteUrl);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setShareError("Could not create the client link. Please try again.");
     } finally {
       setSharing(false);
     }
@@ -618,9 +700,10 @@ function WebDesignBuilderContent() {
               disabled={sharing}
               className="inline-flex items-center gap-2 rounded-xl bg-gradient-hero px-4 py-2 text-sm font-bold text-white shadow-glow transition hover:opacity-90"
             >
-              {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {sharing ? <Loader2 className="h-4 w-4 animate-spin" /> : copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {sharing ? "Creating link..." : copied ? "Client link copied" : "Share with client"}
             </button>
+            {shareError && <p className="basis-full text-sm font-medium text-destructive" role="alert">{shareError}</p>}
           </div>
         </div>
 
@@ -1125,7 +1208,7 @@ function WebDesignBuilderContent() {
 
 export default function WebDesignPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background p-6 text-foreground">Loading web design studio...</div>}>
+    <Suspense fallback={<div className="grid min-h-[420px] place-items-center bg-background p-6 text-foreground" role="status"><div className="flex items-center gap-3"><Loader2 className="h-6 w-6 animate-spin text-primary-light" /><span className="font-semibold">Loading web design studio...</span></div></div>}>
       <WebDesignBuilderContent />
     </Suspense>
   );

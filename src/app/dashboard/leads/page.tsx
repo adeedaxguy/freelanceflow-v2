@@ -18,6 +18,7 @@ import { NICHES } from "@/types";
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { LeadResultsAd } from "@/components/AdSenseUnit";
+import { DASHBOARD_SEARCH_CACHE_KEYS, prepareDashboardSearchCache } from "@/lib/dashboard-search-cache";
 
 const HOUR_OPTIONS = [
   { label: "12h", value: 12 },
@@ -39,6 +40,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const SEARCH_COOLDOWN_SECS = 30;
 const FORCE_COOLDOWN_SECS  = 180;
 const PAGE_SIZE = 20;
+const SS_REMOTE_KEY = DASHBOARD_SEARCH_CACHE_KEYS.remote;
 
 interface UsageStats {
   plan: string;
@@ -80,6 +82,27 @@ interface ContactInfo {
   title: string;
   url: string;
   lead: AggregatedLead;
+}
+
+interface RemoteLeadsCache {
+  leads?: AggregatedLead[];
+  niches?: string[];
+  maxHours?: number;
+  keyword?: string;
+  forMe?: boolean;
+  minMatch?: number;
+  hasEmail?: boolean;
+  hasBudget?: boolean;
+  usage?: UsageStats | null;
+  fetchedAt?: string;
+  savedIds?: string[];
+  searched?: boolean;
+  page?: number;
+  activeTab?: "leads" | "contacts";
+  diagnostics?: SearchDiagnostics | null;
+  selectedSources?: LeadSource[];
+  sortBy?: SortOption;
+  nicheFilter?: string | null;
 }
 
 // ── Cooldown formatter ────────────────────────────────────────────────────────
@@ -293,6 +316,7 @@ export default function LeadsPage() {
   const [expandedIds,     setExpandedIds]    = useState<Set<string>>(new Set());
   const [searchCooldown,  setSearchCooldown] = useState(0);
   const [forceCooldown,   setForceCooldown]  = useState(0);
+  const [cacheReady,      setCacheReady]      = useState(false);
 
   const resultsTopRef = useRef<HTMLDivElement>(null);
   const {
@@ -305,6 +329,62 @@ export default function LeadsPage() {
     closePrompt,
     confirmPromptApplied,
   } = useLeadApplications(leads.map(lead => ({ title: lead.title, url: lead.url })));
+
+  useEffect(() => {
+    try {
+      prepareDashboardSearchCache(sessionStorage);
+      const cached = sessionStorage.getItem(SS_REMOTE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as RemoteLeadsCache;
+        if (Array.isArray(parsed.leads)) setLeads(parsed.leads);
+        if (Array.isArray(parsed.niches)) setNiches(parsed.niches);
+        if (HOUR_OPTIONS.some(option => option.value === parsed.maxHours)) setMaxHours(parsed.maxHours!);
+        if (typeof parsed.keyword === "string") setKeyword(parsed.keyword);
+        setForMe(Boolean(parsed.forMe));
+        if (typeof parsed.minMatch === "number") setMinMatch(parsed.minMatch);
+        setHasEmail(Boolean(parsed.hasEmail));
+        setHasBudget(Boolean(parsed.hasBudget));
+        setUsage(parsed.usage ?? null);
+        if (typeof parsed.fetchedAt === "string") setFetchedAt(parsed.fetchedAt);
+        if (Array.isArray(parsed.savedIds)) setSavedIds(new Set(parsed.savedIds));
+        setSearched(Boolean(parsed.searched));
+        if (typeof parsed.page === "number" && parsed.page > 0) setPage(parsed.page);
+        if (parsed.activeTab === "contacts") setActiveTab("contacts");
+        setDiagnostics(parsed.diagnostics ?? null);
+        if (Array.isArray(parsed.selectedSources)) setSelectedSources(parsed.selectedSources);
+        if (parsed.sortBy && SORT_OPTIONS.some(option => option.value === parsed.sortBy)) setSortBy(parsed.sortBy);
+        if (typeof parsed.nicheFilter === "string" || parsed.nicheFilter === null) setNicheFilter(parsed.nicheFilter);
+      }
+    } catch {}
+    setCacheReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!cacheReady) return;
+    try {
+      const payload: RemoteLeadsCache = {
+        leads,
+        niches,
+        maxHours,
+        keyword,
+        forMe,
+        minMatch,
+        hasEmail,
+        hasBudget,
+        usage,
+        fetchedAt,
+        savedIds: [...savedIds],
+        searched,
+        page,
+        activeTab,
+        diagnostics,
+        selectedSources,
+        sortBy,
+        nicheFilter,
+      };
+      sessionStorage.setItem(SS_REMOTE_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [activeTab, cacheReady, diagnostics, fetchedAt, forMe, hasBudget, hasEmail, keyword, leads, maxHours, minMatch, nicheFilter, niches, page, savedIds, searched, selectedSources, sortBy, usage]);
 
   // Cooldown tickers
   useEffect(() => {

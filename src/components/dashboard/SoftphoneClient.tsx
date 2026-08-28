@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { Call, Device as VoiceDevice } from "@twilio/voice-sdk";
 import {
   AlertTriangle,
+  ArrowLeft,
   ArrowDownLeft,
   ArrowUpRight,
   Bot,
@@ -213,6 +215,11 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
   const [campaignContext, setCampaignContext] = useState("");
   const [consentBasis, setConsentBasis] = useState("");
   const [consentConfirmed, setConsentConfirmed] = useState(false);
+  const requestedReturnTo = searchParams.get("returnTo") || "";
+  const returnTo = requestedReturnTo.startsWith("/dashboard/") && !requestedReturnTo.startsWith("//")
+    ? requestedReturnTo
+    : "";
+  const sourceCompany = searchParams.get("company")?.trim().slice(0, 120) || "";
 
   const refresh = useCallback(async () => {
     const data = await api();
@@ -474,7 +481,17 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
     else setPhone(value => value + key);
   }
 
-  if (loading) return <div className="p-6 lg:p-8"><div className="h-72 rounded-lg border border-border bg-card animate-pulse" /></div>;
+  if (loading) return (
+    <div className="grid min-h-[420px] place-items-center p-6 lg:p-8" role="status" aria-live="polite">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <Loader2 className="h-7 w-7 animate-spin text-primary-light" />
+        <div>
+          <p className="font-semibold text-foreground">Loading your softphone</p>
+          <p className="mt-1 text-sm text-muted-foreground">Checking your number, minutes, and recent calls.</p>
+        </div>
+      </div>
+    </div>
+  );
   const canPlaceOutboundCall = Boolean(minutes?.canCall);
   const minuteLabel = minutes?.unlimited
     ? "Unlimited test minutes"
@@ -487,11 +504,19 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
+          {returnTo && (
+            <Link href={returnTo} className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-primary-light transition hover:text-primary">
+              <ArrowLeft className="h-4 w-4" /> Back to local results
+            </Link>
+          )}
           <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-accent">
             <ShieldCheck className="h-4 w-4" /> {isAdmin ? "Admin beta" : "Softphone"}
           </div>
           <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Softphone</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Buy a dedicated business number, call leads inside iCloseLeads, receive callbacks, and keep a clean activity history.</p>
+          {sourceCompany && phone && (
+            <p className="mt-2 text-sm font-medium text-foreground">Ready for {sourceCompany}: <span className="font-mono text-accent">{phone}</span></p>
+          )}
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm">
           <span className={`h-2 w-2 rounded-full ${deviceState === "Ready" || deviceState === "Connected" ? "bg-accent" : "bg-muted-foreground"}`} />

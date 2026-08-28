@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   AlertCircle,
+  ArrowLeft,
   Building2,
   ExternalLink,
   Globe,
@@ -478,6 +479,7 @@ function DecisionMakerFinderInner() {
   const initialCountry = inferCountryFromParams(params.get("country"), initialLocation);
   const hasPrefillParams = Boolean(initialCompany || initialDomain || initialProfileUrl || initialLocation || params.get("country"));
   const shouldAutoRunFromLocalLeads = params.get("source") === "local-leads" && params.get("autoRun") === "1";
+  const returnToLocalLeads = params.get("source") === "local-leads";
 
   const [company, setCompany] = useState(initialCompany);
   const [domain, setDomain] = useState(normalizeCompanyDomain(initialDomain));
@@ -603,6 +605,11 @@ function DecisionMakerFinderInner() {
     <div className="space-y-6 p-4 pb-24 sm:p-6 lg:p-8">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div className="max-w-3xl">
+          {returnToLocalLeads && (
+            <Link href="/dashboard/local-leads#local-lead-results" className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-primary-light transition hover:text-primary">
+              <ArrowLeft className="h-4 w-4" /> Back to local results
+            </Link>
+          )}
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary-light">
             <Shield className="h-3.5 w-3.5" />
             Agency intelligence
@@ -631,7 +638,8 @@ function DecisionMakerFinderInner() {
       </div>
 
       {!usageLoaded ? (
-        <div className="rounded-2xl border border-border bg-surface p-5 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-5 text-sm text-muted-foreground" role="status" aria-live="polite">
+          <Loader2 className="h-4 w-4 animate-spin text-primary-light" />
           Checking your account access...
         </div>
       ) : !canUseFinder ? (

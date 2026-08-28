@@ -65,6 +65,11 @@ function NewProposalInner() {
   const niche       = params.get("niche") ?? "";
   const emailParam  = params.get("email") ?? "";
   const leadType    = params.get("leadType") ?? "";
+  const requestedReturnTo = params.get("returnTo") ?? "";
+  const returnTo = requestedReturnTo.startsWith("/dashboard/") && !requestedReturnTo.startsWith("//")
+    ? requestedReturnTo
+    : "";
+  const returnLabel = (params.get("returnLabel") ?? "").slice(0, 40);
 
   const hasEmail = emailParam.length > 0;
   const isLocalBusinessLead = leadType === "local-business";
@@ -195,7 +200,8 @@ function NewProposalInner() {
     <div className="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8 space-y-5 pb-10">
       {/* Header */}
       <div className="flex items-start gap-4">
-        <Link href={isLocalBusinessLead ? "/dashboard/local-leads" : "/dashboard/leads"}
+        <Link href={returnTo || (isLocalBusinessLead ? "/dashboard/local-leads#local-lead-results" : "/dashboard/leads")}
+          aria-label={`Back to ${returnLabel || (isLocalBusinessLead ? "local results" : "remote jobs")}`}
           className="mt-1 p-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all flex-shrink-0">
           <ArrowLeft className="w-4 h-4" />
         </Link>

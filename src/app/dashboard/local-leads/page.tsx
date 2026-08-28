@@ -17,12 +17,13 @@ import { getPhoneTypeInfo, getPhoneTypeTone, type PhoneLineType } from "@/lib/ph
 import { copyText } from "@/lib/clipboard";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { LeadResultsAd } from "@/components/AdSenseUnit";
+import { DASHBOARD_SEARCH_CACHE_KEYS, prepareDashboardSearchCache } from "@/lib/dashboard-search-cache";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const ITEMS_PER_PAGE       = 10;
 const FREE_PLAN_LIMIT      = 600;
 const LOCAL_YELP_KEY_KEY   = "ff_yelp_api_key";
-const SS_LOCAL_KEY         = "ff_ss_local_results";
+const SS_LOCAL_KEY         = DASHBOARD_SEARCH_CACHE_KEYS.local;
 const LOCAL_FSQ_KEY_KEY    = "ff_foursquare_api_key";
 const LOCAL_SEARCH_TIMEOUT_MS = 45_000;
 
@@ -716,7 +717,11 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
   if (proposalDomain) siteBuilderParams.set("domain", proposalDomain);
   const siteBuilderHref = `/dashboard/web-design?${siteBuilderParams.toString()}`;
   const softphoneHref = lead.phone
-    ? `/dashboard/softphone?phone=${encodeURIComponent(lead.phone)}`
+    ? `/dashboard/softphone?${new URLSearchParams({
+        phone: lead.phone,
+        company: lead.name,
+        returnTo: "/dashboard/local-leads#local-lead-results",
+      }).toString()}`
     : "/dashboard/softphone";
 
   return (
@@ -776,7 +781,20 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
             {lead.phone ? (
               <div className="flex items-center gap-1.5 text-sm flex-wrap">
                 <Phone className="w-3.5 h-3.5 flex-shrink-0 text-accent"/>
-                <a href={`tel:${lead.phone}`} className="text-accent font-mono font-semibold hover:underline">{lead.phone}</a>
+                {canUseSoftphone ? (
+                  <Link
+                    href={softphoneHref}
+                    title="Call this business with the iCloseLeads softphone"
+                    className="group/phone relative text-accent font-mono font-semibold underline decoration-accent/30 underline-offset-4 hover:decoration-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                  >
+                    {lead.phone}
+                    <span role="tooltip" className="pointer-events-none absolute bottom-full left-0 z-20 mb-2 w-max max-w-56 rounded-md border border-border bg-card px-2.5 py-1.5 font-sans text-xs font-semibold text-foreground opacity-0 shadow-xl transition-opacity group-hover/phone:opacity-100 group-focus-visible/phone:opacity-100">
+                      Call with iCloseLeads softphone
+                    </span>
+                  </Link>
+                ) : (
+                  <a href={`tel:${lead.phone}`} className="text-accent font-mono font-semibold hover:underline">{lead.phone}</a>
+                )}
                 <span
                   className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPhoneTypeTone(phoneType.type)}`}
                   title={`${phoneType.label}${phoneType.confidence === "low" ? " — carrier lookup is needed to verify mobile vs landline." : ""}`}
@@ -1004,6 +1022,7 @@ export default function LocalLeadsPage() {
   const [minRating,      setMinRating]      = useState(0);
   const [showFilters,    setShowFilters]    = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const restoredHashRef = useRef(false);
 
   const syncUsage = useCallback((usage: UsageStats | null) => {
     if (!usage) return;
@@ -1021,12 +1040,7 @@ export default function LocalLeadsPage() {
     if (sessionStatus === "loading") return;
     // Clear stale lead caches on schema changes
     try {
-      if (sessionStorage.getItem("icl_cache_v") !== "7") {
-        sessionStorage.removeItem("ff_ss_live_results");
-        sessionStorage.removeItem("ff_ss_remote_results");
-        sessionStorage.removeItem("ff_ss_local_results");
-        sessionStorage.setItem("icl_cache_v", "7");
-      }
+      prepareDashboardSearchCache(sessionStorage);
     } catch {}
     setYelpKey(localStorage.getItem(LOCAL_YELP_KEY_KEY) ?? "");
     setFsqKey(localStorage.getItem(LOCAL_FSQ_KEY_KEY)   ?? "");
@@ -1076,6 +1090,12 @@ export default function LocalLeadsPage() {
       sessionStorage.setItem(SS_LOCAL_KEY, JSON.stringify(payload));
     } catch {}
   }, [cacheReady, results, keyword, location, filter, hasPhone, smallOperatorOnly, phoneTypeFilter, minRating, page, meta, savedIds]);
+
+  useEffect(() => {
+    if (!cacheReady || results.length === 0 || restoredHashRef.current || window.location.hash !== "#local-lead-results") return;
+    restoredHashRef.current = true;
+    window.setTimeout(() => resultsRef.current?.scrollIntoView({ block: "start" }), 0);
+  }, [cacheReady, results.length]);
 
   const resetAt = usageResetAt ? new Date(usageResetAt) : null;
 
@@ -1606,7 +1626,7 @@ export default function LocalLeadsPage() {
           )}
 
           {/* Results section */}
-          <div ref={resultsRef}>
+          <div id="local-lead-results" ref={resultsRef}>
             {!hasDemo && !loading && results.length > 0 && (
               <div className="flex items-start gap-3 bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 mb-4">
                 <Info className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
