@@ -15,7 +15,7 @@ export default function TermsPage() {
       <main className="pt-16 min-h-screen">
         <div className="max-w-3xl mx-auto px-4 py-24">
           <h1 className="text-4xl font-extrabold text-foreground mb-3">Terms of Service</h1>
-          <p className="text-muted-foreground mb-12">Last updated: January 1, 2025</p>
+          <p className="text-muted-foreground mb-12">Last updated: August 30, 2026</p>
 
           <div className="space-y-10 text-muted-foreground leading-relaxed">
             <section>
@@ -58,7 +58,16 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">7. Intellectual Property</h2>
-              <p>The iCloseLeads platform, its original content, features, and functionality are owned by iCloseLeads, Inc. Content you create (proposals, email copy) remains your intellectual property.</p>
+              <p className="mb-3">The Service and its original software, source code, interface, visual design, text, graphics, workflows, databases, compilations, features, and branding are owned by iCloseLeads or its licensors and are protected by applicable intellectual property laws. These Terms give you a limited, non-exclusive, non-transferable, revocable right to use the Service for its intended purpose; no ownership rights are transferred to you.</p>
+              <p className="mb-2">Except where applicable law does not permit a restriction, you may not:</p>
+              <ul className="list-disc pl-6 space-y-1">
+                <li>Copy, reproduce, republish, distribute, sell, sublicense, or create derivative works from protected parts of the Service</li>
+                <li>Reverse engineer, decompile, disassemble, or attempt to obtain the Service&apos;s source code or non-public logic</li>
+                <li>Systematically extract or replicate our original databases, rankings, interface, content, or workflows</li>
+                <li>Use protected or non-public parts of the Service to build or assist a competing product</li>
+                <li>Remove or alter copyright, trademark, attribution, or proprietary notices</li>
+              </ul>
+              <p className="mt-3">Content you create, including your proposals and email copy, remains yours. Public records, open data, third-party content, and open-source software remain subject to their respective owners&apos; rights and licenses.</p>
             </section>
 
             <section>
