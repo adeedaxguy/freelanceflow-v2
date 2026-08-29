@@ -8,12 +8,11 @@
  * │  1. Yelp Fusion API    — free 500 calls/day, best quality      │
  * │  2. HERE Discover API  — free 250k calls/month, great intl     │
  * │  3. OSM Overpass       — always free, no key, global           │
- * │  4. Smart demo data    — realistic, keyword-aware fallback     │
  * │                                                                 │
  * │  ENRICHMENT PIPELINE                                            │
  * │  • Nominatim geocoding (free, cached per city 24hr)            │
  * │  • Live website validation (HEAD request, tech detection)       │
- * │  • Email pattern generation (info@, contact@, hello@)          │
+ * │  • Published website contact extraction                       │
  * │  • Revenue opportunity estimate by business type               │
  * │  • Groq AI pitch enhancement for top 8 leads (free tier)       │
  * │                                                                 │
@@ -37,7 +36,6 @@ export interface LocalBizLead {
   lon?:            number;
   phone?:          string;
   email?:          string;
-  guessedEmails?:  string[];
   website?:        string;
   websiteStatus:   "none" | "alive" | "outdated" | "unreachable" | "unknown";
   websiteAge?:     string;
@@ -48,7 +46,7 @@ export interface LocalBizLead {
   reviewCount?:    number;
   category:        string;
   categoryLabel:   string;
-  source:          "yelp" | "here" | "foursquare" | "osm" | "demo";
+  source:          "yelp" | "here" | "foursquare" | "osm";
   osmId?:          string;
   isOpen?:         boolean;
   imageUrl?:       string;
@@ -102,7 +100,7 @@ function businessScaleSignal(lead: Pick<LocalBizLead,
 
   if (lead.websiteStatus === "none" || lead.websiteStatus === "unknown") {
     add(12, "weak or missing website signal");
-  } else if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable") {
+  } else if (lead.websiteStatus === "outdated") {
     add(8, "website needs attention");
   }
 
@@ -1274,117 +1272,25 @@ async function fetchFromHERE(keyword: string, bbox: BBox, apiKey: string): Promi
   } catch { return []; }
 }
 
-// ── Smart demo data (realistic, keyword + location aware) ─────────────────────
-const TRADES: Record<string, string[]> = {
-  "mechanic":     ["Auto Repair","Car Service","Motors","Automotive","Auto Centre","Garage"],
-  "plumber":      ["Plumbing","Pipes","Flow","Drain","Water Works","Plumbing Co"],
-  "electrician":  ["Electric","Electrical","Power","Wiring","Spark","Electric Co"],
-  "dentist":      ["Dental","Smile","Teeth","Oral Care","Dental Care","Family Dental"],
-  "bakery":       ["Bakery","Baked Goods","Pastry","Bread","Sweet","Artisan Bread"],
-  "salon":        ["Hair","Beauty","Cuts","Style","Salon","Beauty Bar"],
-  "restaurant":   ["Grill","Kitchen","Bistro","Diner","Eatery","House"],
-  "lawyer":       ["Law Firm","Legal","Attorneys","Counsel","Law Group","Associates"],
-  "accountant":   ["Accounting","Tax","Financial","CPA","Bookkeeping","Advisory"],
-  "landscaper":   ["Landscaping","Gardens","Green","Lawn","Outdoor","Yard Care"],
-  "painter":      ["Painting","Paint","Decor","Interior","Coatings","Brush"],
-  "carpenter":    ["Carpentry","Woodwork","Joinery","Craft","Custom Wood","Build"],
-  "locksmith":    ["Lock","Key","Security","Access","Safe","Lock & Key"],
-  "cleaner":      ["Cleaning","Clean","Sparkle","Fresh","Maid","Cleaning Co"],
-  "photographer": ["Photography","Photos","Studio","Images","Capture","Vision"],
-  "roofer":       ["Roofing","Roof","Tile","Cover","Shelter","Roof Works"],
-  "hvac":         ["Heating","Cooling","HVAC","Climate","Air","Comfort"],
-};
-
-function getDemoSuffixes(keyword: string): string[] {
-  const kw = keyword.toLowerCase();
-  for (const [k, v] of Object.entries(TRADES)) {
-    if (kw.includes(k) || k.includes(kw)) return v;
-  }
-  return ["Services","Solutions","Co","Group","Works","Pro"];
-}
-
-const PHONE_PREFIXES: Record<string,string> = {
-  canada:    "+1 (416)","toronto":   "+1 (416)","vancouver": "+1 (604)",
-  calgary:   "+1 (403)","montreal":  "+1 (514)",
-  australia: "+61 4","sydney":     "+61 2","melbourne":"+61 3","brisbane":"+61 7",
-  uk:        "+44 20","london":    "+44 20","manchester":"+44 161",
-  usa:       "+1 (312)","chicago":  "+1 (312)","los angeles":"+1 (213)",
-  "new york":"+1 (212)","houston": "+1 (713)","dallas":"+1 (214)",
-};
-
-function getPhonePrefix(location: string): string {
-  const lc = location.toLowerCase();
-  for (const [k, v] of Object.entries(PHONE_PREFIXES)) {
-    if (lc.includes(k)) return v;
-  }
-  return "+1 (555)";
-}
-
-function generateDemoLeads(keyword: string, location: string, count = 18): Partial<LocalBizLead>[] {
-  const suffixes = getDemoSuffixes(keyword);
-  const prefix   = getPhonePrefix(location);
-  const city     = location.split(",")[0]?.trim() ?? location;
-  const leads: Partial<LocalBizLead>[] = [];
-
-  // Distribution: ~60% no website, ~25% outdated, ~15% has website
-  const scenarios: Array<{ website?: string; status: LocalBizLead["websiteStatus"]; rating: number; reviews: number }> = [
-    { website: undefined,          status: "none",       rating: 4.2, reviews: 47  },
-    { website: undefined,          status: "none",       rating: 3.8, reviews: 23  },
-    { website: undefined,          status: "none",       rating: 4.7, reviews: 112 },
-    { website: undefined,          status: "none",       rating: 4.0, reviews: 31  },
-    { website: undefined,          status: "none",       rating: 3.5, reviews: 67  },
-    { website: undefined,          status: "none",       rating: 4.5, reviews: 89  },
-    { website: undefined,          status: "none",       rating: 4.1, reviews: 15  },
-    { website: undefined,          status: "none",       rating: 3.9, reviews: 42  },
-    { website: undefined,          status: "none",       rating: 4.3, reviews: 28  },
-    { website: undefined,          status: "none",       rating: 4.6, reviews: 156 },
-    { website: `http://old-${keyword.replace(/\s/g,"-")}.weebly.com`, status:"outdated", rating:3.7, reviews:19 },
-    { website: `http://www.${keyword.replace(/\s/g,"")}-local.wix.com/site`, status:"outdated", rating:4.0, reviews:33 },
-    { website: `http://${keyword.replace(/\s/g,"")}-${city.toLowerCase().replace(/\s/g,"")}.yolasite.com`, status:"outdated", rating:3.6, reviews:8 },
-    { website: `http://www.${keyword.replace(/\s/g,"")}services.net`, status:"unreachable", rating:3.4, reviews:5 },
-    { website: `http://${keyword.replace(/\s/g,"")}-pro.com`, status:"unreachable", rating:4.2, reviews:11 },
-    { website: `https://www.${keyword.replace(/\s/g,"")}${city.toLowerCase().replace(/\s/g,"")}.com`, status:"alive", rating:4.5, reviews:203 },
-    { website: `https://www.local${keyword.replace(/\s/g,"")}s.com`, status:"alive", rating:4.3, reviews:87  },
-    { website: `https://www.${keyword.replace(/\s/g,"")}experts.com`,  status:"alive", rating:4.8, reviews:315 },
-  ];
-
-  for (let i = 0; i < count; i++) {
-    const sc     = scenarios[i % scenarios.length]!;
-    const suffix = suffixes[i % suffixes.length]!;
-    const randN  = (100 + i * 37) % 900 + 100;
-    const randS  = (200 + i * 53) % 9000 + 1000;
-    const streetName = ["Main St","Oak Ave","Elm Rd","King St","Queen St","Park Ave","Maple Dr","First Ave","Church St","Bay St"][i % 10]!;
-    leads.push({
-      id:       `demo-${i}-${Date.now()}`,
-      name:     `${city} ${suffix} ${i > 5 ? "" : "#" + (i + 1)}`.trim().replace("  "," "),
-      address:  `${randN} ${streetName}, ${city}`,
-      city,
-      country:  location.split(",").slice(-1)[0]?.trim() ?? "",
-      phone:    `${prefix} ${String(randS).slice(0,3)}-${String(randS).slice(3)}`,
-      website:  sc.website,
-      mapsUrl:  googleMapsSearchUrl(keyword, city),
-      rating:   sc.rating,
-      reviewCount: sc.reviews,
-      category: keyword,
-      source:   "demo" as const,
-    });
-  }
-  return leads;
-}
-
 // ── Website validation ─────────────────────────────────────────────────────────
-const OUTDATED_HOSTS = ["weebly.com","yolasite.com","wix.com/site/","tripod.com","angelfire.com","geocities.com","freewebs.com","jimdo.com/","moonfruit.com"];
+const OBSOLETE_HOSTS = ["tripod.com", "angelfire.com", "geocities.com", "freewebs.com"];
 const OUTDATED_TECH: Array<[RegExp, string]> = [
   [/Apache\/2\.[012]\./i,     "Old Apache server"],
   [/PHP\/[45]\./i,            "Old PHP 5.x"],
-  [/WordPress\/[1234]\./i,    "Old WordPress"],
+  [/WordPress[ /][1234]\./i,  "Old WordPress"],
   [/Drupal [67]/i,            "Old Drupal"],
   [/Joomla! [12]\./i,         "Old Joomla"],
   [/ASP\.NET MVC [123]/i,     "Old ASP.NET"],
   [/IIS\/[678]\./i,           "Old IIS server"],
 ];
 
-interface WebInfo { status: "alive"|"outdated"|"unreachable"; age?: string; tech?: string; phone?: string; }
+interface WebInfo {
+  status: "alive" | "outdated" | "unreachable";
+  age?: string;
+  tech?: string;
+  phone?: string;
+  email?: string;
+}
 
 // Phone number regex patterns — matches most US/CA/UK/AU/intl formats
 const PHONE_RE = [
@@ -1429,9 +1335,34 @@ function extractPhoneFromHtml(html: string): string | null {
   return null;
 }
 
+function extractPublishedEmailFromHtml(html: string): string | undefined {
+  const mailto = /href=["']mailto:([^?"']+)/i.exec(html)?.[1];
+  const structured = /["']email["']\s*:\s*["']([^"']+@[^"']+)["']/i.exec(html)?.[1];
+  const value = mailto ?? structured;
+  if (!value) return undefined;
+  try {
+    return decodeURIComponent(value).trim().toLowerCase();
+  } catch {
+    return value.trim().toLowerCase();
+  }
+}
+
+function normalizeWebsiteUrl(value: string | undefined): string | undefined {
+  if (!value?.trim()) return undefined;
+  try {
+    const url = new URL(/^https?:\/\//i.test(value) ? value.trim() : `https://${value.trim()}`);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
+}
+
 async function checkWebsite(url: string): Promise<WebInfo> {
   const lc = url.toLowerCase();
-  for (const h of OUTDATED_HOSTS) { if (lc.includes(h)) return { status: "outdated", tech: "Outdated website builder" }; }
+  for (const host of OBSOLETE_HOSTS) {
+    if (lc.includes(host)) return { status: "outdated", tech: "Obsolete website host" };
+  }
   try {
     // Use GET so we can also scrape phone numbers from the HTML
     const r = await fetch(url, {
@@ -1444,41 +1375,55 @@ async function checkWebsite(url: string): Promise<WebInfo> {
     const sv  = r.headers.get("server") ?? "";
     const xp  = r.headers.get("x-powered-by") ?? "";
     const lm  = r.headers.get("last-modified");
-    const all = `${sv} ${xp}`;
-    for (const [re, label] of OUTDATED_TECH) { if (re.test(all)) return { status: "outdated", tech: label }; }
+    const headers = `${sv} ${xp}`;
+    for (const [re, label] of OUTDATED_TECH) {
+      if (re.test(headers)) return { status: "outdated", tech: label };
+    }
 
-    // Try to get HTML for phone extraction (skip huge responses)
     let phone: string | undefined;
+    let email: string | undefined;
     const ct = r.headers.get("content-type") ?? "";
     if (ct.includes("html")) {
       try {
-        const raw   = await r.text();
-        const found = extractPhoneFromHtml(raw.slice(0, 80_000)); // first 80KB
-        if (found) phone = found;
+        const html = (await r.text()).slice(0, 100_000);
+        phone = extractPhoneFromHtml(html) ?? undefined;
+        email = extractPublishedEmailFromHtml(html);
 
-        // Still check last-modified from HTML meta if no header
-        if (!lm) {
-          const metaLm = /<meta[^>]+name=["']?last-modified["']?[^>]+content=["']?([^"'>]+)/i.exec(raw);
-          if (metaLm?.[1]) {
-            const yrs = (Date.now() - new Date(metaLm[1]).getTime()) / (365 * 24 * 3600_000);
-            if (yrs >= 3) return { status: "outdated", age: `${Math.floor(yrs)}+ years old`, phone };
+        for (const [re, label] of OUTDATED_TECH) {
+          if (re.test(html)) return { status: "outdated", tech: label, phone, email };
+        }
+
+        if (/<frameset\b|<marquee\b|application\/x-shockwave-flash|microsoft\s+frontpage/i.test(html)) {
+          return { status: "outdated", tech: "Legacy page markup", phone, email };
+        }
+
+        const hasViewport = /<meta[^>]+name=["']viewport["']/i.test(html);
+        const pageDate = [
+          lm,
+          /<meta[^>]+name=["']?last-modified["']?[^>]+content=["']?([^"'>]+)/i.exec(html)?.[1],
+          /(?:og:updated_time|article:modified_time)[^>]+content=["']([^"']+)/i.exec(html)?.[1],
+          /["']dateModified["']\s*:\s*["']([^"']+)/i.exec(html)?.[1],
+        ]
+          .map(value => value ? new Date(value).getTime() : Number.NaN)
+          .filter(Number.isFinite)
+          .sort((a, b) => b - a)[0];
+
+        if (!hasViewport && pageDate) {
+          const years = (Date.now() - pageDate) / (365 * 24 * 3600_000);
+          if (years >= 3) {
+            return { status: "outdated", age: `${Math.floor(years)}+ years old`, phone, email };
           }
         }
       } catch { /* body read failed — not critical */ }
     }
-
-    if (lm) {
-      const yrs = (Date.now() - new Date(lm).getTime()) / (365 * 24 * 3600_000);
-      if (yrs >= 3) return { status: "outdated", age: `${Math.floor(yrs)}+ years old`, phone };
-    }
-    return { status: "alive", phone };
+    return { status: "alive", phone, email };
   } catch { return { status: "unreachable" }; }
 }
 
 function quickWebsiteStatus(url: string): WebInfo | null {
   const lc = url.toLowerCase();
-  for (const h of OUTDATED_HOSTS) {
-    if (lc.includes(h)) return { status: "outdated", tech: "Outdated website builder" };
+  for (const host of OBSOLETE_HOSTS) {
+    if (lc.includes(host)) return { status: "outdated", tech: "Obsolete website host" };
   }
   return null;
 }
@@ -1524,19 +1469,6 @@ function shouldTrustWebsiteForLead(raw: Partial<LocalBizLead>): boolean {
   return websiteMatchesBusinessName(raw.name, raw.website);
 }
 
-// ── Email pattern generator ────────────────────────────────────────────────────
-export function guessEmails(domain: string | undefined): string[] {
-  if (!domain) return [];
-  const d = domain
-    .replace(/^https?:\/\//i, "")
-    .split("/")[0]!
-    .toLowerCase()
-    .trim()
-    .replace(/^www\./, "");
-  if (!d || d.length < 4) return [];
-  return [`info@${d}`, `contact@${d}`, `hello@${d}`, `admin@${d}`];
-}
-
 // ── Pitch generator ────────────────────────────────────────────────────────────
 function buildCallScript(
   name: string,
@@ -1551,7 +1483,7 @@ function buildCallScript(
     return `Hi, this is [Your name]. Is this the right person for ${businessName}'s website or marketing? I found you while checking local ${businessType} options and could not find a clear website on the business profile. That can make it harder for mobile searchers to see services, photos, and request a quote. I help fix that quickly. Can I send a short example?`;
   }
 
-  if (wsStatus === "outdated" || wsStatus === "unreachable" || opportunityType === "outdated_website") {
+  if (wsStatus === "outdated" || opportunityType === "outdated_website") {
     return `Hi, this is [Your name]. Who handles the website for ${businessName}? I noticed the site may be dated or hard to reach on mobile. I help local ${businessType} businesses make quick fixes that turn visitors into calls, bookings, or quote requests. Would you be open to a short screen recording with the three fixes I would prioritize?`;
   }
 
@@ -1583,7 +1515,7 @@ function buildPitch(
     };
   }
 
-  if (wsStatus === "outdated" || wsStatus === "unreachable") {
+  if (wsStatus === "outdated") {
     const detail = webInfo?.tech ? `(running ${webInfo.tech})` : webInfo?.age ? `(${webInfo.age})` : "(needs a refresh)";
     return {
       pitchSubject: `Quick idea to bring more customers to ${name}`,
@@ -1643,12 +1575,11 @@ async function enhanceWithAI(lead: LocalBizLead, groqKey: string): Promise<void>
 function scoreLead(lead: LocalBizLead): number {
   let s = 50;
   if (lead.websiteStatus === "none")        s = 95;
-  if (lead.websiteStatus === "unreachable") s = 82;
+  if (lead.websiteStatus === "unreachable") s = 45;
   if (lead.websiteStatus === "outdated")    s = 72;
   if (lead.websiteStatus === "alive")       s = 35;
   if (lead.phone)          s += 4;
   if (lead.email)          s += 3;
-  if (lead.guessedEmails?.length) s += 2;
   if (lead.rating && lead.rating >= 4) s += 3;
   if (lead.reviewCount && lead.reviewCount > 50) s += 2;
   if (lead.source === "yelp") s += 5; // Yelp data more reliable
@@ -1748,9 +1679,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
     db,
   } = opts;
   const limit    = Math.min(opts.limit ?? 60, 80);
-  // v7 - add small-operator business scale signals to cached local lead payloads.
+  // v8 - discard old website classifications and generated contact aliases.
   const sourceScope = cacheScope ?? "default";
-  const cacheKey = `v7-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
+  const cacheKey = `v8-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
 
   // 1. Cache check — instant return
   const cached = await cacheGet(cacheKey, db);
@@ -1840,12 +1771,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
       batch.map(async (raw) => {
         let webInfo: WebInfo | null = null;
         let wsStatus: LocalBizLead["websiteStatus"] = "unknown";
-        const trustedWebsite = shouldTrustWebsiteForLead(raw) ? raw.website : undefined;
+        const trustedWebsite = shouldTrustWebsiteForLead(raw) ? normalizeWebsiteUrl(raw.website) : undefined;
 
-        if (raw.websiteStatus && raw.websiteStatus !== "unknown") {
-          // Demo data or pre-enriched source has explicit status
-          wsStatus = raw.websiteStatus;
-        } else if (trustedWebsite) {
+        if (trustedWebsite) {
           const quickStatus = quickWebsiteStatus(trustedWebsite);
           if (quickStatus) {
             webInfo = quickStatus;
@@ -1858,9 +1786,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
             webInfo  = await checkWebsite(trustedWebsite).catch(() => null);
             wsStatus = webInfo?.status ?? "alive";
           } else {
-            // When the deadline is exhausted, keep the lead usable instead of
-            // blocking the full search. Users can still open/verify the profile.
-            wsStatus = "alive";
+            wsStatus = "unknown";
           }
         } else {
           // Only mark "none" if from a rich source that reliably stores website data.
@@ -1873,11 +1799,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
 
         const cat    = (raw.category ?? keyword).toLowerCase();
         const revEst = estimateRevenue(cat, wsStatus);
-        const guEmails = guessEmails(trustedWebsite);
-
         const opType: LocalBizLead["opportunityType"] =
           wsStatus === "none"       ? "no_website" :
-          wsStatus === "unreachable"|| wsStatus === "outdated" ? "outdated_website" :
+          wsStatus === "outdated"   ? "outdated_website" :
           wsStatus === "alive"      ? "seo" : "modernise";
 
         const { pitchPoints, pitchSubject, pitchOpener, callScript } = buildPitch(
@@ -1896,8 +1820,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
           lat:             raw.lat,
           lon:             raw.lon,
           phone:           resolvedPhone,
-          email:           raw.email,
-          guessedEmails:   raw.email ? [] : guEmails,
+          email:           raw.email ?? webInfo?.email,
           website:         trustedWebsite,
           websiteStatus:   wsStatus,
           websiteAge:      webInfo?.age,
@@ -1957,7 +1880,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
 
 function applyFilter(leads: LocalBizLead[], filter: string): LocalBizLead[] {
   if (filter === "no_website")       return leads.filter(l => l.websiteStatus === "none" || l.websiteStatus === "unknown");
-  if (filter === "outdated_website") return leads.filter(l => l.websiteStatus === "outdated" || l.websiteStatus === "unreachable");
+  if (filter === "outdated_website") return leads.filter(l => l.websiteStatus === "outdated");
   if (filter === "has_website")      return leads.filter(l => l.websiteStatus === "alive");
   return leads;
 }

@@ -156,7 +156,7 @@ export async function findPublicLocalBusinesses(input: LocalSearch, userId: stri
     cacheScope: "public-api",
     db: prisma,
   });
-  const realLeads = result.leads.filter(lead => lead.source !== "demo").map(publicLocalLead);
+  const realLeads = result.leads.map(publicLocalLead);
   return {
     ...page(realLeads, input.cursor, input.limit),
     meta: {

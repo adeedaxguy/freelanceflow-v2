@@ -110,10 +110,6 @@ function normalizeUrl(url: string) {
 }
 
 function getContactInfo(lead: LeadExt) {
-  const guessedEmails = contextField(lead.notes, "Guessed Emails")
-    .split(",")
-    .map(email => cleanEmailValue(email.replace(/\s*\(guessed\)\s*$/i, "")))
-    .filter((email): email is string => Boolean(email));
   const directEmail = cleanEmailValue(lead.email);
 
   const country = cleanContactValue(contextField(lead.notes, "Country"));
@@ -128,7 +124,7 @@ function getContactInfo(lead: LeadExt) {
     phoneType: storedPhoneType || inferredPhoneType.label,
     phoneTypeTone: getPhoneTypeTone(inferredPhoneType.type),
     website: cleanWebsiteValue(contextField(lead.notes, "Website")),
-    emails: Array.from(new Set([directEmail, ...guessedEmails].filter((email): email is string => Boolean(email)))),
+    emails: directEmail ? [directEmail] : [],
   };
 }
 

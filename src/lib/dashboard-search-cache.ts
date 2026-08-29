@@ -1,4 +1,4 @@
-export const DASHBOARD_SEARCH_CACHE_VERSION = "8";
+export const DASHBOARD_SEARCH_CACHE_VERSION = "9";
 
 export const DASHBOARD_SEARCH_CACHE_KEYS = {
   live: "ff_ss_live_results",

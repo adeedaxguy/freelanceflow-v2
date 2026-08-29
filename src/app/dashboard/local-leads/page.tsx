@@ -122,7 +122,7 @@ function getSmallOperatorSignal(lead: LocalLead) {
   if (SMALL_OPERATOR_NAME_RE.test(name)) add(16, "owner-run or mobile naming signal");
   if (SMALL_OPERATOR_ADDRESS_RE.test(address)) add(10, "small premises, stall, or mobile address clue");
   if (lead.websiteStatus === "none" || lead.websiteStatus === "unknown") add(12, "weak or missing website signal");
-  if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable") add(8, "website needs attention");
+  if (lead.websiteStatus === "outdated") add(8, "website needs attention");
   if (lead.phone) add(4, "direct public phone route found");
 
   if (typeof lead.reviewCount === "number") {
@@ -226,7 +226,6 @@ function exportLocalLeadsCsv(leads: LocalLead[], keyword: string, location: stri
     "Revenue Estimate",
     "Google Maps",
     "Email",
-    "Guessed Emails",
     "Pitch Subject",
     "Pitch Opener",
     "Pitch Points",
@@ -258,7 +257,6 @@ function exportLocalLeadsCsv(leads: LocalLead[], keyword: string, location: stri
       lead.revenueEst,
       lead.mapsUrl || googleMapsBusinessProfileUrl(lead),
       lead.email,
-      lead.guessedEmails,
       lead.pitchSubject,
       lead.pitchOpener,
       lead.pitchPoints,
@@ -314,7 +312,7 @@ function getLocalLeadCallScript(lead: LocalLead) {
     return `Hi, this is [Your name]. Is this the right person for ${businessName}'s website or marketing? I found you while checking local ${businessType} options and could not find a clear website on the business profile. That can make it harder for mobile searchers to see services, photos, and request a quote. I help fix that quickly. Can I send a short example?`;
   }
 
-  if (lead.websiteStatus === "outdated" || lead.websiteStatus === "unreachable" || lead.opportunityType === "outdated_website") {
+  if (lead.websiteStatus === "outdated" || lead.opportunityType === "outdated_website") {
     return `Hi, this is [Your name]. Who handles the website for ${businessName}? I noticed the site may be dated or hard to reach on mobile. I help local ${businessType} businesses make quick fixes that turn visitors into calls, bookings, or quote requests. Would you be open to a short screen recording with the three fixes I would prioritize?`;
   }
 
@@ -517,8 +515,8 @@ function WebsiteBadge({ status, tech, age }: { status: LocalLead["websiteStatus"
     </span>
   );
   if (status === "unreachable") return (
-    <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 font-semibold">
-      <AlertCircle className="w-3 h-3"/> Site Down
+    <span title="The automated check could not confirm this website. Open it before using it as a pitch signal." className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 font-semibold cursor-help">
+      <AlertCircle className="w-3 h-3"/> Site check inconclusive
     </span>
   );
   if (status === "outdated") return (
@@ -537,7 +535,7 @@ function websiteStatusLabel(status: LocalLead["websiteStatus"]) {
   if (status === "none") return "No website";
   if (status === "unknown") return "Website unverified";
   if (status === "outdated") return "Outdated site";
-  if (status === "unreachable") return "Site down";
+  if (status === "unreachable") return "Website check inconclusive";
   return "Has website";
 }
 
@@ -670,10 +668,7 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
     lead.score >= 50 ? "bg-primary/60" :
     "bg-muted-foreground/30";
 
-  const allEmails = [
-    ...(lead.email ? [{ addr: lead.email, type: "verified" as const }] : []),
-    ...(lead.guessedEmails ?? []).filter(e => e !== lead.email).map(e => ({ addr: e, type: "guessed" as const })),
-  ];
+  const allEmails = lead.email ? [lead.email] : [];
   const phoneType = getPhoneTypeInfo(lead.phone, lead.country);
   const smallOperatorSignal = getSmallOperatorSignal(lead);
 
@@ -820,13 +815,13 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
             )}
 
             {/* Emails */}
-            {allEmails.length > 0 ? allEmails.map(({ addr, type }) => (
+            {allEmails.length > 0 ? allEmails.map(addr => (
               <div key={addr} className="flex items-center gap-1.5 text-sm">
-                <Mail className={`w-3.5 h-3.5 flex-shrink-0 ${type === "verified" ? "text-primary-light" : "text-muted-foreground"}`}/>
-                <a href={`mailto:${addr}`} className={`hover:underline truncate max-w-xs ${type === "verified" ? "text-primary-light" : "text-muted-foreground"}`}>
+                <Mail className="w-3.5 h-3.5 flex-shrink-0 text-primary-light"/>
+                <a href={`mailto:${addr}`} className="text-primary-light hover:underline truncate max-w-xs">
                   {addr}
                 </a>
-                {type === "guessed" && <span className="text-[10px] text-muted-foreground/60 italic">(guessed)</span>}
+                <span className="text-[10px] text-muted-foreground/60">published</span>
                 <CopyBtn text={addr}/>
               </div>
             )) : null}
@@ -1211,7 +1206,7 @@ export default function LocalLeadsPage() {
         body: JSON.stringify({
           company:     lead.name,
           domain,
-          email:       lead.email ?? (lead.guessedEmails?.[0] ?? null),
+          email:       lead.email ?? null,
           phone:       lead.phone ?? null,
           niche:       lead.categoryLabel ?? lead.category ?? "local business",
           title:       `Local Business Lead — ${lead.categoryLabel ?? lead.category ?? "General"} (${websiteStatusLabel(lead.websiteStatus)})`,
@@ -1228,7 +1223,6 @@ export default function LocalLeadsPage() {
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
             lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
             smallSignal.matches ? `Small Operator Signal: ${smallSignal.score}/100 (${smallSignal.reasons.join("; ")})` : null,
-            lead.guessedEmails?.length ? `Guessed Emails: ${lead.guessedEmails.join(", ")}` : null,
             "Lead Coverage: Live local search",
             `Priority Score: ${lead.score}/100 (${lead.urgency} urgency)`,
             "",
@@ -1255,7 +1249,7 @@ export default function LocalLeadsPage() {
     // Website status filter (the main Show: selector)
     // "No Website" shows confirmed none + unverified businesses - both worth pitching.
     if (filter === "no_website"       && r.websiteStatus !== "none" && r.websiteStatus !== "unknown") return false;
-    if (filter === "outdated_website" && r.websiteStatus !== "outdated" && r.websiteStatus !== "unreachable") return false;
+    if (filter === "outdated_website" && r.websiteStatus !== "outdated") return false;
     if (filter === "has_website"      && (!r.website || r.websiteStatus === "none" || r.websiteStatus === "unknown")) return false;
     if (hasPhone  && !r.phone)                    return false;
     if (minRating && (r.rating ?? 0) < minRating) return false;
@@ -1282,7 +1276,7 @@ export default function LocalLeadsPage() {
   const pagedResults  = filteredResults.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
   // Counts from ALL results so the badges always show the full breakdown
   const noWebsite     = results.filter(r => r.websiteStatus === "none" || r.websiteStatus === "unknown").length;
-  const outdated      = results.filter(r => r.websiteStatus === "outdated" || r.websiteStatus === "unreachable").length;
+  const outdated      = results.filter(r => r.websiteStatus === "outdated").length;
   const hotLeads      = filteredResults.filter(r => r.urgency === "high").length;
   const withPhone     = primaryFilteredResults.filter(r => !!r.phone).length;
   const mobilePhoneLeads = phoneTypeCounts.mobile;
@@ -1300,7 +1294,6 @@ export default function LocalLeadsPage() {
     minRating > 0 ? `${minRating} star minimum rating` : null,
   ].filter(Boolean) as string[];
   const selectedPhoneTypeCount = phoneTypeCounts[phoneTypeFilter] ?? 0;
-  const hasDemo       = meta?.sources?.includes("demo");
 
   useEffect(() => {
     if (phoneTypeFilter === "all" || loading || primaryFilteredResults.length === 0) return;
@@ -1512,6 +1505,11 @@ export default function LocalLeadsPage() {
               <span title="No/Unknown Website includes confirmed no-website records and businesses where no website is available from profile data. Always verify on Google Maps before pitching." className="flex items-center gap-1 text-xs text-muted-foreground/60 hover:text-muted-foreground cursor-help transition-colors">
                 <Info className="w-3.5 h-3.5"/>
               </span>
+              {filter === "outdated_website" && (
+                <span className="basis-full text-[11px] leading-relaxed text-muted-foreground/75">
+                  Only sites with strong legacy technology or page evidence are included. Failed checks are excluded.
+                </span>
+              )}
             </div>
 
             {/* Extra filters row */}
@@ -1627,7 +1625,7 @@ export default function LocalLeadsPage() {
 
           {/* Results section */}
           <div id="local-lead-results" ref={resultsRef}>
-            {!hasDemo && !loading && results.length > 0 && (
+            {!loading && results.length > 0 && (
               <div className="flex items-start gap-3 bg-primary/5 border border-primary/15 rounded-xl px-4 py-3 mb-4">
                 <Info className="w-4 h-4 text-primary-light flex-shrink-0 mt-0.5"/>
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -1648,7 +1646,7 @@ export default function LocalLeadsPage() {
                   </span>
                 )}
                 {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no website</span>}
-                {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated/down</span>}
+                {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated</span>}
                 {withPhone > 0 && <span className="text-accent font-medium">{withPhone} with phone</span>}
                 {smallOperatorCount > 0 && <span className="text-cyan-300 font-medium">{smallOperatorCount} small operators</span>}
                 {hotLeads  > 0 && <span className="flex items-center gap-1 text-red-400 font-medium"><Flame className="w-3.5 h-3.5"/>{hotLeads} hot leads</span>}
@@ -1668,7 +1666,7 @@ export default function LocalLeadsPage() {
                       <Clock className="w-3 h-3"/> Cached (24hr)
                     </span>
                   )}
-                  {meta?.source === "live" && !hasDemo && (
+                  {meta?.source === "live" && (
                     <span className="flex items-center gap-1 text-xs bg-accent/10 text-accent px-2 py-0.5 rounded-full border border-accent/20 font-medium">
                       <Zap className="w-3 h-3"/> Live data
                     </span>
@@ -1754,8 +1752,8 @@ export default function LocalLeadsPage() {
                 <div>
                   <h3 className="text-foreground font-bold text-lg">Find your next local client</h3>
                   <p className="text-muted-foreground max-w-sm mx-auto text-sm mt-1.5 leading-relaxed">
-                    Search by trade type and city to discover real businesses that need a website or digital upgrade —
-                    with their phone number, guessed email, and a ready-to-send pitch.
+                    Search by trade type and city to discover real businesses that need a website or digital upgrade,
+                    with published contact details and a ready-to-send pitch when available.
                   </p>
                 </div>
                 <div className="space-y-2">

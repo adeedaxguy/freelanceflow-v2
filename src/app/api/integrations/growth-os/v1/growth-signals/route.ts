@@ -80,7 +80,7 @@ async function localSignals(keyword: string, location: string, filter: "all" | "
     abnGuid: process.env.ABR_GUID,
     cacheScope: "growth-os-service",
   });
-  const realLeads = result.leads.filter((lead) => lead.source !== "demo").slice(0, limit);
+  const realLeads = result.leads.slice(0, limit);
   const signals = realLeads.map((lead) => ({
     id: `local:${lead.source}:${lead.id}`,
     type: "LOCAL_BUSINESS_GAP",
