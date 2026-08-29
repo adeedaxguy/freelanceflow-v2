@@ -46,9 +46,9 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     title: "Find web design leads",
     accentTitle: "with a real reason to pitch today",
     summary:
-      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals. Start with 600 free lead searches before buying any list.",
+      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals. Start with 600 free weekly lead searches before buying any list.",
     directAnswer:
-      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads lets free users start with 600 lead searches and keeps those signals in one workflow so you can search, save, draft, and follow up.",
+      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads lets free users start with 600 weekly lead searches and keeps those signals in one workflow so you can search, save, draft, and follow up.",
     primaryCta: "Search 600 Leads Free",
     secondaryCta: "See local lead workflow",
     dashboardPath: "/dashboard/local-leads",
@@ -57,7 +57,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A focused first search that produces website prospects with context, pitch angles, and a next action.",
     proofPoints: [
-      "Free users can start with 600 lead searches before buying a list or upgrading.",
+      "Free users can start with 600 weekly lead searches before buying a list or upgrading.",
       "Search local businesses by city and website status.",
       "Use remote job signals when companies are hiring for website, design, or marketing work.",
       "Move high-fit leads into AI proposals, owner checks, and CRM follow-up.",
@@ -103,6 +103,8 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     ],
     internalLinks: [
       { label: "Local Business Leads", href: "/lead-generation/local-business-leads", description: "Find businesses by city, category, website status, and phone signals." },
+      { label: "Free Business Leads", href: "/blog/free-business-leads-for-freelancers", description: "Use DataForSEO-backed free business lead terms as a weekly qualification sprint." },
+      { label: "How to Get Free Leads", href: "/blog/how-to-get-free-leads-for-my-business", description: "Turn free lead searches into a simple score-and-follow-up workflow." },
       { label: "Web design leads for free vs verified", href: "/resources/web-design-leads-for-free-vs-verified", description: "Compare free research with a safer verified workflow before you pitch." },
       { label: "AI Website Builder", href: "/features/web-design-generator", description: "Create a visual website concept from the prospect's niche and pitch context." },
       { label: "AI Proposals", href: "/features/ai-proposals", description: "Turn a lead signal into a draft you can edit before sending." },
@@ -119,7 +121,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       },
       {
         q: "Can I get web design leads for free?",
-        a: "Yes. Free users can start with 600 lead searches. The best workflow is to focus those searches on one niche, verify the business context, save only pitchable prospects, and then draft outreach from the visible website gap.",
+        a: "Yes. Free users can start with 600 weekly lead searches. The best workflow is to focus those searches on one niche, verify the business context, save only pitchable prospects, and then draft outreach from the visible website gap.",
       },
       {
         q: "Is this only for web designers?",
@@ -135,16 +137,16 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "freelance-client-leads",
     path: "/lead-generation/freelance-client-leads",
     primaryKeyword: "freelance client leads",
-    metaTitle: "Freelance Client Leads | 600 Leads in a 3-Day Trial",
+    metaTitle: "Freelance Client Leads | Search 600 Leads Free Weekly",
     metaDescription:
-      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Start with 600 leads for three days.",
+      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Search 600 leads free weekly.",
     eyebrow: "Freelance Client Leads",
     title: "Find freelance client leads",
     accentTitle: "without living inside job boards",
     summary:
-      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. The 3-day trial includes up to 600 lead results instead of forcing you to juggle tabs, lists, and generic templates.",
+      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. Free users can use 600 weekly lead searches instead of forcing you to juggle tabs, lists, and generic templates.",
     directAnswer:
-      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets trial users search up to 600 leads over three days and turn those signals into a smaller, better list of prospects.",
+      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets free users search 600 leads weekly and turn those signals into a smaller, better list of prospects.",
     primaryCta: "Find 600 Leads Free",
     secondaryCta: "Explore use cases",
     dashboardPath: "/dashboard/leads",
@@ -153,9 +155,11 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A repeatable prospecting workflow that moves from search to saved lead to draft to follow-up.",
     proofPoints: [
-      "Trial users can run up to 600 lead searches over three days before upgrading.",
+      "Free users can run 600 lead searches per week before upgrading.",
       "Remote, local, and live job lead paths in one product.",
       "AI proposal drafting uses the lead context so messages are less generic.",
+      "Softphone number packages for US, Canada, and UK calling can be added when phone outreach fits.",
+      "The web design generator turns qualified local leads into a pitch-ready website concept.",
     ],
     searchAngles: [
       { group: "Core intent", terms: ["freelance client leads", "find freelance clients", "freelance lead generation"] },
@@ -163,7 +167,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { group: "Software intent", terms: ["freelance lead generation software", "freelance CRM", "AI proposal tool"] },
     ],
     workflow: [
-      { title: "Use the 3-day trial allowance", description: "Start with 600 lead searches and focus them on one service, niche, or local market." },
+      { title: "Use the weekly free allowance", description: "Start with 600 lead searches and focus them on one service, niche, or local market." },
       { title: "Filter by fit", description: "Use niche, freshness, location, website status, budget clues, or contact signals to cut weak prospects before saving them." },
       { title: "Save only pitchable leads", description: "Keep the leads where you can explain the problem and first message in one sentence." },
       { title: "Prepare outreach and follow-up", description: "Draft the email, review it, and track the next step without losing context." },
@@ -197,7 +201,9 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { manual: "Write every first message from scratch.", iclose: "Generate a context-aware draft, then edit it before sending." },
     ],
     internalLinks: [
+      { label: "Free Business Leads", href: "/blog/free-business-leads-for-freelancers", description: "Use free business leads as a focused weekly qualification sprint." },
       { label: "Remote Freelance Jobs", href: "/lead-generation/remote-freelance-jobs", description: "Find fresh remote opportunities before the inbox gets crowded." },
+      { label: "Sales Softphone", href: "/blog/sales-softphone-for-freelancers-us-canada-uk-numbers", description: "Call qualified prospects from a professional number when a phone route fits." },
       { label: "Freelance Cold Outreach", href: "/use-cases/freelance-cold-outreach", description: "Build a message around the signal, not a generic template." },
       { label: "CRM Pipeline", href: "/features/crm-pipeline", description: "Track saved leads, notes, stages, and follow-ups." },
     ],

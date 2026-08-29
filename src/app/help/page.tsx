@@ -80,7 +80,7 @@ const faqs = [
       },
       {
         q: "What's the difference between the free and Pro plans?",
-        a: "The 3-day trial includes up to 600 lead results, AI proposals, and safe Gmail compose outreach. After the trial, Pro and Agency keep lead discovery active with higher limits and advanced workflows.",
+        a: "Free users can start with 600 weekly lead searches, AI proposals, and safe Gmail compose outreach. Pro and Agency keep lead discovery active with higher limits and advanced workflows.",
       },
     ],
   },
@@ -138,7 +138,7 @@ const faqs = [
     questions: [
       {
         q: "How does billing work?",
-        a: "The 3-day trial is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
+        a: "Free lead search is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
       },
       {
         q: "What payment methods do you accept?",

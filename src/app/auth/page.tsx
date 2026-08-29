@@ -386,7 +386,7 @@ function AuthForm() {
           </p>
           <div className="space-y-3">
             {[
-              "3-day trial includes 600 lead results",
+              "Free account includes 600 weekly lead searches",
               "AI proposal drafting during your trial",
               "Search local businesses, remote jobs, and live signals",
               "Save leads and track follow-up in one CRM pipeline",

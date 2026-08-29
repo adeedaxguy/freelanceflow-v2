@@ -40,6 +40,11 @@ const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
   "local-business-leads-scorecard-for-freelancers": 0.84,
   "proposal-ready-leads-for-freelancers": 0.84,
   "client-acquisition-software-free-plan-test": 0.83,
+  "free-business-leads-for-freelancers": 0.86,
+  "how-to-get-free-leads-for-my-business": 0.85,
+  "business-leads-database-free-vs-qualified-leads": 0.84,
+  "client-acquisition-software-for-freelancers-free-leads-crm": 0.86,
+  "sales-softphone-for-freelancers-us-canada-uk-numbers": 0.85,
 };
 
 const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number }[] = [

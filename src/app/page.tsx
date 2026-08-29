@@ -4,11 +4,13 @@ import HomepageClient from "@/components/HomepageClient";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
   title: "iCloseLeads - Freelance Lead Generation Software",
-  description: "Find web design leads, local business prospects, remote job leads, owner paths, AI proposals, Gmail drafts, softphone calling, and CRM follow-up in one workflow.",
+  description: "Find free business leads, web design leads, local prospects, remote job leads, owner paths, AI proposals, Gmail drafts, softphone calling, and CRM follow-up in one workflow.",
   keywords: [
     "iCloseLeads",
     "icloseleads.com",
     "freelance lead generation",
+    "free business leads",
+    "business leads free",
     "web design leads",
     "local business leads for web designers",
     "freelance cold outreach",
@@ -22,6 +24,8 @@ export const metadata: Metadata = {
     "find freelance clients",
     "AI proposal generator",
     "softphone for freelancers",
+    "sales softphone",
+    "client acquisition software for freelancers",
     "call leads from CRM",
     "freelance CRM",
     "client acquisition for freelancers",
@@ -59,7 +63,7 @@ const organizationJsonLd = {
   "alternateName": ["iCloseLeads"],
   "url": "https://icloseleads.com",
   "logo": "https://icloseleads.com/og-image.png",
-  "description": "Freelance lead generation and cold outreach software for web design leads, remote job leads, local business leads, decision-maker research, AI proposals, softphone calling, and CRM follow-up.",
+    "description": "Freelance lead generation and cold outreach software for free business leads, web design leads, remote job leads, local business leads, decision-maker research, AI proposals, softphone calling, and CRM follow-up.",
   "disambiguatingDescription": "iCloseLeads is an independent freelance lead generation platform. It is not iClose or iCloser.",
   "knowsAbout": [
     "freelance cold outreach",
@@ -68,7 +72,9 @@ const organizationJsonLd = {
     "decision maker finder",
     "AI proposals",
     "softphone calling",
-    "freelance CRM"
+    "freelance CRM",
+    "free business leads",
+    "client acquisition software"
   ],
   "contactPoint": {
     "@type": "ContactPoint",
@@ -84,7 +90,7 @@ const websiteJsonLd = {
   "name": "iCloseLeads",
   "alternateName": "iCloseLeads.com",
   "url": "https://icloseleads.com",
-  "description": "Freelance lead generation software for cold outreach, web design leads, remote job leads, local business leads, decision maker discovery, live job opportunities, AI proposals, softphone calling, and CRM follow-up.",
+  "description": "Freelance lead generation software for free business leads, cold outreach, web design leads, remote job leads, local business leads, decision maker discovery, live job opportunities, AI proposals, softphone calling, and CRM follow-up.",
 };
 
 const softwareJsonLd = {
@@ -94,16 +100,18 @@ const softwareJsonLd = {
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
   "url": "https://icloseleads.com",
-  "description": "Freelance lead generation software for finding web design leads, remote job leads, local business leads, owner and manager contact paths, live job opportunities, AI proposals, Gmail-ready outreach, softphone calling, and CRM pipeline tracking.",
+  "description": "Freelance lead generation software for finding free business leads, web design leads, remote job leads, local business leads, owner and manager contact paths, live job opportunities, AI proposals, Gmail-ready outreach, softphone calling, and CRM pipeline tracking.",
   "featureList": [
     "Freelance cold outreach workflow",
     "Remote job lead discovery",
     "Local business lead generation",
+    "Free business lead search",
     "Decision maker and owner contact path discovery",
     "Live job opportunity feed",
     "AI proposal generator",
     "Gmail-ready outreach preparation",
     "Built-in softphone option for calling leads",
+    "Prompt-to-website design concepts for qualified leads",
     "Freelance CRM pipeline",
     "Lead scoring and analytics"
   ],
