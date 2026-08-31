@@ -5,7 +5,7 @@
  * Replaces the old full-grid card layout. Much smaller footprint.
  */
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { NICHES, type NicheOption } from "@/types";
 import { Search, X, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,7 +27,10 @@ export default function NicheSelector({
   const [query,  setQuery]  = useState("");
   const containerRef        = useRef<HTMLDivElement>(null);
   const inputRef            = useRef<HTMLInputElement>(null);
-  const selectedIds         = Array.isArray(selected) ? selected : selected ? [selected] : [];
+  const selectedIds = useMemo(
+    () => Array.isArray(selected) ? selected : selected ? [selected] : [],
+    [selected],
+  );
 
   // Close on outside click
   useEffect(() => {

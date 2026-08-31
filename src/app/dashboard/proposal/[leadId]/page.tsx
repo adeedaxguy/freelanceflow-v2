@@ -464,10 +464,10 @@ function ProposalBuilder({ leadId }: { leadId: string }) {
   );
 }
 
-interface PageProps { params: Promise<{ leadId: string }> }
+interface PageProps { params: { leadId: string } }
 
-export default async function ProposalPage({ params }: PageProps) {
-  const { leadId } = await params;
+export default function ProposalPage({ params }: PageProps) {
+  const { leadId } = params;
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center py-20">

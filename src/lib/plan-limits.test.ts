@@ -1,4 +1,4 @@
-import { FREE_TRIAL_DAYS, getFreeTrialWindow } from "@/lib/plan-limits";
+import { FREE_TRIAL_DAYS, getFreeTrialWindow, isPlanUpgrade } from "@/lib/plan-limits";
 
 describe("free trial window", () => {
   it("gives new users three days from signup", () => {
@@ -15,5 +15,15 @@ describe("free trial window", () => {
 
     expect(trial.startsAt).toEqual(new Date("2026-08-29T00:00:00.000Z"));
     expect(trial.endsAt).toEqual(new Date("2026-09-01T00:00:00.000Z"));
+  });
+});
+
+describe("plan upgrades", () => {
+  it("allows only movement to a higher paid tier", () => {
+    expect(isPlanUpgrade("free", "pro")).toBe(true);
+    expect(isPlanUpgrade("free", "agency")).toBe(true);
+    expect(isPlanUpgrade("pro", "agency")).toBe(true);
+    expect(isPlanUpgrade("pro", "pro")).toBe(false);
+    expect(isPlanUpgrade("agency", "pro")).toBe(false);
   });
 });

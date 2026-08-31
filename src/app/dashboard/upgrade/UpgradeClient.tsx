@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Zap, Crown, Loader2, ArrowRight, Shield, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { isPlanUpgrade } from "@/lib/plan-limits";
 
 interface Props {
   currentPlan: string;
@@ -43,6 +44,7 @@ export default function UpgradeClient({
   const agencyMonthly = parseInt(pricing.agencyPrice);
   const proAnnual     = Math.round(proMonthly * 10);
   const agencyAnnual  = Math.round(agencyMonthly * 10);
+  const hasHighestPlan = currentPlan === "agency";
 
   async function handleUpgrade(plan: string) {
     setLoading(plan);
@@ -157,7 +159,9 @@ export default function UpgradeClient({
             <h1 className="text-3xl font-extrabold text-foreground">Plans and billing</h1>
             <p className="text-muted-foreground mt-2">
               You&apos;re currently on the <span className="text-foreground font-semibold capitalize">{currentPlan}</span> plan.
-              Upgrade through Stripe for higher limits, more campaigns, and stronger outreach workflows.
+              {hasHighestPlan
+                ? " Your complete plan is active. Use Manage billing for subscription changes."
+                : " Upgrade securely through Stripe for higher limits and more outreach capacity."}
             </p>
             <p className="text-xs text-muted-foreground mt-1">Account: {userEmail}</p>
           </div>
@@ -192,6 +196,10 @@ export default function UpgradeClient({
       <div className="flex items-center gap-3 mb-8">
         <span className={`text-sm font-medium ${billing === "monthly" ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
         <button
+          type="button"
+          role="switch"
+          aria-label="Use annual billing"
+          aria-checked={billing === "annual"}
           onClick={() => setBilling(b => b === "monthly" ? "annual" : "monthly")}
           className={`relative w-12 h-6 rounded-full transition-colors ${billing === "annual" ? "bg-primary" : "bg-muted"}`}
         >
@@ -213,6 +221,7 @@ export default function UpgradeClient({
         {plans.map((plan, i) => {
           const price = billing === "monthly" ? plan.price.monthly : plan.price.annual;
           const isCurrentPlan = currentPlan === plan.id;
+          const canSelectPlan = billingTestMode || isPlanUpgrade(currentPlan, plan.id);
           return (
             <motion.div
               key={plan.id}
@@ -272,6 +281,10 @@ export default function UpgradeClient({
               ) : plan.id === "free" ? (
                 <div className="w-full py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium text-center">
                   Trial access only
+                </div>
+              ) : !canSelectPlan ? (
+                <div className="w-full py-3 rounded-xl border border-border text-muted-foreground text-sm font-medium text-center">
+                  Included in your {currentPlan === "agency" ? "Agency" : "current"} plan
                 </div>
               ) : (
                 <button

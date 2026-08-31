@@ -10,6 +10,7 @@ import {
   isStripeCheckoutConfigured,
 } from "@/lib/stripe";
 import { recordAuditLog } from "@/lib/audit-log";
+import { isPlanUpgrade } from "@/lib/plan-limits";
 
 type PaidPlan = "pro" | "agency";
 type BillingInterval = "monthly" | "annual";
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
       getStripeConfig(),
       prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { email: true, role: true },
+        select: { email: true, role: true, plan: true },
       }),
     ]);
 
@@ -72,6 +73,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: "Paid plans are still in private checkout testing. Your free account remains active.",
       }, { status: 503 });
+    }
+
+    const adminTestCheckout = config.testMode && user?.role === "ADMIN";
+    if (!adminTestCheckout && !isPlanUpgrade(user?.plan ?? "free", plan)) {
+      return NextResponse.json({
+        error: user?.plan === plan
+          ? `Your ${PLAN_LABELS[plan]} plan is already active.`
+          : "Choose Manage billing to change or cancel your current subscription.",
+      }, { status: 409 });
     }
 
     const appUrl = (

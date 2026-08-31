@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import UseCaseMarketingPage from "@/components/UseCaseMarketingPage";
-import { getUseCasePage, USE_CASE_PAGES, useCaseMetadata } from "@/data/use-case-pages";
+import { getUseCasePage, USE_CASE_PAGES, useCaseMetadata as getUseCaseMetadata } from "@/data/use-case-pages";
 
 interface Props {
   params: { slug: string };
@@ -14,7 +14,7 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props): Metadata {
   const page = getUseCasePage(params.slug);
   if (!page) return { title: "Use Case Not Found" };
-  return useCaseMetadata(page);
+  return getUseCaseMetadata(page);
 }
 
 export default function UseCasePage({ params }: Props) {

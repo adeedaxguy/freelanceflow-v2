@@ -9,6 +9,11 @@ import {
 
 interface Props {
   initialSettings: Record<string, string>;
+  stripeEnvironment: {
+    secretKey: boolean;
+    webhookSecret: boolean;
+    mode: "test" | "live";
+  };
   lemonEnvironment: {
     apiKey: boolean;
     webhookSecret: boolean;
@@ -61,7 +66,7 @@ function Section({ title, icon, children, color = "primary" }: {
   );
 }
 
-export default function AdminSettingsClient({ initialSettings, lemonEnvironment }: Props) {
+export default function AdminSettingsClient({ initialSettings, stripeEnvironment, lemonEnvironment }: Props) {
   const [s, setS] = useState<Record<string, string>>({ ...initialSettings });
   const [saving, setSaving] = useState<string | null>(null);
   const [savedSections, setSavedSections] = useState<Set<string>>(new Set());
@@ -152,9 +157,29 @@ export default function AdminSettingsClient({ initialSettings, lemonEnvironment 
         </form>
       </Section>
 
-      <Section title="Payment Gateway (Lemon Squeezy)" icon={<CreditCard className="w-4 h-4 text-accent" />} color="primary">
+      <Section title="Active Payment Gateway (Stripe)" icon={<CreditCard className="w-4 h-4 text-accent" />} color="primary">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+            <span className="text-muted-foreground">Secret key</span>
+            <span className={stripeEnvironment.secretKey ? "text-accent" : "text-gold"}>{stripeEnvironment.secretKey ? "Configured" : "Missing"}</span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+            <span className="text-muted-foreground">Webhook</span>
+            <span className={stripeEnvironment.webhookSecret ? "text-accent" : "text-gold"}>{stripeEnvironment.webhookSecret ? "Configured" : "Missing"}</span>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
+            <span className="text-muted-foreground">Mode</span>
+            <span className={stripeEnvironment.mode === "live" ? "text-accent" : "text-gold"}>{stripeEnvironment.mode === "live" ? "Live" : "Test"}</span>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-surface px-3 py-3 text-xs text-muted-foreground">
+          Plan subscriptions, softphone numbers, and calling minute packages use Stripe. Webhook: <span className="font-mono text-foreground">https://icloseleads.com/api/webhooks/stripe</span>
+        </div>
+      </Section>
+
+      <Section title="Legacy Payment Gateway (Lemon Squeezy)" icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}>
         <div className="rounded-lg border border-accent/20 bg-accent/5 px-3 py-3 text-xs text-muted-foreground">
-          Store and variant IDs are safe to configure here. API and webhook secrets are accepted only through Vercel environment variables and are never stored in the platform database.
+          Preserved for historical subscriptions and rollback only. New plan and softphone checkouts use Stripe.
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2.5 text-sm">
@@ -204,9 +229,9 @@ export default function AdminSettingsClient({ initialSettings, lemonEnvironment 
         </form>
       </Section>
 
-      <Section title="Legacy Stripe settings" icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}>
+      <Section title="Payment event logging" icon={<CreditCard className="w-4 h-4 text-muted-foreground" />}>
         <p className="text-sm text-muted-foreground">
-          Existing Stripe values are preserved for rollback, but new iCloseLeads checkouts use Lemon Squeezy. The legacy webhook now rejects unsigned requests.
+          Stripe checkout failures, expired sessions, failed invoices, and subscription changes are recorded in the admin audit log.
         </p>
       </Section>
 

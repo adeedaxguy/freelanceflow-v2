@@ -244,7 +244,7 @@ function CopyButton({ text }: { text: string }) {
 function SmartPagination({ page, total, onChange }: { page: number; total: number; onChange: (p: number) => void }) {
   if (total <= 1) return null;
 
-  const pages: (number | "…")[] = useMemo(() => {
+  const pages: (number | "…")[] = (() => {
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const result: (number | "…")[] = [1];
     if (page > 3)           result.push("…");
@@ -252,7 +252,7 @@ function SmartPagination({ page, total, onChange }: { page: number; total: numbe
     if (page < total - 2)   result.push("…");
     result.push(total);
     return result;
-  }, [page, total]);
+  })();
 
   return (
     <div className="flex items-center gap-1.5">

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Plus, Edit2, Trash2, Eye, EyeOff, BookOpen, ArrowLeft,
-  Save, Globe, Tag, User, Image, Search, CheckCircle,
+  Save, Globe, Tag, User, Image as ImageIcon, Search, CheckCircle,
   AlertCircle, XCircle, RefreshCw, ExternalLink, Bold,
   Italic, List, Heading1, Heading2, Code, Quote, Link2,
   AlignLeft, Type, Minus,
@@ -403,7 +403,7 @@ export default function AdminBlogPage() {
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none"/>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block flex items-center gap-1"><Image className="w-3 h-3"/>Cover Image URL</label>
+                  <label className="text-xs text-muted-foreground mb-1 block flex items-center gap-1"><ImageIcon className="w-3 h-3"/>Cover Image URL</label>
                   <input value={form.coverImage} onChange={e => setForm(p => ({...p, coverImage:e.target.value}))}
                     placeholder="https://…"
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground focus:outline-none"/>
