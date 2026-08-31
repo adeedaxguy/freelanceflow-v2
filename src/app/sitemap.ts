@@ -23,6 +23,7 @@ const RESOURCE_PRIORITY_OVERRIDES: Record<string, number> = {
 };
 
 const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
+  "client-acquisition-agency-vs-software-for-freelancers": 0.86,
   "freelance-client-acquisition-system": 0.86,
   "softphone-for-freelance-lead-outreach": 0.85,
   "softphone-for-sales-teams-client-acquisition": 0.86,
