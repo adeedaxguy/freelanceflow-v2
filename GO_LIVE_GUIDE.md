@@ -237,7 +237,7 @@ In Vercel env vars, add `OPENAI_API_KEY`. The proposal generator already has Gro
 
 1. https://stripe.com → create products **Pro** ($19/mo) and **Agency** ($49/mo).
 2. Copy the price IDs into the upgrade page (`src/app/dashboard/upgrade/UpgradeClient.tsx`).
-3. Add env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_AGENCY_PRICE_ID`.
+3. Add env vars: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and the four `STRIPE_{PRO|AGENCY}_{MONTHLY|ANNUAL}_PRICE_ID` values.
 4. Set up the webhook endpoint in Stripe pointing to `https://yourdomain.com/api/webhooks/stripe`.
 
 ## Proper-route monthly cost: ~$30–60

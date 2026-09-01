@@ -25,6 +25,10 @@ async function monthlyPriceCents(plan: PaidPlan) {
   return Math.round((await getConfiguredPlanMonthlyPrice(plan)) * 100);
 }
 
+function stripePriceId(plan: PaidPlan, billing: BillingInterval) {
+  return process.env[`STRIPE_${plan.toUpperCase()}_${billing.toUpperCase()}_PRICE_ID`]?.trim() || undefined;
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -85,6 +89,7 @@ export async function POST(req: NextRequest) {
       productName: `iCloseLeads ${PLAN_LABELS[plan]}`,
       description: `${PLAN_LABELS[plan]} plan subscription`,
       amountCents,
+      priceId: stripePriceId(plan, billing),
       interval: billing === "annual" ? "year" : "month",
       successUrl: `${appUrl}/dashboard/upgrade?checkout=success`,
       cancelUrl: `${appUrl}/dashboard/upgrade?checkout=cancelled`,

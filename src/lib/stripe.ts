@@ -77,6 +77,7 @@ type CheckoutInput = {
   productName: string;
   description?: string;
   amountCents: number;
+  priceId?: string;
   currency?: string;
   interval?: "month" | "year";
   successUrl: string;
@@ -94,13 +95,18 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
     cancel_url: input.cancelUrl,
     "payment_method_types[0]": "card",
     "line_items[0][quantity]": "1",
-    "line_items[0][price_data][currency]": (input.currency || "USD").toLowerCase(),
-    "line_items[0][price_data][unit_amount]": String(input.amountCents),
-    "line_items[0][price_data][recurring][interval]": input.interval || "month",
-    "line_items[0][price_data][product_data][name]": input.productName,
   });
-  if (input.description) {
-    body.set("line_items[0][price_data][product_data][description]", input.description);
+
+  if (input.priceId) {
+    body.set("line_items[0][price]", input.priceId);
+  } else {
+    body.set("line_items[0][price_data][currency]", (input.currency || "USD").toLowerCase());
+    body.set("line_items[0][price_data][unit_amount]", String(input.amountCents));
+    body.set("line_items[0][price_data][recurring][interval]", input.interval || "month");
+    body.set("line_items[0][price_data][product_data][name]", input.productName);
+    if (input.description) {
+      body.set("line_items[0][price_data][product_data][description]", input.description);
+    }
   }
   if (input.customerEmail) body.set("customer_email", input.customerEmail);
   for (const [key, value] of Object.entries(input.metadata)) {

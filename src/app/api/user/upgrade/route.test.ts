@@ -65,6 +65,8 @@ function request(plan: string, billing = "monthly") {
 describe("Stripe plan checkout", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.STRIPE_PRO_MONTHLY_PRICE_ID;
+    delete process.env.STRIPE_AGENCY_ANNUAL_PRICE_ID;
     (prisma.user.findUnique as jest.Mock).mockResolvedValue({
       email: "buyer@example.com",
       role: "USER",
@@ -79,6 +81,7 @@ describe("Stripe plan checkout", () => {
   });
 
   it("starts checkout for a genuine plan upgrade", async () => {
+    process.env.STRIPE_PRO_MONTHLY_PRICE_ID = "price_pro_monthly";
     const response = await POST(request("pro"));
 
     expect(response.status).toBe(200);
@@ -86,12 +89,14 @@ describe("Stripe plan checkout", () => {
       expect.any(Object),
       expect.objectContaining({
         amountCents: 1000,
+        priceId: "price_pro_monthly",
         metadata: expect.objectContaining({ plan: "pro", purchase_type: "plan" }),
       }),
     );
   });
 
   it("applies the annual discount to the Agency price", async () => {
+    process.env.STRIPE_AGENCY_ANNUAL_PRICE_ID = "price_agency_annual";
     const response = await POST(request("agency", "annual"));
 
     expect(response.status).toBe(200);
@@ -99,6 +104,7 @@ describe("Stripe plan checkout", () => {
       expect.any(Object),
       expect.objectContaining({
         amountCents: 15000,
+        priceId: "price_agency_annual",
         interval: "year",
         metadata: expect.objectContaining({ plan: "agency", billing_interval: "annual" }),
       }),
