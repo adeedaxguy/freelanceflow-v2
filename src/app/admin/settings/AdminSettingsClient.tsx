@@ -239,10 +239,10 @@ export default function AdminSettingsClient({ initialSettings, stripeEnvironment
       <Section title="Pricing Display" icon={<DollarSign className="w-4 h-4 text-gold" />} color="gold">
         <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("pricing", ["pro_price_monthly", "agency_price_monthly"]); }}
           className="space-y-4">
-          <p className="text-xs text-muted-foreground">These control the prices displayed on the upgrade page and landing page.</p>
+          <p className="text-xs text-muted-foreground">These control the upgrade page and new Stripe subscription checkouts.</p>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Pro Monthly Price ($)" value={get("pro_price_monthly")} onChange={v => set("pro_price_monthly", v)} type="number" placeholder="29" />
-            <Field label="Agency Monthly Price ($)" value={get("agency_price_monthly")} onChange={v => set("agency_price_monthly", v)} type="number" placeholder="79" />
+            <Field label="Pro Monthly Price ($)" value={get("pro_price_monthly")} onChange={v => set("pro_price_monthly", v)} type="number" placeholder="10" />
+            <Field label="Agency Monthly Price ($)" value={get("agency_price_monthly")} onChange={v => set("agency_price_monthly", v)} type="number" placeholder="15" />
           </div>
           <SaveBtn sectionKey="pricing" />
         </form>

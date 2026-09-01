@@ -9,8 +9,9 @@ import {
   Settings, MessageSquare, DollarSign, Megaphone, UserCheck, FileText,
   ArrowUpRight, Clock, Zap,
 } from "lucide-react";
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
 
-const PLAN_PRICE: Record<string, number> = { free: 0, pro: 29, agency: 79 };
+const PLAN_PRICE: Record<string, number> = PLAN_MONTHLY_PRICES;
 
 async function getAdminStats() {
   const now = new Date();

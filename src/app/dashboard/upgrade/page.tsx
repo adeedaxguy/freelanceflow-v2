@@ -5,25 +5,29 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getStripeConfig, isStripeCheckoutConfigured } from "@/lib/stripe";
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
+import { getConfiguredPlanMonthlyPrice } from "@/lib/plan-pricing.server";
 import UpgradeClient from "./UpgradeClient";
 
 async function getPlatformPricing() {
   try {
-    const settings = await prisma.platformSetting.findMany({
-      where: {
-        key: { in: ["pro_price_monthly", "agency_price_monthly", "pro_leads_per_week", "agency_leads_per_week"] },
-      },
-    });
-    const map: Record<string, string> = {};
-    for (const s of settings) map[s.key] = s.value;
+    const [proPrice, agencyPrice] = await Promise.all([
+      getConfiguredPlanMonthlyPrice("pro"),
+      getConfiguredPlanMonthlyPrice("agency"),
+    ]);
     return {
-      proPrice:        map["pro_price_monthly"] ?? "29",
-      agencyPrice:     map["agency_price_monthly"] ?? "79",
+      proPrice:        String(proPrice),
+      agencyPrice:     String(agencyPrice),
       proLeads:        "1,000",
       agencyLeads:     "Unlimited",
     };
   } catch {
-    return { proPrice: "29", agencyPrice: "79", proLeads: "1,000", agencyLeads: "Unlimited" };
+    return {
+      proPrice: String(PLAN_MONTHLY_PRICES.pro),
+      agencyPrice: String(PLAN_MONTHLY_PRICES.agency),
+      proLeads: "1,000",
+      agencyLeads: "Unlimited",
+    };
   }
 }
 

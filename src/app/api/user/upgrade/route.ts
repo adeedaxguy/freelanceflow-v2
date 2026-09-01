@@ -11,8 +11,9 @@ import {
 } from "@/lib/stripe";
 import { recordAuditLog } from "@/lib/audit-log";
 import { isPlanUpgrade } from "@/lib/plan-limits";
+import type { PaidPlan } from "@/lib/plan-pricing";
+import { getConfiguredPlanMonthlyPrice } from "@/lib/plan-pricing.server";
 
-type PaidPlan = "pro" | "agency";
 type BillingInterval = "monthly" | "annual";
 
 const PLAN_LABELS: Record<PaidPlan, string> = {
@@ -20,21 +21,8 @@ const PLAN_LABELS: Record<PaidPlan, string> = {
   agency: "Agency",
 };
 
-const DEFAULT_MONTHLY_PRICES: Record<PaidPlan, number> = {
-  pro: 29,
-  agency: 79,
-};
-
-function priceCents(value: string | null | undefined, fallbackDollars: number) {
-  const dollars = Number(value);
-  return Math.round((Number.isFinite(dollars) && dollars > 0 ? dollars : fallbackDollars) * 100);
-}
-
 async function monthlyPriceCents(plan: PaidPlan) {
-  const setting = await prisma.platformSetting.findUnique({
-    where: { key: `${plan}_price_monthly` },
-  }).catch(() => null);
-  return priceCents(setting?.value, DEFAULT_MONTHLY_PRICES[plan]);
+  return Math.round((await getConfiguredPlanMonthlyPrice(plan)) * 100);
 }
 
 export async function POST(req: NextRequest) {

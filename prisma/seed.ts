@@ -91,8 +91,8 @@ async function main() {
     { key: "free_leads_per_week", value: "20" },
     { key: "pro_leads_per_week",  value: "500" },
     { key: "agency_leads_per_week", value: "2000" },
-    { key: "pro_price_monthly",   value: "29" },
-    { key: "agency_price_monthly", value: "79" },
+    { key: "pro_price_monthly",   value: "10" },
+    { key: "agency_price_monthly", value: "15" },
   ];
 
   for (const s of settings) {

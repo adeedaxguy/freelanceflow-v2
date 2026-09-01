@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -12,11 +13,7 @@ async function requireAdmin() {
 }
 
 // Pricing tiers (USD/month)
-const PLAN_PRICE: Record<string, number> = {
-  free:   0,
-  pro:    29,
-  agency: 79,
-};
+const PLAN_PRICE: Record<string, number> = PLAN_MONTHLY_PRICES;
 
 export async function GET() {
   try {

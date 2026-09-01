@@ -2,10 +2,15 @@ export const dynamic = 'force-dynamic';
 
 import { prisma } from "@/lib/prisma";
 import { getStripeConfig } from "@/lib/stripe";
+import { getConfiguredPlanMonthlyPrice } from "@/lib/plan-pricing.server";
 import AdminSettingsClient from "./AdminSettingsClient";
 
 async function getSettings() {
   try {
+    await Promise.all([
+      getConfiguredPlanMonthlyPrice("pro"),
+      getConfiguredPlanMonthlyPrice("agency"),
+    ]);
     const rows = await prisma.platformSetting.findMany({ orderBy: { key: "asc" } });
     const map: Record<string, string> = {};
     for (const r of rows) {

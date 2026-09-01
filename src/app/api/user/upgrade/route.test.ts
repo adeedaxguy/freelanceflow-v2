@@ -28,6 +28,7 @@ jest.mock("@/lib/prisma", () => ({
     },
     platformSetting: {
       findUnique: jest.fn(async () => null),
+      upsert: jest.fn(async () => ({ value: "10" })),
     },
   },
 }));
@@ -84,8 +85,22 @@ describe("Stripe plan checkout", () => {
     expect(createStripeSubscriptionCheckout).toHaveBeenCalledWith(
       expect.any(Object),
       expect.objectContaining({
-        amountCents: 2900,
+        amountCents: 1000,
         metadata: expect.objectContaining({ plan: "pro", purchase_type: "plan" }),
+      }),
+    );
+  });
+
+  it("applies the annual discount to the Agency price", async () => {
+    const response = await POST(request("agency", "annual"));
+
+    expect(response.status).toBe(200);
+    expect(createStripeSubscriptionCheckout).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.objectContaining({
+        amountCents: 15000,
+        interval: "year",
+        metadata: expect.objectContaining({ plan: "agency", billing_interval: "annual" }),
       }),
     );
   });

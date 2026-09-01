@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { DollarSign, TrendingUp, Users, ArrowUpRight, RefreshCw, Zap, Crown, Star } from "lucide-react";
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
 
 interface RevenueData {
   mrr: number; arr: number; paidUsers: number; totalUsers: number; convRate: number;
@@ -34,8 +35,8 @@ export default function AdminRevenuePage() {
   const maxMrr = Math.max(...data.monthlyData.map(m => m.mrr), 1);
   const plans = [
     { key: "free",   label: "Free",   price: 0,  icon: Star,   color: "text-slate-400",  bg: "bg-slate-500/10 border-slate-500/20"  },
-    { key: "pro",    label: "Pro",    price: 29, icon: Zap,    color: "text-primary-light", bg: "bg-primary/10 border-primary/20"   },
-    { key: "agency", label: "Agency", price: 79, icon: Crown,  color: "text-accent",      bg: "bg-accent/10 border-accent/20"      },
+    { key: "pro",    label: "Pro",    price: data.planPrices.pro ?? PLAN_MONTHLY_PRICES.pro, icon: Zap,    color: "text-primary-light", bg: "bg-primary/10 border-primary/20"   },
+    { key: "agency", label: "Agency", price: data.planPrices.agency ?? PLAN_MONTHLY_PRICES.agency, icon: Crown,  color: "text-accent",      bg: "bg-accent/10 border-accent/20"      },
   ];
 
   return (

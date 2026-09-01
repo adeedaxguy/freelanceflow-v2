@@ -15,14 +15,21 @@ const baseProps = {
   hasBillingSubscription: true,
   checkoutReturned: false,
   pricing: {
-    proPrice: "29",
-    agencyPrice: "79",
+    proPrice: "10",
+    agencyPrice: "15",
     proLeads: "1,000",
     agencyLeads: "Unlimited",
   },
 };
 
 describe("UpgradeClient", () => {
+  it("shows the current monthly prices", () => {
+    render(<UpgradeClient {...baseProps} currentPlan="free" />);
+
+    expect(screen.getByText("$10")).toBeInTheDocument();
+    expect(screen.getByText("$15")).toBeInTheDocument();
+  });
+
   it("does not offer a lower-tier checkout to an Agency customer", () => {
     render(<UpgradeClient {...baseProps} currentPlan="agency" />);
 

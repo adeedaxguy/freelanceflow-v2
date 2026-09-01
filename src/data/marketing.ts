@@ -1,3 +1,5 @@
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
+
 export interface Testimonial {
   name: string; role: string; company?: string; avatar: string;
   content: string; rating: number; niche?: string;
@@ -44,7 +46,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     name: "Pro",
-    price: "$29",
+    price: `$${PLAN_MONTHLY_PRICES.pro}`,
     period: "mo",
     description: "Everything you need to land clients consistently.",
     limit: "1,000 leads/week",
@@ -67,7 +69,7 @@ export const PRICING_TIERS: PricingTier[] = [
   },
   {
     name: "Agency",
-    price: "$79",
+    price: `$${PLAN_MONTHLY_PRICES.agency}`,
     period: "mo",
     description: "For agencies running outreach at scale.",
     limit: "Unlimited leads",
