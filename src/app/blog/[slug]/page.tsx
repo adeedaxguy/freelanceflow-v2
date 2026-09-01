@@ -21,6 +21,7 @@ import {
   type BlogArticleSource,
   estimateWordCount,
   extractArticleHeadings,
+  getNextStaticPost,
   getRelatedStaticPosts,
   headingId,
 } from "@/lib/blog-seo";
@@ -377,8 +378,8 @@ function mergeRelatedPosts(posts: BlogPost[], limit = 3) {
   }).slice(0, limit);
 }
 
-function RelatedArticlesSection({ posts }: { posts: BlogPost[] }) {
-  if (!posts.length) return null;
+function RelatedArticlesSection({ posts, nextPost }: { posts: BlogPost[]; nextPost: BlogPost | null }) {
+  if (!posts.length && !nextPost) return null;
 
   return (
     <section className="py-16 bg-surface border-t border-border">
@@ -388,13 +389,26 @@ function RelatedArticlesSection({ posts }: { posts: BlogPost[] }) {
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-light">Keep reading</p>
             <h2 className="mt-2 text-2xl font-bold text-foreground">Related Articles</h2>
           </div>
-          <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
-            View All Articles <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {nextPost && (
+              <Link
+                href={`/blog/${nextPost.slug}`}
+                className="inline-flex max-w-full items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <span className="truncate">Next guide: {nextPost.title}</span>
+                <ArrowRight className="h-4 w-4 shrink-0" />
+              </Link>
+            )}
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
+              View All Articles <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {posts.map(p => <BlogCard key={p.id ?? p.slug} post={p} />)}
-        </div>
+        {posts.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {posts.map(p => <BlogCard key={p.id ?? p.slug} post={p} />)}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -433,6 +447,10 @@ export default async function BlogPostPage({ params }: Props) {
     const relatedDbPosts = await getRelatedDbPosts(dbPost);
     const relatedStaticPosts = getRelatedStaticPosts(articleSource, STATIC_POSTS, 6);
     const relatedPosts = mergeRelatedPosts([...relatedDbPosts, ...relatedStaticPosts], 3);
+    const nextStaticPost = getNextStaticPost(
+      articleSource,
+      STATIC_POSTS.filter(candidate => !isHiddenBlogSlug(candidate.slug)),
+    );
     let jsonLd: object;
     try { jsonLd = JSON.parse(dbPost.schema ?? "{}") as object; } catch { jsonLd = {}; }
     if (!Object.keys(jsonLd).length) {
@@ -527,7 +545,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             <BlogComments slug={dbPost.slug} />
           </article>
-          <RelatedArticlesSection posts={relatedPosts} />
+          <RelatedArticlesSection posts={relatedPosts} nextPost={nextStaticPost} />
         </main>
         <Footer />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -561,6 +579,10 @@ export default async function BlogPostPage({ params }: Props) {
   };
   const articleHeadings = extractArticleHeadings(content);
   const relatedPosts = mergeRelatedPosts(getRelatedStaticPosts(articleSource, STATIC_POSTS, 6), 3);
+  const nextStaticPost = getNextStaticPost(
+    articleSource,
+    STATIC_POSTS.filter(candidate => !isHiddenBlogSlug(candidate.slug)),
+  );
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -635,7 +657,7 @@ export default async function BlogPostPage({ params }: Props) {
           <BlogComments slug={post.slug} />
         </article>
 
-        <RelatedArticlesSection posts={relatedPosts} />
+        <RelatedArticlesSection posts={relatedPosts} nextPost={nextStaticPost} />
       </main>
       <Footer />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />

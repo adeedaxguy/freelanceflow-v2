@@ -1036,3 +1036,22 @@ export function getRelatedStaticPosts(current: BlogArticleSource, posts: BlogPos
     .slice(0, limit)
     .map(item => item.post);
 }
+
+export function getNextStaticPost(current: BlogArticleSource, posts: BlogPost[]): BlogPost | null {
+  const orderedPosts = posts
+    .filter(post => post.published && post.slug !== current.slug)
+    .sort((a, b) => a.slug.localeCompare(b.slug));
+
+  if (!orderedPosts.length) return null;
+
+  const allSlugs = posts
+    .filter(post => post.published)
+    .map(post => post.slug)
+    .sort((a, b) => a.localeCompare(b));
+  const currentIndex = allSlugs.indexOf(current.slug);
+
+  if (currentIndex < 0) return orderedPosts[0] ?? null;
+
+  const nextSlug = allSlugs[(currentIndex + 1) % allSlugs.length];
+  return orderedPosts.find(post => post.slug === nextSlug) ?? orderedPosts[0] ?? null;
+}

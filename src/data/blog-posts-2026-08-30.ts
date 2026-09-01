@@ -1,6 +1,7 @@
 import type { BlogArticleVisual, BlogConversionFunnel, BlogPost } from "@/types";
 
 const publishedAt = (hour: number, minute = 0) => new Date(Date.UTC(2026, 7, 30, hour, minute, 0));
+const refreshedAt = (hour: number, minute = 0) => new Date(Date.UTC(2026, 8, 2, hour, minute, 0));
 
 const dataLedVisuals: BlogArticleVisual[] = [
   {
@@ -304,69 +305,97 @@ Use free lead databases for discovery, but do not let them define your outreach.
   },
   {
     id: "client-acquisition-software-for-freelancers-free-leads-crm",
-    title: "Client Acquisition Software for Freelancers: What to Look for Before You Pay",
+    title: "Client Acquisition Software for Freelancers: A Practical Evaluation Guide",
     slug: "client-acquisition-software-for-freelancers-free-leads-crm",
     excerpt:
-      "A comparison-style guide for freelancers evaluating client acquisition software, free leads, proposals, softphone calling, and CRM follow-up.",
-    content: `Client acquisition software is a crowded search result because the phrase can mean many things: analytics tools, CRM systems, landing page builders, outreach platforms, ad tools, lead databases, and sales software.
+      "Evaluate client acquisition software for freelancers by its lead discovery, qualification context, AI proposals, softphone, web design concepts, CRM follow-up, and free-week test.",
+    content: `Client acquisition software can mean a lead list, a CRM, a proposal writer, or a much broader sales platform. That makes a feature checklist a poor way to choose. A freelancer needs to know whether a tool helps turn one relevant prospect into a respectful, trackable next step.
 
-For freelancers, that broad definition is not enough. The right software should help you get from first search to first conversation.
+This guide is for freelancers who want to evaluate the workflow before committing to a new tool. It does not assume that more contacts are better. The useful test is whether the tool helps you discover a plausible lead, understand why the lead may fit, prepare a specific approach, and keep the follow-up from disappearing.
 
 ## Short answer
 
-The best client acquisition software for freelancers connects lead discovery, qualification, proof, outreach, calling, and follow-up. If the tool only gives you a list, you still have to build the real system yourself.
+The best client acquisition software for freelancers supports the whole path from lead discovery to qualification context, AI proposal drafting, softphone calling when appropriate, web design concepts when a visual pitch helps, and CRM follow-up. iCloseLeads gives free users 600 weekly lead searches so you can test that path with a real offer and market before deciding what deserves more of your time.
 
-## The freelancer buying criteria
+## Compare the workflow, not the feature count
 
-Use these questions before paying for any client acquisition tool:
+Different tool categories solve different parts of client acquisition. The comparison below is deliberately about the work a freelancer still has to do after opening the tool.
 
-- Can I search for the exact buyer I serve?
-- Can I see why this lead is relevant?
-- Can I save proof before writing?
-- Can I draft a specific message from the context?
-- Can I call from a professional number when phone outreach fits?
-- Can I track follow-up without a separate CRM?
-- Can I test the workflow for free?
+| Approach | Useful starting point | What you still need to connect | Best evaluation question |
+| --- | --- | --- | --- |
+| Lead list or directory | A pool of possible businesses or contacts | Fit, current context, proposal angle, and follow-up | Can I explain why this prospect belongs on my list? |
+| Standalone CRM | A place to record stages and next actions | Lead discovery, qualification research, and pitch preparation | Does the lead record preserve the reason I should contact them? |
+| Proposal-writing tool | Help shaping a first draft | A verified prospect, relevant context, and a follow-up process | Is the draft based on a real reason to reach out? |
+| iCloseLeads | Lead discovery, qualification context, AI proposals, softphone, web design concepts, and CRM follow-up | Your offer, judgment, and respectful execution | Can one focused search become one qualified, actionable prospect? |
 
-That last point matters. A free plan or allowance should let you test the loop, not just preview a locked database.
+For a freelancer, the last question is the commercial one. A tool can have a long feature list and still leave you with a generic first message, a forgotten follow-up, or a lead that never matched your service. The right evaluation starts with a small, real prospecting sprint.
 
-## Why iCloseLeads is different from broad B2B software
+## The buying criteria that matter for a solo operator
 
-Many customer acquisition tools are built for funded companies with sales teams. Freelancers need a smaller workflow:
+Use these six criteria to judge any client acquisition workflow:
 
-1. find a good-fit lead
-2. understand the reason to pitch
-3. prepare one useful message
-4. follow up without forgetting the context
+1. **Buyer fit:** Can you search for the niche, location, or type of work you can genuinely sell now?
+2. **Qualification context:** Can you record the public signal, business problem, and reason this lead is worth your attention?
+3. **Proposal readiness:** Can you move from saved context to an AI proposal draft without asking the tool to invent personalization?
+4. **Contact choice:** When a public phone route is appropriate, can you use a softphone instead of treating every prospect exactly the same?
+5. **Pitch clarity:** When you sell web work, can you create a web design concept that makes the proposed improvement easier to discuss?
+6. **Follow-up visibility:** Can you keep the next action visible in a CRM after the first proposal or conversation?
 
-iCloseLeads keeps that loop tight with <a href="/features/lead-discovery">lead discovery</a>, <a href="/features/ai-proposals">proposal drafts</a>, <a href="/features/softphone">softphone calling</a>, <a href="/features/web-design-generator">web design concepts</a>, and <a href="/features/crm-pipeline">CRM stages</a>.
+These criteria are connected in iCloseLeads through <a href="/features/lead-discovery">lead discovery</a>, qualification context, <a href="/features/ai-proposals">AI proposals</a>, <a href="/features/softphone">softphone calling</a>, <a href="/features/web-design-generator">web design concepts</a>, and <a href="/features/crm-pipeline">CRM follow-up</a>. They are not a promise that every lead will respond. They are a way to make each next action more deliberate.
 
-## The free-leads test
+## Lead qualification scorecard: decide before you draft
 
-Before upgrading, run one focused week:
+A raw lead is not automatically a sales opportunity. Score each prospect from 0 to 2 in the five areas below before you spend time on a proposal or a call.
 
-- choose one service
-- choose one buyer group
-- use 600 weekly searches to find prospects
-- save only the best 20 to 40
-- draft 10 messages
-- make 3 to 5 calls if the phone path is appropriate
-- review replies and objections
+| Criterion | 0 points | 1 point | 2 points |
+| --- | --- | --- | --- |
+| Offer fit | Your service is not a clear match | The match is possible but broad | Your offer addresses a clear need for this buyer |
+| Visible proof | No public reason to contact them | A general signal exists | You can point to a specific, relevant observation |
+| Timing | No sign the work matters now | The need may be current | A current signal makes the conversation timely |
+| Contact route | No clear business-facing route | A route exists but needs care | A respectful, appropriate route is clear |
+| Next action | You cannot name a useful next step | You have a tentative idea | You can name a small, relevant next step |
 
-If that process creates real conversations, the tool has earned its place.
+**8-10:** Save the lead and move it toward an AI proposal, a web design concept, a softphone call where appropriate, or CRM follow-up.
+
+**5-7:** Keep researching; do not force a pitch yet.
+
+**0-4:** Skip it and protect your time for better-fit prospects.
+
+For a deeper version of this decision process, use the <a href="/resources/qualified-leads-for-freelancers-scorecard">qualified leads scorecard for freelancers</a>. If you sell locally, the <a href="/lead-generation/local-business-leads">local business leads</a> page shows how to begin with a city and category rather than a broad list.
+
+## A clear free-week activation plan
+
+The free allowance is 600 weekly lead searches. Treat it as a research budget, not a quota for messages. Start by <a href="/auth?mode=signup&intent=client-acquisition-software-freelancers&source=client-acquisition-software-for-freelancers-free-leads-crm">creating a free iCloseLeads account</a>, then run one focused week like this:
+
+1. **Choose one offer and one market.** Write a simple sentence: "I help [buyer] improve [outcome] by fixing [problem]." For example, a web designer might focus on local service businesses with weak booking or quote paths.
+2. **Use the first 250 searches for discovery.** Search only the buyer group you chose. Open the leads that appear connected to the offer; do not change niches just to create volume.
+3. **Use 150 searches to compare a second angle.** Test one nearby location, service category, or problem signal. This is enough to learn whether the first angle is too broad or too narrow.
+4. **Use 100 searches to qualify context.** Check the visible signal, fit, timing, and appropriate contact route. Save the reason with the lead, not only the business name.
+5. **Use the final 100 searches to sharpen the shortlist.** Revisit the strongest lead pattern and find prospects that meet the scorecard threshold. Then choose the few that support a genuinely useful next step.
+6. **Turn qualified context into action.** Use an AI proposal draft when the lead is proposal-ready. For a web opportunity, prepare a web design concept. Use the softphone only when a phone route fits the prospect and your approach. Put every active prospect into CRM follow-up with a clear next action.
+
+At the end of the week, review the quality of the saved leads rather than counting activity. Did the search produce prospects you can explain? Did the context make a proposal more specific? Did the CRM show the next follow-up? That is a much better basis for a software decision than a demo screen or a broad feature list.
+
+## Match the workflow to the service you sell
+
+For general freelance prospecting, begin with <a href="/lead-generation/freelance-client-leads">freelance client leads</a>. For website services, use <a href="/lead-generation/web-design-leads">web design leads</a> and evaluate whether a concept gives the prospect a clearer picture of the improvement you are proposing. For a fuller comparison of the free evaluation path, see <a href="/resources/client-acquisition-software-for-freelancers-free-plan">client acquisition software for freelancers with a free plan</a>.
+
+The same rule applies across services: lead discovery should give you a possible buyer, qualification should tell you whether there is a real reason to proceed, and the next action should stay visible after you make it. That is how a freelancer avoids moving between disconnected lists, drafts, and follow-up notes.
 
 ## Final takeaway
 
-Do not judge client acquisition software by feature count. Judge it by whether it helps you find better prospects and take the next action faster.`,
+Do not choose client acquisition software because it promises the largest pool of names. Choose the workflow that helps you make a sound decision about the next prospect: discover the lead, qualify the context, prepare a useful proposal or concept, call thoughtfully when appropriate, and follow up in the CRM.
+
+iCloseLeads is ready to test on that standard. <a href="/auth?mode=signup&intent=client-acquisition-software-freelancers&source=client-acquisition-software-for-freelancers-free-leads-crm">Sign up free and use the 600 weekly lead searches</a> to run one focused market test this week.`,
     category: "Client Acquisition",
     published: true,
     coverImage: "/blog-images/client-acquisition-system-overview.svg",
     readTime: 7,
     createdAt: publishedAt(6, 30),
-    updatedAt: publishedAt(6, 30),
+    updatedAt: refreshedAt(6, 30),
     metaTitle: "Client Acquisition Software for Freelancers | Free Leads + CRM",
     metaDescription:
-      "Compare client acquisition software for freelancers by lead discovery, proof, proposals, softphone calling, CRM, and free weekly lead searches.",
+      "Evaluate client acquisition software for freelancers with a comparison, lead scorecard, 600-search free-week plan, AI proposals, softphone, web concepts, and CRM follow-up.",
     author: "iCloseLeads SEO Team",
     tags: ["client acquisition software", "freelancer CRM", "lead generation software", "softphone"],
     focusKeyword: "client acquisition software for freelancers",

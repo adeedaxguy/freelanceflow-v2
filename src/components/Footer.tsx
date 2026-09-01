@@ -51,11 +51,27 @@ const footerGroups = [
     ],
   },
   {
+    title: "Built for",
+    links: [
+      { label: "Web Designers", href: "/for/web-designers" },
+      { label: "Marketing Agencies", href: "/for/marketing-agencies" },
+      { label: "Copywriters", href: "/for/freelance-copywriters" },
+      { label: "SEO Consultants", href: "/for/seo-consultants" },
+      { label: "WordPress Developers", href: "/for/wordpress-developers" },
+      { label: "Real Estate Brokers", href: "/for/real-estate-brokers" },
+      { label: "Shopify Developers", href: "/for/shopify-developers" },
+    ],
+  },
+  {
     title: "Company",
     links: [
       { label: "About", href: "/about" },
+      { label: "Careers", href: "/careers" },
+      { label: "Press", href: "/press" },
+      { label: "Affiliate", href: "/affiliate" },
       { label: "Contact", href: "/contact" },
       { label: "Blog", href: "/blog" },
+      { label: "Changelog", href: "/changelog" },
       { label: "Status", href: "/status" },
     ],
   },
@@ -215,7 +231,7 @@ export default function Footer() {
                 ))}
               </div>
 
-              <div className="hidden grid-cols-2 gap-x-7 gap-y-7 sm:grid sm:grid-cols-3 lg:grid-cols-5">
+              <div className="hidden grid-cols-2 gap-x-7 gap-y-7 sm:grid sm:grid-cols-3 lg:grid-cols-6">
                 {footerGroups.map(group => (
                   <div key={group.title} className="min-w-0">
                     <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-foreground">
