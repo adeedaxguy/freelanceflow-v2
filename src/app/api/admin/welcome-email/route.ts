@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 const WINDOW_DAYS = 7;
 const BATCH_SIZE = 20;
 const RETRY_AFTER_MS = 15 * 60 * 1000;
+const SEND_INTERVAL_MS = 125;
 const requestSchema = z.object({ confirm: z.literal("SEND_RECENT_WELCOMES") });
 
 async function isAuthorized(req: NextRequest) {
@@ -94,7 +95,8 @@ export async function POST(req: NextRequest) {
   const delivered: string[] = [];
   const failed: Array<{ email: string; error: string }> = [];
 
-  for (const user of batch) {
+  for (const [index, user] of batch.entries()) {
+    if (index > 0) await new Promise((resolve) => setTimeout(resolve, SEND_INTERVAL_MS));
     try {
       const result = await sendWelcomeEmail(user);
       if (result.success && !result.skipped) delivered.push(user.id);
