@@ -375,6 +375,12 @@ function estimateRevenue(category: string, wsStatus: LocalBizLead["websiteStatus
 const geoCache = new Map<string, { bbox: BBox; ts: number }>();
 interface BBox { south: number; north: number; west: number; east: number; lat: number; lon: number; }
 
+function isWithinBBox(lat: number, lon: number, bbox: BBox): boolean {
+  return Number.isFinite(lat) && Number.isFinite(lon)
+    && lat >= bbox.south && lat <= bbox.north
+    && lon >= bbox.west && lon <= bbox.east;
+}
+
 export async function geocode(location: string): Promise<BBox | null> {
   const key = location.toLowerCase().trim();
   const hit = geoCache.get(key);
@@ -505,10 +511,6 @@ async function fetchFromPhoton(keyword: string, bbox: BBox): Promise<Partial<Loc
       seen.add(key); return true;
     });
 
-    // Use a generous distance filter (2× bbox size) — Photon is already location-biased
-    const latSlack = (bbox.north - bbox.south) * 1.5;
-    const lonSlack = (bbox.east  - bbox.west)  * 1.5;
-
     const results: Partial<LocalBizLead>[] = [];
     for (const f of features) {
       const p    = f.properties;
@@ -516,10 +518,8 @@ async function fetchFromPhoton(keyword: string, bbox: BBox): Promise<Partial<Loc
       if (!name) continue;
       if (!isLikelyBusinessOsmFeature(p.osm_key, p.osm_value)) continue;
 
-      // Filter with generous slack
       const [lon, lat] = f.geometry.coordinates;
-      if (lat < bbox.lat - latSlack || lat > bbox.lat + latSlack ||
-          lon < bbox.lon - lonSlack || lon > bbox.lon + lonSlack) continue;
+      if (!isWithinBBox(lat, lon, bbox)) continue;
 
       const osmType = p.osm_type === "N" ? "node" : p.osm_type === "W" ? "way" : "relation";
       const street  = [p.housenumber, p.street].filter(Boolean).join(" ");
@@ -589,6 +589,7 @@ async function fetchFromNominatim(keyword: string, location: string, bbox: BBox)
       const name = b.namedetails?.name ?? b.display_name?.split(",")[0]?.trim() ?? "";
       if (!name || name.length < 2) continue;
       const lat = Number(b.lat), lon = Number(b.lon);
+      if (!isWithinBBox(lat, lon, bbox)) continue;
       // Skip non-businesses (roads, regions etc.)
       if (!b.extratags && (!b.osm_type || b.osm_type === "relation")) continue;
 
@@ -1572,7 +1573,7 @@ async function enhanceWithAI(lead: LocalBizLead, groqKey: string): Promise<void>
 }
 
 // ── Lead scorer ────────────────────────────────────────────────────────────────
-function scoreLead(lead: LocalBizLead): number {
+function scoreLead(lead: LocalBizLead, keyword: string): number {
   let s = 50;
   if (lead.websiteStatus === "none")        s = 95;
   if (lead.websiteStatus === "unreachable") s = 45;
@@ -1584,6 +1585,12 @@ function scoreLead(lead: LocalBizLead): number {
   if (lead.reviewCount && lead.reviewCount > 50) s += 2;
   if (lead.source === "yelp") s += 5; // Yelp data more reliable
   if (lead.source === "here") s += 3;
+  const name = lead.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const category = keyword.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const genericCategoryName = name === category || name === `${category}s` || `${name}s` === category;
+  if (!/\s/.test(lead.name.trim()) && genericCategoryName) {
+    s -= 18;
+  }
   return Math.min(100, s);
 }
 
@@ -1679,9 +1686,9 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
     db,
   } = opts;
   const limit    = Math.min(opts.limit ?? 60, 80);
-  // v8 - discard old website classifications and generated contact aliases.
+  // v9 - discard searches that used the overly broad Photon location boundary.
   const sourceScope = cacheScope ?? "default";
-  const cacheKey = `v8-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
+  const cacheKey = `v9-${sourceScope}-${keyword.toLowerCase().trim()}-${location.toLowerCase().trim()}-${filter}`;
 
   // 1. Cache check — instant return
   const cached = await cacheGet(cacheKey, db);
@@ -1848,7 +1855,7 @@ export async function searchLocalBusinesses(opts: SearchOpts): Promise<SearchRes
         lead.businessScale = scaleSignal.businessScale;
         lead.businessScaleScore = scaleSignal.businessScaleScore;
         lead.businessScaleReasons = scaleSignal.businessScaleReasons;
-        lead.score   = scoreLead(lead);
+        lead.score   = scoreLead(lead, keyword);
         lead.urgency = lead.score >= 85 ? "high" : lead.score >= 65 ? "medium" : "low";
         return lead;
       })

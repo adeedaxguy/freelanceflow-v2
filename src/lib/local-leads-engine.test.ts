@@ -213,12 +213,49 @@ describe("local lead fallbacks", () => {
                   country: "United States",
                 },
               },
+              {
+                geometry: { coordinates: [-97.73, 30.29] },
+                properties: {
+                  osm_id: 3,
+                  osm_type: "N",
+                  osm_key: "craft",
+                  osm_value: "plumber",
+                  name: "Plumber",
+                  city: "Austin",
+                  country: "United States",
+                },
+              },
+              {
+                geometry: { coordinates: [-96.8, 32.78] },
+                properties: {
+                  osm_id: 4,
+                  osm_type: "N",
+                  osm_key: "craft",
+                  osm_value: "plumber",
+                  name: "Dallas Plumbing Pros",
+                  city: "Dallas",
+                  country: "United States",
+                },
+              },
             ],
           }),
         };
       }
       if (url.includes("nominatim.openstreetmap.org") && url.includes("extratags=1")) {
-        return { ok: true, json: async () => [] };
+        return {
+          ok: true,
+          json: async () => [{
+            place_id: 5,
+            osm_type: "node",
+            osm_id: 5,
+            lat: "33.4484",
+            lon: "-112.0740",
+            display_name: "Phoenix Plumbing Pros, Phoenix, Arizona",
+            namedetails: { name: "Phoenix Plumbing Pros" },
+            address: { city: "Phoenix", state: "Arizona", country: "United States" },
+            extratags: { phone: "+1 602 555 0123" },
+          }],
+        };
       }
       if (url.includes("opencorporates.com")) {
         return { ok: true, json: async () => ({ results: { companies: [] } }) };
@@ -240,6 +277,11 @@ describe("local lead fallbacks", () => {
 
     const names = result.leads.map(lead => lead.name);
     expect(names).toContain("Austin Plumbing Pros");
+    expect(names).toContain("Plumber");
+    expect(names[0]).toBe("Austin Plumbing Pros");
+    expect(result.leads.find(lead => lead.name === "Plumber")?.score).toBeLessThan(result.leads[0]!.score);
     expect(names).not.toContain("Plumbrook Drive");
+    expect(names).not.toContain("Dallas Plumbing Pros");
+    expect(names).not.toContain("Phoenix Plumbing Pros");
   });
 });
