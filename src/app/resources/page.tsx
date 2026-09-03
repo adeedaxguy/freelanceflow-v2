@@ -106,7 +106,7 @@ export default function ResourcesPage() {
           <div className="mx-auto max-w-6xl">
             <div className="inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
               <BookOpen className="h-4 w-4" />
-              SEO-backed playbooks
+              Practical acquisition playbooks
             </div>
             <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight text-foreground sm:text-5xl lg:text-6xl">
               Lead generation resources for freelancers who need web design leads, local business prospects, and outreach workflows that convert
@@ -152,7 +152,7 @@ export default function ResourcesPage() {
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
             {[
               "Every guide points to a product workflow, not a dead-end article.",
-              "Each topic is tied to GSC, GA4, live SERP, competitor, or product evidence.",
+              "Each guide starts with a real buyer problem and ends with a useful action inside the product.",
               "Internal links connect resources to signup-intent use cases, contact validation, proposal paths, and feature pages.",
             ].map((item) => (
               <div key={item} className="rounded-lg border border-border bg-background p-5 text-sm leading-6 text-muted-foreground">

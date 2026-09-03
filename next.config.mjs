@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+const seoRedirects = [
+  ["/resources/google-maps-leads-for-web-designers", "/resources/google-maps-lead-generation-for-freelancers"],
+  ["/resources/google-maps-prospecting-for-web-designers", "/resources/google-maps-prospecting-tool-for-freelancers"],
+  ["/resources/freelance-sales-pipeline-from-google-maps", "/resources/google-maps-lead-generation-for-freelancers"],
+];
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -40,6 +46,7 @@ const nextConfig = {
         destination: "https://icloseleads.com/:path*",
         permanent: true,
       },
+      ...seoRedirects.map(([source, destination]) => ({ source, destination, permanent: true })),
     ];
   },
   async headers() {

@@ -6,6 +6,7 @@ import { RESOURCE_PAGES } from "@/data/resource-pages";
 import { USE_CASE_PAGES } from "@/data/use-case-pages";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
+import { redirectedResourceSlugs } from "@/lib/seo-redirects";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
 const INDUSTRY_PAGES = [
@@ -20,6 +21,9 @@ const INDUSTRY_PAGES = [
 
 const RESOURCE_PRIORITY_OVERRIDES: Record<string, number> = {
   "web-design-lead-generation": 0.84,
+  "google-maps-lead-generation-for-freelancers": 0.86,
+  "google-maps-prospecting-tool-for-freelancers": 0.85,
+  "google-maps-listing-pitch-for-freelancers": 0.85,
 };
 
 const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
@@ -46,6 +50,7 @@ const BLOG_PRIORITY_OVERRIDES: Record<string, number> = {
   "business-leads-database-free-vs-qualified-leads": 0.84,
   "client-acquisition-software-for-freelancers-free-leads-crm": 0.86,
   "sales-softphone-for-freelancers-us-canada-uk-numbers": 0.85,
+  "google-maps-prospecting-tool-for-agencies": 0.86,
 };
 
 const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"; priority: number }[] = [
@@ -72,7 +77,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
   { url: "/pricing",     changeFrequency: "weekly",  priority: 0.9  },
   { url: "/blog",        changeFrequency: "daily",   priority: 0.85 },
   { url: "/resources",   changeFrequency: "weekly",  priority: 0.84 },
-  ...RESOURCE_PAGES.map(page => ({
+  ...RESOURCE_PAGES.filter(page => !redirectedResourceSlugs.has(page.slug)).map(page => ({
     url: `/resources/${page.slug}`,
     changeFrequency: "weekly" as const,
     priority: RESOURCE_PRIORITY_OVERRIDES[page.slug] ?? 0.78,

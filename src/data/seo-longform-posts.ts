@@ -669,7 +669,7 @@ const topics: LongformTopic[] = [
     audience: "local agencies and B2B service providers",
     searchIntent: "The searcher wants a practical Google Maps prospecting workflow or tool that helps an agency find local businesses worth pitching, not just scrape a list of names.",
     problem: "Generic Google Maps scraping creates low-quality lists unless the agency verifies profile activity, website context, contact route, offer fit, and the reason the business should care.",
-    whyNow: "GSC Insights flagged this page as losing impressions, while the nearby Google Maps listing pitch resource is gaining visibility. The recovery move is to connect the tool-intent article to the pitch workflow, local lead qualification, and iCloseLeads signup path.",
+    whyNow: "Local buyers often move from a map profile to a website, phone call, quote form, or booking step before choosing a provider. That public journey gives an agency enough evidence to qualify a small prospect list without guessing private performance or sending a generic redesign pitch.",
     leadSource: "GSC Insights, Google Maps style searches, Google Business Profile signals, local business websites, phone routes, website status checks, and competitor prospecting pages",
     offer: "a Google Maps prospecting workflow that turns profile signals into qualified local leads, saved proof notes, and outreach-ready agency pitches",
     internalPath: "/use-cases/local-business-leads",

@@ -140,6 +140,11 @@ const INTERNAL_LINKS: Record<ArticleTopic, BlogLinkItem[]> = {
   ],
   local: [
     {
+      href: "/resources/google-maps-lead-generation-for-freelancers",
+      label: "Google Maps lead generation workflow",
+      description: "Qualify public local-business signals, save the reason, and choose the next action before outreach.",
+    },
+    {
       href: "/use-cases/local-business-leads",
       label: "Local business lead workflow",
       description: "See how iCloseLeads finds nearby businesses with visible website, SEO, and contact gaps.",
@@ -777,6 +782,12 @@ const OUTBOUND_LINKS: Record<ArticleTopic, BlogLinkItem[]> = {
     },
   ],
   local: [
+    {
+      href: "https://developers.google.com/maps/faq",
+      label: "Google Maps Platform FAQ",
+      description: "Official Google guidance covering Maps Platform usage, attribution, and data restrictions.",
+      external: true,
+    },
     {
       href: "https://support.google.com/business/answer/7091",
       label: "Google Business Profile ranking guidance",

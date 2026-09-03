@@ -26,6 +26,10 @@ const CLIENT_ACQUISITION_SYSTEM_SLUGS = new Set([
   "freelancer-client-acquisition-system",
 ]);
 
+const GOOGLE_MAPS_PROSPECTING_SLUGS = new Set([
+  "google-maps-prospecting-tool-for-agencies",
+]);
+
 const CLIENT_ACQUISITION_SYSTEM_VISUALS = [
   {
     src: "/blog-images/freelancer-client-acquisition-system-funnel.svg",
@@ -122,11 +126,45 @@ const CLIENT_ACQUISITION_SYSTEM_FUNNEL = {
   ],
 };
 
+const GOOGLE_MAPS_PROSPECTING_FUNNEL = {
+  title: "Turn one local market into a qualified campaign",
+  summary:
+    "Choose one service and city, review public business signals, save only the strongest fits, and keep the proposal or reviewed outreach attached to the original lead.",
+  ctaLabel: "Search 600 leads free",
+  proofNote:
+    "A listing is not automatically a lead. The workflow below keeps activity, customer path, offer fit, contact route, and the next action visible before outreach.",
+  steps: [
+    {
+      title: "Define the market",
+      detail: "Choose one city, business category, service offer, and customer action before opening profiles.",
+    },
+    {
+      title: "Verify the public signal",
+      detail: "Confirm the business is active and record one visible website, booking, quote, trust, or contact-path need.",
+    },
+    {
+      title: "Save only qualified leads",
+      detail: "Keep the source, reason, contact route, and offer angle together instead of exporting an unverified list.",
+    },
+    {
+      title: "Prepare the next action",
+      detail: "Create a reviewed proposal, email, permitted phone opener, or website concept and schedule follow-up.",
+    },
+  ],
+};
+
 function isClientAcquisitionSystemPost(post: BlogArticleSource) {
   return CLIENT_ACQUISITION_SYSTEM_SLUGS.has(post.slug);
 }
 
 function getDefaultConversionFunnel(post: BlogArticleSource) {
+  if (GOOGLE_MAPS_PROSPECTING_SLUGS.has(post.slug)) {
+    return {
+      ...GOOGLE_MAPS_PROSPECTING_FUNNEL,
+      ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=organic-google-maps-guide`,
+    };
+  }
+
   if (!isClientAcquisitionSystemPost(post)) return null;
 
   return {

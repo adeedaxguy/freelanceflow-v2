@@ -127,6 +127,109 @@ function GoogleMapsPitchPlaybook() {
   );
 }
 
+const googleMapsSystemSlugs = new Set([
+  "google-maps-lead-generation-for-freelancers",
+  "google-maps-prospecting-tool-for-freelancers",
+  "google-maps-listing-pitch-for-freelancers",
+]);
+
+function GoogleMapsLeadSystem({ page }: { page: ResourcePageData }) {
+  const stages = [
+    {
+      icon: Search,
+      title: "Define one local market",
+      detail: "Choose a service, city, and offer before opening profiles. A focused campaign is easier to verify and personalize.",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Qualify public signals",
+      detail: "Check whether the business is active, the customer action is clear, the gap is visible, and the contact route is appropriate.",
+    },
+    {
+      icon: ClipboardList,
+      title: "Save evidence in CRM",
+      detail: "Keep the profile or website source, the business need, the offer fit, and the first-message angle on one lead record.",
+    },
+    {
+      icon: MessageSquare,
+      title: "Choose the useful next step",
+      detail: "Create a proposal, prepare a reviewed email, call through the softphone where permitted, or build a website concept from the saved brief.",
+    },
+  ];
+  const comparison = [
+    ["First output", "A large export", "One qualified lead with a reason"],
+    ["Quality control", "Usually manual after export", "Fit, proof, contact route, and offer angle before outreach"],
+    ["Sales context", "Often separate notes", "Saved with the lead in CRM"],
+    ["Next action", "Download another file", "Proposal, reviewed email, softphone, or website concept"],
+    ["Follow-up", "Another tool", "Scheduled from the same record"],
+  ];
+
+  return (
+    <section data-google-maps-lead-system className="rounded-lg border border-primary/30 bg-surface p-6 sm:p-8">
+      <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Google Maps lead system</p>
+      <h2 className="mt-3 text-2xl font-extrabold text-foreground">From a local search to one proposal-ready prospect</h2>
+      <p className="mt-4 text-base leading-7 text-muted-foreground">
+        The advantage is not collecting the most listings. It is keeping the public signal, qualification decision, outreach context, and next action together so the campaign improves instead of becoming another spreadsheet.
+      </p>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {stages.map(({ icon: Icon, title, detail }, index) => (
+          <div key={title} className="rounded-lg border border-border bg-background p-5">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary-light">
+                <Icon className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Stage {index + 1}</p>
+                <h3 className="mt-1 text-base font-bold text-foreground">{title}</h3>
+              </div>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <thead className="bg-background text-foreground">
+            <tr>
+              <th className="p-4 font-bold">Decision</th>
+              <th className="p-4 font-bold">Scraper-only workflow</th>
+              <th className="p-4 font-bold">iCloseLeads workflow</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border text-muted-foreground">
+            {comparison.map(([label, basic, iclose]) => (
+              <tr key={label} className="bg-surface">
+                <th className="p-4 font-semibold text-foreground">{label}</th>
+                <td className="p-4">{basic}</td>
+                <td className="p-4">{iclose}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-8 grid gap-4 rounded-lg border border-accent/25 bg-accent/10 p-5 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <h3 className="text-lg font-extrabold text-foreground">Build the first campaign with 600 free weekly leads</h3>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Start narrow, save only qualified prospects, review every message, and keep the next action attached to the lead.</p>
+        </div>
+        <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=maps-lead-system`} className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
+          Start free
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs leading-5 text-muted-foreground">
+        <span>Use public business context responsibly and verify the source before outreach.</span>
+        <a href="https://developers.google.com/maps/faq" target="_blank" rel="noreferrer" className="font-semibold text-primary-light hover:text-foreground">Google Maps Platform terms guidance</a>
+        <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business" target="_blank" rel="noreferrer" className="font-semibold text-primary-light hover:text-foreground">FTC commercial email guidance</a>
+      </div>
+    </section>
+  );
+}
+
 type ResourceResearchIntent = {
   searcherJob: string;
   competitorGap: string;
@@ -432,9 +535,9 @@ export default function ResourcePage({ params }: Props) {
               <div className="min-w-0 space-y-10">
                 {page.relatedSearches?.length ? (
                   <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
-                    <h2 className="text-2xl font-extrabold text-foreground">Searches this workflow should help with</h2>
+                    <h2 className="text-2xl font-extrabold text-foreground">Problems this workflow helps solve</h2>
                     <p className="mt-4 text-base leading-7 text-muted-foreground">
-                      This page is built to answer the commercial search variants real freelancers use before they sign up, search, and save a lead.
+                      Use the closest phrase to define the campaign, then narrow it by buyer type, location, and the service you can credibly offer.
                     </p>
                     <div className="mt-5 flex flex-wrap gap-2">
                       {page.relatedSearches.map((term) => (
@@ -447,14 +550,13 @@ export default function ResourcePage({ params }: Props) {
                 ) : null}
 
                 <section data-resource-research-intent className="rounded-lg border border-border bg-surface p-6 sm:p-8">
-                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Search intent to satisfy</p>
-                  <h2 className="mt-3 text-2xl font-extrabold text-foreground">Why this resource should exist</h2>
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Campaign plan</p>
+                  <h2 className="mt-3 text-2xl font-extrabold text-foreground">Know the goal before collecting leads</h2>
                   <div className="mt-5 grid gap-4">
                     {[
-                      ["Searcher job", researchIntent.searcherJob],
-                      ["Competitor gap", researchIntent.competitorGap],
-                      ["Workflow nudge", researchIntent.workflowNudge],
-                      ["Conversion path", researchIntent.conversionPath],
+                      ["Goal", researchIntent.searcherJob],
+                      ["First move", researchIntent.workflowNudge],
+                      ["Finish line", researchIntent.conversionPath],
                     ].map(([label, body]) => (
                       <div key={label} className="rounded-lg border border-border bg-background p-4">
                         <h3 className="text-sm font-bold text-foreground">{label}</h3>
@@ -463,6 +565,8 @@ export default function ResourcePage({ params }: Props) {
                     ))}
                   </div>
                 </section>
+
+                {googleMapsSystemSlugs.has(page.slug) ? <GoogleMapsLeadSystem page={page} /> : null}
 
                 {page.slug === "google-maps-listing-pitch-for-freelancers" ? <GoogleMapsPitchPlaybook /> : null}
 

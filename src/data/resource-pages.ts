@@ -4432,10 +4432,23 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     "metaTitle": "Google Maps Lead Generation for Freelancers | Qualify Local Prospects",
     "metaDescription": "Use Google Maps lead generation carefully: qualify business profiles, website gaps, contact routes, and pitch angles before outreach.",
     "keyword": "google maps lead generation",
+    "relatedSearches": [
+      "lead generation using google maps",
+      "google maps crm",
+      "crm with google maps",
+      "local lead generation through google maps",
+      "google maps prospecting tool"
+    ],
     "audience": "Freelancers prospecting local businesses from public map and search signals",
     "intent": "The searcher wants to use map listings as a source of local leads.",
-    "summary": "Google Maps lead generation is not about scraping every listing. It works when you use public profile signals to identify businesses where your service can improve calls, bookings, trust, or visibility.",
-    "leadIn": "iCloseLeads helps turn local map-style research into a cleaner workflow: qualify the business, save the reason, draft the outreach, and track follow-up instead of collecting unqualified names.",
+    "researchIntent": {
+      "searcherJob": "Turn a local category and city search into a small, qualified campaign with a clear offer.",
+      "competitorGap": "Most ranking tools stop at extraction. The useful gap is qualification, CRM context, a reviewed message, and follow-up.",
+      "workflowNudge": "Define the market, verify public business signals, save the reason, and choose the next action before opening more listings.",
+      "conversionPath": "Finish with one saved lead that can become a proposal, reviewed email, compliant phone call, or website concept."
+    },
+    "summary": "Google Maps lead generation works best as a focused qualification workflow, not a mass export. Use public business signals to identify where your service could improve calls, bookings, trust, or visibility, then save the evidence and next action in CRM.",
+    "leadIn": "iCloseLeads connects local research to a complete workflow: define one market, qualify the business, save the reason, draft the outreach, and track follow-up instead of collecting unqualified names.",
     activationPlan: {
       trigger: "Use this when public map listings reveal businesses that may need help, but the workflow must stay responsible.",
       firstRun: "Search a focused category and region, then avoid mass scraping or unclear-fit records.",
@@ -4443,16 +4456,34 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       followUp: "Draft one specific pitch from the public signal and pause any lead that lacks a legitimate reason.",
     },
     "steps": [
-      "Search one local category and region at a time.",
-      "Look for profile, website, review, and service clues.",
-      "Avoid outreach when the business need is unclear.",
-      "Save a specific reason before drafting the message.",
-      "Use follow-up sparingly and respectfully."
+      "Choose one local category, region, and offer at a time.",
+      "Check current activity, customer actions, website quality, reviews, and the public business contact route.",
+      "Score fit, visible need, evidence quality, contactability, and the usefulness of your first step.",
+      "Save the source, business reason, offer angle, and next action in one CRM record.",
+      "Create a reviewed proposal, email, phone opener, or website concept only when the fit is clear.",
+      "Schedule one respectful follow-up and stop when the business opts out or the evidence is weak."
+    ],
+    "qualificationChecks": [
+      {
+        "signal": "Active local demand",
+        "whyItMatters": "Recent public activity makes the profile more useful than an abandoned record.",
+        "nextMove": "Note the latest visible activity and the customer action people take."
+      },
+      {
+        "signal": "Visible customer-path gap",
+        "whyItMatters": "A missing booking, quote, call, or website step creates a specific business reason for outreach.",
+        "nextMove": "Save one screenshot or source URL and describe the friction without inventing private metrics."
+      },
+      {
+        "signal": "Appropriate public contact route",
+        "whyItMatters": "The campaign must respect platform terms, commercial messaging rules, and opt-out requests.",
+        "nextMove": "Use the route the business publishes and review the message before sending."
+      }
     ],
     "proofPoints": [
-      "Public SERPs show persistent demand around map-based prospecting and local lead discovery.",
-      "This page gives iCloseLeads a safer, quality-led answer to a topic that can otherwise become spammy.",
-      "The workflow ties local discovery to proposals, CRM, and signup activation."
+      "The workflow separates discovery from qualification so the user does not mistake a listing for a sales-ready lead.",
+      "Each saved prospect keeps the public source, business reason, offer fit, and contact route together.",
+      "The same record can continue into proposal drafting, reviewed email, softphone, website concept, and CRM follow-up."
     ],
     "pitch": "Hi, I found your business while checking local listings for [category]. I noticed [public signal] and had one specific idea for improving [outcome].",
     "internalLinks": [
@@ -4481,6 +4512,14 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       {
         "q": "What should I avoid?",
         "a": "Avoid mass scraping, generic pitches, private assumptions, and outreach that cannot be tied to a clear business benefit."
+      },
+      {
+        "q": "Can I connect Google Maps research to a CRM?",
+        "a": "Yes. Save the public source, qualification notes, contact route, offer angle, and follow-up task on one lead record rather than relying on a raw export."
+      },
+      {
+        "q": "What should happen after I qualify a local lead?",
+        "a": "Choose the smallest useful next step: a reviewed proposal, a permission-first email, a compliant phone opener, or a website concept based on the verified need."
       }
     ]
   },
@@ -6669,7 +6708,7 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
     {
       slug: "google-maps-listing-pitch-for-freelancers",
       title: "Google Maps listing pitch for freelancers",
-      keyword: "the pitch google maps listing",
+      keyword: "Google Maps listing pitch",
       relatedSearches: [
         "Google Maps listing pitch",
         "the pitch google maps listing",
@@ -6973,9 +7012,13 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
     title: page.title,
     metaTitle: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "Google Maps Listing Pitch: Scripts and Lead Workflow"
+      : page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "Google Maps Prospecting Tool for Freelancers | iCloseLeads"
       : page.title + " | iCloseLeads",
     metaDescription: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "Use a proof-led Google Maps listing pitch for email, phone, or a mini audit. Qualify the business, choose the right script, and search 600 leads free."
+      : page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "Turn Google Maps business signals into qualified leads, saved CRM context, reviewed proposals, and follow-up. Start with 600 free weekly leads."
       : "Use iCloseLeads to turn " + page.keyword + " research into verified prospects, saved context, proposal drafts, Gmail-ready outreach, and CRM follow-up.",
     keyword: page.keyword,
     relatedSearches: page.relatedSearches,
@@ -6989,13 +7032,21 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
     },
     summary: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "A good Google Maps listing pitch names one visible customer-path problem, connects it to calls, bookings, or quotes, and asks permission to share one useful next step. Use the scripts below only after verifying the business is active and the gap is real."
+      : page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "A Google Maps prospecting tool should help you qualify a public business signal, save the reason the lead fits, prepare a useful first message, and schedule the next action. It should not turn an unverified listing export into automatic outreach."
       : page.title + " works best when " + page.signal + ". iCloseLeads turns " + page.keyword + " intent into a practical acquisition workflow: search, verify, save, draft, and follow up.",
     leadIn: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "Start with the listing, not a generic redesign offer. Confirm the profile is active, open the website as a customer would, identify the action that breaks, save the proof, and choose the email, phone, or mini-audit script that matches the public contact route."
+      : page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "Start with one service and one location. Review each business profile as a potential customer, verify the company is active, record one visible need, and save only the prospects that match your offer and have an appropriate business contact route."
       : "Use this workflow when " + page.signal + ". The important move is to avoid passive research: " + page.workflow + ".",
     activationPlan: {
-      trigger: "Use this when the search intent is " + page.keyword + " and you need one concrete client-acquisition action today.",
-      firstRun: "Run one narrow search tied to " + page.keyword + ", then open the strongest prospect before saving anything.",
+      trigger: page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "Use this when you want to turn a focused local market into a small, verified prospect list."
+        : "Use this when the search intent is " + page.keyword + " and you need one concrete client-acquisition action today.",
+      firstRun: page.slug === "google-maps-prospecting-tool-for-freelancers"
+        ? "Choose one niche and city, review the first ten profiles, and save only the best qualified prospect with the source and reason attached."
+        : "Run one narrow search tied to " + page.keyword + ", then open the strongest prospect before saving anything.",
       savedLead: "Save one lead only after the public signal, buyer fit, contact path, and offer angle are clear.",
       followUp: "Generate a short outreach draft, review it manually, and put the lead into CRM follow-up before continuing the list.",
     },
@@ -7025,9 +7076,9 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       },
     ],
     proofPoints: [
-      "Public SERP research on July 24, 2026 showed active competitor coverage around freelancer client-acquisition tools, Google Maps no-website prospecting, and cold email follow-up sequences.",
-      "This page strengthens the iCloseLeads entity relationship with lead generation platform, client acquisition software, freelance CRM, proposal workflow, and Gmail-ready outreach.",
-      page.competitorGap,
+      "A qualified lead starts with a visible business need, a matching service offer, and an appropriate public contact route.",
+      "A useful prospect record keeps the source, qualification reason, offer angle, first message, and next action together.",
+      "iCloseLeads connects lead discovery, saved context, proposal drafting, reviewed outreach, and CRM follow-up in one workflow.",
     ],
     pitch: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "Hi [name], I found [business] through its Google Maps listing while looking for [service] in [city]. The profile is active, but the website path to [booking, quote, or call] is hard to complete on mobile. I noted one small fix that could make that next step clearer. Would it be useful if I sent the two-minute audit?"
@@ -7049,6 +7100,23 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       {
         q: "How does iCloseLeads help with a Google Maps listing pitch?",
         a: "iCloseLeads helps you search for local business leads, save the listing signal and website gap, draft a contextual proposal, and keep the follow-up attached to the same lead record."
+      }
+    ] : page.slug === "google-maps-prospecting-tool-for-freelancers" ? [
+      {
+        q: "What does a Google Maps prospecting tool do?",
+        a: "It helps turn local business search results into a qualified prospecting workflow by saving the source, business signal, contact route, offer fit, and next action."
+      },
+      {
+        q: "Can I use Google Maps listings for cold outreach?",
+        a: "Use public business information responsibly, verify that the contact route is intended for business enquiries, follow applicable outreach rules, and stop when a business opts out. Avoid bulk scraping or automatic messaging."
+      },
+      {
+        q: "How should I qualify a Google Maps lead?",
+        a: "Confirm the business is active, identify the customer action it depends on, verify one public website or conversion gap, match the need to your real service, and record an appropriate contact path."
+      },
+      {
+        q: "How does iCloseLeads turn a listing into a sales workflow?",
+        a: "You can save the business signal and source, draft a proposal or reviewed message, choose a permitted calling or email route, and schedule the follow-up from the same lead record."
       }
     ] : [
       {
