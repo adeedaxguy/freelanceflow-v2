@@ -1,9 +1,12 @@
 import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { smtpSend } from "@/lib/smtp-client";
+import { renderWelcomeEmail } from "@/lib/marketing-email";
 
 export const ADMIN_NOTIFICATION_RECIPIENT = "adnan.toprated@gmail.com";
 const DEFAULT_ADMIN_NOTIFICATION_EMAIL = ADMIN_NOTIFICATION_RECIPIENT;
+export const WELCOME_EMAIL_KEY_PREFIX = "welcome_email_";
+const WELCOME_EMAIL_RETRY_MS = 15 * 60 * 1000;
 
 interface PlatformEmailConfig {
   provider: "resend" | "smtp";
@@ -81,6 +84,7 @@ export async function sendPlatformEmail(params: {
   text: string;
   fromName?: string;
   headers?: Record<string, string>;
+  idempotencyKey?: string;
 }) {
   const config = await getPlatformEmailConfig();
   if (!config) return { success: false as const, skipped: true as const };
@@ -107,9 +111,74 @@ export async function sendPlatformEmail(params: {
     html: params.html,
     text: params.text,
     headers: params.headers,
-  });
+  }, params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined);
   if (error) throw new Error(error.message);
   return { success: true as const, provider: "resend" as const, id: data?.id };
+}
+
+export async function sendWelcomeEmail(user: {
+  id: string;
+  name: string | null;
+  email: string;
+}) {
+  const key = `${WELCOME_EMAIL_KEY_PREFIX}${user.id}`;
+  const startedAt = new Date().toISOString();
+  const sendingState = JSON.stringify({ status: "sending", startedAt });
+
+  try {
+    await prisma.platformSetting.create({ data: { key, value: sendingState } });
+  } catch {
+    const existing = await prisma.platformSetting.findUnique({ where: { key } });
+    if (!existing) return { success: false as const, skipped: true as const };
+
+    let status = "sent";
+    try {
+      status = (JSON.parse(existing.value) as { status?: string }).status ?? "sent";
+    } catch {}
+
+    const stale = Date.now() - existing.updatedAt.getTime() >= WELCOME_EMAIL_RETRY_MS;
+    if (status === "sent" || (status === "sending" && !stale)) {
+      return { success: true as const, skipped: true as const };
+    }
+
+    const reclaimed = await prisma.platformSetting.updateMany({
+      where: { id: existing.id, updatedAt: existing.updatedAt },
+      data: { value: sendingState },
+    });
+    if (reclaimed.count !== 1) return { success: true as const, skipped: true as const };
+  }
+
+  try {
+    const rendered = renderWelcomeEmail({ name: user.name });
+    const delivery = await sendPlatformEmail({
+      recipient: user.email,
+      subject: rendered.subject,
+      html: rendered.html,
+      text: rendered.text,
+      idempotencyKey: key,
+    });
+    if (!delivery.success) throw new Error("Platform email delivery is not configured.");
+
+    await prisma.platformSetting.update({
+      where: { key },
+      data: {
+        value: JSON.stringify({
+          status: "sent",
+          provider: delivery.provider,
+          deliveryId: "id" in delivery ? delivery.id : undefined,
+          sentAt: new Date().toISOString(),
+        }),
+      },
+    });
+    return { ...delivery, skipped: false as const };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Welcome email delivery failed";
+    await prisma.platformSetting.update({
+      where: { key },
+      data: { value: JSON.stringify({ status: "failed", error: message, failedAt: new Date().toISOString() }) },
+    }).catch(() => null);
+    throw error;
+  }
 }
 
 function escapeHtml(value: string): string {
@@ -181,19 +250,26 @@ export async function notifyNewUserSignup(user: {
   const expertise = user.expertise?.length ? user.expertise.join(", ") : "Not provided";
   const referralSource = user.referralSource?.trim() || "Not provided";
 
-  return sendAdminNotification({
-    subject: `New iCloseLeads signup: ${user.email}`,
-    title: "New user signed up",
-    lines: [
-      `<strong>Name:</strong> ${escapeHtml(user.name || "Not provided")}`,
-      `<strong>Email:</strong> ${escapeHtml(user.email)}`,
-      `<strong>Plan:</strong> ${escapeHtml(user.plan || "free")}`,
-      `<strong>Expertise:</strong> ${escapeHtml(expertise)}`,
-      `<strong>Referral source:</strong> ${escapeHtml(referralSource)}`,
-      `<strong>User ID:</strong> ${escapeHtml(user.id)}`,
-    ],
-    recipient: ADMIN_NOTIFICATION_RECIPIENT,
-  });
+  const [admin, welcome] = await Promise.allSettled([
+    sendAdminNotification({
+      subject: `New iCloseLeads signup: ${user.email}`,
+      title: "New user signed up",
+      lines: [
+        `<strong>Name:</strong> ${escapeHtml(user.name || "Not provided")}`,
+        `<strong>Email:</strong> ${escapeHtml(user.email)}`,
+        `<strong>Plan:</strong> ${escapeHtml(user.plan || "free")}`,
+        `<strong>Expertise:</strong> ${escapeHtml(expertise)}`,
+        `<strong>Referral source:</strong> ${escapeHtml(referralSource)}`,
+        `<strong>User ID:</strong> ${escapeHtml(user.id)}`,
+      ],
+      recipient: ADMIN_NOTIFICATION_RECIPIENT,
+    }),
+    sendWelcomeEmail(user),
+  ]);
+
+  if (admin.status === "rejected") console.error("[signup] Admin notification failed", admin.reason);
+  if (welcome.status === "rejected") console.error("[signup] Welcome email failed", welcome.reason);
+  return { admin, welcome };
 }
 
 export async function notifyMoreLeadsRequest(request: {

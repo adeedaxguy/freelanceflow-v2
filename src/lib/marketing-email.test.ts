@@ -1,7 +1,9 @@
 import {
   createUnsubscribeToken,
   renderMarketingEmail,
+  renderWelcomeEmail,
   verifyUnsubscribeToken,
+  WELCOME_EMAIL_SUBJECT,
 } from "@/lib/marketing-email";
 
 describe("marketing email", () => {
@@ -49,5 +51,20 @@ describe("marketing email", () => {
     expect(rendered.html).toContain("<ol");
     expect(rendered.html).toContain("Read the 600-lead weekly playbook");
     expect(rendered.html).toContain("https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers");
+  });
+
+  it("renders a focused, personalized welcome workflow", () => {
+    const rendered = renderWelcomeEmail({ name: "Alex<script>alert(1)</script>" });
+
+    expect(rendered.subject).toBe(WELCOME_EMAIL_SUBJECT);
+    expect(rendered.html).toContain("Hi Alex");
+    expect(rendered.html).toContain("Alex&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(rendered.html).not.toContain("<script>alert(1)</script>");
+    expect(rendered.html).toContain("Your first client-winning loop");
+    expect(rendered.html).toContain("up to 600 lead results");
+    expect(rendered.html).toContain("Find your first lead");
+    expect(rendered.html).toContain("dashboard/local-leads");
+    expect(rendered.html).toContain("dashboard/softphone");
+    expect(rendered.text).toContain("This one-time onboarding email");
   });
 });
