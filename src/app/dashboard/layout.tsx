@@ -8,6 +8,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import OnboardingTour from "@/components/OnboardingTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 import SignupAnalytics from "@/components/SignupAnalytics";
+import { DashboardRouteMotion } from "@/components/AppRouteMotion";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -24,7 +25,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           pb-20 lg:pb-0 = clearance for the mobile bottom nav (h-16 + safe area) */}
       <main className="dashboard-content flex-1 min-w-0 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0">
         <ErrorBoundary section="Dashboard">
-          {children}
+          <DashboardRouteMotion>{children}</DashboardRouteMotion>
         </ErrorBoundary>
       </main>
 

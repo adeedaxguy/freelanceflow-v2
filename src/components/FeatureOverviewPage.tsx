@@ -17,6 +17,7 @@ import Footer from "@/components/Footer";
 import FeatureInteractiveDemo from "@/components/FeatureInteractiveDemo";
 import { FEATURE_PAGES, type IconName } from "@/data/feature-pages";
 import { cn } from "@/lib/utils";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
 
 const BASE_URL = "https://icloseleads.com";
 
@@ -121,6 +122,7 @@ export default function FeatureOverviewPage() {
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(159,103,255,0.10),rgba(0,229,160,0.045),rgba(9,9,21,0))]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
+            <AnimatedContent distance={22} blur={5} amount={0.05}>
             <div>
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
                 <Zap className="h-4 w-4" />
@@ -151,7 +153,10 @@ export default function FeatureOverviewPage() {
                 </Link>
               </div>
             </div>
-            <FeatureInteractiveDemo type="overview" />
+            </AnimatedContent>
+            <AnimatedContent direction="horizontal" distance={28} delay={0.08} blur={5} amount={0.05}>
+              <FeatureInteractiveDemo type="overview" />
+            </AnimatedContent>
           </div>
         </section>
 
@@ -162,11 +167,13 @@ export default function FeatureOverviewPage() {
               ["7", "Core feature areas"],
               ["1", "CRM-backed workflow"],
               ["0", "Credit card required"],
-            ].map(([value, label]) => (
-              <div key={label} className="flex min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
+            ].map(([value, label], index) => (
+              <AnimatedContent key={label} delay={index * 0.06} distance={14} className="h-full">
+              <div className="flex h-full min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
                 <p className="text-2xl font-extrabold text-accent">{value}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{label}</p>
               </div>
+              </AnimatedContent>
             ))}
           </div>
         </section>
@@ -183,9 +190,9 @@ export default function FeatureOverviewPage() {
               </p>
             </div>
             <div className="mt-12 grid auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {FEATURE_PAGES.map(page => (
+              {FEATURE_PAGES.map((page, index) => (
+                <AnimatedContent key={page.slug} delay={(index % 3) * 0.06} distance={16} className="h-full">
                 <Link
-                  key={page.slug}
                   href={page.path}
                   className={cn(panelSurface, "group flex h-full min-h-[250px] flex-col p-5 transition-all", page.theme.hoverBorder)}
                 >
@@ -199,6 +206,7 @@ export default function FeatureOverviewPage() {
                     <ArrowRight className="h-4 w-4" />
                   </span>
                 </Link>
+                </AnimatedContent>
               ))}
             </div>
           </div>

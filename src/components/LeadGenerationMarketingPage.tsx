@@ -15,6 +15,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { LEAD_GENERATION_PAGES, type LeadGenerationPageData } from "@/data/lead-generation-pages";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
 
 const BASE_URL = "https://icloseleads.com";
 
@@ -128,6 +129,7 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
           <div className="absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent to-accent/10" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_0.86fr] lg:px-8 lg:py-24">
+            <AnimatedContent distance={22} blur={5} amount={0.05} className="min-w-0">
             <div className="min-w-0">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-bold text-primary-light">
                 <Zap className="h-4 w-4" />
@@ -175,8 +177,10 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
                 ))}
               </div>
             </div>
+            </AnimatedContent>
 
-            <aside className="min-w-0 self-start rounded-lg border border-border bg-gradient-card p-5 shadow-card">
+            <AnimatedContent direction="horizontal" distance={28} delay={0.08} blur={5} amount={0.05} className="min-w-0 self-start">
+            <aside className="min-w-0 rounded-lg border border-border bg-gradient-card p-5 shadow-card">
               <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Sample search</p>
@@ -208,16 +212,19 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </aside>
+            </AnimatedContent>
           </div>
         </section>
 
         <section className="px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-            {page.proofPoints.map(point => (
-              <div key={point} className="rounded-lg border border-border bg-surface p-5">
+            {page.proofPoints.map((point, index) => (
+              <AnimatedContent key={point} delay={index * 0.07} distance={16} className="h-full">
+              <div className="h-full rounded-lg border border-border bg-surface p-5">
                 <CheckCircle2 className="mb-4 h-5 w-5 text-accent" />
                 <p className="text-sm leading-7 text-muted-foreground">{point}</p>
               </div>
+              </AnimatedContent>
             ))}
           </div>
         </section>
@@ -273,7 +280,8 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
             {page.workflow.map((step, index) => {
               const Icon = workflowIcons[index] ?? ClipboardList;
               return (
-                <div key={step.title} className="rounded-lg border border-border bg-background p-5">
+                <AnimatedContent key={step.title} delay={index * 0.07} distance={16} className="h-full">
+                <div className="h-full rounded-lg border border-border bg-background p-5">
                   <div className="mb-5 flex items-center justify-between">
                     <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary-light">
                       <Icon className="h-5 w-5" />
@@ -283,6 +291,7 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
                   <h3 className="break-words font-bold text-foreground">{step.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.description}</p>
                 </div>
+                </AnimatedContent>
               );
             })}
           </div>

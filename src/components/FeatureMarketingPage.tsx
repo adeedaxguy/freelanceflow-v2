@@ -23,6 +23,7 @@ import Footer from "@/components/Footer";
 import FeatureInteractiveDemo from "@/components/FeatureInteractiveDemo";
 import { FEATURE_PAGES, type FeatureItem, type FeaturePageData, type IconName } from "@/data/feature-pages";
 import { cn } from "@/lib/utils";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
 
 const BASE_URL = "https://icloseleads.com";
 
@@ -170,6 +171,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
           <div className={cn("absolute inset-0 bg-gradient-to-b opacity-80", page.theme.heroWash)} />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
           <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
+            <AnimatedContent distance={22} blur={5} amount={0.05}>
             <div>
               <div className={cn("mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold", page.theme.accentBg, page.theme.accentBorder, page.theme.accentText)}>
                 <FeatureIcon name={page.icon} className="h-4 w-4" />
@@ -206,7 +208,10 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 ))}
               </div>
             </div>
-            <FeatureInteractiveDemo type={page.slug} />
+            </AnimatedContent>
+            <AnimatedContent direction="horizontal" distance={28} delay={0.08} blur={5} amount={0.05}>
+              <FeatureInteractiveDemo type={page.slug} />
+            </AnimatedContent>
           </div>
         </section>
 
@@ -222,11 +227,13 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
             </div>
           </div>
           <div className="mx-auto mt-8 grid max-w-6xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {page.stats.map(stat => (
-              <div key={stat.label} className="flex min-h-[104px] flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
+            {page.stats.map((stat, index) => (
+              <AnimatedContent key={stat.label} delay={index * 0.06} distance={14} className="h-full">
+              <div className="flex min-h-[104px] h-full flex-col items-center justify-center rounded-2xl border border-border bg-background/65 px-4 py-4 text-center">
                 <p className={cn("text-2xl font-extrabold", page.theme.accentText)}>{stat.value}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">{stat.label}</p>
               </div>
+              </AnimatedContent>
             ))}
           </div>
         </section>
@@ -262,7 +269,8 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
           />
           <div className="mx-auto mt-12 grid max-w-6xl auto-rows-fr gap-4 lg:grid-cols-4">
             {page.workflow.map((item, index) => (
-              <div key={item.title} className="flex h-full min-h-[230px] flex-col rounded-2xl border border-border bg-background p-5">
+              <AnimatedContent key={item.title} delay={index * 0.07} distance={18} className="h-full">
+              <div className="flex h-full min-h-[230px] flex-col rounded-2xl border border-border bg-background p-5">
                 <div className="mb-5 flex items-center justify-between">
                   <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border", page.theme.accentBg, page.theme.accentBorder)}>
                     <FeatureIcon name={item.icon} className={cn("h-5 w-5", page.theme.accentText)} />
@@ -272,6 +280,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 <h3 className="font-bold text-foreground">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
               </div>
+              </AnimatedContent>
             ))}
           </div>
         </section>
@@ -283,8 +292,10 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
             description="Practical building blocks that help freelancers move from a useful lead signal to a stronger client conversation."
           />
           <div className="mx-auto mt-12 grid max-w-6xl auto-rows-fr gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {page.capabilities.map(item => (
-              <FeatureCard key={item.title} item={item} page={page} />
+            {page.capabilities.map((item, index) => (
+              <AnimatedContent key={item.title} delay={(index % 3) * 0.06} distance={16} className="h-full">
+                <FeatureCard item={item} page={page} />
+              </AnimatedContent>
             ))}
           </div>
         </section>

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import DeferredClientChrome from "@/components/DeferredClientChrome";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { MarketingRouteMotion } from "@/components/AppRouteMotion";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
@@ -51,7 +52,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <GoogleAnalytics />
         <Providers>
-          {children}
+          <MarketingRouteMotion>{children}</MarketingRouteMotion>
           <DeferredClientChrome />
         </Providers>
       </body>

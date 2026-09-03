@@ -201,6 +201,81 @@
     @apply inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground;
   }
 
+  .react-bits-spotlight {
+    --spotlight-x: 50%;
+    --spotlight-y: 50%;
+  }
+
+  .react-bits-spotlight-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      320px circle at var(--spotlight-x) var(--spotlight-y),
+      var(--spotlight-color),
+      transparent 72%
+    );
+    transition: opacity 260ms ease;
+  }
+
+  .react-bits-spotlight:hover .react-bits-spotlight-layer,
+  .react-bits-spotlight:focus-within .react-bits-spotlight-layer {
+    opacity: 1;
+  }
+
+  .marketing-primary-cta,
+  .marketing-secondary-cta,
+  .marketing-icon-button,
+  .dashboard-action-pill,
+  .dashboard-choice,
+  .dashboard-result-card,
+  .dashboard-control-panel,
+  .dashboard-metric-card {
+    transition-duration: 180ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .marketing-primary-cta:active,
+  .marketing-secondary-cta:active,
+  .marketing-icon-button:active,
+  .dashboard-shell button:not(:disabled):active,
+  .dashboard-shell a:active {
+    transform: scale(0.98);
+  }
+
+  .dashboard-control-panel:focus-within {
+    border-color: hsl(var(--primary) / 0.38);
+  }
+
+  .dashboard-shell nav a svg {
+    transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dashboard-shell nav a:hover svg {
+    transform: translateX(1px) scale(1.04);
+  }
+
+  .dashboard-nav-active svg {
+    animation: dashboard-nav-icon-enter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .dashboard-result-card:focus-within {
+    border-color: hsl(var(--primary) / 0.42);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .marketing-primary-cta:hover,
+    .marketing-secondary-cta:hover {
+      transform: translateY(-1px);
+    }
+
+    .marketing-primary-cta:hover {
+      box-shadow: 0 16px 34px hsl(var(--primary) / 0.25);
+    }
+  }
+
   .prose-content {
     min-width: 0;
     max-width: 100%;
@@ -626,6 +701,10 @@
     from { opacity: 0; transform: scale(0.6); }
     to { opacity: 1; transform: scale(1); }
   }
+  @keyframes dashboard-nav-icon-enter {
+    from { opacity: 0.5; transform: scale(0.82); }
+    to { opacity: 1; transform: scale(1); }
+  }
 
   @media (max-width: 767px) {
     .shimmer-line::after { display: none; }
@@ -638,6 +717,8 @@
       scroll-behavior: auto !important;
       transition-duration: 0.001ms !important;
     }
+
+    .react-bits-spotlight-layer { display: none; }
   }
 }
 

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   BarChart3,
@@ -32,6 +33,9 @@ import TestimonialCard from "@/components/TestimonialCard";
 import { MarketingAdBand } from "@/components/AdSenseUnit";
 import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
 import { useAuthStatus } from "@/lib/use-auth-status";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
+import CountUp from "@/components/react-bits/CountUp";
+import SpotlightCard from "@/components/react-bits/SpotlightCard";
 
 const leadEngines = [
   {
@@ -168,15 +172,27 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function ProductPreview() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <div className="relative mx-auto w-full max-w-[620px] lg:mx-0">
-      <div className="absolute -left-5 top-20 hidden w-44 rounded-lg border border-border bg-background p-3 shadow-card sm:block">
+    <motion.div
+      className="relative mx-auto w-full max-w-[620px] lg:mx-0"
+      initial={reduceMotion ? false : { opacity: 0, x: 26, clipPath: "inset(0 0 0 14%)" }}
+      animate={{ opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
+      transition={{ duration: 0.72, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <motion.div
+        className="absolute -left-5 top-20 hidden w-44 rounded-lg border border-border bg-background p-3 shadow-card sm:block"
+        initial={reduceMotion ? false : { opacity: 0, x: 12, y: 6 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent/10 text-accent"><MapPin className="h-4 w-4" /></span>
           Local signal found
         </div>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">No verified website. Public phone available.</p>
-      </div>
+      </motion.div>
 
       <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
         <div className="flex items-center justify-between border-b border-border bg-background/75 px-4 py-3">
@@ -235,8 +251,14 @@ function ProductPreview() {
                 ["Northline Dental", "Clinic", "Outdated booking flow", "91"],
                 ["Brightway Cleaning", "Home service", "No verified website", "86"],
                 ["Peak Fitness Studio", "Fitness", "Mobile experience gap", "82"],
-              ].map(([name, category, signal, score]) => (
-                <div key={name} className="grid grid-cols-[1fr_auto] items-center gap-4 p-4">
+              ].map(([name, category, signal, score], index) => (
+                <motion.div
+                  key={name}
+                  className="grid grid-cols-[1fr_auto] items-center gap-4 p-4"
+                  initial={reduceMotion ? false : { opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.46 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-sm font-bold text-foreground">{name}</p>
@@ -248,7 +270,7 @@ function ProductPreview() {
                     <p className="text-sm font-bold text-foreground">{score}</p>
                     <p className="text-[10px] text-muted-foreground">score</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -263,7 +285,12 @@ function ProductPreview() {
         </div>
       </div>
 
-      <div className="absolute -bottom-5 -right-3 hidden w-48 rounded-lg border border-border bg-background p-3 shadow-card sm:block">
+      <motion.div
+        className="absolute -bottom-5 -right-3 hidden w-48 rounded-lg border border-border bg-background p-3 shadow-card sm:block"
+        initial={reduceMotion ? false : { opacity: 0, x: -12, y: -6 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.86, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary-light"><Sparkles className="h-4 w-4" /></span>
           <div>
@@ -271,8 +298,8 @@ function ProductPreview() {
             <p className="text-[11px] text-muted-foreground">Ready for your review</p>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -315,7 +342,15 @@ function LeadEngineSection({ isAuthenticated }: { isAuthenticated: boolean }) {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border bg-background shadow-card">
+          <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={engine.id}
+            className="overflow-hidden rounded-lg border border-border bg-background shadow-card"
+            initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="border-b border-border p-5 sm:p-7">
               <div className={`mb-5 flex h-11 w-11 items-center justify-center rounded-lg ${engine.wash} ${engine.color}`}><Icon className="h-5 w-5" /></div>
               <h3 className="text-2xl font-bold text-foreground sm:text-3xl">{engine.title}</h3>
@@ -354,7 +389,8 @@ function LeadEngineSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                 {isAuthenticated ? "Open search" : "Try it free"} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-          </div>
+          </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>
@@ -370,9 +406,10 @@ function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean })
   ] as const;
 
   return (
-    <section id="softphone" className="marketing-section border-y border-border bg-background">
+        <section id="softphone" className="marketing-section border-y border-border bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+          <AnimatedContent distance={22} blur={4}>
           <div>
             <Eyebrow>Built-in softphone</Eyebrow>
             <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">
@@ -399,11 +436,14 @@ function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean })
               Phone numbers and calling minute packages are billed separately through secure checkout.
             </p>
           </div>
+          </AnimatedContent>
 
+          <AnimatedContent delay={0.08} distance={22} blur={4}>
           <div className="rounded-lg border border-border bg-surface p-4 shadow-card sm:p-5">
             <div className="grid gap-3 sm:grid-cols-4">
               {steps.map(([StepIcon, title, detail], index) => (
-                <div key={title} className="relative rounded-lg border border-border bg-background p-4">
+                <AnimatedContent key={title} delay={index * 0.08} distance={16} className="h-full">
+                <div className="relative h-full rounded-lg border border-border bg-background p-4">
                   {index < steps.length - 1 && (
                     <div className="absolute left-[calc(100%-0.25rem)] top-9 hidden h-px w-4 bg-border sm:block" aria-hidden="true" />
                   )}
@@ -413,6 +453,7 @@ function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean })
                   <h3 className="mt-4 text-sm font-bold text-foreground">{title}</h3>
                   <p className="mt-2 text-xs leading-5 text-muted-foreground">{detail}</p>
                 </div>
+                </AnimatedContent>
               ))}
             </div>
 
@@ -454,6 +495,7 @@ function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean })
               </div>
             </div>
           </div>
+          </AnimatedContent>
         </div>
       </div>
     </section>
@@ -479,9 +521,9 @@ function Testimonials() {
         </div>
         <div ref={ref} className="scrollbar-hide -mx-4 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2">
           {TESTIMONIALS.map((testimonial, index) => (
-            <div key={`${testimonial.name}-${index}`} className="h-[310px] shrink-0 basis-[88%] snap-start sm:basis-[420px] lg:basis-[32%]">
+            <AnimatedContent key={`${testimonial.name}-${index}`} delay={Math.min(index * 0.06, 0.18)} distance={16} className="h-[310px] shrink-0 basis-[88%] snap-start sm:basis-[420px] lg:basis-[32%]">
               <TestimonialCard testimonial={testimonial} index={index} />
-            </div>
+            </AnimatedContent>
           ))}
         </div>
       </div>
@@ -492,8 +534,13 @@ function Testimonials() {
 export default function HomepageClient() {
   const authStatus = useAuthStatus();
   const isAuthenticated = authStatus === "authenticated";
+  const reduceMotion = useReducedMotion();
   const [openFaq, setOpenFaq] = useState(0);
   const primaryHref = isAuthenticated ? "/dashboard/local-leads" : signupHref("first-search", "homepage-hero");
+  const heroItem = {
+    hidden: { opacity: 0, y: 18, filter: "blur(6px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)" },
+  };
 
   return (
     <div className="marketing-shell min-h-screen overflow-x-hidden bg-background text-foreground">
@@ -502,19 +549,24 @@ export default function HomepageClient() {
         <section className="marketing-hero relative overflow-hidden border-b border-border pt-16">
           <div className="marketing-grid absolute inset-0 opacity-60" aria-hidden="true" />
           <div className="relative mx-auto grid min-h-[calc(100svh-7rem)] max-w-7xl items-center gap-14 px-4 py-14 sm:px-6 sm:py-20 lg:min-h-[760px] lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
-            <div className="min-w-0 max-w-2xl">
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
+            <motion.div
+              className="min-w-0 max-w-2xl"
+              initial={reduceMotion ? false : "hidden"}
+              animate="visible"
+              variants={{ visible: { transition: { delayChildren: 0.08, staggerChildren: 0.085 } } }}
+            >
+              <motion.div variants={heroItem} transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1] }} className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent"><Zap className="h-3 w-3" /></span>
                 600 free weekly lead searches - no card required
-              </div>
-              <h1 className="marketing-display break-words text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
+              </motion.div>
+              <motion.h1 variants={heroItem} transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }} className="marketing-display break-words text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
                 Find the lead. Know the angle. Start the conversation.
-              </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+              </motion.h1>
+              <motion.p variants={heroItem} transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1] }} className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
                 iCloseLeads helps freelancers find local businesses, remote jobs, and live demand, then verify the contact path, draft the pitch, call from the platform, and track every follow-up.
-              </p>
+              </motion.p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <motion.div variants={heroItem} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={primaryHref}
                   prefetch={false}
@@ -525,9 +577,9 @@ export default function HomepageClient() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="#how-it-works" className="marketing-secondary-cta">See how it works</Link>
-              </div>
+              </motion.div>
 
-              <div className="mt-5 flex flex-col gap-2 text-sm font-semibold text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center">
+              <motion.div variants={heroItem} transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }} className="mt-5 flex flex-col gap-2 text-sm font-semibold text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center">
                 <Link
                   href="/blog/freelance-client-acquisition-system"
                   prefetch={false}
@@ -546,14 +598,14 @@ export default function HomepageClient() {
                   Start a focused lead search
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
-              </div>
+              </motion.div>
 
-              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+              <motion.div variants={heroItem} transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
                 {["600 weekly lead searches", "Stripe plan upgrades", "Paid softphone add-ons"].map(item => (
                   <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-accent" />{item}</span>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             <ProductPreview />
           </div>
@@ -564,12 +616,15 @@ export default function HomepageClient() {
             <p className="text-sm font-semibold text-foreground">One client acquisition workflow for independent experts</p>
             <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap sm:items-center sm:gap-8">
               {[
-                ["3", "lead engines"],
-                ["16+", "signal paths"],
-                ["6", "pipeline stages"],
-                ["$0", "to start"],
-              ].map(([value, label]) => (
-                <div key={label} className="flex items-baseline gap-2"><strong className="text-xl text-foreground">{value}</strong><span className="text-xs text-muted-foreground">{label}</span></div>
+                { value: 3, label: "lead engines" },
+                { value: 16, suffix: "+", label: "signal paths" },
+                { value: 6, label: "pipeline stages" },
+                { value: 0, prefix: "$", label: "to start" },
+              ].map(({ value, prefix, suffix, label }, index) => (
+                <div key={label} className="flex items-baseline gap-2">
+                  <strong className="text-xl text-foreground"><CountUp to={value} prefix={prefix} suffix={suffix} delay={index * 0.08} /></strong>
+                  <span className="text-xs text-muted-foreground">{label}</span>
+                </div>
               ))}
             </div>
           </div>
@@ -585,8 +640,10 @@ export default function HomepageClient() {
 
             <div className="relative mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <div className="absolute left-[10%] right-[10%] top-8 hidden border-t border-dashed border-primary/35 lg:block" aria-hidden="true" />
-              {workflow.map(({ icon: Icon, number, title, description, note }) => (
-                <article key={number} className="relative rounded-lg border border-border bg-surface p-5">
+              {workflow.map(({ icon: Icon, number, title, description, note }, index) => (
+                <AnimatedContent key={number} delay={index * 0.07} distance={18} className="h-full">
+                <SpotlightCard className="h-full rounded-lg border border-border bg-surface">
+                <article className="relative h-full p-5">
                   <div className="relative z-10 flex items-center justify-between">
                     <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/25 bg-background text-primary-light"><Icon className="h-5 w-5" /></span>
                     <span className="text-xs font-bold text-muted-foreground">{number}</span>
@@ -595,6 +652,8 @@ export default function HomepageClient() {
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
                   <p className="mt-6 border-t border-border pt-4 text-xs font-bold text-primary-light">{note}</p>
                 </article>
+                </SpotlightCard>
+                </AnimatedContent>
               ))}
             </div>
           </div>
@@ -648,11 +707,11 @@ export default function HomepageClient() {
               </div>
               <div className="grid min-w-0 divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
                 {features.map(([Icon, title, description], index) => (
-                  <div key={title} className={`min-w-0 p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-border" : ""}`}>
+                  <AnimatedContent key={title} delay={(index % 2) * 0.06} distance={14} className={`min-w-0 p-5 sm:p-6 ${index > 1 ? "sm:border-t sm:border-border" : ""}`}>
                     <Icon className="h-5 w-5 text-accent" />
                     <h3 className="mt-5 text-lg font-bold">{title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-                  </div>
+                  </AnimatedContent>
                 ))}
               </div>
             </div>
@@ -667,12 +726,14 @@ export default function HomepageClient() {
             </div>
             <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {audiences.map(([title, description, href], index) => (
-                <Link key={title} href={href} className="group flex min-h-[245px] flex-col rounded-lg border border-border bg-surface p-5 transition-colors hover:border-primary/40">
+                <AnimatedContent key={title} delay={index * 0.06} distance={16} className="h-full">
+                <Link href={href} className="group flex min-h-[245px] h-full flex-col rounded-lg border border-border bg-surface p-5 transition-colors hover:border-primary/40">
                   <span className="text-xs font-bold text-muted-foreground">0{index + 1}</span>
                   <h3 className="mt-10 text-xl font-bold text-foreground">{title}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{description}</p>
                   <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-bold text-primary-light">See the workflow <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
                 </Link>
+                </AnimatedContent>
               ))}
             </div>
           </div>
@@ -709,7 +770,20 @@ export default function HomepageClient() {
                       <span className="font-bold text-foreground">{question}</span>
                       <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
                     </button>
-                    {open && <p className="max-w-2xl pb-6 text-sm leading-7 text-muted-foreground">{answer}</p>}
+                    <AnimatePresence initial={false}>
+                      {open && (
+                        <motion.div
+                          key="answer"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <p className="max-w-2xl pb-6 text-sm leading-7 text-muted-foreground">{answer}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 );
               })}

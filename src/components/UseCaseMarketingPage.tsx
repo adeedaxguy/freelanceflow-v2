@@ -13,6 +13,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { USE_CASE_PAGES, type UseCasePageData } from "@/data/use-case-pages";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
 
 const BASE_URL = "https://icloseleads.com";
 
@@ -130,6 +131,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:64px_64px]" />
           <div className="relative mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-24">
+            <AnimatedContent distance={22} blur={5} amount={0.05} className="min-w-0">
             <div className="min-w-0">
               <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-light">
                 <Zap className="h-4 w-4" />
@@ -184,7 +186,9 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                 </div>
               </div>
             </div>
+            </AnimatedContent>
 
+            <AnimatedContent direction="horizontal" distance={28} delay={0.08} blur={5} amount={0.05} className="min-w-0">
             <div className="min-w-0 rounded-lg border border-border bg-gradient-card p-5 shadow-card">
               <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
                 <div>
@@ -209,6 +213,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                 ))}
               </div>
             </div>
+            </AnimatedContent>
           </div>
         </section>
 
@@ -270,7 +275,8 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
           />
           <div className="mx-auto mt-12 grid max-w-6xl gap-4 md:grid-cols-2 lg:grid-cols-4">
             {page.workflow.map((step, index) => (
-              <div key={step.title} className="min-w-0 rounded-lg border border-border bg-background p-5">
+              <AnimatedContent key={step.title} delay={index * 0.07} distance={16} className="h-full min-w-0">
+              <div className="h-full min-w-0 rounded-lg border border-border bg-background p-5">
                 <div className="mb-5 flex items-center justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary-light">
                     {[Search, Target, FileText, Layers][index] ? (
@@ -287,6 +293,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                 <h3 className="break-words font-bold text-foreground">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{step.description}</p>
               </div>
+              </AnimatedContent>
             ))}
           </div>
         </section>

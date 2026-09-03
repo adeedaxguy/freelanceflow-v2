@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Check, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PricingTier } from "@/data/marketing";
+import AnimatedContent from "@/components/react-bits/AnimatedContent";
 
 interface PricingCardProps {
   tier: PricingTier;
@@ -12,10 +13,10 @@ interface PricingCardProps {
 
 export default function PricingCard({ tier, index = 0 }: PricingCardProps) {
   return (
+    <AnimatedContent delay={index * 0.08} distance={18} className="h-full">
     <div
-      style={{ transitionDelay: `${index * 70}ms` }}
       className={cn(
-        "relative flex flex-col rounded-2xl border p-8 transition-all duration-300",
+        "relative flex h-full flex-col rounded-2xl border p-8 transition-all duration-300",
         tier.highlight
           ? "bg-gradient-card border-primary/50 shadow-glow-primary/20 scale-105"
           : "bg-surface border-border hover:border-primary/30 hover:shadow-card-hover"
@@ -70,5 +71,6 @@ export default function PricingCard({ tier, index = 0 }: PricingCardProps) {
         {tier.cta}
       </Link>
     </div>
+    </AnimatedContent>
   );
 }
