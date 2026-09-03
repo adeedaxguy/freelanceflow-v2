@@ -1097,7 +1097,7 @@ export default function LocalLeadsPage() {
   const resetAt = usageResetAt ? new Date(usageResetAt) : null;
 
   const isPaidPlan  = userPlan === "pro" || userPlan === "agency";
-  const isOverLimit = !isPaidPlan && leadsViewed >= dailyLimit;
+  const isOverLimit = !isPaidPlan && (trialExpired || leadsViewed >= dailyLimit);
 
   const doSearch = useCallback(async () => {
     if (usageLoading || !keyword.trim() || !location.trim() || isOverLimit) return;
