@@ -989,6 +989,7 @@ export default function LocalLeadsPage() {
   const [filter,     setFilter]     = useState<"all"|"no_website"|"outdated_website"|"has_website">("no_website");
   const [results,    setResults]    = useState<LocalLead[]>([]);
   const [loading,    setLoading]    = useState(false);
+  const [usageLoading, setUsageLoading] = useState(true);
   const [error,      setError]      = useState("");
   const [meta,       setMeta]       = useState<{ source?: string; geocoded?: boolean; cached?: boolean; sources?: string[] } | null>(null);
   const [savedIds,   setSavedIds]   = useState<Set<string>>(new Set());
@@ -1063,7 +1064,8 @@ export default function LocalLeadsPage() {
     fetch("/api/usage")
       .then(r => r.ok ? r.json() as Promise<UsageStats> : null)
       .then(syncUsage)
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setUsageLoading(false));
   }, [sessionStatus, syncUsage]);
 
   useEffect(() => {
@@ -1098,7 +1100,7 @@ export default function LocalLeadsPage() {
   const isOverLimit = !isPaidPlan && leadsViewed >= dailyLimit;
 
   const doSearch = useCallback(async () => {
-    if (!keyword.trim() || !location.trim() || isOverLimit) return;
+    if (usageLoading || !keyword.trim() || !location.trim() || isOverLimit) return;
     setLoading(true); setError(""); setLimitNotice(""); setPage(1); setShowSugg(null); setPhoneTypeFilter("all");
     try {
       const body: Record<string, unknown> = {
@@ -1188,7 +1190,7 @@ export default function LocalLeadsPage() {
       );
     }
     finally { setLoading(false); }
-  }, [keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, yelpKey, fsqKey, syncUsage]);
+  }, [usageLoading, keyword, location, filter, hasPhone, smallOperatorOnly, minRating, savedIds, isOverLimit, isPaidPlan, yelpKey, fsqKey, syncUsage]);
 
   const handleSave = async (lead: LocalLead) => {
     if (savedIds.has(lead.id)) return;
@@ -1321,8 +1323,15 @@ export default function LocalLeadsPage() {
         </p>
       </div>
 
+      {usageLoading && (
+        <div className="dashboard-control-panel flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground">
+          <RefreshCw className="h-4 w-4 animate-spin text-primary-light" />
+          Checking trial access…
+        </div>
+      )}
+
       {/* Daily usage bar — free plan only */}
-      {!isOverLimit && !isPaidPlan && (
+      {!usageLoading && !isOverLimit && !isPaidPlan && (
         <div className="dashboard-control-panel rounded-xl px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1.5">
@@ -1349,7 +1358,7 @@ export default function LocalLeadsPage() {
       )}
 
       {/* Daily limit hit */}
-      {isOverLimit && (
+      {!usageLoading && isOverLimit && (
         <div className="bg-surface border border-border rounded-2xl p-6 text-center">
           <p className="text-foreground font-semibold mb-2">
             {trialExpired ? "Your 3-day trial has ended" : `You've used your ${dailyLimit} trial leads`}
@@ -1595,9 +1604,11 @@ export default function LocalLeadsPage() {
               )}
 
               {/* Search button */}
-              <button onClick={() => void doSearch()} disabled={loading || !keyword.trim() || !location.trim() || isOverLimit}
+              <button onClick={() => void doSearch()} disabled={usageLoading || loading || !keyword.trim() || !location.trim() || isOverLimit}
                 className="ml-auto min-h-12 flex items-center justify-center gap-2 px-8 py-3 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-glow-primary/20">
-                {loading
+                {usageLoading
+                  ? <><RefreshCw className="w-4 h-4 animate-spin"/> Checking access…</>
+                  : loading
                   ? <><RefreshCw className="w-4 h-4 animate-spin"/> Searching…</>
                   : <><Search className="w-4 h-4"/> Find Businesses</>
                 }
