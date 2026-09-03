@@ -196,6 +196,8 @@ const SOURCE_COLORS: Record<string, string> = {
   greenhouse:    "bg-emerald-500/15 text-emerald-300 border-emerald-500/20",
   lever:         "bg-blue-500/15 text-blue-300 border-blue-500/20",
   ashby:         "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/20",
+  remotefirstjobs: "bg-teal-500/15 text-teal-300 border-teal-500/20",
+  web3jobsradar: "bg-amber-500/15 text-amber-300 border-amber-500/20",
 };
 
 function SourcePill({ source }: { source: string }) {
@@ -571,10 +573,10 @@ export default function LeadsPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary-light" />
-            Find Leads
+            Remote Jobs
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Real-time opportunities from live channels — matched to your niche
+            Fresh, remote-only roles from public job feeds — matched to your niche
           </p>
         </div>
         {fetchedAt && (

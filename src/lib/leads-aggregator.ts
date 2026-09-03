@@ -1,5 +1,5 @@
 /**
- * iCloseLeads Lead Aggregator v6
+ * iCloseLeads Lead Aggregator v7
  *
  * Sources:
  *  1.  RemoteOK            — https://remoteok.com/api
@@ -22,6 +22,12 @@
  *  18. Greenhouse boards   — selected public startup/company boards
  *  19. Lever boards        — selected public Lever boards
  *  20. Ashby boards        — selected public Ashby boards
+ *  21. Remote First Jobs   — public category RSS feeds
+ *  22. Web3 Jobs Radar     — public remote Web3 jobs API
+ *
+ * v7 changes:
+ *  - Added Remote First Jobs and Web3 Jobs Radar without API keys
+ *  - Mixed job feeds now require an explicit remote-work signal
  *
  * v6 changes:
  *  - Added Job Opportunities' keyless, employer-direct remote feed
@@ -60,7 +66,9 @@ export type LeadSource =
   | "nodesk"          // nodesk.co — curated remote-work RSS
   | "greenhouse"      // selected public Greenhouse job boards
   | "lever"           // selected public Lever job boards
-  | "ashby";          // selected public Ashby job boards
+  | "ashby"           // selected public Ashby job boards
+  | "remotefirstjobs" // remotefirstjobs.com — public category RSS
+  | "web3jobsradar";  // web3jobsradar.com — focused public Web3 API
 
 /** Canonical display labels for every source — used by the UI source-filter chips */
 export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
@@ -85,6 +93,8 @@ export const ALL_SOURCE_LABELS: Record<LeadSource, string> = {
   greenhouse:       "Greenhouse Jobs",
   lever:            "Lever Jobs",
   ashby:            "Ashby Jobs",
+  remotefirstjobs:  "Remote First Jobs",
+  web3jobsradar:    "Web3 Jobs Radar",
 };
 
 // Callable for recovery probes, but excluded from normal user searches.
@@ -332,6 +342,11 @@ function detectUrgency(text: string): boolean {
   return /\b(asap|urgent(?:ly)?|immediately|right\s*away|start\s*(?:today|now|asap|immediately)|quick(?:ly)?|rush(?:\s*job)?|time[\s-]sensitive|need\s*(?:it\s*)?(?:done\s*)?(?:today|now|asap)|deadline\s*soon)\b/i.test(text);
 }
 
+function hasRemoteSignal(...parts: Array<string | string[] | undefined>): boolean {
+  const text = parts.flatMap(part => Array.isArray(part) ? part : [part ?? ""]).join(" ");
+  return /\b(remote(?:[-\s]?first)?|work[-\s]?from[-\s]?home|wfh|distributed|anywhere|worldwide)\b/i.test(text);
+}
+
 function isJobSeekerPost(text: string): boolean {
   return /\b(open\s+to\s+work|hire\s+me|available\s+for\s+(?:hire|work)|need\s+(?:a\s+)?job|looking\s+for\b.{0,80}\b(?:job|work|role|position|opportunit(?:y|ies)))\b/i.test(text);
 }
@@ -488,6 +503,7 @@ async function fetchRedditSub(
     const contentRaw = entry.match(/<content[^>]*>([\s\S]*?)<\/content>/i)?.[1] ?? "";
     const body       = stripHtml(contentRaw);
     if (isJobSeekerPost(`${title} ${body}`)) continue;
+    if (!["RemoteJobs", "remotework", "remoteworking"].includes(sub) && !hasRemoteSignal(title, body)) continue;
 
     // Author
     const author = entry.match(/<name[^>]*>([\s\S]*?)<\/name>/i)?.[1]?.trim() ?? "";
@@ -780,7 +796,172 @@ async function fetchJobOpportunities(
   return { leads, raw: inWindow };
 }
 
-// ─── Source 5: Public ATS feeds (Greenhouse, Lever, Ashby) ───────────────────
+// ─── Source 5: Remote First Jobs ────────────────────────────────────────
+const REMOTE_FIRST_CATEGORY: Record<string, string> = {
+  "web-development": "software-development",
+  "mobile-apps": "software-development",
+  "wordpress": "wordpress",
+  "shopify": "shopify",
+  "ui-ux-design": "design",
+  "graphic-design": "graphic-design",
+  "copywriting": "writing",
+  "technical-writing": "writing",
+  "seo": "marketing",
+  "social-media": "social-media",
+  "meta-ads": "marketing",
+  "email-marketing": "marketing",
+  "data-science": "data-science",
+  "devops": "devops",
+  "video-editing": "design",
+  "photography": "design",
+  "blockchain": "web3",
+  "cybersecurity": "cybersecurity",
+  "business-consulting": "business",
+  "game-development": "unreal-engine",
+  "virtual-assistant": "virtual-assistant",
+};
+
+async function fetchRemoteFirstJobs(
+  niche: string,
+  keywords: string[],
+  maxHours: number,
+  freshOnly: boolean,
+): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  if (niche === "blockchain") return { leads: [], raw: 0 };
+  const category = REMOTE_FIRST_CATEGORY[niche] ?? "software-development";
+  const res = await withTimeout(
+    fetch(`https://remotefirstjobs.com/rss/jobs/${category}.rss`, {
+      headers: { "User-Agent": "iCloseLeads/7.0", "Accept": "application/rss+xml, text/xml, */*" },
+      ...cacheOpts(freshOnly, 600),
+    }),
+    10000,
+  );
+  if (!res.ok) throw new Error(`Remote First Jobs ${res.status}`);
+
+  const xml = await res.text();
+  const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+  const leads: AggregatedLead[] = [];
+  let inWindow = 0;
+
+  for (const match of items) {
+    const item = match[1] ?? "";
+    const fullTitle = stripHtml(extractRSS(item, "title"));
+    const link = extractRSS(item, "link");
+    const guid = stripHtml(extractRSS(item, "guid"));
+    const posted = new Date(extractRSS(item, "pubDate"));
+    if (!fullTitle || !link || isNaN(posted.getTime())) continue;
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) continue;
+    inWindow++;
+
+    const rawDescription = extractRSS(item, "description") || extractRSS(item, "content:encoded");
+    const description = stripHtml(stripHtml(rawDescription));
+    const titleMatch = fullTitle.match(/^(.+?)\s+at\s+(.+)$/i);
+    const title = titleMatch?.[1]?.trim() || fullTitle;
+    const company = (titleMatch?.[2]?.trim() || "Remote First Jobs company").slice(0, 100);
+    const tags = [category, "remote"];
+    const titleConfidence = scoreMatch(title, "", [], keywords);
+    const confidence = scoreMatch(title, description, tags, keywords);
+    if (confidence < SOURCE_FLOOR || (titleConfidence === 0 && confidence < 60)) continue;
+
+    const budget = extractBudget(description);
+    const urgency = detectUrgency(`${title} ${description}`);
+    const email = extractEmail(description);
+    const domain = companyToDomain(company);
+
+    leads.push({
+      id: `rfj-${guid || link.split("/").filter(Boolean).pop() || Math.random()}`,
+      company, domain, email, title,
+      description: truncate(description),
+      url: link,
+      source: "remotefirstjobs",
+      sourceLabel: ALL_SOURCE_LABELS.remotefirstjobs,
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags, confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description, tags, domain, title, budget, urgency }),
+    });
+  }
+
+  return { leads, raw: inWindow };
+}
+
+// Source 6: Web3 Jobs Radar public API.
+interface Web3RadarJob {
+  id?: string;
+  title?: string;
+  company?: string;
+  url?: string;
+  applyUrl?: string;
+  location?: string;
+  remote?: string;
+  role?: string;
+  seniority?: string;
+  tags?: string[];
+  postedAt?: string;
+  salary?: { min?: number | null; max?: number | null; currency?: string | null } | null;
+}
+interface Web3RadarResponse { jobs?: Web3RadarJob[]; }
+
+async function fetchWeb3JobsRadar(
+  niche: string,
+  keywords: string[],
+  maxHours: number,
+  freshOnly: boolean,
+): Promise<{ leads: AggregatedLead[]; raw: number }> {
+  if (niche !== "blockchain") return { leads: [], raw: 0 };
+
+  const since = maxHours <= 24 ? "24h" : maxHours <= 168 ? "7d" : "30d";
+  const params = new URLSearchParams({ remote: "remote", since, sort: "new", limit: "50" });
+  const res = await withTimeout(
+    fetch(`https://web3jobsradar.com/api/jobs?${params.toString()}`, {
+      headers: { "User-Agent": "iCloseLeads/7.0", "Accept": "application/json" },
+      ...cacheOpts(freshOnly, 600),
+    }),
+    9000,
+  );
+  if (!res.ok) throw new Error(`Web3 Jobs Radar ${res.status}`);
+  const data = await res.json() as Web3RadarResponse;
+
+  let inWindow = 0;
+  const leads = (data.jobs ?? []).flatMap((job): AggregatedLead[] => {
+    if (!job.id || !job.title || !job.company || !job.postedAt || job.remote !== "remote") return [];
+    const posted = new Date(job.postedAt);
+    if (isNaN(posted.getTime())) return [];
+    const hrs = hoursAgo(posted);
+    if (hrs > maxHours) return [];
+    inWindow++;
+
+    const tags = [job.role, job.seniority, job.location, ...(job.tags ?? []), "remote"]
+      .filter((value): value is string => Boolean(value))
+      .slice(0, 8);
+    const description = `${job.company} is hiring a remote ${job.title}. ${tags.join(", ")}.`;
+    const confidence = Math.max(55, scoreMatch(job.title, description, tags, keywords));
+    if (confidence < SOURCE_FLOOR) return [];
+
+    const salary = job.salary;
+    const budget = salary?.min || salary?.max
+      ? `${salary.currency || "USD"} ${salary.min?.toLocaleString() || "?"}-${salary.max?.toLocaleString() || "?"}/year`
+      : undefined;
+    const url = job.url || job.applyUrl;
+    if (!url) return [];
+    const domain = extractDomain(url);
+
+    return [{
+      id: `w3r-${job.id}`,
+      company: job.company.trim(), domain,
+      title: job.title.trim(), description, url,
+      source: "web3jobsradar",
+      sourceLabel: ALL_SOURCE_LABELS.web3jobsradar,
+      postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
+      tags, confidence, budget, urgency: false,
+      qualityScore: calcQuality({ description, tags, domain, title: job.title, budget }),
+    }];
+  });
+
+  return { leads, raw: inWindow };
+}
+
+// Source 7: Public ATS feeds (Greenhouse, Lever, Ashby).
 // These are public job-board APIs used by startups and software companies. They
 // do not require scraping or user API keys, and are treated as generic verified
 // hiring channels in the UI.
@@ -895,13 +1076,14 @@ async function fetchGreenhouseBoards(keywords: string[], maxHours: number, fresh
         if (!posted) return [];
         const hrs = hoursAgo(posted);
         if (hrs > maxHours) return [];
-        inWindow++;
         const tags = [
           ...(job.departments ?? []).map(d => d.name ?? ""),
           ...(job.offices ?? []).map(o => o.name ?? ""),
           job.location?.name ?? "",
         ].filter(Boolean).slice(0, 8);
         const desc = stripHtml([job.content, job.location?.name, ...tags].filter(Boolean).join(" "));
+        if (!hasRemoteSignal(job.title, desc, tags)) return [];
+        inWindow++;
         const confidence = atsQualityBoost(scoreMatch(job.title, desc, tags, keywords), job.title, desc);
         if (confidence < SOURCE_FLOOR) return [];
         const budget  = extractBudget(desc);
@@ -950,7 +1132,6 @@ async function fetchLeverBoards(keywords: string[], maxHours: number, freshOnly:
         if (!posted) return [];
         const hrs = hoursAgo(posted);
         if (hrs > maxHours) return [];
-        inWindow++;
         const tags = [
           job.categories?.team ?? "",
           job.categories?.location ?? "",
@@ -963,6 +1144,8 @@ async function fetchLeverBoards(keywords: string[], maxHours: number, freshOnly:
           job.additionalPlain,
           ...tags,
         ].filter(Boolean).join(" "));
+        if (!hasRemoteSignal(job.text, desc, tags)) return [];
+        inWindow++;
         const confidence = atsQualityBoost(scoreMatch(job.text, desc, tags, keywords), job.text, desc);
         if (confidence < SOURCE_FLOOR) return [];
         const budget  = extractBudget(desc);
@@ -1010,7 +1193,6 @@ async function fetchAshbyBoards(keywords: string[], maxHours: number, freshOnly:
         if (!posted) return [];
         const hrs = hoursAgo(posted);
         if (hrs > maxHours) return [];
-        inWindow++;
         const tags = [
           job.department ?? "",
           job.team ?? "",
@@ -1020,6 +1202,8 @@ async function fetchAshbyBoards(keywords: string[], maxHours: number, freshOnly:
           job.workplaceType ?? "",
         ].filter(Boolean).slice(0, 8);
         const desc = stripHtml([job.descriptionPlain, job.descriptionHtml, ...tags].filter(Boolean).join(" "));
+        if (!job.isRemote && !hasRemoteSignal(job.title, desc, tags)) return [];
+        inWindow++;
         const confidence = atsQualityBoost(scoreMatch(job.title, desc, tags, keywords), job.title, desc);
         if (confidence < SOURCE_FLOOR) return [];
         const budget  = extractBudget(desc);
@@ -1150,6 +1334,7 @@ async function fetchWeWorkRemotely(niche: string, keywords: string[], maxHours: 
 interface ArbeitnowJob {
   slug?: string; company_name?: string; title?: string; description?: string;
   url?: string; tags?: string[]; created_at?: string | number;
+  remote?: boolean; location?: string;
 }
 interface ArbeitnowResponse { data?: ArbeitnowJob[]; }
 
@@ -1166,6 +1351,7 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
   let inWindow = 0;
   const leads = (data.data ?? []).flatMap((job): AggregatedLead[] => {
     if (!job.title || !job.company_name) return [];
+    if (job.remote !== true) return [];
     let posted: Date | null = null;
     if (job.created_at) {
       const v = typeof job.created_at === "number" ? new Date(job.created_at * 1000) : new Date(job.created_at);
@@ -1176,7 +1362,8 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
     if (hrs > maxHours) return [];
     inWindow++;
     const desc       = stripHtml(job.description ?? "");
-    const confidence = scoreMatch(job.title, desc, job.tags ?? [], keywords);
+    const tags       = [...(job.tags ?? []), job.location ?? "", "remote"].filter(Boolean).slice(0, 8);
+    const confidence = scoreMatch(job.title, desc, tags, keywords);
     if (confidence < SOURCE_FLOOR) return [];
     const budget  = extractBudget(desc);
     const urgency = detectUrgency(job.title + " " + desc);
@@ -1188,8 +1375,8 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
       description: truncate(desc), url: job.url ?? "https://arbeitnow.com",
       source: "arbeitnow", sourceLabel: "Arbeitnow",
       postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
-      tags: (job.tags ?? []).slice(0, 8), confidence, budget, urgency,
-      qualityScore: calcQuality({ email, description: desc, tags: job.tags, domain, title: job.title, budget, urgency }),
+      tags, confidence, budget, urgency,
+      qualityScore: calcQuality({ email, description: desc, tags, domain, title: job.title, budget, urgency }),
     }];
   });
   return { leads, raw: inWindow };
@@ -1463,10 +1650,11 @@ async function fetchHackerNews(keywords: string[], maxHours: number, freshOnly: 
     const posted = new Date(c.created_at_i * 1000);
     const hrs    = hoursAgo(posted);
     if (hrs > maxHours) continue;
-    inWindow++;
     const text = stripHtml(c.text);
     if (text.length < 40) continue;
     if (isFreelancerThread && /seeking\s*work/i.test(text) && !/seeking\s*freelancer/i.test(text)) continue;
+    if (!hasRemoteSignal(text)) continue;
+    inWindow++;
     const confidence = scoreMatch(text.slice(0, 120), text, [], keywords);
     if (confidence < SOURCE_FLOOR) continue;
 
@@ -1544,9 +1732,10 @@ async function fetchYCJobs(keywords: string[], maxHours: number, freshOnly: bool
     const posted = new Date(item.time * 1000);
     const hrs    = hoursAgo(posted);
     if (hrs > maxHours) continue;
-    inWindow++;
 
     const body       = stripHtml(item.text ?? "");
+    if (!hasRemoteSignal(item.title, body)) continue;
+    inWindow++;
     const baseConfidence = scoreMatch(item.title, body, [], keywords);
     const confidence = baseConfidence > 0 ? Math.min(100, baseConfidence + 10) : 0;
     if (confidence < SOURCE_FLOOR) continue;
@@ -1614,8 +1803,9 @@ async function fetchAuthenticJobs(keywords: string[], maxHours: number, freshOnl
     if (isNaN(posted.getTime())) continue;
     const hrs = hoursAgo(posted);
     if (hrs > maxHours) continue;
-    inWindow++;
     const cleanDesc  = stripHtml(desc);
+    if (!hasRemoteSignal(title, cleanDesc)) continue;
+    inWindow++;
     const confidence = scoreMatch(title, cleanDesc, [], keywords);
     if (confidence < SOURCE_FLOOR) continue;
 
@@ -1872,8 +2062,9 @@ async function fetchDribbbleJobs(keywords: string[], maxHours: number, freshOnly
     if (isNaN(posted.getTime())) continue;
     const hrs = hoursAgo(posted);
     if (hrs > maxHours) continue;
-    inWindow++;
     const cleanDesc  = stripHtml(desc);
+    if (!hasRemoteSignal(title, cleanDesc)) continue;
+    inWindow++;
     const confidence = scoreMatch(title, cleanDesc, [], keywords);
     if (confidence < SOURCE_FLOOR) continue;
 
@@ -2059,6 +2250,8 @@ const SOURCE_RUNNERS: Array<{
   { name: "arbeitnow",     run: (_n, k, h, f) => fetchArbeitnow(k, h, f) },
   { name: "remotejobsorg", run: (n, k, h, f)  => fetchRemoteJobsOrg(n, k, h, f) },
   { name: "jobopportunities", run: (_n, k, h, f) => fetchJobOpportunities(k, h, f) },
+  { name: "remotefirstjobs", run: (n, k, h, f) => fetchRemoteFirstJobs(n, k, h, f) },
+  { name: "web3jobsradar", run: (n, k, h, f) => fetchWeb3JobsRadar(n, k, h, f) },
   { name: "jobicy",        run: (_n, k, h, f) => fetchJobicy(k, h, f) },
   { name: "workingnomads", run: (_n, k, h, f) => fetchWorkingNomads(k, h, f) },
   { name: "hackernews",    run: (_n, k, h, f) => fetchHackerNews(k, h, f) },
@@ -2077,6 +2270,8 @@ const SOURCE_RUNNERS: Array<{
 
 const SOURCE_RANK_BOOST: Partial<Record<LeadSource, number>> = {
   jobopportunities: 5,
+  remotefirstjobs:  4,
+  web3jobsradar:    4,
   ashby:          5,
   greenhouse:     5,
   lever:          4,

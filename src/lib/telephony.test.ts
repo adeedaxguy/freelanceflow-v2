@@ -24,8 +24,11 @@ describe("telephony security helpers", () => {
     const encrypted = encryptTelephonySecret("subaccount-secret");
     expect(encrypted).not.toContain("subaccount-secret");
     expect(decryptTelephonySecret(encrypted)).toBe("subaccount-secret");
-    const tampered = `${encrypted.slice(0, -1)}${encrypted.endsWith("x") ? "y" : "x"}`;
-    expect(() => decryptTelephonySecret(tampered)).toThrow();
+    const parts = encrypted.split(":");
+    const tamperedTag = Buffer.from(parts[2]!, "base64url");
+    tamperedTag[0] = tamperedTag[0]! ^ 1;
+    parts[2] = tamperedTag.toString("base64url");
+    expect(() => decryptTelephonySecret(parts.join(":"))).toThrow();
   });
 
   it("signs a short-lived number quote", () => {

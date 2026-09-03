@@ -18,6 +18,8 @@ const SOURCE_COLORS: Record<string, string> = {
   greenhouse:     "bg-emerald-500",
   lever:          "bg-blue-500",
   ashby:          "bg-fuchsia-500",
+  remotefirstjobs:"bg-teal-500",
+  web3jobsradar:  "bg-amber-500",
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -29,6 +31,8 @@ const SOURCE_LABELS: Record<string, string> = {
   greenhouse:     "Verified Hiring A",
   lever:          "Verified Hiring B",
   ashby:          "Verified Hiring C",
+  remotefirstjobs:"Remote First Jobs",
+  web3jobsradar:  "Web3 Jobs Radar",
 };
 
 const CRM_STAGES = [

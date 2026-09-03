@@ -31,6 +31,7 @@ const VALID_SOURCES: LeadSource[] = [
   "ycjobs", "authenticjobs", "githubissues",
   "freelancermap", "smashingjobs", "dribbble",
   "himalayas", "nodesk", "greenhouse", "lever", "ashby",
+  "remotefirstjobs", "web3jobsradar",
 ];
 
 const UNLIMITED_EMAILS = new Set([
@@ -42,13 +43,18 @@ const UNLIMITED_EMAILS = new Set([
 const MIN_USEFUL_FRESH_RESULTS = 12;
 
 /**
- * Per-user dedup fingerprint. Combines the FULL normalized company name with
- * the domain — not a truncated substring of either.
+ * Per-user dedup keys. Match either the exact posting URL or company + title,
+ * without treating every future role from the same company as a duplicate.
  */
-function fingerprint(company: string, domain: string): string {
+function fingerprints(company: string, domain: string, title = "", sourceUrl = ""): string[] {
+  const keys: string[] = [];
+  const url = sourceUrl.replace(/[?#].*$/, "").replace(/\/+$/, "").toLowerCase();
+  if (url) keys.push(`url:${url}`);
   const co  = (company ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
   const dom = (domain ?? "").toLowerCase().replace(/^www\./, "");
-  return `${co}|${dom}`;
+  const ti  = title.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 80);
+  if (co && ti) keys.push(`job:${co}|${dom}|${ti}`);
+  return keys;
 }
 
 export async function POST(req: NextRequest) {
@@ -112,10 +118,12 @@ export async function POST(req: NextRequest) {
     try {
       const saved = await prisma.lead.findMany({
         where: { userId: session.user.id },
-        select: { company: true, domain: true },
+        select: { company: true, domain: true, title: true, sourceUrl: true },
       });
       for (const s of saved) {
-        savedFingerprints.add(fingerprint(s.company, s.domain));
+        for (const key of fingerprints(s.company, s.domain, s.title ?? "", s.sourceUrl ?? "")) {
+          savedFingerprints.add(key);
+        }
       }
     } catch { /* non-fatal */ }
 
@@ -175,7 +183,7 @@ export async function POST(req: NextRequest) {
     }
 
     let leads: AggregatedLead[] = rawLeads.filter(l =>
-      !savedFingerprints.has(fingerprint(l.company, l.domain))
+      !fingerprints(l.company, l.domain, l.title, l.url).some(key => savedFingerprints.has(key))
     );
     const totalAfterUserDedup = leads.length;
 

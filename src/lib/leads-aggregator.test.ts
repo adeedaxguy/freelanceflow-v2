@@ -57,7 +57,7 @@ describe("remote lead ranking", () => {
       const url = String(input);
       const entries = url.includes("/r/forhire/")
         ? [
-          `<entry><title>[Hiring] Social media manager for ecommerce brand</title><id>tag:reddit.com,200</id><updated>2026-08-26T11:00:00Z</updated><content>Need a social media manager for paid work. Email owner@examplebrand.com.</content><author><name>brandowner</name></author><link rel="alternate" href="https://reddit.com/r/forhire/comments/hiring"/></entry>`,
+          `<entry><title>[Hiring] Remote social media manager for ecommerce brand</title><id>tag:reddit.com,200</id><updated>2026-08-26T11:00:00Z</updated><content>Need a remote social media manager for paid work. Email owner@examplebrand.com.</content><author><name>brandowner</name></author><link rel="alternate" href="https://reddit.com/r/forhire/comments/hiring"/></entry>`,
           `<entry><title>Looking for a remote VA, Social media manager job</title><id>tag:reddit.com,201</id><updated>2026-08-26T11:30:00Z</updated><content>I am open to work and looking for a remote job.</content><author><name>jobseeker</name></author><link rel="alternate" href="https://reddit.com/r/forhire/comments/seeker"/></entry>`,
         ].join("")
         : "";
@@ -173,6 +173,110 @@ describe("remote lead ranking", () => {
       source: "jobopportunities",
       company: "Direct Co",
       title: "Contract React Developer",
+    });
+  });
+
+  it("keeps only explicitly remote Arbeitnow jobs", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: [
+          {
+            slug: "onsite-react",
+            company_name: "Office Co",
+            title: "React Developer",
+            description: "Build a React app from our Berlin office.",
+            url: "https://arbeitnow.com/onsite-react",
+            remote: false,
+            location: "Berlin",
+            created_at: Math.floor(new Date("2026-08-26T10:00:00Z").getTime() / 1000),
+          },
+          {
+            slug: "remote-react",
+            company_name: "Remote Co",
+            title: "Remote React Developer",
+            description: "Build a React and TypeScript web app from anywhere.",
+            url: "https://arbeitnow.com/remote-react",
+            remote: true,
+            location: "Remote",
+            created_at: Math.floor(new Date("2026-08-26T10:30:00Z").getTime() / 1000),
+          },
+        ],
+      }),
+    });
+
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "arbeitnow",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(leads.map(lead => lead.id)).toEqual(["arb-remote-react"]);
+  });
+
+  it("maps Remote First Jobs RSS with source attribution", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      text: async () => `
+        <rss><channel><item>
+          <title>Senior React Developer at Fresh Remote Co</title>
+          <link>https://remotefirstjobs.com/companies/fresh/jobs/react-1</link>
+          <guid>react-1</guid>
+          <pubDate>Wed, 26 Aug 2026 10:00:00 +0000</pubDate>
+          <description>&lt;p&gt;Remote contract role building a React and TypeScript web app. Budget $8,000.&lt;/p&gt;</description>
+        </item></channel></rss>
+      `,
+    });
+
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "remotefirstjobs",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(leads[0]).toMatchObject({
+      id: "rfj-react-1",
+      source: "remotefirstjobs",
+      sourceLabel: "Remote First Jobs",
+      company: "Fresh Remote Co",
+      title: "Senior React Developer",
+    });
+  });
+
+  it("uses Web3 Jobs Radar only for blockchain searches", async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        jobs: [{
+          id: "web3-1",
+          title: "Remote Solidity Engineer",
+          company: "Chain Co",
+          applyUrl: "https://jobs.ashbyhq.com/chain/solidity",
+          location: "Remote",
+          remote: "remote",
+          role: "engineering",
+          seniority: "mid",
+          tags: ["solidity", "smart contract"],
+          postedAt: "2026-08-26T10:00:00Z",
+          salary: { min: 140000, max: 180000, currency: "USD" },
+        }],
+      }),
+    });
+
+    const { leads } = await aggregateLeadsWithDiagnostics("blockchain", {
+      filterSource: "web3jobsradar",
+      maxHours: 72,
+      minConfidence: 0,
+      freshOnly: true,
+    });
+
+    expect(leads[0]).toMatchObject({
+      id: "w3r-web3-1",
+      source: "web3jobsradar",
+      company: "Chain Co",
+      title: "Remote Solidity Engineer",
     });
   });
 });
