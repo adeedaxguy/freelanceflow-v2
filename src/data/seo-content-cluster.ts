@@ -1917,6 +1917,7 @@ This article is the strategy hub. The next best page depends on the lead source 
 - Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly sprint</a> when the reader wants to test the free allowance before paying.
 - Use the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> or <a href="/resources/web-design-lead-generation">web design lead generation resource</a> when the offer is website, redesign, booking-flow, or local SEO work.
 - Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects from a city or category search.
+- Use the <a href="/resources/google-maps-listing-pitch-for-freelancers">Google Maps listing pitch builder</a> when a listing exposes a real website, booking, quote, or phone-flow gap and the reader needs an email, phone, or mini-audit script.
 - Use <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready leads</a> when the visitor already has prospects but needs proof, context, and a first-offer angle before outreach.
 
 Those pages keep the topic graph practical: client acquisition system -> free lead search -> web design or local-business qualification -> proposal-ready outreach -> follow-up.`;

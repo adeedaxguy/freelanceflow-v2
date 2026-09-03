@@ -7402,8 +7402,12 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
   return pages.map((page) => ({
     slug: page.slug,
     title: page.title,
-    metaTitle: page.title + " | iCloseLeads",
-    metaDescription: "Use iCloseLeads to turn " + page.keyword + " research into verified prospects, saved context, proposal drafts, and CRM follow-up.",
+    metaTitle: page.slug === "google-maps-listing-pitch-for-freelancers"
+      ? "Google Maps Listing Pitch: Scripts and Lead Workflow"
+      : page.title + " | iCloseLeads",
+    metaDescription: page.slug === "google-maps-listing-pitch-for-freelancers"
+      ? "Use a proof-led Google Maps listing pitch for email, phone, or a mini audit. Qualify the business, choose the right script, and search 600 leads free."
+      : "Use iCloseLeads to turn " + page.keyword + " research into verified prospects, saved context, proposal drafts, and CRM follow-up.",
     keyword: page.keyword,
     relatedSearches: page.relatedSearches,
     audience: page.audience,
@@ -7414,8 +7418,12 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
       workflowNudge: page.workflow,
       conversionPath: "Move the visitor from research into a free iCloseLeads signup, one focused search, one saved lead, one proposal or Gmail-ready draft, and one scheduled follow-up.",
     },
-    summary: page.title + " should start from " + page.signal + ". The page turns " + page.keyword + " intent into a practical iCloseLeads workflow: search, verify, save, draft, and follow up.",
-    leadIn: "Use this workflow when " + page.signal + ". The important move is to avoid passive research: " + page.workflow + ".",
+    summary: page.slug === "google-maps-listing-pitch-for-freelancers"
+      ? "A good Google Maps listing pitch names one visible customer-path problem, connects it to calls, bookings, or quotes, and asks permission to share one useful next step. Use the scripts below only after verifying the business is active and the gap is real."
+      : page.title + " should start from " + page.signal + ". The page turns " + page.keyword + " intent into a practical iCloseLeads workflow: search, verify, save, draft, and follow up.",
+    leadIn: page.slug === "google-maps-listing-pitch-for-freelancers"
+      ? "Start with the listing, not a generic redesign offer. Confirm the profile is active, open the website as a customer would, identify the action that breaks, save the proof, and choose the email, phone, or mini-audit script that matches the public contact route."
+      : "Use this workflow when " + page.signal + ". The important move is to avoid passive research: " + page.workflow + ".",
     activationPlan: {
       trigger: "Use this when the search intent is " + page.keyword + " and you need a real prospecting action, not another generic article.",
       firstRun: "Run one narrow search tied to " + page.keyword + ", then open the strongest prospect before saving anything.",
@@ -7452,9 +7460,28 @@ function buildJuly23SerpResourcePages(): ResourcePage[] {
       "The page connects research intent to signup, saved-lead context, proposal drafting, and follow-up.",
       page.competitorGap,
     ],
-    pitch: "Hi, I found your business while researching " + page.keyword + ". " + page.pitchAngle + ". If useful, I can send a short idea with the first step I would test.",
+    pitch: page.slug === "google-maps-listing-pitch-for-freelancers"
+      ? "Hi [name], I found [business] through its Google Maps listing while looking for [service] in [city]. The profile is active, but the website path to [booking, quote, or call] is hard to complete on mobile. I noted one small fix that could make that next step clearer. Would it be useful if I sent the two-minute audit?"
+      : "Hi, I found your business while researching " + page.keyword + ". " + page.pitchAngle + ". If useful, I can send a short idea with the first step I would test.",
     internalLinks: page.internalLinks,
-    faqs: [
+    faqs: page.slug === "google-maps-listing-pitch-for-freelancers" ? [
+      {
+        q: "What should I say when pitching a business from Google Maps?",
+        a: "Mention how you found the business, name one public website or conversion gap, connect it to a customer action such as calls or bookings, and ask permission to send one small recommendation."
+      },
+      {
+        q: "Should I pitch every listing without a website button?",
+        a: "No. First verify that the business is active, the contact route is business-facing, the service depends on trust or bookings, and a website improvement would create a real customer benefit."
+      },
+      {
+        q: "Is a phone call or email better for a Google Maps lead?",
+        a: "Use the public business route the company already prefers. Phone can suit local service businesses; email or a contact form is better when the offer needs screenshots or an audit. Respect local calling rules and opt-out requests."
+      },
+      {
+        q: "How does iCloseLeads help with a Google Maps listing pitch?",
+        a: "iCloseLeads helps you search for local business leads, save the listing signal and website gap, draft a contextual proposal, and keep the follow-up attached to the same lead record."
+      }
+    ] : [
       {
         q: "What is the first step for " + page.keyword + "?",
         a: "Start by narrowing the buyer type and source, then verify one public signal before saving or pitching the lead.",

@@ -49,6 +49,84 @@ function getResourceSignalScorecard(page: ResourcePageData) {
   ];
 }
 
+function GoogleMapsPitchPlaybook() {
+  const auditChecks = [
+    ["Listing is active", "Recent reviews, current hours, photos, or owner replies show the business is operating."],
+    ["Customer action is clear", "Identify whether a visitor should call, book, request a quote, visit, or buy."],
+    ["The gap is public", "Use only what any customer can see: broken links, weak mobile flow, missing service detail, or no clear next step."],
+    ["Contact route is appropriate", "Use the public business phone, email, or form and respect local outreach and opt-out rules."],
+  ];
+  const scripts = [
+    {
+      title: "Email or contact form",
+      when: "Best when a screenshot or two-minute audit makes the issue easier to understand.",
+      copy: "Hi [name], I found [business] through Google Maps while looking for [service] in [city]. The listing looks active, but the website path to [booking or quote] is difficult to complete on mobile. I noted one small fix that could make that step clearer. May I send the two-minute audit?",
+    },
+    {
+      title: "Business phone opener",
+      when: "Best for a public business number when the company already handles enquiries by phone.",
+      copy: "Hi, I found your business through its Google Maps listing. I am not calling about advertising. I noticed one issue between the listing and the [booking or quote] step on the website. Who is the right person to send a short screenshot to?",
+    },
+    {
+      title: "Mini-audit follow-up",
+      when: "Best after the business gives permission or replies with interest.",
+      copy: "Thanks. The main issue is [specific public gap]. A customer arriving from Maps may [friction]. The first improvement I would test is [small action]. If useful, I can outline the scope, timing, and what success would look like.",
+    },
+  ];
+
+  return (
+    <section data-google-maps-pitch-playbook className="rounded-lg border border-primary/30 bg-surface p-6 sm:p-8">
+      <p className="text-sm font-bold uppercase tracking-[0.18em] text-primary-light">Practical pitch builder</p>
+      <h2 className="mt-3 text-2xl font-extrabold text-foreground">Turn one Google Maps signal into a useful first message</h2>
+      <p className="mt-4 text-base leading-7 text-muted-foreground">
+        A listing is a starting point, not permission to spam. Complete the four checks, write the customer action in plain language, and use only the script that fits the public contact route.
+      </p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        {auditChecks.map(([title, detail], index) => (
+          <div key={title} className="rounded-lg border border-border bg-background p-4">
+            <div className="flex items-center gap-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-sm font-bold text-primary-light">{index + 1}</span>
+              <h3 className="text-base font-bold text-foreground">{title}</h3>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 rounded-lg border border-accent/25 bg-accent/10 p-5">
+        <h3 className="text-lg font-extrabold text-foreground">Write the pitch in four fields</h3>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          <strong className="text-foreground">Found:</strong> Google Maps listing in [city] · <strong className="text-foreground">Customer action:</strong> [call, book, quote] · <strong className="text-foreground">Visible gap:</strong> [specific friction] · <strong className="text-foreground">First step:</strong> [one small test]
+        </p>
+      </div>
+
+      <div className="mt-8 grid gap-4">
+        {scripts.map((script) => (
+          <div key={script.title} className="rounded-lg border border-border bg-background p-5">
+            <h3 className="text-lg font-bold text-foreground">{script.title}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{script.when}</p>
+            <p className="mt-4 rounded-lg border border-border bg-surface p-4 text-sm leading-7 text-foreground">{script.copy}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <h3 className="text-lg font-bold text-foreground">Do not pitch when the evidence is weak</h3>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Skip inactive businesses, personal contact details, invented performance claims, generic redesign offers, and any company that asks not to be contacted.
+          </p>
+        </div>
+        <Link href="/auth?mode=signup&intent=google-maps-listing-pitch&source=resource-pitch-builder" className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
+          Search 600 leads free
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 type ResourceResearchIntent = {
   searcherJob: string;
   competitorGap: string;
@@ -385,6 +463,8 @@ export default function ResourcePage({ params }: Props) {
                     ))}
                   </div>
                 </section>
+
+                {page.slug === "google-maps-listing-pitch-for-freelancers" ? <GoogleMapsPitchPlaybook /> : null}
 
                 <section className="rounded-lg border border-border bg-surface p-6 sm:p-8">
                   <h2 className="flex items-center gap-3 text-2xl font-extrabold text-foreground">
