@@ -1094,7 +1094,7 @@ export default function LeadsPage() {
                         </Link>
                       </div>
                     </div>
-                    {index === 5 && <LeadResultsAd />}
+                    {index === 2 && <LeadResultsAd />}
                     </Fragment>
                   );
                 })}

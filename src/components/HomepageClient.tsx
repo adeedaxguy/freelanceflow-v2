@@ -630,6 +630,8 @@ export default function HomepageClient() {
           </div>
         </section>
 
+        <MarketingAdBand />
+
         <section id="how-it-works" className="marketing-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
@@ -662,8 +664,6 @@ export default function HomepageClient() {
         <LeadEngineSection isAuthenticated={isAuthenticated} />
 
         <SoftphoneInfographic isAuthenticated={isAuthenticated} />
-
-        <MarketingAdBand />
 
         <section className="marketing-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

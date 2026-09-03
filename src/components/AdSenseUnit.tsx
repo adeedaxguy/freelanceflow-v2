@@ -279,25 +279,6 @@ function ResponsiveNativeAd({ className = "" }: { className?: string }) {
   );
 }
 
-function ResponsiveMarketingAd({ className = "" }: { className?: string }) {
-  const viewport = useAdViewport();
-
-  if (!viewport) return null;
-
-  if (viewport === "mobile") {
-    return <ResponsiveNativeAd className={className} />;
-  }
-
-  return (
-    <AdSenseUnit
-      slot={DISPLAY_AD_SLOT}
-      format="auto"
-      fullWidthResponsive
-      className={className}
-    />
-  );
-}
-
 function ResponsiveBannerAd({ className = "" }: { className?: string }) {
   const viewport = useAdViewport();
 
@@ -374,11 +355,11 @@ export function LeadResultsAd() {
       key={`lead-results-${viewport}`}
       {...ad}
       shell="native"
-      className="my-7"
+      className="my-10"
     />
   );
 }
 
-export function DashboardBottomAd() {
-  return <ResponsiveMarketingAd className="mt-8" />;
+export function DashboardOverviewAd() {
+  return <ResponsiveBannerAd />;
 }

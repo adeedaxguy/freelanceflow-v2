@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import {
   BlogInlineAd,
-  DashboardBottomAd,
+  DashboardOverviewAd,
   LeadResultsAd,
   MarketingAdBand,
 } from "./AdSenseUnit";
@@ -43,25 +43,25 @@ it("uses the mobile in-feed unit after mobile hydration", async () => {
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
 });
 
-it("uses the responsive dashboard unit on desktop", async () => {
+it("uses a horizontal dashboard unit on desktop", async () => {
   mockViewport(false);
-  render(<DashboardBottomAd />);
+  render(<DashboardOverviewAd />);
 
   const ad = screen.getByLabelText("Advertisement").querySelector("ins");
   expect(ad).toHaveAttribute("data-ad-slot", "1080749546");
-  expect(ad).toHaveAttribute("data-ad-format", "auto");
+  expect(ad).toHaveAttribute("data-ad-format", "horizontal");
   expect(ad).toHaveAttribute("data-full-width-responsive", "true");
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
 });
 
-it("uses the mobile in-feed unit on mobile dashboard placements", async () => {
+it("uses the responsive horizontal dashboard unit on mobile", async () => {
   mockViewport(true);
-  render(<DashboardBottomAd />);
+  render(<DashboardOverviewAd />);
 
   const ad = await screen.findByLabelText("Advertisement");
-  expect(ad.querySelector("ins")).toHaveAttribute("data-ad-slot", "9482129532");
-  expect(ad.querySelector("ins")).toHaveAttribute("data-ad-format", "fluid");
-  expect(ad.querySelector("ins")).toHaveAttribute("data-ad-layout-key", "-6c+e7+1e-40+6x");
+  expect(ad.querySelector("ins")).toHaveAttribute("data-ad-slot", "1080749546");
+  expect(ad.querySelector("ins")).toHaveAttribute("data-ad-format", "horizontal");
+  expect(ad.querySelector("ins")).toHaveAttribute("data-full-width-responsive", "true");
   await waitFor(() => expect(window.adsbygoogle).toHaveLength(1));
 });
 

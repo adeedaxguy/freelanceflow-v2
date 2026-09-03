@@ -787,7 +787,7 @@ export default function LiveJobsPage() {
                         </div>
                       )}
                     </div>
-                    {index === 5 && <LeadResultsAd />}
+                    {index === 2 && <LeadResultsAd />}
                     </Fragment>
                   );
                 })}

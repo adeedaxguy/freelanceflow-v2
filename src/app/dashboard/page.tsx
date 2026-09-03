@@ -15,7 +15,7 @@ import CmdKButton from "@/components/CmdKButton";
 import MarketingEmailOptIn from "@/components/MarketingEmailOptIn";
 import { LeadStatusBadge, EmailStatusBadge } from "@/components/Badge";
 import { formatRelativeTime } from "@/lib/utils";
-import { DashboardBottomAd } from "@/components/AdSenseUnit";
+import { DashboardOverviewAd } from "@/components/AdSenseUnit";
 
 const DIRECT_EMAIL_STATUSES = ["SENT", "DELIVERED", "OPENED", "BOUNCED", "FAILED"];
 const OUTREACH_STATUSES = [...DIRECT_EMAIL_STATUSES, "READY_TO_SEND"];
@@ -250,6 +250,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      <DashboardOverviewAd />
+
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="mr-1 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Quick access</span>
@@ -394,8 +396,6 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
-
-      <DashboardBottomAd />
     </div>
   );
 }

@@ -1722,7 +1722,7 @@ export default function LocalLeadsPage() {
                   <LeadCard lead={lead} onSave={handleSave}
                     isSaved={savedIds.has(lead.id)} isSaving={savingId === lead.id}
                     searchLocation={location} canUseSoftphone={Boolean(session?.user)}/>
-                  {index === 5 && <LeadResultsAd />}
+                  {index === 2 && <LeadResultsAd />}
                   </Fragment>
                 ))}
               </div>
