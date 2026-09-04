@@ -510,7 +510,10 @@ function AuthForm() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-muted-foreground mb-1.5">Password</label>
+                    <div className="mb-1.5 flex items-center justify-between gap-4">
+                      <label className="block text-sm font-medium text-muted-foreground">Password</label>
+                      {mode === "signin" && <Link href="/auth/reset-password" className="text-xs font-medium text-primary-light hover:underline">Forgot password?</Link>}
+                    </div>
                     <div className="relative">
                       <input type={showPwd ? "text" : "password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} required
                         placeholder={mode === "signup" ? "Min 8 characters" : "Your password"}
