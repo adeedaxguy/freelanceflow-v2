@@ -3,8 +3,8 @@ import HomepageClient from "@/components/HomepageClient";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
-  title: "iCloseLeads - Freelance Lead Generation Software",
-  description: "Find free business leads, web design leads, local prospects, remote job leads, owner paths, AI proposals, Gmail drafts, softphone calling, and CRM follow-up in one workflow.",
+  title: { absolute: "iCloseLeads - Freelance Lead Generation Software" },
+  description: "Find local, web design, and remote freelance leads. Qualify prospects, draft proposals, call, and manage follow-up in one client acquisition workflow.",
   keywords: [
     "iCloseLeads",
     "icloseleads.com",

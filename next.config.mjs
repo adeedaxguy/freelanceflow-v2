@@ -3,6 +3,15 @@ const seoRedirects = [
   ["/resources/google-maps-leads-for-web-designers", "/resources/google-maps-lead-generation-for-freelancers"],
   ["/resources/google-maps-prospecting-for-web-designers", "/resources/google-maps-prospecting-tool-for-freelancers"],
   ["/resources/freelance-sales-pipeline-from-google-maps", "/resources/google-maps-lead-generation-for-freelancers"],
+  ["/blog/find-clients-for-hubspot-consulting", "/blog/client-acquisition-software-for-freelancers-free-leads-crm"],
+  ["/for/data-scientists", "/lead-generation/freelance-client-leads"],
+  ["/blog/portfolio-that-books-calls-roi-first-approach", "/blog/freelance-client-acquisition-system"],
+  ["/for/mobile-app-developers", "/lead-generation/freelance-client-leads"],
+  ["/for/shopify-experts", "/lead-generation/web-design-leads"],
+  ["/for/video-editors", "/lead-generation/freelance-client-leads"],
+  ["/for/virtual-assistants", "/lead-generation/freelance-client-leads"],
+  ["/for/social-media-managers", "/lead-generation/freelance-client-leads"],
+  ["/blog/best-crm-for-high-ticket-closing-in-2026-compared-1780943521022", "/blog/freelance-crm-track-leads-close-clients"],
 ];
 
 const nextConfig = {

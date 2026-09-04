@@ -13,11 +13,11 @@ export const dynamic = "force-dynamic";
 const POSTS_PER_PAGE = 15;
 
 export const metadata: Metadata = {
-  title: "Freelance Tips & Client Acquisition Strategies | iCloseLeads Blog",
+  title: { absolute: "Freelance Client Acquisition Guides | iCloseLeads" },
   description: "Expert advice on finding freelance clients, writing winning proposals, cold email strategies, and growing your freelance business.",
   alternates: { canonical: "https://icloseleads.com/blog" },
   openGraph: {
-    title: "iCloseLeads Blog — Freelance Growth Playbook",
+    title: "Freelance Client Acquisition Guides | iCloseLeads",
     description: "Actionable strategies, templates, and insights to grow your freelance business.",
     url: "https://icloseleads.com/blog",
     type: "website",

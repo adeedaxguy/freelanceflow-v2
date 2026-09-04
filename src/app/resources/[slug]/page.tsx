@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle2, ClipboardList, MessageSquare, Search } from "
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getResourcePage, RESOURCE_PAGES } from "@/data/resource-pages";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 const BASE_URL = "https://icloseleads.com";
 
@@ -388,17 +389,18 @@ export function generateStaticParams() {
 export function generateMetadata({ params }: Props): Metadata {
   const page = getResourcePage(params.slug);
   if (!page) return { title: "Resource Not Found" };
-  const pageTitle = normalizeResourceMetaTitle(page.metaTitle);
+  const pageTitle = seoTitle(normalizeResourceMetaTitle(page.metaTitle));
+  const pageDescription = seoDescription(page.metaDescription);
 
   return {
     metadataBase: new URL(BASE_URL),
-    title: pageTitle,
-    description: page.metaDescription,
+    title: { absolute: pageTitle },
+    description: pageDescription,
     keywords: [page.keyword, "freelance lead generation", "iCloseLeads", "client acquisition"],
     alternates: { canonical: `${BASE_URL}/resources/${page.slug}` },
     openGraph: {
       title: pageTitle,
-      description: page.metaDescription,
+      description: pageDescription,
       url: `${BASE_URL}/resources/${page.slug}`,
       type: "article",
       siteName: "iCloseLeads",
@@ -406,7 +408,7 @@ export function generateMetadata({ params }: Props): Metadata {
     twitter: {
       card: "summary_large_image",
       title: pageTitle,
-      description: page.metaDescription,
+      description: pageDescription,
     },
   };
 }

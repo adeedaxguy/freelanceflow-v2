@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export type UseCaseSlug =
   | "remote-job-leads"
@@ -278,9 +279,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads | Free Web Design Leads, Google Maps Gaps, and Owner Paths",
+    metaTitle: "Local Business Leads for Freelancers",
     metaDescription:
-      "Find local business leads for web designers, SEO consultants, and marketers using website gaps, Google Maps listing signals, phone numbers, and owner or manager paths.",
+      "Find local business leads using website gaps, Google Maps signals, phone routes, and owner checks. Start with 600 free weekly lead searches.",
     keywords: [
       "local business leads",
       "free local business leads",
@@ -534,23 +535,25 @@ export function getUseCasePage(slug: string): UseCasePageData | undefined {
 
 export function useCaseMetadata(page: UseCasePageData): Metadata {
   const url = `${BASE_URL}${page.path}`;
+  const title = seoTitle(page.metaTitle);
+  const description = seoDescription(page.metaDescription);
   return {
     metadataBase: new URL(BASE_URL),
-    title: page.metaTitle,
-    description: page.metaDescription,
+    title: { absolute: title },
+    description,
     keywords: page.keywords,
     alternates: { canonical: url },
     openGraph: {
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title,
+      description,
       url,
       type: "website",
       siteName: "iCloseLeads",
     },
     twitter: {
       card: "summary_large_image",
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title,
+      description,
     },
   };
 }

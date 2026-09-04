@@ -27,6 +27,7 @@ import {
 } from "@/lib/blog-seo";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { prisma } from "@/lib/prisma";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 import type { BlogPost } from "@/types";
 
 export const dynamic = 'force-dynamic';
@@ -84,13 +85,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Try DB post first
   const dbPost = await getDbPost(params.slug);
   if (dbPost) {
-    const title   = dbPost.metaTitle  || dbPost.title;
-    const desc    = dbPost.metaDesc   || dbPost.excerpt || "";
+    const title   = seoTitle(dbPost.metaTitle || dbPost.title);
+    const desc    = seoDescription(dbPost.metaDesc || dbPost.excerpt || "");
     const image   = getBlogCoverImageUrl(BASE_URL, dbPost.slug, dbPost.ogImage, dbPost.coverImage);
     const canonicalUrl = dbPost.canonical || `${BASE_URL}/blog/${dbPost.slug}`;
 
     return {
-      title,
+      title: { absolute: title },
       description:  desc,
       keywords:     dbPost.focusKeyword ? [dbPost.focusKeyword, ...(dbPost.tags?.split(",").map(t => t.trim()) ?? [])] : undefined,
       alternates:   { canonical: canonicalUrl },
@@ -118,11 +119,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Fall back to static post
   const post = STATIC_POSTS.find(p => p.slug === params.slug);
   if (!post) return { title: "Post Not Found" };
-  const title = post.metaTitle || post.title;
-  const description = post.metaDescription || post.excerpt || "";
+  const title = seoTitle(post.metaTitle || post.title);
+  const description = seoDescription(post.metaDescription || post.excerpt || "");
   const image = getBlogCoverImageUrl(BASE_URL, post.slug, post.coverImage);
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: post.focusKeyword ? [post.focusKeyword, ...(post.tags ?? [])] : undefined,
     alternates: { canonical: `${BASE_URL}/blog/${post.slug}` },

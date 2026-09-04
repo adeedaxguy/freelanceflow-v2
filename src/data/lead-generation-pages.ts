@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export type LeadGenerationSlug =
   | "web-design-leads"
@@ -39,9 +40,9 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "web-design-leads",
     path: "/lead-generation/web-design-leads",
     primaryKeyword: "web design leads",
-    metaTitle: "Web Design Leads for Freelancers | Search 600 Leads Free",
+    metaTitle: "Web Design Leads: Search 600 Free",
     metaDescription:
-      "Find web design leads for free from local businesses, weak websites, businesses without websites, and remote hiring signals. Search 600 leads free with iCloseLeads.",
+      "Find web design leads from local businesses, weak websites, no-website prospects, and remote hiring signals. Search 600 leads free each week.",
     eyebrow: "Web Design Leads",
     title: "Find web design leads",
     accentTitle: "with a real reason to pitch today",
@@ -501,9 +502,11 @@ export function getLeadGenerationPage(slug: string) {
 
 export function leadGenerationMetadata(page: LeadGenerationPageData): Metadata {
   const canonical = `${BASE_URL}${page.path}`;
+  const title = seoTitle(page.metaTitle);
+  const description = seoDescription(page.metaDescription);
   return {
-    title: page.metaTitle,
-    description: page.metaDescription,
+    title: { absolute: title },
+    description,
     keywords: [
       page.primaryKeyword,
       ...page.searchAngles.flatMap(group => group.terms),
@@ -517,14 +520,14 @@ export function leadGenerationMetadata(page: LeadGenerationPageData): Metadata {
       type: "website",
       url: canonical,
       siteName: "iCloseLeads",
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title,
+      description,
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: page.metaTitle }],
     },
     twitter: {
       card: "summary_large_image",
-      title: page.metaTitle,
-      description: page.metaDescription,
+      title,
+      description,
     },
     robots: {
       index: true,
