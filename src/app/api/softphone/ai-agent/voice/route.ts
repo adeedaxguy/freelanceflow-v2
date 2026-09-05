@@ -9,6 +9,7 @@ import {
 } from "@/lib/ai-voice-agent";
 import { prisma } from "@/lib/prisma";
 import { appUrl, twilio, validateTwilioWebhook } from "@/lib/telephony";
+import { getPlatformSetting } from "@/lib/platform-secrets";
 
 export const dynamic = "force-dynamic";
 
@@ -139,8 +140,8 @@ export async function POST(req: NextRequest) {
     return xml(response);
   }
 
-  const setting = await prisma.platformSetting.findUnique({ where: { key: "groq_api_key" }, select: { value: true } }).catch(() => null);
-  const turn = await generateVoiceAgentTurn(state, prospectText, setting?.value || process.env.GROQ_API_KEY);
+  const setting = await getPlatformSetting("groq_api_key").catch(() => "");
+  const turn = await generateVoiceAgentTurn(state, prospectText, setting || process.env.GROQ_API_KEY);
   state = appendTranscript({ ...state, stage: turn.stage }, "agent", turn.reply);
   await prisma.voiceCall.update({
     where: { id: record.id },

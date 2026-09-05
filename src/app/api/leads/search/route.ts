@@ -13,11 +13,11 @@ import { z } from "zod";
 
 // Accept either `niche: "web-development"` (legacy) or `niches: ["web-development", "shopify"]`.
 const searchSchema = z.object({
-  niche:         z.string().min(1).optional(),
-  niches:        z.array(z.string().min(1)).max(15).optional(),
+  niche:         z.string().trim().min(1).max(100).optional(),
+  niches:        z.array(z.string().trim().min(1).max(100)).max(15).optional(),
   maxHours:      z.number().int().min(1).max(720).optional().default(48),
-  source:        z.string().optional(),
-  keyword:       z.string().optional(),
+  source:        z.string().trim().max(40).optional(),
+  keyword:       z.string().trim().max(100).optional(),
   minConfidence: z.number().int().min(0).max(100).optional().default(45),
   hasEmail:      z.boolean().optional().default(false),
   freshOnly:     z.boolean().optional().default(false),
@@ -204,8 +204,20 @@ export async function POST(req: NextRequest) {
     const toReturn = leads.slice(0, cap);
 
     if (toReturn.length > 0) {
-      try { await checkAndIncrementLeads(session.user.id, toReturn.length); }
-      catch { /* non-fatal */ }
+      let reservation: Awaited<ReturnType<typeof checkAndIncrementLeads>>;
+      try {
+        reservation = await checkAndIncrementLeads(session.user.id, toReturn.length);
+      } catch (error) {
+        console.error("Lead usage reservation failed:", error);
+        return NextResponse.json({ error: "Lead search is temporarily unavailable. Please try again." }, { status: 503 });
+      }
+      if (!reservation.allowed) {
+        return NextResponse.json({
+          error: "Your lead allowance was used by another search. Please search again to refresh your remaining results.",
+          upgrade: reservation.remaining === 0,
+          usage: reservation,
+        }, { status: 429 });
+      }
     }
 
     let updatedUsage = usage;
@@ -249,7 +261,6 @@ export async function POST(req: NextRequest) {
     console.error("Lead search error:", error);
     return NextResponse.json({
       error: "Failed to fetch leads. Please try again.",
-      detail: error instanceof Error ? error.message : "unknown error",
     }, { status: 500 });
   }
 }

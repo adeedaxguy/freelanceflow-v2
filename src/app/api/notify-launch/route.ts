@@ -1,44 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 const schema = z.object({
-  email: z.string().email(),
-  plan:  z.string().min(1),
+  email: z.string().trim().email().max(254).transform(email => email.toLowerCase()),
+  plan:  z.enum(["pro", "agency"]),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as unknown;
     const { email, plan } = schema.parse(body);
+    const limit = await securityRateLimit("launch-waitlist", getClientIp(req.headers), 5, 24 * 60 * 60 * 1000);
+    if (!limit.allowed) {
+      return NextResponse.json({ ok: false }, { status: 429, headers: rateLimitHeaders(limit) });
+    }
 
     // Store in AdminUser table as a simple waitlist entry using a tag
     // OR fall back to a SiteSettings key — no schema migration needed.
     // We use a raw upsert into a dedicated key in SiteSettings JSON blob.
     await prisma.$executeRawUnsafe(
       `CREATE TABLE IF NOT EXISTS "LaunchWaitlist" (
-        id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(8)))),
+        id TEXT PRIMARY KEY,
         email TEXT NOT NULL,
         plan TEXT NOT NULL,
-        "createdAt" TEXT NOT NULL
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(email, plan)
       )`
-    ).catch(() => {}); // PostgreSQL: table may already exist
+    );
 
     await prisma.$executeRawUnsafe(
       `INSERT INTO "LaunchWaitlist" (id, email, plan, "createdAt")
-       VALUES (gen_random_uuid()::text, $1, $2, now()::text)
+       VALUES ($1, $2, $3, NOW())
        ON CONFLICT DO NOTHING`,
-      email.toLowerCase(),
-      plan
-    ).catch(async () => {
-      // Fallback: try without gen_random_uuid (SQLite dev)
-      await prisma.$executeRawUnsafe(
-        `INSERT OR IGNORE INTO "LaunchWaitlist" (id, email, plan, "createdAt")
-         VALUES (lower(hex(randomblob(8))), ?, ?, datetime('now'))`,
-        email.toLowerCase(),
-        plan
-      );
-    });
+      randomUUID(), email, plan,
+    );
 
     return NextResponse.json({ ok: true });
   } catch {
@@ -47,9 +47,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  // Admin-only: list waitlist entries
-  const secret = req.headers.get("x-admin-secret");
-  if (secret !== process.env.NEXTAUTH_SECRET) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {

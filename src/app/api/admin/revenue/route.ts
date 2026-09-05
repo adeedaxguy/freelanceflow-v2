@@ -68,7 +68,7 @@ export async function GET() {
       monthlyData,
       planPrices: PLAN_PRICE,
     });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load revenue data" }, { status: 500 });
   }
 }

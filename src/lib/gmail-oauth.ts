@@ -10,6 +10,8 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { readStoredSecret, sealSecret } from "@/lib/secret-box";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +42,68 @@ function toBase64url(input: string): string {
     .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+function headerValue(value: string, maxLength: number): string {
+  return value.replace(/[\r\n]+/g, " ").trim().slice(0, maxLength);
+}
+
+const GMAIL_STATE_TTL_MS = 10 * 60 * 1000;
+
+function getStateSecret(): string {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) throw new Error("NEXTAUTH_SECRET not configured");
+  return secret;
+}
+
+function signState(payload: string): string {
+  return createHmac("sha256", getStateSecret()).update(payload).digest("base64url");
+}
+
+/** Create a short-lived, signed state value that binds OAuth to this user. */
+export function createGmailOAuthState(userId: string): string {
+  if (!userId || userId.length > 128) throw new Error("Invalid Gmail OAuth user");
+  const payload = toBase64url(JSON.stringify({
+    userId,
+    nonce: randomBytes(16).toString("hex"),
+    expiresAt: Date.now() + GMAIL_STATE_TTL_MS,
+  }));
+  return `${payload}.${signState(payload)}`;
+}
+
+/** Verify signature, shape, and expiry before accepting an OAuth callback. */
+export function verifyGmailOAuthState(state: string): string | null {
+  if (!state || state.length > 1024) return null;
+  const [payload, signature, ...extra] = state.split(".");
+  if (!payload || !signature || extra.length > 0) return null;
+
+  try {
+    const expected = signState(payload);
+    const providedBytes = Buffer.from(signature);
+    const expectedBytes = Buffer.from(expected);
+    if (providedBytes.length !== expectedBytes.length || !timingSafeEqual(providedBytes, expectedBytes)) {
+      return null;
+    }
+
+    const decoded = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as {
+      userId?: unknown;
+      nonce?: unknown;
+      expiresAt?: unknown;
+    };
+    if (
+      typeof decoded.userId !== "string" ||
+      decoded.userId.length === 0 ||
+      decoded.userId.length > 128 ||
+      typeof decoded.nonce !== "string" ||
+      decoded.nonce.length < 16 ||
+      typeof decoded.expiresAt !== "number" ||
+      !Number.isFinite(decoded.expiresAt) ||
+      decoded.expiresAt < Date.now()
+    ) return null;
+    return decoded.userId;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Step 1: Build auth URL ───────────────────────────────────────────────────
 
 export function buildGmailAuthUrl(userId: string): string {
@@ -57,7 +121,7 @@ export function buildGmailAuthUrl(userId: string): string {
     ].join(" "),
     access_type: "offline",
     prompt:      "consent",       // force refresh_token even if previously granted
-    state:       userId,          // verified in callback via session
+    state:       createGmailOAuthState(userId),
   });
 
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -118,7 +182,7 @@ export async function saveGmailTokens(userId: string, tokens: GmailTokens): Prom
   await prisma.user.update({
     where: { id: userId },
     data: {
-      gmailRefreshToken: tokens.refreshToken,
+      gmailRefreshToken: sealSecret(tokens.refreshToken),
       gmailEmail:        tokens.email,
     },
   });
@@ -170,14 +234,16 @@ export async function sendWithGmailOAuth(
 
   // Build RFC 2822 MIME message
   const boundary = `ff_boundary_${Date.now()}`;
-  const fromDisplay = payload.fromName
-    ? `"${payload.fromName.replace(/"/g, "")}" <${gmailEmail}>`
-    : gmailEmail;
+  const safeEmail = headerValue(gmailEmail, 254);
+  const safeFromName = headerValue(payload.fromName, 120).replace(/"/g, "");
+  const fromDisplay = safeFromName
+    ? `"${safeFromName}" <${safeEmail}>`
+    : safeEmail;
 
   const mime = [
     `From: ${fromDisplay}`,
-    `To: ${payload.to}`,
-    `Subject: ${payload.subject}`,
+    `To: ${headerValue(payload.to, 254)}`,
+    `Subject: ${headerValue(payload.subject, 300)}`,
     `MIME-Version: 1.0`,
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     ``,
@@ -233,8 +299,16 @@ export async function sendMailViaGmail(
     if (!user?.gmailRefreshToken || !user.gmailEmail) {
       return { success: false, error: "Gmail not connected" };
     }
+    const refreshToken = readStoredSecret(user.gmailRefreshToken);
+    if (!refreshToken) return { success: false, error: "Gmail connection is no longer valid" };
+    if (!user.gmailRefreshToken.startsWith("enc:v1:")) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { gmailRefreshToken: sealSecret(refreshToken) },
+      }).catch(() => undefined);
+    }
     const id = await sendWithGmailOAuth(
-      user.gmailRefreshToken,
+      refreshToken,
       user.gmailEmail,
       payload,
     );

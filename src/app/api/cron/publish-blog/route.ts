@@ -9,20 +9,14 @@ export const maxDuration = 30;
  * Auto-blog publisher — called by Vercel Cron every Monday at 09:00 UTC.
  * Picks the next unpublished post from BLOG_QUEUE and publishes it.
  *
- * Also callable manually:
- *   GET /api/cron/publish-blog?secret=CRON_SECRET
+ * Manual calls use the same Authorization header as Vercel Cron.
  */
 export async function GET(req: NextRequest) {
-  // Auth check — Vercel Cron sends the CRON_SECRET automatically via Authorization header.
-  // Manual calls pass it as a query param.
+  // Keep the secret out of URLs, which can be retained in logs and referrers.
   const authHeader = req.headers.get("authorization");
-  const querySecret = req.nextUrl.searchParams.get("secret");
   const expected = process.env.CRON_SECRET;
 
-  const isVercelCron = authHeader === `Bearer ${expected}`;
-  const isManual = querySecret === expected;
-
-  if (!expected || (!isVercelCron && !isManual)) {
+  if (!expected || authHeader !== `Bearer ${expected}`) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -73,8 +67,8 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("[CRON] Blog publish failed:", error);
     return NextResponse.json(
-      { error: "Failed to publish post", detail: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
+      { error: "Failed to publish post" },
+      { status: 503 }
     );
   }
 }

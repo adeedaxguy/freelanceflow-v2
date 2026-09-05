@@ -8,6 +8,11 @@ jest.mock("next/server", () => ({
   },
 }));
 jest.mock("@/lib/admin-notifications", () => ({ notifyNewUserSignup: jest.fn() }));
+jest.mock("@/lib/security-rate-limit", () => ({
+  getClientIp: jest.fn(() => "127.0.0.1"),
+  rateLimitHeaders: jest.fn(() => ({})),
+  securityRateLimit: jest.fn(async () => ({ allowed: true, remaining: 4, retryAfterSeconds: 60 })),
+}));
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
@@ -30,7 +35,7 @@ const validBody = {
 };
 
 function registerRequest(body = validBody) {
-  return { json: async () => body } as never;
+  return { json: async () => body, headers: new Headers() } as never;
 }
 
 describe("POST /api/auth/register", () => {

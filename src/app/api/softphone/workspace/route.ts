@@ -278,7 +278,8 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error(`[softphone/${parsed.data.action}]`, error);
     const message = error instanceof Error ? error.message : "Softphone request failed";
-    const status = /not ready|up to \d+ phone numbers|in progress|no longer available|expired|invalid|unsupported|does not belong/i.test(message) ? 409 : 502;
-    return NextResponse.json({ error: message }, { status });
+    const isUserSafe = /not ready|up to \d+ phone numbers|in progress|no longer available|expired|invalid|unsupported|does not belong|choose an active calling number|purchase quote|payment has not been confirmed/i.test(message);
+    const status = isUserSafe ? 409 : 502;
+    return NextResponse.json({ error: isUserSafe ? message : "Softphone request failed. Please try again." }, { status });
   }
 }

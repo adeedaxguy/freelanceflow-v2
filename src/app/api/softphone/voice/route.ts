@@ -112,7 +112,8 @@ export async function POST(req: NextRequest) {
     callerId = selectAuthorizedCallerId(params.From, callerIds);
   } catch (error) {
     const response = new twilio.twiml.VoiceResponse();
-    response.say(error instanceof Error ? error.message : "That destination is not supported.");
+    console.warn("[softphone/voice] rejected destination", error);
+    response.say("That destination is not supported.");
     response.hangup();
     return xml(response);
   }

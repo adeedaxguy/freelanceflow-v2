@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { aggregateLeadsWithDiagnostics, type AggregatedLead } from "@/lib/leads-aggregator";
 import { searchLocalBusinesses, type LocalBizLead } from "@/lib/local-leads-engine";
+import { getPlatformSettings } from "@/lib/platform-secrets";
 import { prisma } from "@/lib/prisma";
 
 const queryBoolean = z.enum(["true", "false"]).transform(value => value === "true");
@@ -68,13 +69,10 @@ async function loadPlatformKeys(): Promise<PlatformKeys> {
     abnGuid: process.env.ABR_GUID,
   };
 
-  const settings = await prisma.platformSetting.findMany({
-    where: { key: { in: Object.keys(SETTING_ENV) } },
-    select: { key: true, value: true },
-  }).catch(() => []);
-  for (const setting of settings) {
-    const field = SETTING_ENV[setting.key];
-    if (field && setting.value?.length > 10) keys[field] = setting.value;
+  const settings = await getPlatformSettings(Object.keys(SETTING_ENV)).catch(() => ({}));
+  for (const [key, value] of Object.entries(settings)) {
+    const field = SETTING_ENV[key];
+    if (field && value.length > 10) keys[field] = value;
   }
   return keys;
 }

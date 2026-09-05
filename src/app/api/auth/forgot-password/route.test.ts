@@ -9,6 +9,10 @@ jest.mock("next/server", () => ({
   },
 }));
 jest.mock("@/lib/admin-notifications", () => ({ sendPlatformEmail: jest.fn() }));
+jest.mock("@/lib/security-rate-limit", () => ({
+  getClientIp: jest.fn(() => "127.0.0.1"),
+  securityRateLimit: jest.fn(async () => ({ allowed: true, remaining: 5, retryAfterSeconds: 60 })),
+}));
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn() },
@@ -21,7 +25,7 @@ import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
 
 function request(body: unknown) {
-  return { json: async () => body } as unknown as NextRequest;
+  return { json: async () => body, headers: new Headers() } as unknown as NextRequest;
 }
 
 describe("forgot password", () => {

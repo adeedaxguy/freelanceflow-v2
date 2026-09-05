@@ -14,7 +14,7 @@ async function getSettings() {
     const rows = await prisma.platformSetting.findMany({ orderBy: { key: "asc" } });
     const map: Record<string, string> = {};
     for (const r of rows) {
-      if (["stripe_secret_key", "stripe_webhook_secret"].includes(r.key)) continue;
+      if (/(?:secret|token|api_key|_key$)/i.test(r.key) || r.key.startsWith("smtp_")) continue;
       map[r.key] = r.value;
     }
     map.lemonsqueezy_test_mode ||= "true";

@@ -4,16 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || session.user.role !== "ADMIN")
     throw new Error("Forbidden — only ADMIN can manage staff");
   return session;
-}
-
-function cuid() {
-  return "c" + Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
 }
 
 export async function GET() {
@@ -29,37 +26,37 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json({ managers });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load managers" }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest) {
   try {
     const session = await requireAdmin();
-    const body = await req.json() as { id: string; role: "USER" | "MANAGER" | "ADMIN" };
-    const { id, role } = body;
-
-    if (!["USER", "MANAGER", "ADMIN"].includes(role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
-    }
+    const parsed = z.object({
+      id: z.string().min(1).max(128),
+      role: z.enum(["USER", "MANAGER", "ADMIN"]),
+    }).safeParse(await req.json().catch(() => null));
+    if (!parsed.success) return NextResponse.json({ error: "Invalid role change" }, { status: 400 });
+    const { id, role } = parsed.data;
     // Prevent demoting yourself
     if (id === session.user.id && role !== "ADMIN") {
       return NextResponse.json({ error: "Cannot change your own role" }, { status: 400 });
     }
 
-    await prisma.user.update({ where: { id }, data: { role } });
+    await prisma.user.update({ where: { id }, data: { role, sessionVersion: { increment: 1 } } });
 
     // Audit log (non-fatal — AuditLog table may not exist)
     try {
       await prisma.$executeRawUnsafe(
         `INSERT INTO "AuditLog" (id, "adminId", "adminEmail", action, "targetType", "targetId", details, "createdAt") VALUES ($1, $2, $3, 'role_change', 'User', $4, $5, NOW())`,
-        cuid(), session.user.id, session.user.email ?? "", id, JSON.stringify({ newRole: role })
+        `c${crypto.randomUUID().replaceAll("-", "")}`, session.user.id, session.user.email ?? "", id, JSON.stringify({ newRole: role })
       );
     } catch { /* non-fatal */ }
 
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to update manager" }, { status: 500 });
   }
 }

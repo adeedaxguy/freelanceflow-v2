@@ -6,6 +6,7 @@ const config: Config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^server-only$": "<rootDir>/jest.server-only.ts",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
   transform: {

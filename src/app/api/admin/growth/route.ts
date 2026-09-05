@@ -82,7 +82,7 @@ export async function GET() {
       topNiches: topNiches.map(n => ({ niche: n.niche ?? "unknown", count: n._count._all })),
       recentSignups,
     });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load growth data" }, { status: 500 });
   }
 }

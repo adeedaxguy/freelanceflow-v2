@@ -12,8 +12,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SharedSitePreviewPage({ params }: { params: { token: string } }) {
-  const searchParams = decodeSiteShare(params.token);
+export default async function SharedSitePreviewPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params;
+  const searchParams = decodeSiteShare(token);
   if (!searchParams) notFound();
   return <SitePreviewContent searchParams={{ ...searchParams, client: "1" }} />;
 }

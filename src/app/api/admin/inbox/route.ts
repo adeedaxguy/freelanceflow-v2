@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     replyTo: sender.fromEmail,
     headers: threadHeaders,
   });
-  if (error || !data?.id) return NextResponse.json({ error: error?.message ?? "Email could not be sent." }, { status: 502 });
+  if (error || !data?.id) return NextResponse.json({ error: "Email could not be sent." }, { status: 502 });
 
   const message = await prisma.adminMailboxMessage.create({
     data: {

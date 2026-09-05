@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { prisma } from "@/lib/prisma";
 import { smtpSend } from "@/lib/smtp-client";
 import { renderWelcomeEmail } from "@/lib/marketing-email";
+import { getPlatformSettings } from "@/lib/platform-secrets";
 
 export const ADMIN_NOTIFICATION_RECIPIENT = "adnan.toprated@gmail.com";
 const DEFAULT_ADMIN_NOTIFICATION_EMAIL = ADMIN_NOTIFICATION_RECIPIENT;
@@ -50,11 +51,9 @@ async function getPlatformEmailConfig(): Promise<PlatformEmailConfig | null> {
   }
 
   try {
-    const rows = await prisma.platformSetting.findMany({
-      where: { key: { in: ["resend_api_key", "resend_from_email"] } },
-      select: { key: true, value: true },
-    });
-    const settings = Object.fromEntries(rows.map((row) => [row.key, row.value?.trim() ?? ""]));
+    const settings = await getPlatformSettings(["resend_api_key", "resend_from_email"]);
+    settings.resend_api_key = settings.resend_api_key?.trim() ?? "";
+    settings.resend_from_email = settings.resend_from_email?.trim() ?? "";
     if (!settings.resend_api_key) return null;
 
     return {

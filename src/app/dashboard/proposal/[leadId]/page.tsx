@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { use, useState, useEffect, useCallback, Suspense } from "react";
 import {
   Sparkles, Eye, EyeOff, Loader2, CheckCircle, AlertCircle,
   ArrowLeft, RefreshCw, Copy, Link as LinkIcon, Mail, ExternalLink,
@@ -464,10 +464,10 @@ function ProposalBuilder({ leadId }: { leadId: string }) {
   );
 }
 
-interface PageProps { params: { leadId: string } }
+interface PageProps { params: Promise<{ leadId: string }> }
 
 export default function ProposalPage({ params }: PageProps) {
-  const { leadId } = params;
+  const { leadId } = use(params);
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center py-20">

@@ -32,7 +32,9 @@ export function decodeSiteShare(token: string): SitePreviewSearchParams | null {
   if (received.length !== trusted.length || !timingSafeEqual(received, trusted)) return null;
 
   try {
-    const value = JSON.parse(inflateRawSync(Buffer.from(body, "base64url")).toString("utf8")) as SitePreviewSearchParams;
+    const value = JSON.parse(inflateRawSync(Buffer.from(body, "base64url"), {
+      maxOutputLength: 32_000,
+    }).toString("utf8")) as SitePreviewSearchParams;
     return value && typeof value === "object" ? value : null;
   } catch {
     return null;

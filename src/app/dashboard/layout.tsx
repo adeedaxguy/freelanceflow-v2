@@ -12,7 +12,7 @@ import { DashboardRouteMotion } from "@/components/AppRouteMotion";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/auth");
+  if (!session?.user?.id) redirect("/auth");
 
   return (
     <div className="dashboard-shell flex min-h-screen bg-background">

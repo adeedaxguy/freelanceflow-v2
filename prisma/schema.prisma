@@ -28,6 +28,7 @@ model User {
   avatarUrl         String?
   googleId          String?  @unique
   suspended         Boolean  @default(false)
+  sessionVersion    Int      @default(0)
   plan              String   @default("free")
   expertise         String?
   referralSource    String?
@@ -258,6 +259,15 @@ model PlatformSetting {
   updatedAt DateTime @updatedAt
 
   @@index([key])
+}
+
+model SecurityRateLimit {
+  key       String   @id
+  count     Int      @default(1)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
 }
 
 model SupportTicket {

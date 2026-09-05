@@ -7,13 +7,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { supportChat } from "@/lib/groq";
 import { z } from "zod";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 const schema = z.object({
   messages: z.array(z.object({
     role:    z.enum(["user", "assistant"]),
-    content: z.string().min(1),
-  })).min(1),
-  email: z.string().email().optional(),
+    content: z.string().trim().min(1).max(4_000),
+  })).min(1).max(40),
+  email: z.string().trim().email().max(254).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,6 +28,19 @@ export async function POST(req: NextRequest) {
     const body: unknown = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
+
+    const limit = await securityRateLimit(
+      "support-chat",
+      session?.user?.id ?? getClientIp(req.headers),
+      20,
+      15 * 60 * 1000,
+    );
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many support requests. Please try again later." }, {
+        status: 429,
+        headers: rateLimitHeaders(limit),
+      });
+    }
 
     const { messages, email } = parsed.data;
     const { reply, shouldCreateTicket } = await supportChat(messages);
@@ -54,6 +68,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ reply, ticketCreated });
   } catch (err) {
     console.error("Support chat error:", err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    return NextResponse.json({ error: "Support chat is temporarily unavailable." }, { status: 503 });
   }
 }

@@ -21,10 +21,9 @@ The Find Leads pipeline was rebuilt end-to-end. Before launching, know what chan
 ## Admin Panel
 
 - **URL:** `/admin`
-- **Default Email:** `admin@freelanceflow.io`
-- **Default Password:** `Admin@FF2025!`
-
-> **Change this password the moment you log in.** Admin → Users → click your user → set new password.
+- There are no default or web-based setup credentials.
+- Create a normal account, then promote that exact account directly in the database as described in the smoke test below.
+- Use the normal password-reset flow if the account password is lost.
 
 ---
 

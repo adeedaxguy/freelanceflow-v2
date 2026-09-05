@@ -45,7 +45,9 @@ export async function checkAndIncrementLeads(
   userId: string,
   count: number
 ): Promise<{ allowed: boolean; remaining: number; plan: string; resetAt?: string }> {
-  const user = await prisma.user.findUnique({
+  if (!Number.isInteger(count) || count <= 0) return { allowed: false, remaining: 0, plan: "free" };
+
+  let user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       email: true,
@@ -76,47 +78,81 @@ export async function checkAndIncrementLeads(
       return { allowed: false, remaining: 0, plan, resetAt: trial.endsAt.toISOString() };
     }
     if (resetDate < trial.startsAt) {
-      resetDate = trial.startsAt;
-      currentCount = 0;
-      await prisma.user.update({
-        where: { id: userId },
+      await prisma.user.updateMany({
+        where: { id: userId, weeklyLeadReset: { lt: trial.startsAt } },
         data: { weeklyLeads: 0, weeklyLeadReset: trial.startsAt },
       });
+      user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          email: true,
+          plan: true,
+          weeklyLeads: true,
+          weeklyLeadReset: true,
+          bonusLeads: true,
+          bonusClaimed: true,
+          createdAt: true,
+        },
+      });
+      if (!user) return { allowed: false, remaining: 0, plan };
+      resetDate = new Date(user.weeklyLeadReset);
+      currentCount = user.weeklyLeads;
     }
     const remaining = Math.max(0, limit - currentCount);
-    if (remaining === 0) return { allowed: false, remaining: 0, plan, resetAt: trial.endsAt.toISOString() };
+    if (remaining < count) return { allowed: false, remaining, plan, resetAt: trial.endsAt.toISOString() };
 
-    const toAdd = Math.min(count, remaining);
-    await prisma.user.update({
-      where: { id: userId },
-      data: { weeklyLeads: { increment: toAdd } },
+    const reserved = await prisma.user.updateMany({
+      where: {
+        id: userId,
+        weeklyLeadReset: resetDate,
+        weeklyLeads: { lte: limit - count },
+      },
+      data: { weeklyLeads: { increment: count } },
     });
-    return { allowed: true, remaining: remaining - toAdd, plan, resetAt: trial.endsAt.toISOString() };
+    if (reserved.count !== 1) return { allowed: false, remaining: 0, plan, resetAt: trial.endsAt.toISOString() };
+    return { allowed: true, remaining: remaining - count, plan, resetAt: trial.endsAt.toISOString() };
   }
 
   // Paid-plan lead counters reset weekly.
   const hoursSinceReset = (now.getTime() - resetDate.getTime()) / 3_600_000;
 
   if (hoursSinceReset >= FREE_LEAD_RESET_HOURS) {
-    currentCount = 0;
-    resetDate = now;
-    await prisma.user.update({
-      where: { id: userId },
+    const cutoff = new Date(now.getTime() - FREE_LEAD_RESET_HOURS * 3_600_000);
+    await prisma.user.updateMany({
+      where: { id: userId, weeklyLeadReset: { lt: cutoff } },
       data: { weeklyLeads: 0, weeklyLeadReset: now },
     });
+    user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        plan: true,
+        weeklyLeads: true,
+        weeklyLeadReset: true,
+        bonusLeads: true,
+        bonusClaimed: true,
+        createdAt: true,
+      },
+    });
+    if (!user) return { allowed: false, remaining: 0, plan };
+    resetDate = new Date(user.weeklyLeadReset);
+    currentCount = user.weeklyLeads;
   }
 
   const resetAt = new Date(resetDate.getTime() + FREE_LEAD_RESET_HOURS * 3_600_000).toISOString();
   const remaining = Math.max(0, limit - currentCount);
-  if (remaining === 0) return { allowed: false, remaining: 0, plan, resetAt };
+  if (remaining < count) return { allowed: false, remaining, plan, resetAt };
 
-  const toAdd = Math.min(count, remaining);
-  await prisma.user.update({
-    where: { id: userId },
-    data: { weeklyLeads: { increment: toAdd } },
+  const reserved = await prisma.user.updateMany({
+    where: {
+      id: userId,
+      weeklyLeadReset: resetDate,
+      weeklyLeads: { lte: limit - count },
+    },
+    data: { weeklyLeads: { increment: count } },
   });
-
-  return { allowed: true, remaining: remaining - toAdd, plan, resetAt };
+  if (reserved.count !== 1) return { allowed: false, remaining: 0, plan, resetAt };
+  return { allowed: true, remaining: remaining - count, plan, resetAt };
 }
 
 export async function getUsageStats(userId: string) {

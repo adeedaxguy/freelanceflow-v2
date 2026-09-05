@@ -25,10 +25,10 @@ export const metadata: Metadata = {
 };
 
 type BlogPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     category?: string | string[];
     page?: string | string[];
-  };
+  }>;
 };
 
 function parsePage(value: string | string[] | undefined) {
@@ -84,9 +84,10 @@ function getPaginationItems(currentPage: number, totalPages: number) {
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const selectedCategory = Array.isArray(searchParams?.category)
-    ? searchParams?.category[0]
-    : searchParams?.category;
+  const resolvedSearchParams = await searchParams;
+  const selectedCategory = Array.isArray(resolvedSearchParams?.category)
+    ? resolvedSearchParams?.category[0]
+    : resolvedSearchParams?.category;
   const activeCategory = selectedCategory?.trim().toLowerCase() || "all";
 
   let dbPosts: BlogPost[] = [];
@@ -124,7 +125,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     ? publishedPosts
     : publishedPosts.filter(post => post.category.toLowerCase() === activeCategory);
   const totalPages = Math.max(1, Math.ceil(posts.length / POSTS_PER_PAGE));
-  const currentPage = Math.min(parsePage(searchParams?.page), totalPages);
+  const currentPage = Math.min(parsePage(resolvedSearchParams?.page), totalPages);
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
   const paginatedPosts = posts.slice(startIndex, startIndex + POSTS_PER_PAGE);
   const activeCategoryLabel = categories.find(cat => cat.toLowerCase() === activeCategory);

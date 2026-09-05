@@ -310,9 +310,9 @@ function AuthForm() {
       router.push("/dashboard");
       return;
     }
-    if (password.length < 8) {
+    if (password.length < 10) {
       trackAuthEvent("auth_signup_error", { method: "credentials", reason: "password_too_short" });
-      setError("Password must be at least 8 characters");
+      setError("Password must be at least 10 characters");
       setLoading(false);
       return;
     }

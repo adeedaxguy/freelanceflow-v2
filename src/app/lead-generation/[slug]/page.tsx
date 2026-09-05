@@ -8,21 +8,23 @@ import {
 } from "@/data/lead-generation-pages";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export function generateStaticParams() {
   return LEAD_GENERATION_PAGES.map(page => ({ slug: page.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const page = getLeadGenerationPage(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const page = getLeadGenerationPage(slug);
   if (!page) return { title: "Lead Generation Page Not Found" };
   return leadGenerationMetadata(page);
 }
 
-export default function LeadGenerationDetailPage({ params }: Props) {
-  const page = getLeadGenerationPage(params.slug);
+export default async function LeadGenerationDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const page = getLeadGenerationPage(slug);
   if (!page) notFound();
   return <LeadGenerationMarketingPage page={page} />;
 }

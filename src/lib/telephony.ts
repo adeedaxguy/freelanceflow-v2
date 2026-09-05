@@ -439,16 +439,30 @@ export function createNumberQuote(input: Omit<NumberQuote, "expiresAt">) {
 }
 
 export function verifyNumberQuote(token: string): NumberQuote {
-  const [payload, signature] = token.split(".");
-  if (!payload || !signature) throw new Error("Invalid purchase quote");
-  const expected = sign(payload);
-  if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+  try {
+    if (token.length > 3_000) throw new Error("Invalid purchase quote");
+    const [payload, signature, extra] = token.split(".");
+    if (!payload || !signature || extra) throw new Error("Invalid purchase quote");
+    const expected = sign(payload);
+    if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      throw new Error("Invalid purchase quote");
+    }
+    const quote = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Partial<NumberQuote>;
+    if (
+      typeof quote.userId !== "string" || quote.userId.length > 128 ||
+      typeof quote.workspaceId !== "string" || quote.workspaceId.length > 128 ||
+      typeof quote.phoneNumber !== "string" || !E164.test(quote.phoneNumber) ||
+      typeof quote.country !== "string" || !COUNTRIES.has(quote.country) ||
+      typeof quote.monthlyPriceCents !== "number" || !Number.isInteger(quote.monthlyPriceCents) || quote.monthlyPriceCents <= 0 ||
+      typeof quote.currency !== "string" || quote.currency.length > 8 ||
+      typeof quote.expiresAt !== "number" || !Number.isSafeInteger(quote.expiresAt)
+    ) throw new Error("Invalid purchase quote");
+    if (quote.expiresAt < Date.now()) throw new Error("Purchase quote expired");
+    return quote as NumberQuote;
+  } catch (error) {
+    if (error instanceof Error && error.message === "Purchase quote expired") throw error;
     throw new Error("Invalid purchase quote");
   }
-  const quote = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as NumberQuote;
-  if (quote.expiresAt < Date.now()) throw new Error("Purchase quote expired");
-  if (!COUNTRIES.has(quote.country) || !E164.test(quote.phoneNumber)) throw new Error("Invalid purchase quote");
-  return quote;
 }
 
 export function hasPhoneSubscriptionAccess(status: string | null | undefined, endsAt?: Date | string | null) {
@@ -738,7 +752,7 @@ export async function provisionPhoneNumber(purchaseId: string) {
 }
 
 export async function latestPhonePurchase(userId: string) {
-  return prisma.telephonyPurchase.findFirst({
+  const purchase = await prisma.telephonyPurchase.findFirst({
     where: { userId },
     orderBy: { createdAt: "desc" },
     select: {
@@ -755,6 +769,9 @@ export async function latestPhonePurchase(userId: string) {
       createdAt: true,
     },
   });
+  return purchase
+    ? { ...purchase, lastError: purchase.lastError ? "The latest payment or provisioning attempt needs attention." : null }
+    : null;
 }
 
 export function createVoiceToken(workspace: {
@@ -805,20 +822,24 @@ export function publicWorkspace(workspace: Awaited<ReturnType<typeof prisma.tele
     monthlyPriceCents: workspace.monthlyPriceCents,
     priceCurrency: workspace.priceCurrency,
     consentAcceptedAt: workspace.consentAcceptedAt,
-    lastError: workspace.lastError,
+    lastError: workspace.lastError ? "The latest setup attempt needs attention." : null,
   };
 }
 
 export async function validateTwilioWebhook(req: Request, params: Record<string, string>) {
-  const accountSid = params.AccountSid;
-  const signature = req.headers.get("x-twilio-signature");
-  if (!accountSid || !signature) return null;
-  const workspace = await prisma.telephonyWorkspace.findUnique({ where: { twilioAccountSid: accountSid } });
-  if (!workspace?.twilioAuthTokenEncrypted) return null;
-  const url = appUrl(new URL(req.url).pathname + new URL(req.url).search);
-  return twilio.validateRequest(decryptTelephonySecret(workspace.twilioAuthTokenEncrypted), signature, url, params)
-    ? workspace
-    : null;
+  try {
+    const accountSid = params.AccountSid;
+    const signature = req.headers.get("x-twilio-signature");
+    if (!accountSid || !signature) return null;
+    const workspace = await prisma.telephonyWorkspace.findUnique({ where: { twilioAccountSid: accountSid } });
+    if (!workspace?.twilioAuthTokenEncrypted) return null;
+    const url = appUrl(new URL(req.url).pathname + new URL(req.url).search);
+    return twilio.validateRequest(decryptTelephonySecret(workspace.twilioAuthTokenEncrypted), signature, url, params)
+      ? workspace
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 export { twilio };

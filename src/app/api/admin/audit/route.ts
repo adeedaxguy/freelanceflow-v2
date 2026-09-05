@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       // AuditLog table may not exist yet
       return NextResponse.json({ logs: [], total: 0, page, totalPages: 0 });
     }
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load audit logs" }, { status: 500 });
   }
 }

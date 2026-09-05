@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     });
     console.error("Billing checkout error:", error);
     return NextResponse.json({
-      error: error instanceof Error ? error.message : "Could not start secure checkout.",
+      error: "Could not start secure checkout. Please try again.",
     }, { status: 502 });
   }
 }

@@ -4,14 +4,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getUsageStats } from "@/lib/usage";
+import { getPlatformSetting } from "@/lib/platform-secrets";
 import { z } from "zod";
 
 const schema = z.object({
-  jobTitle:       z.string().min(1),
-  company:        z.string().min(1),
-  description:    z.string().default(""),
-  niche:          z.string().default(""),
-  portfolioLinks: z.array(z.object({ label: z.string(), url: z.string() })).optional().default([]),
+  jobTitle:       z.string().trim().min(1).max(200),
+  company:        z.string().trim().min(1).max(160),
+  description:    z.string().max(10_000).default(""),
+  niche:          z.string().trim().max(120).default(""),
+  portfolioLinks: z.array(z.object({
+    label: z.string().trim().min(1).max(100),
+    url: z.string().trim().url().max(500),
+  })).max(10).optional().default([]),
 });
 
 interface PortfolioLink { label: string; url: string; }
@@ -138,7 +142,7 @@ export async function POST(req: NextRequest) {
         where: { id: session.user.id },
         select: { name: true, expertise: true },
       }),
-      prisma.platformSetting.findUnique({ where: { key: "groq_api_key" } }),
+      getPlatformSetting("groq_api_key"),
     ]);
     if (user?.name) userName = user.name;
     if (user?.expertise) {
@@ -147,7 +151,7 @@ export async function POST(req: NextRequest) {
         if (exp.length > 0) expertiseStr = exp.slice(0, 3).join(", ");
       } catch { /* ignore */ }
     }
-    if (setting?.value && setting.value.length > 10) groqKey = setting.value;
+    if (setting.length > 10) groqKey = setting;
 
     // Load saved portfolio links from profile if none passed in
     if (incomingLinks.length === 0) {

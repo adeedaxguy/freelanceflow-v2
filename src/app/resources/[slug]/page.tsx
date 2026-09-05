@@ -10,7 +10,7 @@ import { seoDescription, seoTitle } from "@/lib/seo-copy";
 const BASE_URL = "https://icloseleads.com";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 type ResourcePageData = NonNullable<ReturnType<typeof getResourcePage>>;
@@ -386,8 +386,9 @@ export function generateStaticParams() {
   return RESOURCE_PAGES.map((page) => ({ slug: page.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const page = getResourcePage(params.slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const page = getResourcePage(slug);
   if (!page) return { title: "Resource Not Found" };
   const pageTitle = seoTitle(normalizeResourceMetaTitle(page.metaTitle));
   const pageDescription = seoDescription(page.metaDescription);
@@ -480,8 +481,9 @@ function ResourceJsonLd({ page }: { page: ResourcePageData }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />;
 }
 
-export default function ResourcePage({ params }: Props) {
-  const page = getResourcePage(params.slug);
+export default async function ResourcePage({ params }: Props) {
+  const { slug } = await params;
+  const page = getResourcePage(slug);
   if (!page) notFound();
   const shortAnswer = `${page.summary} iCloseLeads helps ${page.audience.toLowerCase()} turn that workflow into a focused search, a saved lead, and a first outreach draft without bouncing between separate tools.`;
   const workflowKickoff = [

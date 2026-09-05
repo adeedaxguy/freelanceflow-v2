@@ -34,8 +34,9 @@ async function getPlatformPricing() {
 export default async function UpgradePage({
   searchParams,
 }: {
-  searchParams?: { checkout?: string };
+  searchParams?: Promise<{ checkout?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth");
 
@@ -70,7 +71,7 @@ export default async function UpgradePage({
       billingTestMode={billingTestMode}
       canCheckout={canCheckout}
       hasBillingSubscription={hasBillingSubscription}
-      checkoutReturned={searchParams?.checkout === "success"}
+      checkoutReturned={resolvedSearchParams?.checkout === "success"}
     />
   );
 }

@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendWithGmailOAuth } from "@/lib/gmail-oauth";
+import { readStoredSecret } from "@/lib/secret-box";
 
 /**
  * POST /api/auth/gmail-oauth/test
@@ -24,10 +25,14 @@ export async function POST() {
   if (!user?.gmailRefreshToken || !user.gmailEmail) {
     return NextResponse.json({ error: "Gmail not connected" }, { status: 400 });
   }
+  const refreshToken = readStoredSecret(user.gmailRefreshToken);
+  if (!refreshToken) {
+    return NextResponse.json({ error: "Gmail connection is no longer valid. Please reconnect Gmail." }, { status: 409 });
+  }
 
   try {
     await sendWithGmailOAuth(
-      user.gmailRefreshToken,
+      refreshToken,
       user.gmailEmail,
       {
         to:       user.gmailEmail,
@@ -53,7 +58,7 @@ export async function POST() {
     return NextResponse.json({
       error: isApiDisabled
         ? "Gmail API is not enabled. Go to console.cloud.google.com → APIs & Services → Library → search 'Gmail API' → click Enable. Then click Reconnect below."
-        : `Gmail send failed: ${msg}`,
+        : "Gmail send failed. Please reconnect Gmail and try again.",
     }, { status: 500 });
   }
 }

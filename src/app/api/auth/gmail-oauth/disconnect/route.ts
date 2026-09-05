@@ -19,7 +19,7 @@ export async function DELETE() {
     await deleteGmailTokens(session.user.id);
     return NextResponse.json({ success: true });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Disconnect failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Gmail OAuth disconnect failed:", e);
+    return NextResponse.json({ error: "Could not disconnect Gmail right now." }, { status: 503 });
   }
 }

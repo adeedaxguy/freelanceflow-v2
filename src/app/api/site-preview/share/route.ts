@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import type { SitePreviewSearchParams } from "@/components/SitePreviewPageContent";
+import { authOptions } from "@/lib/auth";
 import { encodeSiteShare } from "@/lib/site-share";
+import { rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 const ALLOWED_KEYS = [
   "company",
@@ -29,6 +32,16 @@ const ALLOWED_KEYS = [
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const limit = await securityRateLimit("site-share", session.user.id, 30, 60 * 60 * 1000);
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many share links. Please try again later." }, {
+        status: 429,
+        headers: rateLimitHeaders(limit),
+      });
+    }
+
     const body = await request.json() as { search?: string };
     const source = new URLSearchParams(body.search ?? "");
     const params: SitePreviewSearchParams = { client: "1" };

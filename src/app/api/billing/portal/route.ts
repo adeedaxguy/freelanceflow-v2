@@ -76,7 +76,7 @@ export async function POST() {
   } catch (error) {
     console.error("Billing portal error:", error);
     return NextResponse.json({
-      error: error instanceof Error ? error.message : "Could not open the billing portal.",
+      error: "Could not open the billing portal. Please try again.",
     }, { status: 502 });
   }
 }

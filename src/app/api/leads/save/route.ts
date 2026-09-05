@@ -158,7 +158,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("Save lead error:", msg);
-    return NextResponse.json({ error: "Failed to save lead", detail: msg }, { status: 500 });
+    return NextResponse.json({ error: "Failed to save lead" }, { status: 500 });
   }
 }
 
@@ -181,12 +181,16 @@ export async function PATCH(req: NextRequest) {
     if (description !== undefined) updateData.description = description;
     if (Object.keys(updateData).length === 0) return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
 
-    await prisma.lead.update({ where: { id }, data: updateData });
+    const updated = await prisma.lead.updateMany({
+      where: { id, userId: session.user.id },
+      data: updateData,
+    });
+    if (updated.count !== 1) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error("Patch lead error:", msg);
-    return NextResponse.json({ error: "Failed to update lead", detail: msg }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update lead" }, { status: 500 });
   }
 }
 

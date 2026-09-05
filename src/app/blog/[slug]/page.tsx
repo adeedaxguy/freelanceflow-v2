@@ -1,4 +1,5 @@
 import React, { type ReactNode } from "react";
+import sanitizeHtml from "sanitize-html";
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
@@ -67,6 +68,32 @@ function rewritePublicDashboardLinks(html: string) {
   );
 }
 
+function safeInlineHtml(html: string) {
+  return sanitizeHtml(rewritePublicDashboardLinks(html), {
+    allowedTags: ["a", "strong", "em", "code", "br"],
+    allowedAttributes: {
+      a: ["href", "target", "rel", "class"],
+      strong: ["class"],
+      code: ["class"],
+    },
+    allowedSchemes: ["http", "https", "mailto"],
+    allowProtocolRelative: false,
+    transformTags: {
+      a: (_tagName, attribs) => ({
+        tagName: "a",
+        attribs: {
+          ...attribs,
+          ...(attribs.target === "_blank" ? { rel: "noopener noreferrer" } : {}),
+        },
+      }),
+    },
+  });
+}
+
+function safeJsonLd(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+}
+
 // ── Data fetch ────────────────────────────────────────────────────────────────
 async function getDbPost(slug: string): Promise<DbPost | null> {
   if (isHiddenBlogSlug(slug)) return null;
@@ -79,11 +106,12 @@ async function getDbPost(slug: string): Promise<DbPost | null> {
 }
 
 // ── Metadata ──────────────────────────────────────────────────────────────────
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
   // Try DB post first
-  const dbPost = await getDbPost(params.slug);
+  const dbPost = await getDbPost(slug);
   if (dbPost) {
     const title   = seoTitle(dbPost.metaTitle || dbPost.title);
     const desc    = seoDescription(dbPost.metaDesc || dbPost.excerpt || "");
@@ -117,7 +145,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   // Fall back to static post
-  const post = STATIC_POSTS.find(p => p.slug === params.slug);
+  const post = STATIC_POSTS.find(p => p.slug === slug);
   if (!post) return { title: "Post Not Found" };
   const title = seoTitle(post.metaTitle || post.title);
   const description = seoDescription(post.metaDescription || post.excerpt || "");
@@ -286,7 +314,7 @@ function renderMarkdown(content: string): ReactNode {
       }
       nodes.push(
         <ul key={i} className="list-disc pl-6 space-y-1.5 mb-5 text-muted-foreground">
-          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
+          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: safeInlineHtml(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
         </ul>
       );
       continue;
@@ -298,7 +326,7 @@ function renderMarkdown(content: string): ReactNode {
       }
       nodes.push(
         <ol key={i} className="list-decimal pl-6 space-y-1.5 mb-5 text-muted-foreground">
-          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
+          {items.map((it, j) => <li key={j} dangerouslySetInnerHTML={{ __html: safeInlineHtml(it.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>')) }} />)}
         </ol>
       );
       continue;
@@ -313,7 +341,7 @@ function renderMarkdown(content: string): ReactNode {
           .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
           .replace(/\*(.*?)\*/g,     '<em>$1</em>')
           .replace(/`(.*?)`/g,      '<code class="px-1.5 py-0.5 rounded bg-primary/10 text-primary-light text-sm font-mono">$1</code>');
-        nodes.push(<p key={i} className="text-muted-foreground leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: rewritePublicDashboardLinks(html) }} />);
+        nodes.push(<p key={i} className="text-muted-foreground leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: safeInlineHtml(html) }} />);
       }
     }
     i++;
@@ -417,12 +445,13 @@ function RelatedArticlesSection({ posts, nextPost }: { posts: BlogPost[]; nextPo
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default async function BlogPostPage({ params }: Props) {
-  if (params.slug === "freelancer-client-acquisition-system") {
+  const { slug } = await params;
+  if (slug === "freelancer-client-acquisition-system") {
     permanentRedirect("/blog/freelance-client-acquisition-system");
   }
 
   // 1. Try DB (admin-published posts with SEO fields)
-  const dbPost = await getDbPost(params.slug);
+  const dbPost = await getDbPost(slug);
   if (dbPost) {
     const postDate = dbPost.createdAt instanceof Date ? dbPost.createdAt : new Date(String(dbPost.createdAt));
     const updDate  = dbPost.updatedAt instanceof Date ? dbPost.updatedAt  : new Date(String(dbPost.updatedAt));
@@ -549,16 +578,16 @@ export default async function BlogPostPage({ params }: Props) {
           <RelatedArticlesSection posts={relatedPosts} nextPost={nextStaticPost} />
         </main>
         <Footer />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       </>
     );
   }
 
   // 2. Fall back to static posts
-  const post = STATIC_POSTS.find(p => p.slug === params.slug);
+  const post = STATIC_POSTS.find(p => p.slug === slug);
   if (!post) notFound();
 
-  const content = post.content || FULL_POSTS[params.slug] || "Full article coming soon. Subscribe to be notified.";
+  const content = post.content || FULL_POSTS[slug] || "Full article coming soon. Subscribe to be notified.";
   const postDate = post.createdAt instanceof Date ? post.createdAt : new Date(String(post.createdAt));
   const updatedDate = post.updatedAt instanceof Date ? post.updatedAt : new Date(String(post.updatedAt ?? post.createdAt));
   const coverImage = getBlogCoverImage(post.slug, post.coverImage);
@@ -661,7 +690,7 @@ export default async function BlogPostPage({ params }: Props) {
         <RelatedArticlesSection posts={relatedPosts} nextPost={nextStaticPost} />
       </main>
       <Footer />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(articleJsonLd) }} />
     </>
   );
 }

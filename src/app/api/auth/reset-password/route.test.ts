@@ -9,6 +9,11 @@ jest.mock("next/server", () => ({
   },
 }));
 jest.mock("bcryptjs", () => ({ __esModule: true, default: { hash: jest.fn() } }));
+jest.mock("@/lib/security-rate-limit", () => ({
+  getClientIp: jest.fn(() => "127.0.0.1"),
+  rateLimitHeaders: jest.fn(() => ({})),
+  securityRateLimit: jest.fn(async () => ({ allowed: true, remaining: 5, retryAfterSeconds: 60 })),
+}));
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn(), updateMany: jest.fn() },
@@ -21,7 +26,7 @@ import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
 
 function request(body: unknown) {
-  return { json: async () => body } as unknown as NextRequest;
+  return { json: async () => body, headers: new Headers() } as unknown as NextRequest;
 }
 
 describe("reset password", () => {
@@ -52,7 +57,7 @@ describe("reset password", () => {
     expect(bcrypt.hash).toHaveBeenCalledWith("FreshPass123", 12);
     expect(prisma.user.updateMany).toHaveBeenCalledWith({
       where: { id: "google-user", updatedAt },
-      data: { password: "new-password-hash" },
+      data: { password: "new-password-hash", sessionVersion: { increment: 1 } },
     });
   });
 

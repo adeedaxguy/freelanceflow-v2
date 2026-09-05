@@ -4,17 +4,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPlatformSetting } from "@/lib/platform-secrets";
 import { rateLimit } from "@/lib/rate-limit";
 import { getUsageStats } from "@/lib/usage";
 import { z } from "zod";
 
 const schema = z.object({
-  company:   z.string().min(1),
-  domain:    z.string().optional().default(""),
-  niche:     z.string().optional().default(""),
-  title:     z.string().optional().default(""),
-  notes:     z.string().optional().default(""),
-  expertise: z.array(z.string()).optional().default([]),
+  company:   z.string().trim().min(1).max(160),
+  domain:    z.string().trim().max(240).optional().default(""),
+  niche:     z.string().trim().max(120).optional().default(""),
+  title:     z.string().trim().max(200).optional().default(""),
+  notes:     z.string().trim().max(5_000).optional().default(""),
+  expertise: z.array(z.string().trim().max(80)).max(20).optional().default([]),
   tone:      z.enum(["professional", "casual", "bold"]).optional().default("professional"),
 });
 
@@ -135,8 +136,8 @@ export async function POST(req: NextRequest) {
   // Resolve Groq key: DB setting first, then env
   let groqKey = process.env.GROQ_API_KEY ?? "";
   try {
-    const setting = await prisma.platformSetting.findUnique({ where: { key: "groq_api_key" } });
-    if (setting?.value && setting.value.length > 10) groqKey = setting.value;
+    const setting = await getPlatformSetting("groq_api_key");
+    if (setting.length > 10) groqKey = setting;
   } catch { /* use env key */ }
 
   // If no key → high-quality template

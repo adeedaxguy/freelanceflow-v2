@@ -41,7 +41,7 @@ describe("POST /api/leads/search", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getUsageStats as jest.Mock).mockResolvedValue(mockUsage);
-    (checkAndIncrementLeads as jest.Mock).mockResolvedValue(undefined);
+    (checkAndIncrementLeads as jest.Mock).mockResolvedValue({ allowed: true, remaining: 99, plan: "free" });
     (prisma.lead.findMany as jest.Mock).mockResolvedValue([]);
   });
 

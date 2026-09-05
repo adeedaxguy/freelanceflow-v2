@@ -1,3 +1,5 @@
+import { readLimitedText, safeFetch } from "@/lib/safe-fetch";
+
 /**
  * iCloseLeads — Local Business Leads Engine v2
  *
@@ -1366,10 +1368,9 @@ async function checkWebsite(url: string): Promise<WebInfo> {
   }
   try {
     // Use GET so we can also scrape phone numbers from the HTML
-    const r = await fetch(url, {
+    const r = await safeFetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (compatible; iCloseLeads/2.0)" },
       signal:  AbortSignal.timeout(3500),
-      redirect: "follow",
     });
     if (r.status >= 400) return { status: "unreachable" };
 
@@ -1386,7 +1387,7 @@ async function checkWebsite(url: string): Promise<WebInfo> {
     const ct = r.headers.get("content-type") ?? "";
     if (ct.includes("html")) {
       try {
-        const html = (await r.text()).slice(0, 100_000);
+        const html = await readLimitedText(r, 100_000);
         phone = extractPhoneFromHtml(html) ?? undefined;
         email = extractPublishedEmailFromHtml(html);
 

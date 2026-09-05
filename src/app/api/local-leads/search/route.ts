@@ -8,6 +8,7 @@ import { z } from "zod";
 import { searchLocalBusinesses, checkRateLimit, type LocalBizLead } from "@/lib/local-leads-engine";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
 import { FREE_TRIAL_LEAD_LIMIT, PRO_WEEKLY_LEAD_LIMIT } from "@/lib/plan-limits";
+import { getPlatformSettings } from "@/lib/platform-secrets";
 
 // Re-export the type so the dashboard page can import it from this route
 export type { LocalBizLead as LocalLead };
@@ -95,7 +96,9 @@ export async function POST(req: NextRequest) {
   // Accept user-provided keys from request body (set via Settings → Integrations)
   const bodyRaw = body as Record<string, unknown>;
   const pick = (k: string, cur: string) =>
-    typeof bodyRaw[k] === "string" && (bodyRaw[k] as string).length > 10 ? bodyRaw[k] as string : cur;
+    typeof bodyRaw[k] === "string" && (bodyRaw[k] as string).length > 10 && (bodyRaw[k] as string).length <= 300
+      ? bodyRaw[k] as string
+      : cur;
   yelpKey       = pick("yelpKey",           yelpKey);
   const userFoursquareKey = pick("foursquareKey", "");
   tomtomKey     = pick("tomtomKey",         tomtomKey);
@@ -108,9 +111,8 @@ export async function POST(req: NextRequest) {
     "tomtom_api_key","geoapify_api_key","radar_api_key","bing_maps_key","companies_house_key",
   ];
   try {
-    const settings = await prisma.platformSetting.findMany({
-      where: { key: { in: ALL_SETTING_KEYS } },
-    }).catch(() => []);
+    const settings = Object.entries(await getPlatformSettings(ALL_SETTING_KEYS).catch(() => ({})))
+      .map(([key, value]) => ({ key, value }));
     for (const s of settings) {
       if (!s.value || s.value.length <= 10) continue;
       if (s.key === "groq_api_key")        groqKey           = s.value;
@@ -160,10 +162,19 @@ export async function POST(req: NextRequest) {
   const cappedResults = result.leads.slice(0, usage.remaining);
 
   if (cappedResults.length > 0) {
+    let reservation: Awaited<ReturnType<typeof checkAndIncrementLeads>>;
     try {
-      await checkAndIncrementLeads(session.user.id, cappedResults.length);
-    } catch {
-      // Non-fatal: results can still be returned even if analytics increment fails.
+      reservation = await checkAndIncrementLeads(session.user.id, cappedResults.length);
+    } catch (error) {
+      console.error("Local lead usage reservation failed:", error);
+      return NextResponse.json({ error: "Search is temporarily unavailable. Please try again." }, { status: 503 });
+    }
+    if (!reservation.allowed) {
+      return NextResponse.json({
+        error: "Your lead allowance was used by another search. Please search again to refresh your remaining results.",
+        upgrade: reservation.remaining === 0,
+        usage: reservation,
+      }, { status: 429 });
     }
   }
 

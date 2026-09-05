@@ -6,6 +6,7 @@ import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { findDecisionMakers } from "@/lib/decision-maker-finder";
+import { getPlatformSettings } from "@/lib/platform-secrets";
 
 const UNLIMITED_EMAILS = new Set([
   "adeedaxguy@gmail.com",
@@ -44,19 +45,13 @@ async function loadDecisionSourceKeys() {
     openCorporatesKey: process.env.OPENCORPORATES_API_KEY ?? process.env.OPENCORPORATES_API_TOKEN ?? "",
   };
   try {
-    const settings = await prisma.platformSetting.findMany({
-      where: {
-        key: {
-          in: [
-            "companies_house_key",
-            "companies_house_api_key",
-            "hunter_api_key",
-            "opencorporates_api_key",
-            "opencorporates_api_token",
-          ],
-        },
-      },
-    });
+    const settings = Object.entries(await getPlatformSettings([
+      "companies_house_key",
+      "companies_house_api_key",
+      "hunter_api_key",
+      "opencorporates_api_key",
+      "opencorporates_api_token",
+    ])).map(([key, value]) => ({ key, value }));
     for (const setting of settings) {
       if (!setting.value || setting.value.length <= 10) continue;
       if (setting.key === "companies_house_key" || setting.key === "companies_house_api_key") {

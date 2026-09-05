@@ -1,6 +1,9 @@
 import { type ReactNode } from "react";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 import AdminSidebar from "@/components/AdminSidebar";
+import { authOptions } from "@/lib/auth";
 
 export const metadata = { title: "iCloseLeads Admin" };
 
@@ -14,6 +17,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   if (pathname === "/admin/login") {
     return <>{children}</>;
   }
+
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id || session.user.role !== "ADMIN") redirect("/admin/login");
 
   return (
     <div className="flex min-h-screen bg-background">

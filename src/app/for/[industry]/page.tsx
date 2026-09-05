@@ -162,28 +162,30 @@ export function generateStaticParams() {
   return Object.keys(INDUSTRIES).map(industry => ({ industry }));
 }
 
-export async function generateMetadata({ params }: { params: { industry: string } }): Promise<Metadata> {
-  const data = INDUSTRIES[params.industry];
+export async function generateMetadata({ params }: { params: Promise<{ industry: string }> }): Promise<Metadata> {
+  const { industry } = await params;
+  const data = INDUSTRIES[industry];
   if (!data) return { title: "Not Found" };
   return {
-    title: params.industry === "web-designers"
+    title: industry === "web-designers"
       ? "Web Design Leads for Freelancers | Find Local Businesses That Need a Website"
       : `iCloseLeads for ${data.name} — Find Clients & Leads in 2026`,
     description: data.sub,
     keywords: data.keywords,
     alternates: {
-      canonical: `https://icloseleads.com/for/${params.industry}`,
+      canonical: `https://icloseleads.com/for/${industry}`,
     },
     openGraph: {
       title: `iCloseLeads for ${data.name}`,
       description: data.sub,
-      url: `https://icloseleads.com/for/${params.industry}`,
+      url: `https://icloseleads.com/for/${industry}`,
     },
   };
 }
 
-export default function ForIndustryPage({ params }: { params: { industry: string } }) {
-  const data = INDUSTRIES[params.industry];
+export default async function ForIndustryPage({ params }: { params: Promise<{ industry: string }> }) {
+  const { industry } = await params;
+  const data = INDUSTRIES[industry];
   if (!data) notFound();
 
   return (
@@ -204,7 +206,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
               {data.sub}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href={`/auth?mode=signup&intent=${encodeURIComponent(params.industry)}&source=industry-hero`}
+              <Link href={`/auth?mode=signup&intent=${encodeURIComponent(industry)}&source=industry-hero`}
                 className="flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-all shadow-glow-primary hover:-translate-y-0.5 w-full sm:w-auto justify-center">
                 <Zap className="w-5 h-5" />
                 {data.cta}
@@ -293,7 +295,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
               Use iCloseLeads to build a steadier outreach pipeline without cold calling or expensive ad spend.
             </p>
-            <Link href={`/auth?mode=signup&intent=${encodeURIComponent(params.industry)}&source=industry-final-cta`}
+              <Link href={`/auth?mode=signup&intent=${encodeURIComponent(industry)}&source=industry-final-cta`}
               className="inline-flex items-center gap-2.5 px-10 py-4 rounded-2xl bg-primary text-white font-bold text-lg hover:bg-primary-light transition-all shadow-glow-primary hover:-translate-y-0.5">
               <Zap className="w-5 h-5" />
               {data.cta}
@@ -310,7 +312,7 @@ export default function ForIndustryPage({ params }: { params: { industry: string
           "name": "iCloseLeads",
           "applicationCategory": "BusinessApplication",
           "description": data.sub,
-          "url": `https://icloseleads.com/for/${params.industry}`,
+          "url": `https://icloseleads.com/for/${industry}`,
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           "operatingSystem": "Web",
         }) }} />

@@ -4,11 +4,16 @@ jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
 jest.mock("@/lib/mailer", () => ({ sendMail: jest.fn() }));
 jest.mock("@/lib/outreach-limits", () => ({ getResolvedOutreachUsage: jest.fn() }));
+jest.mock("@/lib/security-rate-limit", () => ({
+  getClientIp: jest.fn(() => "127.0.0.1"),
+  rateLimitHeaders: jest.fn(() => ({})),
+  securityRateLimit: jest.fn(async () => ({ allowed: true, remaining: 9, retryAfterSeconds: 60 })),
+}));
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn() },
     sentEmail: { create: jest.fn() },
-    lead: { create: jest.fn(), update: jest.fn() },
+    lead: { create: jest.fn(), findFirst: jest.fn(), updateMany: jest.fn() },
   }
 }));
 
@@ -80,5 +85,25 @@ describe("POST /api/email/send", () => {
       body: JSON.stringify({ to: "not-an-email", subject: "Hello", body: "Hi there!" }),
     });
     expect((await POST(req)).status).toBe(400);
+  });
+
+  it("does not allow attaching another user's lead", async () => {
+    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    (prisma.lead.findFirst as jest.Mock).mockResolvedValue(null);
+
+    const { POST } = await import("@/app/api/email/send/route");
+    const req = new NextRequest("http://localhost/api/email/send", {
+      method: "POST",
+      body: JSON.stringify({
+        to: "prospect@acme.com",
+        subject: "Hello",
+        body: "Hi there, I wanted to reach out about something.",
+        leadId: "someone-elses-lead",
+      }),
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(404);
+    expect(sendMail).not.toHaveBeenCalled();
   });
 });

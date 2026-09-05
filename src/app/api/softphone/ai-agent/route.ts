@@ -173,6 +173,6 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     console.error("[softphone/ai-agent]", error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : "AI call failed" }, { status: 502 });
+    return NextResponse.json({ error: "AI call failed. Please try again." }, { status: 502 });
   }
 }

@@ -56,7 +56,7 @@ function PasswordRecoveryForm() {
           </h1>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {isReset
-              ? "Use at least 8 characters. Afterward, you can sign in with your email even if you originally joined with Google or GitHub."
+              ? "Use at least 10 characters. Afterward, you can sign in with your email even if you originally joined with Google or GitHub."
               : "Enter the email connected to your account. We will send a secure one-time link if the account exists."}
           </p>
 
@@ -86,7 +86,7 @@ function PasswordRecoveryForm() {
                   <div>
                     <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">New password</label>
                     <div className="relative">
-                      <input id="new-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-11 text-base text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/15 sm:text-sm" />
+                      <input id="new-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={10} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="At least 10 characters" className="w-full rounded-lg border border-border bg-background px-4 py-3 pr-11 text-base text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/15 sm:text-sm" />
                       <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} title={showPassword ? "Hide password" : "Show password"} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
@@ -94,7 +94,7 @@ function PasswordRecoveryForm() {
                   </div>
                   <div>
                     <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-medium text-muted-foreground">Confirm password</label>
-                    <input id="confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} maxLength={128} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Repeat your new password" className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/15 sm:text-sm" />
+                    <input id="confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={10} maxLength={128} value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Repeat your new password" className="w-full rounded-lg border border-border bg-background px-4 py-3 text-base text-foreground outline-none placeholder:text-muted-foreground focus:border-primary/60 focus:ring-2 focus:ring-primary/15 sm:text-sm" />
                   </div>
                 </>
               )}

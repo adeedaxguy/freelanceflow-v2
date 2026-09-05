@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -45,18 +46,35 @@ export async function GET(req: NextRequest) {
       page, totalPages: Math.ceil(total / limit),
       counts: counts.map(c => ({ status: c.status, cnt: c._count._all })),
     });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load support tickets" }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    const body = await req.json() as {
-      email: string; subject: string; message: string;
-      category?: string; priority?: string;
-    };
+    const parsed = z.object({
+      email: z.string().trim().email().max(254).transform(email => email.toLowerCase()),
+      subject: z.string().trim().min(3).max(160),
+      message: z.string().trim().min(10).max(5000),
+      category: z.string().trim().max(60).optional(),
+    }).safeParse(await req.json().catch(() => null));
+    if (!parsed.success) return NextResponse.json({ error: "Invalid support request" }, { status: 400 });
+
+    const limit = await securityRateLimit(
+      "support-ticket",
+      session?.user?.id ?? getClientIp(req.headers),
+      5,
+      60 * 60 * 1000,
+    );
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many support requests. Please try again later." }, {
+        status: 429,
+        headers: rateLimitHeaders(limit),
+      });
+    }
+    const body = parsed.data;
 
     const messages = JSON.stringify([{
       role: "user",
@@ -71,11 +89,12 @@ export async function POST(req: NextRequest) {
         subject:  body.subject,
         messages,
         status:   "open",
+        category: body.category ?? null,
       },
     });
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: "Unable to create support ticket" }, { status: 500 });
   }
 }
 
@@ -118,7 +137,7 @@ export async function PATCH(req: NextRequest) {
     await prisma.supportTicket.update({ where: { id }, data: updateData });
 
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to update support ticket" }, { status: 500 });
   }
 }

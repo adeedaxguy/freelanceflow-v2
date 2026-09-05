@@ -1,3 +1,5 @@
+import { readLimitedText, safeFetch } from "@/lib/safe-fetch";
+
 export type DecisionCountry = "us" | "uk" | "ca" | "au" | "nz" | "ie";
 
 export type DecisionEvidenceLevel = "high" | "medium" | "low";
@@ -699,20 +701,17 @@ async function fetchHtml(url: string) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 6500);
   try {
-    const res = await fetch(url, {
+    const res = await safeFetch(url, {
       signal: controller.signal,
-      redirect: "follow",
       headers: {
         "user-agent": "iCloseLeads Decision Maker Finder (+https://icloseleads.com)",
         accept: "text/html,application/xhtml+xml",
       },
-      next: { revalidate: 0 },
     });
     if (!res.ok) return null;
     const contentType = res.headers.get("content-type") ?? "";
     if (contentType && !/html|text/i.test(contentType)) return null;
-    const html = await res.text();
-    return html.slice(0, 750_000);
+    return await readLimitedText(res, 750_000);
   } catch {
     return null;
   } finally {

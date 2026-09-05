@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
+import { getPlatformSetting } from "@/lib/platform-secrets";
 
 export type StripeConfig = {
   secretKey: string;
@@ -9,8 +10,7 @@ export type StripeConfig = {
 };
 
 async function stored(key: string) {
-  const setting = await prisma.platformSetting.findUnique({ where: { key } }).catch(() => null);
-  return setting?.value?.trim() || "";
+  return (await getPlatformSetting(key)).trim();
 }
 
 export async function getStripeConfig(): Promise<StripeConfig> {

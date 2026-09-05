@@ -27,7 +27,7 @@ export async function GET() {
     const url = buildGmailAuthUrl(session.user.id);
     return NextResponse.redirect(url);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Failed to build auth URL";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.error("Gmail OAuth connect failed:", e);
+    return NextResponse.json({ error: "Gmail connection is not available right now." }, { status: 503 });
   }
 }

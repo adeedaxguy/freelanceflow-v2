@@ -159,8 +159,9 @@ function motif(theme: Theme) {
   }
 }
 
-export async function GET(_request: Request, { params }: { params: { slug: string } }) {
-  const slug = decodeURIComponent(params.slug).replace(/\.svg$/i, "");
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug).replace(/\.svg$/i, "");
   const title = titleFromSlug(slug);
   const category = inferCategory(title, slug);
   const theme = inferTheme(title, category, slug);

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { sendPlatformEmail } from "@/lib/admin-notifications";
 import { createPasswordResetToken, renderPasswordResetEmail } from "@/lib/password-reset";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, securityRateLimit } from "@/lib/security-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,12 @@ export async function POST(req: NextRequest) {
 
   const email = parsed.data.email.toLowerCase();
   try {
+    const [ipLimit, accountLimit] = await Promise.all([
+      securityRateLimit("forgot-password-ip", getClientIp(req.headers), 10, 15 * 60 * 1000),
+      securityRateLimit("forgot-password-account", email, 3, 60 * 60 * 1000),
+    ]);
+    if (!ipLimit.allowed || !accountLimit.allowed) return NextResponse.json(response);
+
     const user = await prisma.user.findUnique({
       where: { email },
       select: { id: true, email: true, updatedAt: true, suspended: true },

@@ -77,8 +77,8 @@ export async function GET(req: NextRequest) {
       totalPages: Math.max(1, Math.ceil(total / limit)),
       counts: { pending, approved, all: pending + approved },
     });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to load comments" }, { status: 500 });
   }
 }
 
@@ -113,8 +113,8 @@ export async function PATCH(req: NextRequest) {
     });
 
     return NextResponse.json({ comment });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to update comment" }, { status: 500 });
   }
 }
 
@@ -128,7 +128,7 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.blogComment.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch (e) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 403 });
+  } catch {
+    return NextResponse.json({ error: "Unable to delete comment" }, { status: 500 });
   }
 }

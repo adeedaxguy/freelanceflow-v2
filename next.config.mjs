@@ -14,10 +14,42 @@ const seoRedirects = [
   ["/blog/best-crm-for-high-ticket-closing-in-2026-compared-1780943521022", "/blog/freelance-crm-track-leads-close-clients"],
 ];
 
+const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self' https://accounts.google.com https://github.com https://checkout.stripe.com https://*.paddle.com",
+      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://cdn.paddle.com",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https://avatars.githubusercontent.com https://lh3.googleusercontent.com https://images.unsplash.com https://*.googlesyndication.com https://*.doubleclick.net",
+      "font-src 'self' data:",
+      "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://api.stripe.com https://*.paddle.com https://*.twilio.com wss://*.twilio.com",
+      "frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://checkout.stripe.com https://*.paddle.com",
+      "media-src 'self' blob:",
+      "worker-src 'self' blob:",
+      "manifest-src 'self'",
+    ].join("; "),
+  },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=()" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "X-XSS-Protection", value: "0" },
+];
+
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  outputFileTracingRoot: process.cwd(),
+  serverExternalPackages: ["@prisma/client", "bcryptjs"],
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
@@ -27,7 +59,6 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ["@prisma/client", "bcryptjs"],
     optimizePackageImports: [
       "lucide-react",
       "@radix-ui/react-accordion",
@@ -71,20 +102,23 @@ const nextConfig = {
       },
       {
         source: "/:path*",
-        headers: [
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(self), geolocation=(), payment=()",
-          },
-        ],
+        headers: securityHeaders,
+      },
+      {
+        source: "/api/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
+      },
+      {
+        source: "/dashboard/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
+      },
+      {
+        source: "/auth/:path*",
+        headers: [{ key: "Cache-Control", value: "private, no-store, max-age=0" }],
       },
     ];
   },

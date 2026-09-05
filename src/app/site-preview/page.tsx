@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SitePreviewPage(props: { searchParams?: SitePreviewSearchParams }) {
-  return <SitePreviewPageContent {...props} />;
+export default async function SitePreviewPage({ searchParams }: { searchParams?: Promise<SitePreviewSearchParams> }) {
+  const resolvedSearchParams = await searchParams;
+  return <SitePreviewPageContent searchParams={resolvedSearchParams} />;
 }

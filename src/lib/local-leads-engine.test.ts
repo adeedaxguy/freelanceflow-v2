@@ -1,3 +1,7 @@
+jest.mock("node:dns/promises", () => ({
+  lookup: jest.fn(async () => [{ address: "93.184.216.34", family: 4 }]),
+}));
+
 import { searchLocalBusinesses } from "./local-leads-engine";
 
 describe("local lead fallbacks", () => {

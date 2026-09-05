@@ -9,6 +9,7 @@ import {
 } from "@/lib/blog-comments";
 import { STATIC_POSTS } from "@/data/blog-posts";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -45,8 +46,16 @@ export async function GET(req: NextRequest) {
 // POST /api/blog/comments
 export async function POST(req: NextRequest) {
   try {
+    const limit = await securityRateLimit("blog-comment", getClientIp(req.headers), 5, 60 * 60 * 1000);
+    if (!limit.allowed) {
+      return NextResponse.json({ error: "Too many comments. Please try again later." }, {
+        status: 429,
+        headers: rateLimitHeaders(limit),
+      });
+    }
     await ensureBlogCommentTables();
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     const { slug, parentId, authorName, authorEmail, content, honeypot, startedAt } = body;
 
     // 1. Honeypot — bots fill this hidden field

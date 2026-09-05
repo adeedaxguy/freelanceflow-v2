@@ -117,37 +117,41 @@ export async function authorizePublicApi(request: NextRequest, requiredScope: Ap
   }
 
   const now = new Date();
-  const requestDay = new Date(key.requestDay);
-  const sameUtcDay = now.toISOString().slice(0, 10) === requestDay.toISOString().slice(0, 10);
-  if (!sameUtcDay) {
-    await prisma.$executeRawUnsafe(
-      `UPDATE "ApiKey" SET "requestsToday" = 0, "requestDay" = $2, "updatedAt" = $2 WHERE "id" = $1`,
-      key.id, now,
-    );
-  }
-
-  const updated = limit === null
-    ? await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
-        UPDATE "ApiKey"
-        SET "requestsToday" = "requestsToday" + 1,
-            "totalRequests" = "totalRequests" + 1,
-            "lastUsedAt" = $2,
-            "updatedAt" = $2
-        WHERE "id" = $1
-        RETURNING "requestsToday"
-      `, key.id, now)
-    : await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
-        UPDATE "ApiKey"
-        SET "requestsToday" = "requestsToday" + 1,
-            "totalRequests" = "totalRequests" + 1,
-            "lastUsedAt" = $2,
-            "updatedAt" = $2
-        WHERE "id" = $1 AND "requestsToday" < $3
-        RETURNING "requestsToday"
-      `, key.id, now, limit);
+  const startOfDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const startOfNextDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+  // Reset and increment under the same row lock. This prevents concurrent
+  // requests from racing the daily reset or spending the same last slot.
+  const updated = await prisma.$queryRawUnsafe<Array<{ requestsToday: number }>>(`
+    UPDATE "ApiKey"
+    SET "requestsToday" = CASE
+          WHEN "requestDay" >= $2 AND "requestDay" < $3 THEN "requestsToday" + 1
+          ELSE 1
+        END,
+        "requestDay" = CASE
+          WHEN "requestDay" >= $2 AND "requestDay" < $3 THEN "requestDay"
+          ELSE $2
+        END,
+        "totalRequests" = "totalRequests" + 1,
+        "lastUsedAt" = $4,
+        "updatedAt" = $4
+    WHERE "id" = $1
+      AND "revokedAt" IS NULL
+      AND EXISTS (
+        SELECT 1 FROM "User"
+        WHERE "User"."id" = "ApiKey"."userId" AND "User"."suspended" = false
+      )
+      AND (
+        $5::integer IS NULL
+        OR CASE
+             WHEN "requestDay" >= $2 AND "requestDay" < $3 THEN "requestsToday"
+             ELSE 0
+           END < $5
+      )
+    RETURNING "requestsToday"
+  `, key.id, startOfDay, startOfNextDay, now, limit);
   const used = updated[0]?.requestsToday;
   if (!used) {
-    const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
+    const resetAt = startOfNextDay.toISOString();
     return { ok: false, status: 429, error: "Daily API request limit reached.", code: "rate_limit_exceeded", limit, remaining: 0, resetAt };
   }
 
@@ -155,7 +159,7 @@ export async function authorizePublicApi(request: NextRequest, requiredScope: Ap
     return { ok: true, userId: key.userId, keyId: key.id, limit: null, remaining: null };
   }
 
-  const resetAt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)).toISOString();
+  const resetAt = startOfNextDay.toISOString();
   return { ok: true, userId: key.userId, keyId: key.id, limit, remaining: Math.max(0, limit - used), resetAt };
 }
 

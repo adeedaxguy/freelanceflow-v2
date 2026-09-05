@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (!recipients.includes(mailbox)) return NextResponse.json({ received: true, ignored: true });
 
     const { data, error } = await getResendClient().emails.receiving.get(event.data.email_id);
-    if (error || !data) return NextResponse.json({ error: error?.message ?? "Email could not be retrieved." }, { status: 502 });
+    if (error || !data) return NextResponse.json({ error: "Email could not be retrieved." }, { status: 502 });
 
     await prisma.adminMailboxMessage.upsert({
       where: { externalId: data.id },

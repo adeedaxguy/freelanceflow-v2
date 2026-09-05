@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -7,6 +8,15 @@ export const dynamic = 'force-dynamic';
 
 // PostgreSQL-compatible migrations. Safe to run repeatedly.
 const TABLE_MIGRATIONS = [
+  {
+    name: "SecurityRateLimit",
+    sql: `CREATE TABLE IF NOT EXISTS "SecurityRateLimit" (
+      "key" TEXT PRIMARY KEY,
+      "count" INTEGER NOT NULL DEFAULT 1,
+      "resetAt" TIMESTAMP(3) NOT NULL,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+  },
   {
     name: "AuditLog",
     sql: `CREATE TABLE IF NOT EXISTS "AuditLog" (
@@ -229,12 +239,14 @@ const TABLE_MIGRATIONS = [
   { name: "ApiKey.userId_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_userId_idx" ON "ApiKey"("userId")` },
   { name: "ApiKey.revokedAt_idx", sql: `CREATE INDEX IF NOT EXISTS "ApiKey_revokedAt_idx" ON "ApiKey"("revokedAt")` },
   { name: "AuditLog.createdAt_idx", sql: `CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt")` },
+  { name: "SecurityRateLimit.resetAt_idx", sql: `CREATE INDEX IF NOT EXISTS "SecurityRateLimit_resetAt_idx" ON "SecurityRateLimit"("resetAt")` },
 ];
 
 const MIGRATIONS = [
   { table: "User", name: "suspended",       sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS suspended BOOLEAN DEFAULT false` },
   { table: "User", name: "plan",            sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free'` },
   { table: "User", name: "role",            sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'USER'` },
+  { table: "User", name: "sessionVersion",  sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "sessionVersion" INTEGER NOT NULL DEFAULT 0` },
   { table: "User", name: "expertise",       sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS expertise TEXT` },
   { table: "User", name: "referralSource",  sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "referralSource" TEXT` },
   { table: "User", name: "weeklyLeads",     sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "weeklyLeads" INTEGER DEFAULT 0` },
@@ -257,11 +269,17 @@ const MIGRATIONS = [
   { table: "Lead", name: "isManual",        sql: `ALTER TABLE "Lead" ADD COLUMN IF NOT EXISTS "isManual" BOOLEAN DEFAULT false` },
 ];
 
-export async function GET(req: NextRequest) {
+function secretsMatch(supplied: string, expected: string) {
+  const suppliedBuffer = Buffer.from(supplied);
+  const expectedBuffer = Buffer.from(expected);
+  return suppliedBuffer.length === expectedBuffer.length && timingSafeEqual(suppliedBuffer, expectedBuffer);
+}
+
+export async function POST(req: NextRequest) {
   const secret = process.env.MIGRATE_SECRET;
-  const supplied = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || req.nextUrl.searchParams.get("secret");
+  const supplied = req.headers.get("authorization")?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() ?? "";
   const session = await getServerSession(authOptions);
-  const hasSecret = Boolean(secret && supplied === secret);
+  const hasSecret = Boolean(secret && supplied && secretsMatch(supplied, secret));
   const isAdmin = session?.user?.role === "ADMIN";
   if (!hasSecret && !isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -273,8 +291,8 @@ export async function GET(req: NextRequest) {
       await prisma.$executeRawUnsafe(m.sql);
       results.push({ col: m.name, status: "added" });
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      results.push({ col: m.name, status: "error", detail: msg });
+      console.error(`[db/migrate] ${m.name} failed`, e);
+      results.push({ col: m.name, status: "error" });
     }
   }
   for (const m of MIGRATIONS) {
@@ -284,7 +302,8 @@ export async function GET(req: NextRequest) {
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       const isDuplicate = msg.includes("already exists") || msg.includes("duplicate column");
-      results.push({ col: `${m.table}.${m.name}`, status: isDuplicate ? "exists" : "error", detail: isDuplicate ? undefined : msg });
+      if (!isDuplicate) console.error(`[db/migrate] ${m.table}.${m.name} failed`, e);
+      results.push({ col: `${m.table}.${m.name}`, status: isDuplicate ? "exists" : "error" });
     }
   }
   const added  = results.filter(r => r.status === "added").length;
@@ -297,5 +316,5 @@ export async function GET(req: NextRequest) {
       ? `Migration complete. ${added} column(s) added.`
       : `Finished with ${errors.length} error(s).`,
     results,
-  });
+  }, { headers: { "Cache-Control": "no-store" } });
 }

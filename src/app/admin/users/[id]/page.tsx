@@ -7,11 +7,12 @@ import { prisma } from "@/lib/prisma";
 import { Badge, LeadStatusBadge, EmailStatusBadge } from "@/components/Badge";
 import { formatDate } from "@/lib/utils";
 
-interface PageProps { params: { id: string } }
+interface PageProps { params: Promise<{ id: string }> }
 
 export default async function AdminUserDetailPage({ params }: PageProps) {
+  const { id } = await params;
   const user = await prisma.user.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       leads: { orderBy: { savedAt: "desc" }, take: 10 },
       sentEmails: { orderBy: { sentAt: "desc" }, take: 10, include: { lead: { select: { company: true } } } },

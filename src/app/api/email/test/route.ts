@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json({ success: true, message: `Test email sent to ${toEmail}` });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Connection failed";
-    return NextResponse.json({ success: false, error: msg }, { status: 400 });
+    console.error("SMTP connection test failed:", e);
+    return NextResponse.json({ success: false, error: "SMTP connection failed. Check the settings and try again." }, { status: 400 });
   }
 }

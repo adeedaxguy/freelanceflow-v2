@@ -16,6 +16,7 @@ import {
   outreachLimitError,
 } from "@/lib/outreach-limits";
 import { Resend } from "resend";
+import { readStoredSecret, sealSecret } from "@/lib/secret-box";
 
 export interface MailOptions {
   to: string;
@@ -54,8 +55,16 @@ export async function getUserSmtpConfig(userId: string): Promise<UserSmtpConfig 
       where: { key: `smtp_${userId}` },
     });
     if (!row?.value) return null;
-    const cfg = JSON.parse(row.value) as UserSmtpConfig;
+    const stored = readStoredSecret(row.value);
+    if (!stored) return null;
+    const cfg = JSON.parse(stored) as UserSmtpConfig;
     if (!cfg.host || !cfg.user || !cfg.pass || !cfg.fromEmail) return null;
+    if (!row.value.startsWith("enc:v1:")) {
+      await prisma.platformSetting.update({
+        where: { key: `smtp_${userId}` },
+        data: { value: sealSecret(stored) },
+      }).catch(() => undefined);
+    }
     return cfg;
   } catch {
     return null;
@@ -63,10 +72,11 @@ export async function getUserSmtpConfig(userId: string): Promise<UserSmtpConfig 
 }
 
 export async function saveUserSmtpConfig(userId: string, cfg: UserSmtpConfig): Promise<void> {
+  const value = sealSecret(JSON.stringify(cfg));
   await prisma.platformSetting.upsert({
     where: { key: `smtp_${userId}` },
-    update: { value: JSON.stringify(cfg) },
-    create: { key: `smtp_${userId}`, value: JSON.stringify(cfg) },
+    update: { value },
+    create: { key: `smtp_${userId}`, value },
   });
 }
 
@@ -184,7 +194,7 @@ export async function sendMail(userId: string, opts: MailOptions): Promise<MailR
       provider: "error",
       error: isApiDisabled
         ? "Gmail API is not enabled for direct delivery. Use Prepare in Gmail from the proposal page instead."
-        : `Gmail send failed: ${gmailError}. Use Prepare in Gmail from the proposal page instead.`,
+        : "Gmail direct delivery failed. Use Prepare in Gmail from the proposal page instead.",
     };
   }
 

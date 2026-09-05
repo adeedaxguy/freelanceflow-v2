@@ -5,6 +5,10 @@ import GitHubProvider from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { notifyNewUserSignup } from "@/lib/admin-notifications";
+import { getClientIp, securityRateLimit } from "@/lib/security-rate-limit";
+
+type UserRole = "USER" | "MANAGER" | "ADMIN";
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync("invalid-login-placeholder", 12);
 
 declare module "next-auth" {
   interface Session {
@@ -13,25 +17,28 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
-      role: "USER" | "ADMIN";
+      role: UserRole;
       plan: string;
       createdAt?: string;
     };
   }
   interface User {
     id: string;
-    role: "USER" | "ADMIN";
+    role?: UserRole;
     plan?: string;
     createdAt?: string;
+    sessionVersion?: number;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string;
-    role: "USER" | "ADMIN";
-    plan: string;
+    id?: string;
+    role?: UserRole;
+    plan?: string;
     createdAt?: string;
+    sessionVersion?: number;
+    active?: boolean;
   }
 }
 
@@ -56,6 +63,14 @@ export const authOptions: NextAuthOptions = {
                 response_type: "code",
               },
             },
+            profile(profile) {
+              return {
+                id: profile.sub,
+                name: profile.name,
+                email: profile.email_verified === true ? profile.email : null,
+                image: profile.picture,
+              };
+            },
           }),
         ]
       : []),
@@ -71,6 +86,23 @@ export const authOptions: NextAuthOptions = {
                 scope: "read:user user:email",
               },
             },
+            userinfo: {
+              url: "https://api.github.com/user",
+              async request({ client, tokens }) {
+                if (!tokens.access_token) throw new Error("GitHub did not return an access token");
+                const profile = await client.userinfo(tokens.access_token);
+                const response = await fetch("https://api.github.com/user/emails", {
+                  headers: { Authorization: `Bearer ${tokens.access_token}` },
+                });
+                const emails = response.ok
+                  ? await response.json() as Array<{ email?: string; primary?: boolean; verified?: boolean }>
+                  : [];
+                const verified = emails.find(email => email.primary && email.verified)
+                  ?? emails.find(email => email.verified);
+                profile.email = verified?.email;
+                return profile;
+              },
+            },
           }),
         ]
       : []),
@@ -81,33 +113,40 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const email = credentials.email.trim().toLowerCase();
+        if (email.length > 254 || credentials.password.length > 128) return null;
+
         try {
+          const headers = new Headers(request.headers as HeadersInit);
+          const ip = getClientIp(headers);
+          const [ipLimit, accountLimit] = await Promise.all([
+            securityRateLimit("login-ip", ip, 30, 15 * 60 * 1000),
+            securityRateLimit("login-account", email, 10, 15 * 60 * 1000),
+          ]);
+          if (!ipLimit.allowed || !accountLimit.allowed) {
+            console.warn("[security] Login throttled");
+            return null;
+          }
+
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email.trim().toLowerCase() },
-            select: { id: true, name: true, email: true, password: true, role: true, plan: true, suspended: true, createdAt: true },
+            where: { email },
+            select: { id: true, name: true, email: true, password: true, role: true, plan: true, suspended: true, createdAt: true, sessionVersion: true },
           });
 
-          if (!user) return null;
-
-          // Treat suspended as suspended
-          if (user.suspended) return null;
-
-          // Google-only accounts have no password
-          if (!user.password) return null;
-
-          const isValid = await bcrypt.compare(credentials.password, user.password);
-          if (!isValid) return null;
+          const isValid = await bcrypt.compare(credentials.password, user?.password ?? DUMMY_PASSWORD_HASH);
+          if (!user || user.suspended || !user.password || !isValid) return null;
 
           return {
             id:    user.id,
             name:  user.name,
             email: user.email,
-            role:  (user.role as "USER" | "ADMIN") ?? "USER",
+            role:  (user.role as UserRole) ?? "USER",
             plan:  user.plan ?? "free",
             createdAt: user.createdAt.toISOString(),
+            sessionVersion: user.sessionVersion,
           };
         } catch (err) {
           console.error("[auth] authorize error:", err);
@@ -132,7 +171,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const existing = await prisma.user.findUnique({
             where: { email: normalizedEmail },
-            select: { id: true, role: true, plan: true, suspended: true, createdAt: true },
+            select: { id: true, role: true, plan: true, suspended: true, createdAt: true, sessionVersion: true },
           });
 
           if (existing) {
@@ -141,6 +180,7 @@ export const authOptions: NextAuthOptions = {
             (user as { role?: string; plan?: string }).role = existing.role ?? "USER";
             (user as { role?: string; plan?: string }).plan = existing.plan ?? "free";
             user.createdAt = existing.createdAt.toISOString();
+            user.sessionVersion = existing.sessionVersion;
           } else {
             // Create new OAuth account
             const newUser = await prisma.user.create({
@@ -150,12 +190,13 @@ export const authOptions: NextAuthOptions = {
                 plan:  "free",
                 role:  "USER",
               },
-              select: { id: true, role: true, plan: true, createdAt: true },
+              select: { id: true, role: true, plan: true, createdAt: true, sessionVersion: true },
             });
             user.id = newUser.id;
             (user as { role?: string; plan?: string }).role = newUser.role;
             (user as { role?: string; plan?: string }).plan = newUser.plan ?? "free";
             user.createdAt = newUser.createdAt.toISOString();
+            user.sessionVersion = newUser.sessionVersion;
 
             try {
               await notifyNewUserSignup({
@@ -178,30 +219,47 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id   = user.id;
-        token.role = (user as { role?: "USER" | "ADMIN" }).role ?? "USER";
+        token.role = (user as { role?: UserRole }).role ?? "USER";
         token.plan = (user as { plan?: string }).plan ?? "free";
         token.createdAt = user.createdAt;
-      }
-      // Re-fetch plan on session refresh
-      if (trigger === "update" && token.id) {
+        token.sessionVersion = user.sessionVersion ?? 0;
+        token.active = true;
+      } else if (token.id) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id },
-            select: { plan: true, role: true },
+            select: { plan: true, role: true, suspended: true, sessionVersion: true },
           });
-          if (dbUser) {
-            if (dbUser.plan) token.plan = dbUser.plan;
-            if (dbUser.role) token.role = dbUser.role as "USER" | "ADMIN";
+          const versionMatches = token.sessionVersion === undefined || token.sessionVersion === dbUser?.sessionVersion;
+          if (!dbUser || dbUser.suspended || !versionMatches) {
+            token.id = undefined;
+            token.role = undefined;
+            token.plan = undefined;
+            token.active = false;
+          } else {
+            token.plan = dbUser.plan ?? "free";
+            token.role = (dbUser.role as UserRole) ?? "USER";
+            token.sessionVersion = dbUser.sessionVersion;
+            token.active = true;
           }
-        } catch { /* non-fatal */ }
+        } catch (error) {
+          console.error("[auth] Session validation failed:", error);
+          token.id = undefined;
+          token.role = undefined;
+          token.plan = undefined;
+          token.active = false;
+        }
       }
       return token;
     },
 
     async session({ session, token }) {
+      if (!token.active || !token.id) {
+        return null as unknown as typeof session;
+      }
       if (session.user) {
         session.user.id   = token.id;
         session.user.role = token.role ?? "USER";

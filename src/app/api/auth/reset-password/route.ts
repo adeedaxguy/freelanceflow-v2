@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyPasswordResetToken } from "@/lib/password-reset";
 import { prisma } from "@/lib/prisma";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 export const dynamic = "force-dynamic";
 
 const schema = z.object({
   token: z.string().min(1).max(2048),
-  password: z.string().min(8, "Password must be at least 8 characters.").max(128),
+  password: z.string().min(10, "Password must be at least 10 characters.").max(128),
 });
 const invalid = { error: "This reset link is invalid or expired. Request a new one." };
 
@@ -19,6 +20,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const [ipLimit, tokenLimit] = await Promise.all([
+      securityRateLimit("reset-password-ip", getClientIp(req.headers), 10, 15 * 60 * 1000),
+      securityRateLimit("reset-password-token", parsed.data.token, 5, 15 * 60 * 1000),
+    ]);
+    if (!ipLimit.allowed || !tokenLimit.allowed) {
+      const limited = !ipLimit.allowed ? ipLimit : tokenLimit;
+      return NextResponse.json(
+        { error: "Too many reset attempts. Request a new link or try again later." },
+        { status: 429, headers: rateLimitHeaders(limited) },
+      );
+    }
+
     const payload = verifyPasswordResetToken(parsed.data.token);
     if (!payload) return NextResponse.json(invalid, { status: 400 });
 
@@ -33,7 +46,7 @@ export async function POST(req: NextRequest) {
     const password = await bcrypt.hash(parsed.data.password, 12);
     const updated = await prisma.user.updateMany({
       where: { id: user.id, updatedAt: user.updatedAt },
-      data: { password },
+      data: { password, sessionVersion: { increment: 1 } },
     });
     if (updated.count !== 1) return NextResponse.json(invalid, { status: 400 });
 

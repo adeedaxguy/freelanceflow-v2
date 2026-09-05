@@ -4,13 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
+import { getPlatformSetting } from "@/lib/platform-secrets";
 import { z } from "zod";
 
 const schema = z.object({
-  replyText:    z.string().min(1, "Reply text required"),
-  company:      z.string().optional().default(""),
-  originalBody: z.string().optional().default(""),
-  niche:        z.string().optional().default(""),
+  replyText:    z.string().trim().min(1, "Reply text required").max(5_000),
+  company:      z.string().trim().max(160).optional().default(""),
+  originalBody: z.string().max(10_000).optional().default(""),
+  niche:        z.string().trim().max(120).optional().default(""),
 });
 
 type Intent = "interested" | "objection" | "price" | "timing" | "referral" | "not_right_fit" | "more_info" | "positive";
@@ -146,10 +147,10 @@ export async function POST(req: NextRequest) {
     const { prisma } = await import("@/lib/prisma");
     const [user, setting] = await Promise.all([
       prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } }),
-      prisma.platformSetting.findUnique({ where: { key: "groq_api_key" } }),
+      getPlatformSetting("groq_api_key"),
     ]);
     if (user?.name) userName = user.name;
-    if (setting?.value && setting.value.length > 10) groqKey = setting.value;
+    if (setting.length > 10) groqKey = setting;
   } catch { /* defaults */ }
 
   let subject: string; let body: string; let source: "groq" | "template";

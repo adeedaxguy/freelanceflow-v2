@@ -3,16 +3,16 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { notifyNewUserSignup } from "@/lib/admin-notifications";
+import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
 export const dynamic = 'force-dynamic';
 
 const schema = z.object({
-  name:           z.string().min(1, "Name is required").max(100),
-  email:          z.string().email("Invalid email address"),
-  password:       z.string().min(8, "Password must be at least 8 characters"),
-  expertise:      z.array(z.string()).optional().default([]),
-  referralSource: z.string().optional().default(""),
-  plan:           z.string().optional().default("free"),
+  name:           z.string().trim().min(1, "Name is required").max(100),
+  email:          z.string().trim().email("Invalid email address").max(254),
+  password:       z.string().min(10, "Password must be at least 10 characters").max(128),
+  expertise:      z.array(z.string().trim().max(80)).max(20).optional().default([]),
+  referralSource: z.string().trim().max(160).optional().default(""),
   marketingConsent: z.boolean().optional().default(false),
 });
 
@@ -31,6 +31,19 @@ export async function POST(req: NextRequest) {
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
+    const ip = getClientIp(req.headers);
+    const [ipLimit, accountLimit] = await Promise.all([
+      securityRateLimit("register-ip", ip, 5, 60 * 60 * 1000),
+      securityRateLimit("register-account", normalizedEmail, 3, 24 * 60 * 60 * 1000),
+    ]);
+    if (!ipLimit.allowed || !accountLimit.allowed) {
+      const limited = !ipLimit.allowed ? ipLimit : accountLimit;
+      return NextResponse.json(
+        { error: "Too many signup attempts. Please try again later." },
+        { status: 429, headers: rateLimitHeaders(limited) },
+      );
+    }
+
     // Check for existing user
     const existing = await prisma.user.findUnique({
       where: { email: normalizedEmail },
@@ -49,7 +62,7 @@ export async function POST(req: NextRequest) {
     // Create user via Prisma ORM
     const user = await prisma.user.create({
       data: {
-        name:           name.trim(),
+        name,
         email:          normalizedEmail,
         password:       hashed,
         role:           "USER",

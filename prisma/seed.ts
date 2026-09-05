@@ -1,12 +1,7 @@
 /**
- * FreelanceFlow Database Seed
+ * iCloseLeads database seed
  * Run: npx ts-node prisma/seed.ts  OR  npx prisma db seed
- *
- * Creates the default admin account:
- *   Email:    admin@freelanceflow.io
- *   Password: Admin@FF2025!
- *
- * IMPORTANT: Change the admin password immediately after first login.
+ * Set ADMIN_SEED_EMAIL and ADMIN_SEED_PASSWORD to create an initial admin.
  */
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -14,25 +9,34 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("Seeding database...");
 
   // ── Admin user ─────────────────────────────────────────────────
-  const adminEmail    = "admin@freelanceflow.io";
-  const adminPassword = "Admin@FF2025!";
-  const adminHash     = await bcrypt.hash(adminPassword, 12);
-
-  const admin = await prisma.user.upsert({
-    where: { email: adminEmail },
-    update: { role: "ADMIN", suspended: false },
-    create: {
-      email:    adminEmail,
-      name:     "FreelanceFlow Admin",
-      password: adminHash,
-      role:     "ADMIN",
-      plan:     "agency",
-    },
-  });
-  console.log(`✅ Admin: ${admin.email} (id: ${admin.id})`);
+  const adminEmail = process.env.ADMIN_SEED_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_SEED_PASSWORD;
+  if ((adminEmail && !adminPassword) || (!adminEmail && adminPassword)) {
+    throw new Error("Set both ADMIN_SEED_EMAIL and ADMIN_SEED_PASSWORD, or neither.");
+  }
+  if (adminEmail && adminPassword) {
+    if (adminPassword.length < 14 || adminPassword.length > 128) {
+      throw new Error("ADMIN_SEED_PASSWORD must contain 14 to 128 characters.");
+    }
+    const adminHash = await bcrypt.hash(adminPassword, 12);
+    const admin = await prisma.user.upsert({
+      where: { email: adminEmail },
+      update: {},
+      create: {
+        email: adminEmail,
+        name: "iCloseLeads Admin",
+        password: adminHash,
+        role: "ADMIN",
+        plan: "agency",
+      },
+    });
+    console.log(`Admin ready: ${admin.email} (id: ${admin.id})`);
+  } else {
+    console.log("Admin creation skipped; no seed credentials were supplied.");
+  }
 
   // ── Default templates ───────────────────────────────────────────
   const templates = [
@@ -65,7 +69,7 @@ async function main() {
       update: {},
       create: { id: `seed-${t.niche}`, ...t },
     });
-    console.log(`✅ Template: ${t.name}`);
+    console.log(`Template: ${t.name}`);
   }
 
   // ── Default platform settings ───────────────────────────────────
@@ -102,17 +106,8 @@ async function main() {
       create: s,
     });
   }
-  console.log("✅ Platform settings initialized");
-
-  console.log("\n🎉 Seed complete!");
-  console.log("─────────────────────────────────────────");
-  console.log("Admin login:");
-  console.log(`  URL:      http://localhost:3000/auth`);
-  console.log(`  Email:    ${adminEmail}`);
-  console.log(`  Password: ${adminPassword}`);
-  console.log("Admin panel: http://localhost:3000/admin");
-  console.log("─────────────────────────────────────────");
-  console.log("⚠️  Change the admin password after first login!");
+  console.log("Platform settings initialized");
+  console.log("Seed complete.");
 }
 
 main()
