@@ -431,6 +431,7 @@ async function handleCheckoutIssue(session: Record<string, unknown>, event: Stri
       customerId: stringValue(session.customer),
       subscriptionId: stringValue(session.subscription),
       message,
+      testMode: !(session.livemode ?? event.livemode ?? false),
     },
   });
 
@@ -452,7 +453,13 @@ async function handleInvoicePaymentFailed(invoice: Record<string, unknown>, even
         prisma.billingSubscription.findUnique({ where: { externalSubscriptionId: subscriptionId } }),
       ])
     : [null, null] as const;
-  const userId = phonePurchase?.userId || billingSubscription?.userId || metadataOf(invoice).user_id || metadataOf(invoice).userId;
+  const parent = invoice.parent as { type?: string; subscription_details?: Record<string, unknown> } | undefined;
+  const subscriptionDetails = parent?.type === "subscription_details"
+    ? parent.subscription_details
+    : invoice.subscription_details as Record<string, unknown> | undefined;
+  // Initial failures can arrive before the local subscription record exists.
+  const metadata = { ...metadataOf(subscriptionDetails ?? {}), ...metadataOf(invoice) };
+  const userId = phonePurchase?.userId || billingSubscription?.userId || metadata.user_id || metadata.userId;
 
   if (phonePurchase) {
     await prisma.telephonyPurchase.update({
@@ -489,6 +496,8 @@ async function handleInvoicePaymentFailed(invoice: Record<string, unknown>, even
       attemptCount,
       nextPaymentAttempt,
       message,
+      purchaseType: metadata.purchase_type || "unknown",
+      testMode,
     },
   });
 

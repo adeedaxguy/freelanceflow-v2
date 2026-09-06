@@ -96,7 +96,62 @@ describe("Stripe webhook failure logging", () => {
       actorEmail: "buyer@example.com",
       targetType: "StripeCheckout",
       targetId: "cs_test_failed",
+      details: expect.objectContaining({ testMode: true }),
     }));
+  });
+
+  it.each([
+    { subscription: "sub_first", subscription_details: { metadata: { user_id: "user_first", purchase_type: "plan" } } },
+    { parent: { type: "subscription_details", subscription_details: { subscription: "sub_first", metadata: { user_id: "user_first", purchase_type: "plan" } } } },
+    { subscription: "sub_first", metadata: { userId: "user_first", purchase_type: "plan" } },
+  ])("attributes a first invoice failure without an existing subscription record: %j", async (subscriptionFields) => {
+    const response = await POST(request(JSON.stringify({
+      id: "evt_invoice_first", type: "invoice.payment_failed", livemode: true,
+      data: { object: {
+        id: "in_first", customer: "cus_first", amount_due: 1000, currency: "usd", attempt_count: 1,
+        ...subscriptionFields,
+      } },
+    })));
+    expect(response.status).toBe(200);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({
+      action: "payment_failed", actorId: "user_first", targetType: "StripeInvoice", targetId: "in_first",
+      details: expect.objectContaining({ subscriptionId: "sub_first", purchaseType: "plan", amountDue: 1000, testMode: false }),
+    }));
+    expect(prisma.user.update).not.toHaveBeenCalled();
+    expect(prisma.billingSubscription.upsert).not.toHaveBeenCalled();
+    expect(provisionPhoneNumber).not.toHaveBeenCalled();
+  });
+
+  it("uses the recorded subscriber for renewal failures and labels test events", async () => {
+    (prisma.billingSubscription.findUnique as jest.Mock).mockResolvedValueOnce({ id: "billing_renewal", userId: "recorded_user" });
+    const response = await POST(request(JSON.stringify({
+      id: "evt_renewal", type: "invoice.payment_failed", livemode: false,
+      data: { object: {
+        id: "in_renewal", subscription: "sub_renewal",
+        subscription_details: { metadata: { user_id: "old_metadata_user", purchase_type: "plan" } },
+      } },
+    })));
+    expect(response.status).toBe(200);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({
+      actorId: "recorded_user", targetType: "BillingSubscription", targetId: "billing_renewal",
+      details: expect.objectContaining({ testMode: true }),
+    }));
+    expect(prisma.billingSubscription.update).toHaveBeenCalledWith({
+      where: { id: "billing_renewal" }, data: { status: "past_due", testMode: true },
+    });
+  });
+
+  it("records an expired checkout without counting it as a declined payment", async () => {
+    const response = await POST(request(JSON.stringify({
+      id: "evt_expired", type: "checkout.session.expired", livemode: true,
+      data: { object: { id: "cs_expired", metadata: { user_id: "user_123", purchase_type: "plan" } } },
+    })));
+    expect(response.status).toBe(200);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({
+      action: "payment_checkout_expired", actorId: "user_123",
+      details: expect.objectContaining({ testMode: false }),
+    }));
+    expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
   it("does not let a delayed initial checkout overwrite later plan or cancellation status", async () => {
