@@ -34,7 +34,6 @@ import { MarketingAdBand } from "@/components/AdSenseUnit";
 import { PRICING_TIERS, TESTIMONIALS } from "@/data/marketing";
 import { useAuthStatus } from "@/lib/use-auth-status";
 import AnimatedContent from "@/components/react-bits/AnimatedContent";
-import CountUp from "@/components/react-bits/CountUp";
 import SpotlightCard from "@/components/react-bits/SpotlightCard";
 
 const leadEngines = [
@@ -172,27 +171,15 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function ProductPreview() {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <motion.div
-      className="relative mx-auto w-full max-w-[620px] lg:mx-0"
-      initial={reduceMotion ? false : { opacity: 0, x: 26, clipPath: "inset(0 0 0 14%)" }}
-      animate={{ opacity: 1, x: 0, clipPath: "inset(0 0 0 0%)" }}
-      transition={{ duration: 0.72, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <motion.div
-        className="absolute -left-5 top-20 hidden w-44 rounded-lg border border-border bg-background p-3 shadow-card sm:block"
-        initial={reduceMotion ? false : { opacity: 0, x: 12, y: 6 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      >
+    <div className="relative mx-auto w-full max-w-[620px] lg:mx-0">
+      <div className="absolute -left-5 top-20 hidden w-44 rounded-lg border border-border bg-background p-3 shadow-card sm:block">
         <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-accent/10 text-accent"><MapPin className="h-4 w-4" /></span>
           Local signal found
         </div>
         <p className="mt-2 text-xs leading-5 text-muted-foreground">No verified website. Public phone available.</p>
-      </motion.div>
+      </div>
 
       <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
         <div className="flex items-center justify-between border-b border-border bg-background/75 px-4 py-3">
@@ -251,13 +238,10 @@ function ProductPreview() {
                 ["Northline Dental", "Clinic", "Outdated booking flow", "91"],
                 ["Brightway Cleaning", "Home service", "No verified website", "86"],
                 ["Peak Fitness Studio", "Fitness", "Mobile experience gap", "82"],
-              ].map(([name, category, signal, score], index) => (
-                <motion.div
+              ].map(([name, category, signal, score]) => (
+                <div
                   key={name}
                   className="grid grid-cols-[1fr_auto] items-center gap-4 p-4"
-                  initial={reduceMotion ? false : { opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.46 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -270,7 +254,7 @@ function ProductPreview() {
                     <p className="text-sm font-bold text-foreground">{score}</p>
                     <p className="text-[10px] text-muted-foreground">score</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -285,12 +269,7 @@ function ProductPreview() {
         </div>
       </div>
 
-      <motion.div
-        className="absolute -bottom-5 -right-3 hidden w-48 rounded-lg border border-border bg-background p-3 shadow-card sm:block"
-        initial={reduceMotion ? false : { opacity: 0, x: -12, y: -6 }}
-        animate={{ opacity: 1, x: 0, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.86, ease: [0.16, 1, 0.3, 1] }}
-      >
+      <div className="absolute -bottom-5 -right-3 hidden w-48 rounded-lg border border-border bg-background p-3 shadow-card sm:block">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary-light"><Sparkles className="h-4 w-4" /></span>
           <div>
@@ -298,8 +277,8 @@ function ProductPreview() {
             <p className="text-[11px] text-muted-foreground">Ready for your review</p>
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
 
@@ -620,9 +599,9 @@ export default function HomepageClient() {
                 { value: 16, suffix: "+", label: "signal paths" },
                 { value: 6, label: "pipeline stages" },
                 { value: 0, prefix: "$", label: "to start" },
-              ].map(({ value, prefix, suffix, label }, index) => (
+              ].map(({ value, prefix, suffix, label }) => (
                 <div key={label} className="flex items-baseline gap-2">
-                  <strong className="text-xl text-foreground"><CountUp to={value} prefix={prefix} suffix={suffix} delay={index * 0.08} /></strong>
+                  <strong className="text-xl text-foreground">{prefix}{value}{suffix}</strong>
                   <span className="text-xs text-muted-foreground">{label}</span>
                 </div>
               ))}
