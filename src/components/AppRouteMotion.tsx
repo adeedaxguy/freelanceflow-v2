@@ -6,22 +6,12 @@ import { usePathname } from "next/navigation";
 
 export function MarketingRouteMotion({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const reduceMotion = useReducedMotion();
 
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
     return children;
   }
 
-  return (
-    <motion.div
-      key={pathname}
-      initial={reduceMotion ? false : { opacity: 0.92, filter: "blur(4px)" }}
-      animate={{ opacity: 1, filter: "blur(0px)" }}
-      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div key={pathname}>{children}</div>;
 }
 
 export function DashboardRouteMotion({ children }: { children: ReactNode }) {

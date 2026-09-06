@@ -1,6 +1,5 @@
 "use client";
 
-import Script from "next/script";
 import { Suspense, useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -42,26 +41,48 @@ function GoogleAnalyticsPageTracker({ measurementId }: { measurementId: string }
 }
 
 export default function GoogleAnalytics() {
+  useEffect(() => {
+    if (!MEASUREMENT_ID) return;
+
+    let timer: number | undefined;
+    let started = false;
+    const events = ["pointerdown", "keydown", "touchstart"] as const;
+
+    const removeListeners = () => {
+      events.forEach(event => window.removeEventListener(event, start));
+    };
+
+    const start = () => {
+      if (started) return;
+      started = true;
+      removeListeners();
+      if (timer) window.clearTimeout(timer);
+
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
+      window.gtag("js", new Date());
+      window.gtag("config", MEASUREMENT_ID, { send_page_view: true });
+
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
+      document.head.appendChild(script);
+    };
+
+    events.forEach(event => window.addEventListener(event, start, { once: true, passive: true }));
+    timer = window.setTimeout(start, 5000);
+
+    return () => {
+      removeListeners();
+      if (timer) window.clearTimeout(timer);
+    };
+  }, []);
+
   if (!MEASUREMENT_ID) return null;
 
   return (
-    <>
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', '${MEASUREMENT_ID}');
-        `}
-      </Script>
-      <Suspense fallback={null}>
-        <GoogleAnalyticsPageTracker measurementId={MEASUREMENT_ID} />
-      </Suspense>
-    </>
+    <Suspense fallback={null}>
+      <GoogleAnalyticsPageTracker measurementId={MEASUREMENT_ID} />
+    </Suspense>
   );
 }

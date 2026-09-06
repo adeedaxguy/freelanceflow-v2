@@ -117,7 +117,7 @@ function AdSenseUnit({
           visibilityObserver?.disconnect();
           requestAd();
         },
-        { rootMargin: "600px 0px" }
+        { rootMargin: "0px 0px -20% 0px" }
       );
 
       visibilityObserver.observe(containerRef.current);

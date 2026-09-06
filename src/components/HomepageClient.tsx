@@ -551,7 +551,7 @@ export default function HomepageClient() {
           <div className="relative mx-auto grid min-h-[calc(100svh-7rem)] max-w-7xl items-center gap-14 px-4 py-14 sm:px-6 sm:py-20 lg:min-h-[760px] lg:grid-cols-[0.92fr_1.08fr] lg:px-8 lg:py-24">
             <motion.div
               className="min-w-0 max-w-2xl"
-              initial={reduceMotion ? false : "hidden"}
+              initial={false}
               animate="visible"
               variants={{ visible: { transition: { delayChildren: 0.08, staggerChildren: 0.085 } } }}
             >
