@@ -99,6 +99,8 @@ describe("local lead fallbacks", () => {
       email: "info1@pasadenachildrensdentistry.com",
     });
     expect(lead).not.toHaveProperty("guessedEmails");
+    expect(lead?.pitchOpener).toContain("Would you be open to a short website review");
+    expect(lead?.pitchOpener).not.toMatch(/spotted|competitors|rank on page 1/i);
 
     const outdated = await searchLocalBusinesses({
       keyword: "orthodontist",
@@ -173,6 +175,9 @@ describe("local lead fallbacks", () => {
 
     expect(result.leads).toHaveLength(1);
     expect(result.leads[0]).toMatchObject({ websiteStatus: "outdated", websiteTech: "Old WordPress" });
+    expect(result.leads[0]?.pitchOpener).toContain("automated check");
+    expect(result.leads[0]?.pitchOpener).toContain("Old WordPress");
+    expect(result.leads[0]?.pitchPoints.join(" ")).not.toMatch(/62%|60%|double enquiries/i);
   });
 
   it("drops Photon street matches that look like businesses only by text", async () => {
@@ -283,6 +288,11 @@ describe("local lead fallbacks", () => {
     expect(names).toContain("Austin Plumbing Pros");
     expect(names).toContain("Plumber");
     expect(names[0]).toBe("Austin Plumbing Pros");
+    const unknown = result.leads.find(lead => lead.name === "Austin Plumbing Pros")!;
+    expect(unknown.websiteStatus).toBe("unknown");
+    expect(unknown.pitchOpener).toContain("Could you point me to your current website?");
+    expect(unknown.callScript).toContain("Could you confirm your current website");
+    expect(unknown.pitchPoints.join(" ")).toContain("verified needs");
     expect(result.leads.find(lead => lead.name === "Plumber")?.score).toBeLessThan(result.leads[0]!.score);
     expect(names).not.toContain("Plumbrook Drive");
     expect(names).not.toContain("Dallas Plumbing Pros");

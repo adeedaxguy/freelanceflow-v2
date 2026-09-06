@@ -136,7 +136,7 @@ function BestMatchBadge({ score }: { score: number }) {
 
 function leadNextStep(lead: AggregatedLead & { bmScore?: number }) {
   if (lead.email && (lead.bmScore ?? 0) >= 80) return "Best match with contact found. Save it, then prepare a fast proposal.";
-  if (lead.email) return "Contact found. Save it and send a concise, specific first message.";
+  if (lead.email) return "Email found in the post. Verify its purpose and the application route before contacting anyone.";
   if ((lead.bmScore ?? 0) >= 80) return "Strong fit. Open the post, verify the need, then save it for outreach.";
   return "Open the post, confirm the signal is real, then save if it fits your offer.";
 }

@@ -15,6 +15,29 @@ describe("remote lead ranking", () => {
     jest.useRealTimers();
   });
 
+  it.each([
+    ["We raised $25 million to grow the company.", undefined],
+    ["We raised $25M in funding.", undefined],
+    ["The company raised $500,000 in funding.", undefined],
+    ["We raised $25 million. Salary: $120,000-$150,000/year", "Salary: $120,000-$150,000/year"],
+    ["Home office allowance $500. Rate: $45.50/hour", "Rate: $45.50/hour"],
+    ["Budget: $1k-$5k/project", "Budget: $1k-$5k/project"],
+    ["Compensation: EUR 70,000 per year", "Compensation: EUR 70,000 per year"],
+    ["Offering 500 USD per project", "500 USD per project"],
+    ["Contract work at $45/hr", "$45/hr"],
+  ])("preserves monetary context in %s", async (description, budget) => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => [{
+      id: "amount", epoch: Math.floor(Date.now() / 1000), company: "Amount Co",
+      url: "https://remoteok.com/amount", title: "Remote React Developer",
+      description: `Remote React and TypeScript development. ${description}`, tags: ["react"],
+    }] });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "remoteok", maxHours: 72, minConfidence: 0, freshOnly: true,
+    });
+    expect(leads).toHaveLength(1);
+    expect(leads[0]?.budget).toBe(budget);
+  });
+
   it("excludes explicitly expired Himalayas jobs and clears completed request timers", async () => {
     const job = {
       title: "Senior React TypeScript Developer &#x28;Remote&#x29;", companyName: "Test &amp; Company",
@@ -30,7 +53,7 @@ describe("remote lead ranking", () => {
       filterSource: "himalayas", maxHours: 72, minConfidence: 0, freshOnly: true,
     });
     expect(leads.map(lead => lead.id).sort()).toEqual(["him-active", "him-unknown"]);
-    expect(leads[0].title).toBe("Senior React TypeScript Developer (Remote)");
+    expect(leads[0]?.title).toBe("Senior React TypeScript Developer (Remote)");
     expect(leads.find(lead => lead.id === "him-active")?.company).toBe("Test & Company");
     expect(jest.getTimerCount()).toBe(0);
   });
@@ -247,7 +270,7 @@ describe("remote lead ranking", () => {
     ] });
     const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "lever", maxHours: 72, minConfidence: 0 });
     expect(leads).toHaveLength(1);
-    expect(leads[0].url).toBe("https://jobs.lever.co/test/remote");
+    expect(leads[0]?.url).toBe("https://jobs.lever.co/test/remote");
   });
 
   it("does not override Ashby's explicit non-remote flag with description keywords", async () => {
@@ -261,7 +284,7 @@ describe("remote lead ranking", () => {
     ] }) });
     const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "ashby", maxHours: 72, minConfidence: 0 });
     expect(leads).toHaveLength(1);
-    expect(leads[0].url).toBe("https://jobs.ashbyhq.com/test/remote");
+    expect(leads[0]?.url).toBe("https://jobs.ashbyhq.com/test/remote");
   });
 
   it("maps Remote First Jobs RSS with source attribution", async () => {

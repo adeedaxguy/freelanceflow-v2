@@ -34,7 +34,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "freshest",     label: "Freshest First" },
   { value: "best-match",   label: "Best Match" },
   { value: "best-quality", label: "Best Quality" },
-  { value: "has-budget",   label: "Has Budget First" },
+  { value: "has-budget",   label: "Stated Amount First" },
 ];
 
 const SEARCH_COOLDOWN_SECS = 30;
@@ -116,7 +116,7 @@ function fmtCooldown(secs: number): string {
 function exportLeadsCSV(leads: AggregatedLead[], filename = "icloseleads-leads.csv") {
   const headers = [
     "Title", "Company", "Domain", "Source", "Niche", "Match %", "Quality",
-    "Budget", "Urgent", "Has Email", "Email", "Posted At", "Hours Ago",
+    "Stated Amount", "Urgent", "Has Email", "Email", "Posted At", "Hours Ago",
     "Tags", "Description", "URL",
   ];
   const escape = (v: string | number | boolean | undefined) => {
@@ -225,9 +225,9 @@ function QualityDot({ score }: { score: number }) {
 }
 
 function leadNextStep(lead: AggregatedLead) {
-  if (lead.email && lead.budget) return "Contact found and budget mentioned. Save it, then send a researched proposal.";
-  if (lead.email) return "Contact found. Save it, then prepare a short proposal while the post is fresh.";
-  if (lead.budget) return "Budget signal found. Open the post, verify fit, then save it for outreach.";
+  if (lead.email && lead.budget) return "Contact and amount found. Verify the recipient and whether the amount is salary, a rate or a project budget.";
+  if (lead.email) return "Email found in the post. Verify its purpose and the application route before contacting anyone.";
+  if (lead.budget) return "Amount mentioned. Open the post to confirm its currency, period and whether it is salary or a project budget.";
   if (lead.urgency) return "Urgency signal found. Move quickly with a specific first message.";
   return "Open the post, verify fit, then save the lead if the need is real.";
 }
@@ -680,7 +680,7 @@ export default function LeadsPage() {
             {[
               { val: forMe,     set: setForMe,     icon: <TrendingUp className="w-3.5 h-3.5 text-primary-light" />, label: "High Match Only",  color: "bg-primary" },
               { val: hasEmail,  set: setHasEmail,  icon: <Mail className="w-3.5 h-3.5 text-accent" />,             label: "Has Email",         color: "bg-accent" },
-              { val: hasBudget, set: setHasBudget, icon: <DollarSign className="w-3.5 h-3.5 text-green-400" />,   label: "Has Budget",        color: "bg-green-500" },
+              { val: hasBudget, set: setHasBudget, icon: <DollarSign className="w-3.5 h-3.5 text-green-400" />,   label: "Stated Amount",     color: "bg-green-500" },
             ].map(({ val, set, icon, label, color }) => (
               <label key={label} className="flex items-center gap-2.5 cursor-pointer">
                 <div className={`w-9 h-5 rounded-full transition-colors relative ${val ? color : "bg-muted"}`}
@@ -839,7 +839,7 @@ export default function LeadsPage() {
               )}
               {budgetCount > 0 && (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 font-medium flex items-center gap-1">
-                  <DollarSign className="w-3 h-3" /> {budgetCount} with budget
+                  <DollarSign className="w-3 h-3" /> {budgetCount} with stated amount
                 </span>
               )}
               {urgentCount > 0 && (

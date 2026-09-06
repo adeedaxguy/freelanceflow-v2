@@ -223,7 +223,7 @@ function exportLocalLeadsCsv(leads: LocalLead[], keyword: string, location: stri
     "Score",
     "Urgency",
     "Business Scale",
-    "Revenue Estimate",
+    "Illustrative Service Price (Not Confirmed Budget)",
     "Google Maps",
     "Email",
     "Pitch Subject",
@@ -744,8 +744,8 @@ function LeadCard({ lead, onSave, isSaved, isSaving, searchLocation, canUseSoftp
               </span>
             )}
             {lead.revenueEst && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-medium">
-                <DollarSign className="w-3 h-3"/> {lead.revenueEst}/mo potential
+              <span title="Illustrative service-price range, not a confirmed client budget or monthly revenue" className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 font-medium">
+                <DollarSign className="w-3 h-3"/> {lead.revenueEst} example service price
               </span>
             )}
             {smallOperatorSignal.matches && (
@@ -1223,7 +1223,7 @@ export default function LocalLeadsPage() {
             lead.phone ? `Phone Type: ${phoneType.label}${phoneType.confidence === "low" ? " (not carrier-verified)" : ""}` : null,
             `Website: ${lead.website ?? "None"} (${lead.websiteStatus}${lead.websiteTech ? ` — ${lead.websiteTech}` : ""}${lead.websiteAge ? ` — ${lead.websiteAge}` : ""})`,
             lead.rating != null ? `Rating: ${lead.rating}★ (${lead.reviewCount ?? 0} reviews)` : null,
-            lead.revenueEst ? `Revenue Potential: ${lead.revenueEst}/mo` : null,
+            lead.revenueEst ? `Illustrative service price, not a confirmed budget: ${lead.revenueEst}` : null,
             smallSignal.matches ? `Small Operator Signal: ${smallSignal.score}/100 (${smallSignal.reasons.join("; ")})` : null,
             "Lead Coverage: Live local search",
             `Priority Score: ${lead.score}/100 (${lead.urgency} urgency)`,
@@ -1656,7 +1656,7 @@ export default function LocalLeadsPage() {
                     ({results.length} total · filtered to {filteredResults.length})
                   </span>
                 )}
-                {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no website</span>}
+                {noWebsite > 0 && <span className="text-red-400 font-medium">{noWebsite} with no listed or verified website</span>}
                 {outdated  > 0 && <span className="text-yellow-400 font-medium">{outdated} outdated</span>}
                 {withPhone > 0 && <span className="text-accent font-medium">{withPhone} with phone</span>}
                 {smallOperatorCount > 0 && <span className="text-cyan-300 font-medium">{smallOperatorCount} small operators</span>}

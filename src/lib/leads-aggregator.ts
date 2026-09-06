@@ -322,19 +322,24 @@ function titleHasNicheContext(niche: string, title: string, tags: string[]): boo
 }
 
 /**
- * Extract a budget / rate string from text.
- * Matches "$500", "$45/hr", "$1k-$5k", "budget: $200", "500 USD", etc.
+ * Extract a stated amount, preferring explicit compensation context.
+ * A description amount is not proof of a client's project budget.
  */
 function extractBudget(text: string): string | undefined {
   if (!text) return undefined;
   const patterns = [
-    /\$\s*\d[\d,]*(?:\s*[kK])?\s*(?:[-–]\s*\$?\s*\d[\d,]*(?:\s*[kK])?)?\s*(?:\/\s*(?:hr|hour|mo|month|week|wk|project|task|day))?/,
-    /(?:budget|rate|compensation|pay|salary|fixed|price)\s*:?\s*\$?\s*\d[\d,]*(?:\s*[kK])?(?:\s*\/\s*(?:hr|hour|mo|month|project))?/i,
-    /\d[\d,]+\s*(?:USD|EUR|GBP|CAD|AUD)(?:\s*\/\s*(?:hr|hour|mo|month|project))?/i,
+    /\b(?:budget|rate|compensation|pay|salary|fixed price)(?:\s+range)?\s*:?\s*(?:USD|EUR|GBP|CAD|AUD|[$£€])?\s*\d[\d,]*(?:\.\d+)?(?:\s*k\b)?(?:\s*[-–]\s*[$£€]?\s*\d[\d,]*(?:\.\d+)?(?:\s*k\b)?)?(?:\s*(?:USD|EUR|GBP|CAD|AUD))?(?:\s*(?:\/|per\s+)\s*(?:hours?|hr|months?|mo|weeks?|wk|years?|yr|annum|project|task|day))?/i,
+    /(?:USD|EUR|GBP|CAD|AUD|[$£€])\s*\d[\d,]*(?:\.\d+)?(?:\s*k\b)?(?:\s*[-–]\s*[$£€]?\s*\d[\d,]*(?:\.\d+)?(?:\s*k\b)?)?(?:\s*(?:\/|per\s+)\s*(?:hours?|hr|months?|mo|weeks?|wk|years?|yr|annum|project|task|day))?/i,
+    /\d[\d,]*(?:\.\d+)?\s*(?:USD|EUR|GBP|CAD|AUD)(?:\s*(?:\/|per\s+)\s*(?:hours?|hr|months?|mo|weeks?|wk|years?|yr|annum|project|task|day))?/i,
   ];
   for (const p of patterns) {
-    const m = text.match(p);
-    if (m?.[0] && m[0].replace(/\D/g, "").length >= 2) {
+    for (const m of text.matchAll(new RegExp(p.source, "gi"))) {
+      const before = text.slice(Math.max(0, m.index! - 60), m.index);
+      const after = text.slice(m.index! + m[0].length, m.index! + m[0].length + 50);
+      // Do not truncate company funding or valuation amounts into apparent pay.
+      if (/^\s*(?:million|billion|mn\b|bn\b|m\b|b\b)/i.test(after)) continue;
+      if (/\b(?:raised|funding|valuation|valued at|investment)\b[^.!?;]*$/i.test(before)
+        && !/^(?:budget|rate|compensation|pay|salary|fixed price)\b/i.test(m[0])) continue;
       return m[0].trim().replace(/\s+/g, " ").slice(0, 55);
     }
   }
@@ -420,7 +425,7 @@ function calcQuality(lead: {
 }): number {
   let score = 28;
   if (lead.email)   score += 22;
-  if (lead.budget)  score += 18; // stated budget = high-intent client
+  if (lead.budget)  score += 18; // amount supplied; its purpose still needs verification
   if (lead.urgency) score += 6;
   const dl = lead.description?.length ?? 0;
   if (dl > 80)  score += 8;
