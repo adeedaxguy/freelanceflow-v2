@@ -4,14 +4,16 @@ import { ArrowRight, CheckCircle2, Search, Sparkles, Target } from "lucide-react
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { USE_CASE_PAGES } from "@/data/use-case-pages";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 const BASE_URL = "https://icloseleads.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Freelance Lead Generation Use Cases: Remote, Cold Outreach, Local, and Live Leads",
-  description:
-    "Explore iCloseLeads use cases for remote job leads, freelance cold outreach, local business leads, and live job leads. Find better prospects, generate AI proposals, and track every follow-up.",
+  title: { absolute: seoTitle("Freelance Lead Generation Use Cases") },
+  description: seoDescription(
+    "Explore workflows for remote job leads, cold outreach, local business leads, and live opportunities. Find prospects, create proposals, and track follow-up.",
+  ),
   keywords: [
     "freelance lead generation use cases",
     "freelance cold outreach",

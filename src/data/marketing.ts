@@ -44,7 +44,7 @@ export const PRICING_TIERS: PricingTier[] = [
     limit: "1,000 leads/week",
     features: [...PLAN_FEATURES.pro],
     cta: "Upgrade to Pro",
-    href: "/dashboard/upgrade?plan=pro",
+    href: "/auth?callbackUrl=%2Fdashboard%2Fupgrade%3Fplan%3Dpro",
     highlight: true,
     badge: "For solo outreach",
   },
@@ -56,6 +56,6 @@ export const PRICING_TIERS: PricingTier[] = [
     limit: "Unlimited leads",
     features: [...PLAN_FEATURES.agency],
     cta: "Upgrade to Agency",
-    href: "/dashboard/upgrade?plan=agency",
+    href: "/auth?callbackUrl=%2Fdashboard%2Fupgrade%3Fplan%3Dagency",
   },
 ];

@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { Users, Target, Zap, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export const metadata: Metadata = {
-  title: "About iCloseLeads — Built for Freelancers Who Mean Business",
-  description: "iCloseLeads is on a mission to help freelancers worldwide escape platform dependency and build sustainable client pipelines through AI-powered outreach.",
+  title: { absolute: seoTitle("About iCloseLeads: Built for Freelancers") },
+  description: seoDescription("iCloseLeads helps freelancers escape platform dependency and build sustainable client pipelines with lead research, outreach, and follow-up tools."),
   alternates: { canonical: "https://icloseleads.com/about" },
 };
 

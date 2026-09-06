@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Braces, Building2, Clock3, KeyRound, Radio } from "lucide-react";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export const metadata: Metadata = {
-  title: "Lead Generation API for Local Businesses and Remote Jobs",
-  description: "Use the iCloseLeads API to search local business leads, remote jobs, and fresh live job opportunities from your own application.",
+  title: { absolute: seoTitle("Lead Generation API for Local and Remote Leads") },
+  description: seoDescription("Use the iCloseLeads API to search local business leads, remote jobs, and fresh live opportunities from your own application."),
   alternates: { canonical: "https://icloseleads.com/developers" },
 };
 

@@ -4,14 +4,18 @@ import { ArrowRight, BookOpen, CheckCircle2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { RESOURCE_PAGES } from "@/data/resource-pages";
+import { redirectedResourceSlugs } from "@/lib/seo-redirects";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 const BASE_URL = "https://icloseleads.com";
+const PUBLIC_RESOURCE_PAGES = RESOURCE_PAGES.filter((page) => !redirectedResourceSlugs.has(page.slug));
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "Lead Generation Resources for Freelancers, Web Design Leads, and Cold Outreach Workflows",
-  description:
-    "Practical iCloseLeads resources for freelancer lead generation, web design leads, local business prospecting, Gmail-ready cold outreach, proposal templates, and CRM follow-up workflows.",
+  title: { absolute: seoTitle("Freelance Lead Generation Resources") },
+  description: seoDescription(
+    "Practical guides for freelancer lead generation, web design leads, local prospecting, cold outreach, proposal templates, and CRM follow-up.",
+  ),
   keywords: [
     "best lead generation tools for freelancers",
     "cold outreach CRM for freelancers",
@@ -84,7 +88,7 @@ function ResourcesJsonLd() {
       "@context": "https://schema.org",
       "@type": "ItemList",
       name: "iCloseLeads resources",
-      itemListElement: RESOURCE_PAGES.map((page, index) => ({
+      itemListElement: PUBLIC_RESOURCE_PAGES.map((page, index) => ({
         "@type": "ListItem",
         position: index + 1,
         name: page.title,
@@ -134,7 +138,7 @@ export default function ResourcesPage() {
 
         <section className="px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {RESOURCE_PAGES.map((page) => (
+            {PUBLIC_RESOURCE_PAGES.map((page) => (
               <Link key={page.slug} href={`/resources/${page.slug}`} className="group flex min-h-[360px] min-w-0 flex-col rounded-lg border border-border bg-surface p-6 transition hover:border-primary/40">
                 <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-light">{page.keyword}</p>
                 <h2 className="mt-4 text-2xl font-extrabold leading-tight text-foreground group-hover:text-primary-light">{page.title}</h2>

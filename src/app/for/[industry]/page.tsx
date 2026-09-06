@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowRight, Check, Zap, MapPin, Target, TrendingUp } from "lucide-react";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 // ── Industry definitions ──────────────────────────────────────────────────────
 const INDUSTRIES: Record<string, {
@@ -166,11 +167,13 @@ export async function generateMetadata({ params }: { params: Promise<{ industry:
   const { industry } = await params;
   const data = INDUSTRIES[industry];
   if (!data) return { title: "Not Found" };
+  const title = seoTitle(industry === "web-designers"
+    ? "Web Design Leads for Freelancers"
+    : `Lead Generation for ${data.name}`);
+  const description = seoDescription(data.sub);
   return {
-    title: industry === "web-designers"
-      ? "Web Design Leads for Freelancers | Find Local Businesses That Need a Website"
-      : `iCloseLeads for ${data.name} — Find Clients & Leads in 2026`,
-    description: data.sub,
+    title: { absolute: title },
+    description,
     keywords: data.keywords,
     alternates: {
       canonical: `https://icloseleads.com/for/${industry}`,

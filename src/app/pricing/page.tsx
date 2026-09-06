@@ -6,10 +6,11 @@ import Footer from "@/components/Footer";
 import PricingCard from "@/components/PricingCard";
 import { PRICING_TIERS } from "@/data/marketing";
 import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export const metadata: Metadata = {
-  title: "iCloseLeads Pricing — Affordable Plans for Freelancers",
-  description: `Start free, upgrade when ready. iCloseLeads offers plans from $0 to $${PLAN_MONTHLY_PRICES.agency}/mo with lead discovery, AI proposals, outreach, CRM, and optional softphone add-ons.`,
+  title: { absolute: seoTitle("Pricing Plans for Freelancers") },
+  description: seoDescription(`Start free, upgrade when ready. Plans run from $0 to $${PLAN_MONTHLY_PRICES.agency}/mo with lead discovery, AI proposals, outreach, CRM, and optional softphone add-ons.`),
   alternates: { canonical: "https://icloseleads.com/pricing" },
 };
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export type FeatureSlug =
   | "lead-discovery"
@@ -1348,23 +1349,25 @@ export function getFeaturePage(slug: FeatureSlug): FeaturePageData {
 
 export function featureMetadata(page: FeaturePageData): Metadata {
   const url = `${BASE_URL}${page.path}`;
+  const title = seoTitle(page.titleTag);
+  const description = seoDescription(page.metaDescription);
   return {
     metadataBase: new URL(BASE_URL),
-    title: page.titleTag,
-    description: page.metaDescription,
+    title: { absolute: title },
+    description,
     keywords: page.keywords,
     alternates: { canonical: url },
     openGraph: {
-      title: page.titleTag,
-      description: page.metaDescription,
+      title,
+      description,
       url,
       type: "website",
       siteName: "iCloseLeads",
     },
     twitter: {
       card: "summary_large_image",
-      title: page.titleTag,
-      description: page.metaDescription,
+      title,
+      description,
     },
   };
 }
