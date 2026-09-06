@@ -29,7 +29,7 @@ export async function POST() {
   }
 
   const subscription = await prisma.billingSubscription.findFirst({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, testMode: false, plan: { in: ["pro", "agency"] } },
     orderBy: { updatedAt: "desc" },
   });
   if (!subscription) {

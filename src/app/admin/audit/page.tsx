@@ -96,7 +96,7 @@ export default function AdminAuditPage() {
         ) : (
           <div className="divide-y divide-border/40">
             {logs.map(entry => {
-              const ac = ACTION_LABELS[entry.action] ?? { label: entry.action, color: "text-muted-foreground" };
+              const ac = ACTION_LABELS[entry.action] ?? { label: entry.action.replaceAll("_", " "), color: "text-muted-foreground" };
               const details = parseDetails(entry);
               return (
                 <div key={entry.id} className="grid grid-cols-12 gap-2 px-6 py-3.5 hover:bg-primary/5 transition-colors text-sm">
