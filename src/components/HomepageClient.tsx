@@ -144,7 +144,7 @@ const audiences = [
 
 const faq = [
   ["What does iCloseLeads actually do?", "It brings local business leads, remote jobs, live opportunity signals, decision-maker research, AI proposals, outreach preparation, softphone calling, and CRM follow-up into one freelancer-focused workflow."],
-  ["Is it free to start?", "Yes. Free users can start with 600 weekly lead searches without a credit card. Choose Pro or Agency when you want higher limits and advanced workflows."],
+  ["Is it free to start?", "Yes. You get up to 600 lead results over a 3-day trial, without a credit card. Choose Pro or Agency to continue discovery after the trial. Saved leads remain accessible."],
   ["Can I call leads from iCloseLeads?", "Yes. Every plan can access the softphone option. You can buy a dedicated phone number and monthly calling minutes, then call prospects from the dashboard while keeping the lead context nearby."],
   ["Where do the leads come from?", "iCloseLeads monitors public opportunity signals and business data paths, then normalizes and scores the results so you can search them from one place."],
   ["Does AI send messages automatically?", "No. AI helps create a stronger draft, but you review the message and stay in control of what is sent."],
@@ -557,7 +557,7 @@ export default function HomepageClient() {
             >
               <motion.div variants={heroItem} transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1] }} className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-sm">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/15 text-accent"><Zap className="h-3 w-3" /></span>
-                600 free weekly lead searches - no card required
+                600 lead results over 3 days - no card required
               </motion.div>
               <motion.h1 variants={heroItem} transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }} className="marketing-display break-words text-5xl font-bold leading-[1.02] text-foreground sm:text-6xl lg:text-[72px]">
                 Find the lead. Know the angle. Start the conversation.
@@ -586,7 +586,7 @@ export default function HomepageClient() {
                   onClick={() => marketingEvent("homepage_gsc_insight_guide_click", { guide: "freelance-client-acquisition-system" })}
                   className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface/70 px-3 py-2 text-foreground transition-colors hover:border-primary/50 hover:text-primary-light"
                 >
-                  Popular guide: turn 600 weekly leads into a focused sprint
+                  Popular guide: turn your lead allowance into a focused sprint
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
                 <Link
@@ -601,7 +601,7 @@ export default function HomepageClient() {
               </motion.div>
 
               <motion.div variants={heroItem} transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }} className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                {["600 weekly lead searches", "Stripe plan upgrades", "Paid softphone add-ons"].map(item => (
+                {["600 results in a 3-day trial", "Stripe plan upgrades", "Paid softphone add-ons"].map(item => (
                   <span key={item} className="inline-flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-accent" />{item}</span>
                 ))}
               </motion.div>
@@ -746,7 +746,7 @@ export default function HomepageClient() {
             <div className="mx-auto max-w-3xl text-center">
               <Eyebrow>Start free, continue when ready</Eyebrow>
               <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">Find out if the leads are worth pitching first.</h2>
-              <p className="mt-5 text-base leading-8 text-muted-foreground">The free weekly allowance gives you a real starting point with 600 lead searches. Pro and Agency keep lead discovery active at higher volume, while every plan can add paid softphone calling with a dedicated number and monthly minutes.</p>
+              <p className="mt-5 text-base leading-8 text-muted-foreground">Start with up to 600 lead results over 3 days. Pro keeps discovery active at 1,000 results per week. Agency adds higher volume, a larger outreach allowance, and API access. Phone numbers and calling minutes are paid add-ons on every plan.</p>
             </div>
             <div className="mx-auto mt-12 grid max-w-6xl gap-5 lg:grid-cols-3">
               {PRICING_TIERS.map((tier, index) => <PricingCard key={tier.name} tier={tier} index={index} />)}

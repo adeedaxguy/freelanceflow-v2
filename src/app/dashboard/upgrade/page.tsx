@@ -34,7 +34,7 @@ async function getPlatformPricing() {
 export default async function UpgradePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ checkout?: string }>;
+  searchParams?: Promise<{ checkout?: string; plan?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
@@ -52,7 +52,7 @@ export default async function UpgradePage({
   const [pricing, hasBillingSubscription] = await Promise.all([
     getPlatformPricing(),
     prisma.billingSubscription.findFirst({
-      where: { userId: session.user.id, provider: "STRIPE" },
+      where: { userId: session.user.id, testMode: false, plan: { in: ["pro", "agency"] } },
       select: { id: true },
     }).then(Boolean).catch(() => false),
   ]);
@@ -72,6 +72,8 @@ export default async function UpgradePage({
       canCheckout={canCheckout}
       hasBillingSubscription={hasBillingSubscription}
       checkoutReturned={resolvedSearchParams?.checkout === "success"}
+      checkoutCancelled={resolvedSearchParams?.checkout === "cancelled"}
+      selectedPlan={resolvedSearchParams?.plan === "agency" ? "agency" : resolvedSearchParams?.plan === "pro" ? "pro" : undefined}
     />
   );
 }

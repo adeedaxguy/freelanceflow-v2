@@ -21,11 +21,13 @@ jest.mock("@/lib/usage", () => ({
   getUsageStats: jest.fn(),
 }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
+jest.mock("@/lib/audit-log", () => ({ recordAuditLog: jest.fn(async () => undefined) }));
 
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { aggregateLeadsWithDiagnostics } from "@/lib/leads-aggregator";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
+import { recordAuditLog } from "@/lib/audit-log";
 
 const mockSession = { user: { id: "user-1", name: "Test User", email: "test@example.com", role: "USER" as const } };
 const mockUsage = {
@@ -73,7 +75,7 @@ describe("POST /api/leads/search", () => {
           tags: ["web-design"],
         },
       ],
-      diagnostics: { totalFetched: 1, errors: [] },
+      diagnostics: { totalFetched: 1, sources: [{ source: "reddit", ok: true, fetched: 1, kept: 1 }] },
     });
 
     const { POST } = await import("@/app/api/leads/search/route");
@@ -88,6 +90,10 @@ describe("POST /api/leads/search", () => {
     expect(data.leads).toHaveLength(1);
     expect(data.total).toBe(1);
     expect(checkAndIncrementLeads).toHaveBeenCalledWith("user-1", 1);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({
+      action: "lead_search_completed", actorId: "user-1",
+      details: expect.objectContaining({ results: 1, sourceCount: 1, failedSourceCount: 0 }),
+    }));
   });
 
   it("returns 400 when neither domain nor company provided", async () => {

@@ -99,6 +99,22 @@ describe("Stripe webhook failure logging", () => {
     }));
   });
 
+  it("does not let a delayed initial checkout overwrite later plan or cancellation status", async () => {
+    const response = await POST(request(JSON.stringify({
+      id: "evt_delayed_checkout", type: "checkout.session.completed", livemode: false,
+      data: { object: {
+        id: "cs_initial", subscription: "sub_existing", customer: "cus_existing",
+        payment_status: "paid",
+        metadata: { purchase_type: "plan", user_id: "user_123", plan: "pro" },
+      } },
+    })));
+    expect(response.status).toBe(200);
+    const input = (prisma.billingSubscription.upsert as jest.Mock).mock.calls[0][0];
+    expect(input.create).toMatchObject({ plan: "pro", status: "active" });
+    expect(input.update).not.toHaveProperty("plan");
+    expect(input.update).not.toHaveProperty("status");
+  });
+
   it("confirms a paid phone-number checkout and provisions the number", async () => {
     (prisma.telephonyPurchase.findUnique as jest.Mock).mockResolvedValueOnce({
       id: "purchase_123",
@@ -189,5 +205,36 @@ describe("Stripe webhook failure logging", () => {
       where: { externalSubscriptionId: "sub_minutes" },
       update: expect.objectContaining({ status: "canceled" }),
     }));
+  });
+
+  it("uses the billed price rather than stale plan metadata after a portal change", async () => {
+    process.env.STRIPE_AGENCY_MONTHLY_PRICE_ID = "price_agency";
+    try {
+      const response = await POST(request(JSON.stringify({
+        type: "customer.subscription.updated", livemode: true,
+        data: { object: {
+          id: "sub_plan", status: "active", livemode: true,
+          metadata: { user_id: "user_123", plan: "pro" },
+          items: { data: [{ price: { id: "price_agency" }, current_period_end: 1_900_000_000 }] },
+        } },
+      })));
+      expect(response.status).toBe(200);
+      expect(prisma.billingSubscription.upsert).toHaveBeenCalledWith(expect.objectContaining({
+        update: expect.objectContaining({ plan: "agency", renewsAt: new Date(1_900_000_000_000) }),
+      }));
+    } finally { delete process.env.STRIPE_AGENCY_MONTHLY_PRICE_ID; }
+  });
+
+  it("catches asynchronous fulfillment failures and returns a retryable error", async () => {
+    (prisma.billingSubscription.upsert as jest.Mock).mockRejectedValueOnce(new Error("Temporary database failure"));
+    const response = await POST(request(JSON.stringify({
+      id: "evt_retry", type: "checkout.session.completed", livemode: true,
+      data: { object: {
+        id: "cs_retry", subscription: "sub_retry", payment_status: "paid", livemode: true,
+        metadata: { purchase_type: "plan", user_id: "user_123", plan: "agency" },
+      } },
+    })));
+    expect(response.status).toBe(500);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({ action: "payment_webhook_error", targetId: "evt_retry" }));
   });
 });

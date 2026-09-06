@@ -53,7 +53,9 @@ export default withAuth(
 
     // ── Dashboard routes: require any auth ──
     if (pathname.startsWith("/dashboard") && (!token || token.active === false)) {
-      return NextResponse.redirect(new URL("/auth", req.url));
+      const loginUrl = new URL("/auth", req.url);
+      loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
+      return NextResponse.redirect(loginUrl);
     }
 
     return NextResponse.next({

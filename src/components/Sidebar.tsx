@@ -66,7 +66,7 @@ type PlanCfg = {
 };
 const PLAN_CONFIG: Record<string, PlanCfg> = {
   free:   { label: "3-Day Trial", color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", icon: Sparkles, leadsPerWeek: "600 total", showUpgrade: true },
-  pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "1,000 / week", showUpgrade: false },
+  pro:    { label: "Pro",    color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Crown, leadsPerWeek: "1,000 / week", showUpgrade: true },
   agency: { label: "Agency", color: "text-primary-light", bg: "bg-primary/10", border: "border-primary/25", icon: Shield, leadsPerWeek: "Unlimited leads", showUpgrade: false },
 };
 
@@ -391,7 +391,7 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
           >
             <span className="inline-flex min-w-0 items-center gap-1.5">
               <Crown className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">Upgrade to Pro</span>
+              <span className="truncate">{user?.plan === "pro" ? "Explore Agency" : "Compare paid plans"}</span>
             </span>
             <ChevronRight className="h-3.5 w-3.5 shrink-0" />
           </Link>

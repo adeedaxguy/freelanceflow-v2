@@ -20,14 +20,17 @@ const CREATE_AUDIT_LOG_SQL = `CREATE TABLE IF NOT EXISTS "AuditLog" (
   "details" TEXT,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 )`;
+let tableReady: Promise<unknown> | undefined;
 
 export async function recordAuditLog(input: AuditLogInput) {
   try {
     const details = typeof input.details === "string"
       ? input.details
       : JSON.stringify(input.details ?? {});
-    await prisma.$executeRawUnsafe(CREATE_AUDIT_LOG_SQL);
-    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt")`);
+    tableReady ??= prisma.$executeRawUnsafe(CREATE_AUDIT_LOG_SQL)
+      .then(() => prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt")`))
+      .catch(error => { tableReady = undefined; throw error; });
+    await tableReady;
     await prisma.$executeRawUnsafe(
       `INSERT INTO "AuditLog" (id, "adminId", "adminEmail", action, "targetType", "targetId", details, "createdAt")
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,

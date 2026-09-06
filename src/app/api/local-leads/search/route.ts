@@ -9,6 +9,7 @@ import { searchLocalBusinesses, checkRateLimit, type LocalBizLead } from "@/lib/
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
 import { FREE_TRIAL_LEAD_LIMIT, PRO_WEEKLY_LEAD_LIMIT } from "@/lib/plan-limits";
 import { getPlatformSettings } from "@/lib/platform-secrets";
+import { recordAuditLog } from "@/lib/audit-log";
 
 // Re-export the type so the dashboard page can import it from this route
 export type { LocalBizLead as LocalLead };
@@ -21,6 +22,7 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const startedAt = Date.now();
   // Auth
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
@@ -152,6 +154,7 @@ export async function POST(req: NextRequest) {
       db:                prisma,
     });
   } catch (err) {
+    await recordAuditLog({ action: "lead_search_failed", actorId: session.user.id, targetType: "LocalSearch", details: { engine: "local", durationMs: Date.now() - startedAt } });
     console.error("[local-leads/search]", err);
     return NextResponse.json(
       { error: "Search temporarily unavailable. Please try again in a moment.", geocoded: false, results: [], total: 0, sources: [] },
@@ -186,6 +189,11 @@ export async function POST(req: NextRequest) {
     // Non-fatal
   }
 
+  await recordAuditLog({
+    action: cappedResults.length ? "lead_search_completed" : "lead_search_empty",
+    actorId: session.user.id, targetType: "LocalSearch",
+    details: { engine: "local", results: cappedResults.length, durationMs: Date.now() - startedAt, cached: result.source === "cache" },
+  });
   return NextResponse.json({
     results:  cappedResults,
     source:   result.source,

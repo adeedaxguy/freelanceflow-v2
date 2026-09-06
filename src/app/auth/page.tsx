@@ -8,6 +8,7 @@ import { ArrowRight, Eye, EyeOff, Check, Loader2, Zap } from "lucide-react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { getAuthDestination } from "@/lib/auth-destination";
 
 const PENDING_SIGNUP_KEY = "icl_pending_oauth_signup";
 
@@ -177,6 +178,7 @@ function AuthForm() {
   const signupIntentCopy = getSignupIntentCopy(intentParam);
   const signupNextSteps = getSignupNextSteps(intentParam);
   const signupDestination = getSignupDestination(intentParam);
+  const authDestination = getAuthDestination(params.get("callbackUrl"), planParam, mode === "signup" ? signupDestination : "/dashboard");
 
   // Sync mode from URL
   useEffect(() => {
@@ -211,9 +213,9 @@ function AuthForm() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(mode === "signup" ? signupDestination : "/dashboard");
+      router.replace(authDestination);
     }
-  }, [status, router, mode, signupDestination]);
+  }, [status, router, authDestination]);
 
   const strength = strengthLabel(password);
   const oauthProviderCount = Number(oauthProviders.google) + Number(oauthProviders.github);
@@ -267,7 +269,7 @@ function AuthForm() {
     trackAuthEvent("auth_oauth_click", { provider: "google" });
     rememberOAuthSignup("google");
     try {
-      await signIn("google", { callbackUrl: mode === "signup" ? signupDestination : "/dashboard" });
+      await signIn("google", { callbackUrl: authDestination });
     } catch {
       clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "google" });
@@ -287,7 +289,7 @@ function AuthForm() {
     trackAuthEvent("auth_oauth_click", { provider: "github" });
     rememberOAuthSignup("github");
     try {
-      await signIn("github", { callbackUrl: mode === "signup" ? signupDestination : "/dashboard" });
+      await signIn("github", { callbackUrl: authDestination });
     } catch {
       clearPendingOAuthSignup();
       trackAuthEvent("auth_oauth_error", { provider: "github" });
@@ -307,7 +309,7 @@ function AuthForm() {
         setError("Invalid email or password"); setLoading(false); return;
       }
       trackAuthEvent("auth_login_success", { method: "credentials" });
-      router.push("/dashboard");
+      router.push(authDestination);
       return;
     }
     if (password.length < 10) {
@@ -346,7 +348,7 @@ function AuthForm() {
         method: "credentials",
         has_referral_source: Boolean(signupAttribution),
       });
-      router.push(signupDestination);
+      router.push(authDestination);
     } catch (err) {
       trackAuthEvent("auth_signup_error", { method: "credentials" });
       setError(err instanceof Error ? err.message : "Registration failed");
@@ -386,7 +388,7 @@ function AuthForm() {
           </p>
           <div className="space-y-3">
             {[
-              "Free account includes 600 weekly lead searches",
+              "600 lead results over a 3-day trial, no card required",
               "AI proposal drafting during your trial",
               "Search local businesses, remote jobs, and live signals",
               "Save leads and track follow-up in one CRM pipeline",

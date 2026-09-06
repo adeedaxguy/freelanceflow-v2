@@ -80,7 +80,7 @@ const faqs = [
       },
       {
         q: "What's the difference between the free and Pro plans?",
-        a: "Free users can start with 600 weekly lead searches, AI proposals, and safe Gmail compose outreach. Pro and Agency keep lead discovery active with higher limits and advanced workflows.",
+        a: "New users get up to 600 lead results over 3 days, with AI proposal drafting and Gmail compose outreach. After the trial, upgrade to continue new discovery and AI proposals. Saved leads remain accessible.",
       },
     ],
   },

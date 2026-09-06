@@ -43,12 +43,12 @@ The iCloseLeads team`,
 
 const PRODUCT_UPDATE_TEMPLATE = {
   label: "Product update",
-  subject: "600 free leads a week, plus a sharper way to use them",
+  subject: "Your 3-day trial: turn lead research into a focused shortlist",
   body: `Hi {name},
 
 A quick product update from iCloseLeads.
 
-Free accounts now include 600 leads every week. That gives you enough room to test a niche properly, compare the results, and focus on the businesses or jobs that genuinely fit your service.
+New accounts include up to 600 lead results during a 3-day trial, with no card required. Test a niche, compare the results, and focus on businesses or jobs that genuinely fit your service. After the trial, Pro is $10/month and Agency is $15/month. Your saved leads remain accessible.
 
 What changed:
 
@@ -64,7 +64,7 @@ A focused 10-minute workflow:
 3. Open one owner path.
 4. Draft one specific pitch.
 
-Read the 600-lead weekly playbook:
+Read the lead research playbook:
 
 https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers
 

@@ -10,6 +10,7 @@ import {
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
 import { FREE_TRIAL_LEAD_LIMIT } from "@/lib/plan-limits";
 import { z } from "zod";
+import { recordAuditLog } from "@/lib/audit-log";
 
 // Accept either `niche: "web-development"` (legacy) or `niches: ["web-development", "shopify"]`.
 const searchSchema = z.object({
@@ -58,11 +59,14 @@ function fingerprints(company: string, domain: string, title = "", sourceUrl = "
 }
 
 export async function POST(req: NextRequest) {
+  const startedAt = Date.now();
+  let actorId: string | undefined;
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    actorId = session.user.id;
 
     const body: unknown = await req.json();
     const parsed = searchSchema.safeParse(body);
@@ -233,6 +237,16 @@ export async function POST(req: NextRequest) {
     for (const l of toReturn) {
       if (l.source in sources) sources[l.source] = (sources[l.source] ?? 0) + 1;
     }
+    await recordAuditLog({
+      action: toReturn.length ? "lead_search_completed" : "lead_search_empty",
+      actorId: session.user.id, targetType: "RemoteSearch",
+      details: {
+        engine: "remote", results: toReturn.length, durationMs: Date.now() - startedAt,
+        sourceCount: diagnostics.sources.filter(source => source.ok).length,
+        failedSourceCount: diagnostics.sources.filter(source => !source.ok).length,
+        broadened: autoBroadened,
+      },
+    });
 
     return NextResponse.json({
       leads:     toReturn,
@@ -258,6 +272,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
+    if (actorId) await recordAuditLog({ action: "lead_search_failed", actorId, targetType: "RemoteSearch", details: { engine: "remote", durationMs: Date.now() - startedAt } });
     console.error("Lead search error:", error);
     return NextResponse.json({
       error: "Failed to fetch leads. Please try again.",

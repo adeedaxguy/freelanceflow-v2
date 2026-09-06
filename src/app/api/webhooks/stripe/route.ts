@@ -65,12 +65,14 @@ function paidPlan(value: string | null | undefined) {
 
 function subscriptionDates(subscription: Record<string, unknown>) {
   const status = stripeStatus(subscription);
+  const items = subscription.items as { data?: Array<{ current_period_end?: number }> } | undefined;
+  const periodEnd = subscription.current_period_end ?? items?.data?.[0]?.current_period_end;
   return {
-    renewsAt: status === "canceled" ? null : dateValue(subscription.current_period_end),
+    renewsAt: status === "canceled" ? null : dateValue(periodEnd),
     endsAt: dateValue(subscription.ended_at)
       || dateValue(subscription.canceled_at)
       || dateValue(subscription.cancel_at)
-      || (status === "canceled" ? dateValue(subscription.current_period_end) : null),
+      || (status === "canceled" ? dateValue(periodEnd) : null),
     trialEndsAt: dateValue(subscription.trial_end),
   };
 }
@@ -331,14 +333,16 @@ async function handlePlanCheckout(session: Record<string, unknown>, event: Strip
       provider: "STRIPE",
       externalCustomerId: stringValue(session.customer),
       externalOrderId: stringValue(session.id),
-      plan,
-      variantId: plan,
-      status,
-      testMode,
+      // A delayed checkout event must not undo a later subscription change.
     },
   });
 
   if (!testMode && hasPlanAccess(status, null)) await updateEffectivePlan(userId);
+  await recordAuditLog({
+    action: "payment_checkout_completed", actorId: userId,
+    targetType: "StripeCheckout", targetId: stringValue(session.id),
+    details: { plan, testMode, status },
+  });
   return NextResponse.json({ received: true, plan: "checkout_completed" });
 }
 
@@ -349,7 +353,8 @@ async function handlePlanSubscription(subscription: Record<string, unknown>, eve
 
   const existing = await prisma.billingSubscription.findUnique({ where: { externalSubscriptionId: subscriptionId } });
   const userId = metadata.user_id || metadata.userId || existing?.userId;
-  const plan = paidPlan(metadata.plan) || paidPlan(existing?.plan) || paidPlan(fallbackPlan);
+  const pricePlan = await getPlanFromPriceId(priceIdOf(subscription));
+  const plan = paidPlan(pricePlan) || paidPlan(fallbackPlan) || paidPlan(metadata.plan) || paidPlan(existing?.plan);
   if (!userId || !plan) {
     return NextResponse.json({ received: true, ignored: "unmapped_plan_subscription" }, { status: 202 });
   }
@@ -490,7 +495,13 @@ async function handleInvoicePaymentFailed(invoice: Record<string, unknown>, even
   return NextResponse.json({ received: true, stripe: "invoice_payment_failed_logged" });
 }
 
-async function getPlanFromPriceId(priceId: string): Promise<string | null> {
+async function getPlanFromPriceId(priceId: string | null): Promise<string | null> {
+  if (!priceId) return null;
+  for (const plan of ["pro", "agency"] as const) {
+    for (const billing of ["MONTHLY", "ANNUAL"]) {
+      if (process.env[`STRIPE_${plan.toUpperCase()}_${billing}_PRICE_ID`]?.trim() === priceId) return plan;
+    }
+  }
   try {
     const [proSetting, agencySetting] = await Promise.all([
       prisma.platformSetting.findUnique({ where: { key: "pro_price_id" } }),
@@ -528,34 +539,34 @@ export async function POST(req: NextRequest) {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
       const metadata = metadataOf(session);
-      if (metadata.purchase_type === "softphone_number") return handleNumberCheckout(session, event);
-      if (metadata.purchase_type === "softphone_minutes") return handleMinutesCheckout(session, event);
-      if (metadata.purchase_type === "plan") return handlePlanCheckout(session, event);
+      if (metadata.purchase_type === "softphone_number") return await handleNumberCheckout(session, event);
+      if (metadata.purchase_type === "softphone_minutes") return await handleMinutesCheckout(session, event);
+      if (metadata.purchase_type === "plan") return await handlePlanCheckout(session, event);
 
       const userId = metadata.userId || metadata.user_id;
       const plan = metadata.plan;
       if (userId && plan && session.payment_status === "paid" && !packageIdFromCallingPlan(plan)) {
-        return handlePlanCheckout(session, event);
+        return await handlePlanCheckout(session, event);
       }
     }
 
     if (event.type === "checkout.session.async_payment_failed") {
-      return handleCheckoutIssue(event.data.object, event, "failed");
+      return await handleCheckoutIssue(event.data.object, event, "failed");
     }
 
     if (event.type === "checkout.session.expired") {
-      return handleCheckoutIssue(event.data.object, event, "expired");
+      return await handleCheckoutIssue(event.data.object, event, "expired");
     }
 
     if (event.type === "invoice.payment_failed") {
-      return handleInvoicePaymentFailed(event.data.object, event);
+      return await handleInvoicePaymentFailed(event.data.object, event);
     }
 
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
       const subscription = event.data.object;
       const metadata = metadataOf(subscription);
-      if (metadata.purchase_type === "softphone_number") return handleNumberSubscription(subscription, event);
-      if (metadata.purchase_type === "softphone_minutes") return handleMinutesSubscription(subscription, event);
+      if (metadata.purchase_type === "softphone_number") return await handleNumberSubscription(subscription, event);
+      if (metadata.purchase_type === "softphone_minutes") return await handleMinutesSubscription(subscription, event);
 
       const subscriptionId = stringValue(subscription.id);
       if (subscriptionId) {
@@ -581,19 +592,19 @@ export async function POST(req: NextRequest) {
             select: { id: true },
           }),
         ]);
-        if (phonePurchase) return handleNumberSubscription(subscription, event);
-        if (minutesSubscription) return handleMinutesSubscription(subscription, event);
-        if (planSubscription) return handlePlanSubscription(subscription, event);
+        if (phonePurchase) return await handleNumberSubscription(subscription, event);
+        if (minutesSubscription) return await handleMinutesSubscription(subscription, event);
+        if (planSubscription) return await handlePlanSubscription(subscription, event);
       }
 
       const userId = metadata.userId || metadata.user_id;
       if (userId && paidPlan(metadata.plan)) {
-        return handlePlanSubscription(subscription, event);
+        return await handlePlanSubscription(subscription, event);
       }
       const priceId = priceIdOf(subscription);
       if (userId && priceId) {
         const plan = await getPlanFromPriceId(priceId);
-        if (plan) return handlePlanSubscription(subscription, event, plan);
+        if (plan) return await handlePlanSubscription(subscription, event, plan);
       }
     }
   } catch (error) {
@@ -605,6 +616,7 @@ export async function POST(req: NextRequest) {
       details: {
         gateway: "stripe",
         eventType: event.type,
+        testMode: event.livemode === false,
         error: error instanceof Error ? error.message : "Handler failed",
       },
     });

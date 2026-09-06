@@ -1,4 +1,6 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import { useSession } from "next-auth/react";
+jest.mock("next-auth/react", () => ({ useSession: jest.fn() }));
 import {
   BlogInlineAd,
   DashboardOverviewAd,
@@ -18,9 +20,17 @@ function mockViewport(isMobile: boolean) {
 }
 
 beforeEach(() => {
+  (useSession as jest.Mock).mockReturnValue({ status: "authenticated", data: { user: { plan: "free", role: "USER" } } });
   jest.useRealTimers();
   window.adsbygoogle = [];
   mockViewport(false);
+});
+
+it.each(["pro", "agency"])("does not show lead-result ads to %s customers", plan => {
+  (useSession as jest.Mock).mockReturnValue({ status: "authenticated", data: { user: { plan, role: "USER" } } });
+  render(<LeadResultsAd />);
+  expect(screen.queryByLabelText("Advertisement")).not.toBeInTheDocument();
+  expect(window.adsbygoogle).toHaveLength(0);
 });
 
 it("uses the desktop in-feed unit after desktop hydration", async () => {

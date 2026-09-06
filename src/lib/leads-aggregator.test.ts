@@ -15,6 +15,26 @@ describe("remote lead ranking", () => {
     jest.useRealTimers();
   });
 
+  it("excludes explicitly expired Himalayas jobs and clears completed request timers", async () => {
+    const job = {
+      title: "Senior React TypeScript Developer &#x28;Remote&#x29;", companyName: "Test &amp; Company",
+      pubDate: "2026-08-26T10:00:00Z", description: "Remote contract React and TypeScript web developer.",
+      categories: ["web developer", "react"], employmentType: "Contractor",
+    };
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ jobs: [
+      { ...job, guid: "expired", applicationLink: "https://himalayas.app/jobs/expired", expiryDate: Math.floor(new Date("2026-08-26T11:00:00Z").getTime() / 1000) },
+      { ...job, guid: "active", applicationLink: "https://himalayas.app/jobs/active", expiryDate: "2026-09-01T00:00:00Z" },
+      { ...job, companyName: "Another Company", guid: "unknown", applicationLink: "https://himalayas.app/jobs/unknown" },
+    ] }) });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", {
+      filterSource: "himalayas", maxHours: 72, minConfidence: 0, freshOnly: true,
+    });
+    expect(leads.map(lead => lead.id).sort()).toEqual(["him-active", "him-unknown"]);
+    expect(leads[0].title).toBe("Senior React TypeScript Developer (Remote)");
+    expect(leads.find(lead => lead.id === "him-active")?.company).toBe("Test & Company");
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
   it("prioritizes stronger fit over merely newer postings", async () => {
     fetchMock.mockResolvedValue({
       ok: true,
@@ -213,6 +233,35 @@ describe("remote lead ranking", () => {
     });
 
     expect(leads.map(lead => lead.id)).toEqual(["arb-remote-react"]);
+  });
+
+  it("respects Lever's hybrid and onsite fields even when benefits mention remote work", async () => {
+    const job = {
+      text: "Senior React TypeScript Developer", createdAt: new Date("2026-08-26T10:00:00Z").getTime(),
+      descriptionPlain: "Build React applications. Benefits include remote opportunities.",
+    };
+    fetchMock.mockResolvedValue({ ok: true, json: async () => [
+      { ...job, id: "hybrid", workplaceType: "hybrid", hostedUrl: "https://jobs.lever.co/test/hybrid" },
+      { ...job, id: "office", workplaceType: "on-site", hostedUrl: "https://jobs.lever.co/test/office" },
+      { ...job, id: "remote", workplaceType: "remote", hostedUrl: "https://jobs.lever.co/test/remote" },
+    ] });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "lever", maxHours: 72, minConfidence: 0 });
+    expect(leads).toHaveLength(1);
+    expect(leads[0].url).toBe("https://jobs.lever.co/test/remote");
+  });
+
+  it("does not override Ashby's explicit non-remote flag with description keywords", async () => {
+    const job = {
+      title: "Senior React TypeScript Developer", publishedAt: "2026-08-26T10:00:00Z",
+      descriptionPlain: "Build React applications. Benefits include remote opportunities.",
+    };
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ jobs: [
+      { ...job, id: "office", isRemote: false, jobUrl: "https://jobs.ashbyhq.com/test/office" },
+      { ...job, id: "remote", isRemote: true, jobUrl: "https://jobs.ashbyhq.com/test/remote" },
+    ] }) });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "ashby", maxHours: 72, minConfidence: 0 });
+    expect(leads).toHaveLength(1);
+    expect(leads[0].url).toBe("https://jobs.ashbyhq.com/test/remote");
   });
 
   it("maps Remote First Jobs RSS with source attribution", async () => {

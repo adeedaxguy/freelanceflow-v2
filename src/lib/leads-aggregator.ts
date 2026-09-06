@@ -285,6 +285,10 @@ function stripHtml(text: string): string {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, " ")
     .replace(/<[^>]+>/g, " ")
+    .replace(/&#(x[0-9a-f]+|[0-9]+);/gi, (entity, value: string) => {
+      const code = value.toLowerCase().startsWith("x") ? parseInt(value.slice(1), 16) : Number(value);
+      return code > 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : entity;
+    })
     .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -430,12 +434,13 @@ function calcQuality(lead: {
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
   return Promise.race([
     promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms)
-    ),
-  ]);
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
 }
 
 function cacheOpts(freshOnly: boolean, revalidateSec: number): RequestInit & { next?: { revalidate: number } } {
@@ -1128,6 +1133,7 @@ async function fetchLeverBoards(keywords: string[], maxHours: number, freshOnly:
       let inWindow = 0;
       const leads = jobs.flatMap((job): AggregatedLead[] => {
         if (!job.text) return [];
+        if (["hybrid", "on-site", "onsite"].includes(job.workplaceType?.toLowerCase() ?? "")) return [];
         const posted = parsePostedDate(job.createdAt);
         if (!posted) return [];
         const hrs = hoursAgo(posted);
@@ -1189,6 +1195,7 @@ async function fetchAshbyBoards(keywords: string[], maxHours: number, freshOnly:
       let inWindow = 0;
       const leads = jobs.flatMap((job): AggregatedLead[] => {
         if (!job.title) return [];
+        if (job.isRemote === false || ["hybrid", "on-site", "onsite"].includes(job.workplaceType?.toLowerCase() ?? "")) return [];
         const posted = parsePostedDate(job.publishedAt);
         if (!posted) return [];
         const hrs = hoursAgo(posted);
@@ -2101,7 +2108,7 @@ async function fetchDribbbleJobs(keywords: string[], maxHours: number, freshOnly
 
 interface HimalayasJob {
   title?: string; excerpt?: string; companyName?: string; companySlug?: string;
-  description?: string; pubDate?: string | number; applicationLink?: string; guid?: string;
+  description?: string; pubDate?: string | number; expiryDate?: string | number; applicationLink?: string; guid?: string;
   categories?: string[]; parentCategories?: string[]; employmentType?: string;
   minSalary?: number | null; maxSalary?: number | null; currency?: string | null; salaryPeriod?: string | null;
 }
@@ -2136,6 +2143,8 @@ async function fetchHimalayas(niche: string, keywords: string[], maxHours: numbe
   let inWindow = 0;
   const leads = (data.jobs ?? []).flatMap((job): AggregatedLead[] => {
     if (!job.title || !job.companyName) return [];
+    const expires = typeof job.expiryDate === "number" ? job.expiryDate * 1000 : job.expiryDate ? Date.parse(job.expiryDate) : NaN;
+    if (Number.isFinite(expires) && expires <= Date.now()) return [];
     const posted = typeof job.pubDate === "number" ? new Date(job.pubDate * 1000) : job.pubDate ? new Date(job.pubDate) : null;
     if (!posted || isNaN(posted.getTime())) return [];
     const hrs = hoursAgo(posted);
@@ -2330,7 +2339,7 @@ export async function aggregateLeadsWithDiagnostics(
   }));
 
   const totalFetched = sourceDiagnostics.reduce((s, d) => s + d.fetched, 0);
-  let all = results.flat().flatMap((lead): AggregatedLead[] => {
+  let all = results.flat().map(lead => ({ ...lead, title: stripHtml(lead.title), company: stripHtml(lead.company) })).flatMap((lead): AggregatedLead[] => {
     const match = bestNicheMatch(lead, nicheKeywordSets);
     if (!match) return [];
     return [{ ...lead, niche: match.niche, confidence: Math.min(100, Math.max(lead.confidence, match.confidence)) }];

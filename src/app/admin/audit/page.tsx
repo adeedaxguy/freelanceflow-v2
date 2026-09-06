@@ -25,20 +25,26 @@ const ACTION_LABELS: Record<string, { label: string; color: string }> = {
 export default function AdminAuditPage() {
   const [logs, setLogs]     = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [page, setPage]     = useState(1);
   const [total, setTotal]   = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetch(`/api/admin/audit?page=${page}`);
-    if (res.ok) {
+    setError("");
+    try {
+      const res = await fetch(`/api/admin/audit?page=${page}`);
+      if (!res.ok) throw new Error("Audit history is unavailable. Please retry.");
       const d = await res.json() as { logs: AuditEntry[]; total: number; totalPages: number };
       setLogs(d.logs);
       setTotal(d.total);
       setTotalPages(d.totalPages);
+    } catch {
+      setError("Audit history is unavailable. Please retry.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [page]);
 
   useEffect(() => { void load(); }, [load]);
@@ -58,18 +64,20 @@ export default function AdminAuditPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Audit Log</h1>
-          <p className="text-muted-foreground mt-1 text-sm">{total} admin actions recorded</p>
+          <p className="text-muted-foreground mt-1 text-sm">{total} account, search and payment events recorded</p>
         </div>
-        <button onClick={() => void load()} className="p-2 rounded-xl border border-border text-muted-foreground hover:text-foreground transition-all">
+        <button onClick={() => void load()} disabled={loading} aria-label="Refresh audit history" title="Refresh audit history" className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-all">
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
 
-      <div className="bg-gradient-card border border-border rounded-2xl overflow-hidden">
+      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      <div className="border-y border-border overflow-x-auto">
+        <div className="min-w-[600px]">
         <div className="px-6 py-3 border-b border-border bg-muted/20">
           <div className="grid grid-cols-12 text-xs font-medium text-muted-foreground uppercase tracking-wider">
             <span className="col-span-3">Action</span>
-            <span className="col-span-3">Admin</span>
+            <span className="col-span-3">Actor</span>
             <span className="col-span-3">Target</span>
             <span className="col-span-3">Time</span>
           </div>
@@ -79,11 +87,11 @@ export default function AdminAuditPage() {
           <div className="flex items-center justify-center py-16">
             <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
-        ) : logs.length === 0 ? (
+        ) : !error && logs.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <Shield className="w-10 h-10 mb-3 opacity-20" />
-            <p className="text-sm">No admin actions recorded yet</p>
-            <p className="text-xs mt-1 opacity-60">Actions appear here as admins use the panel</p>
+            <p className="text-sm">No events recorded yet</p>
+            <p className="text-xs mt-1 opacity-60">New account, search and payment events will appear here.</p>
           </div>
         ) : (
           <div className="divide-y divide-border/40">
@@ -94,7 +102,7 @@ export default function AdminAuditPage() {
                 <div key={entry.id} className="grid grid-cols-12 gap-2 px-6 py-3.5 hover:bg-primary/5 transition-colors text-sm">
                   <div className="col-span-3">
                     <span className={`font-medium ${ac.color}`}>{ac.label}</span>
-                    {details && <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{details}</p>}
+                    {details && <details className="mt-1 text-xs text-muted-foreground"><summary className="cursor-pointer">Details</summary><p className="mt-2 break-words">{details}</p></details>}
                   </div>
                   <div className="col-span-3 flex items-center gap-2 min-w-0">
                     <User className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
@@ -132,6 +140,7 @@ export default function AdminAuditPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

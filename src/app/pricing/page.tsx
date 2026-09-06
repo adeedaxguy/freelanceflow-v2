@@ -17,7 +17,8 @@ const billingFAQ = [
   { q: "Can I change plans anytime?", a: "Yes. Paid subscriptions are managed through the secure Stripe billing portal." },
   { q: "Can every plan use the softphone?", a: "Yes. Every plan can access the softphone option. Phone numbers and monthly calling minute packages are separate paid add-ons, so calling costs stay tied to actual phone usage." },
   { q: "How are payments handled?", a: "Pro, Agency, softphone number subscriptions, and calling-minute packages use secure Stripe Checkout. iCloseLeads does not store card details." },
-  { q: "Is there a free trial for paid plans?", a: "You can start on the Free plan without a card. Upgrade through Stripe when you need higher limits or agency features." },
+  { q: "What happens after the free trial?", a: "You get up to 600 lead results over 3 days, starting when you register. After that, choose Pro or Agency to continue new lead searches and AI proposals. Your saved leads and outreach history remain accessible. There is no automatic charge." },
+  { q: "When should I choose Agency?", a: "Choose Agency for more than 1,000 lead results a week, a larger outreach allowance, or API access. It is a single-user account, not a shared team workspace. Lead availability varies by source and location." },
   { q: "What happens when I hit my weekly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
   { q: "Do you offer annual billing?", a: "Yes. Annual billing is available from the dashboard upgrade page and is shown before checkout." },
 ];

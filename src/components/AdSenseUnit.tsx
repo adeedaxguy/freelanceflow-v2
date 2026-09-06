@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 declare global {
   interface Window {
@@ -345,8 +346,9 @@ export function PublicFooterAd() {
 
 export function LeadResultsAd() {
   const viewport = useAdViewport();
+  const { data: session, status } = useSession();
 
-  if (!viewport) return null;
+  if (!viewport || status !== "authenticated" || session?.user?.plan !== "free" || session?.user?.role === "ADMIN") return null;
 
   const ad = viewport === "mobile" ? MOBILE_IN_FEED_AD : DESKTOP_IN_FEED_AD;
 

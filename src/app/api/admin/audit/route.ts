@@ -5,21 +5,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-async function requireAdmin() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || !["ADMIN", "MANAGER"].includes(session.user.role ?? ""))
-    throw new Error("Forbidden");
-}
-
-export async function GET(req: NextRequest) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   try {
-    await requireAdmin();
     const { searchParams } = new URL(req.url);
-    const page  = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+    const requestedPage = Number(searchParams.get("page") ?? 1);
+    const page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
     const limit = 50;
     const offset = (page - 1) * limit;
 
-    try {
       const logs = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(
         `SELECT * FROM "AuditLog" ORDER BY "createdAt" DESC LIMIT $1 OFFSET $2`,
         limit, offset
@@ -33,11 +29,7 @@ export async function GET(req: NextRequest) {
         logs, total: count,
         page, totalPages: Math.ceil(count / limit),
       });
-    } catch {
-      // AuditLog table may not exist yet
-      return NextResponse.json({ logs: [], total: 0, page, totalPages: 0 });
-    }
   } catch {
-    return NextResponse.json({ error: "Unable to load audit logs" }, { status: 500 });
+    return NextResponse.json({ error: "Audit history is unavailable. Please retry." }, { status: 503 });
   }
 }

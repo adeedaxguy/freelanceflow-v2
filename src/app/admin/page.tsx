@@ -9,9 +9,6 @@ import {
   Settings, MessageSquare, DollarSign, Megaphone, UserCheck, FileText,
   ArrowUpRight, Clock, Zap,
 } from "lucide-react";
-import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
-
-const PLAN_PRICE: Record<string, number> = PLAN_MONTHLY_PRICES;
 
 async function getAdminStats() {
   const now = new Date();
@@ -46,7 +43,6 @@ async function getAdminStats() {
   const planMap: Record<string, number> = {};
   for (const p of planDist) planMap[p.plan] = p._count._all;
 
-  const mrr = Object.entries(planMap).reduce((s, [plan, cnt]) => s + (PLAN_PRICE[plan] ?? 0) * cnt, 0);
   const proUsers   = planMap.pro    ?? 0;
   const agencyUsers = planMap.agency ?? 0;
   const freeUsers  = planMap.free   ?? 0;
@@ -57,7 +53,7 @@ async function getAdminStats() {
     totalUsers, newUsers7d, newUsers30d,
     totalLeads, newLeads7d,
     totalEmails, newEmails7d,
-    mrr, paidUsers, freeUsers, proUsers, agencyUsers, convRate,
+    paidUsers, freeUsers, proUsers, agencyUsers, convRate,
     recentUsers,
     openTickets: openTickets ?? 0,
     totalCampaigns,
@@ -75,8 +71,8 @@ export default async function AdminDashboard() {
       href: "/admin/users",
     },
     {
-      label: "MRR",            value: `$${s.mrr.toLocaleString()}`,
-      sub: `${s.convRate}% conversion`, icon: DollarSign, color: "text-accent", bg: "bg-accent/10",
+      label: "Billing",        value: "View report",
+      sub: "Live subscriptions and activation", icon: DollarSign, color: "text-accent", bg: "bg-accent/10",
       href: "/admin/revenue",
     },
     {
@@ -100,8 +96,8 @@ export default async function AdminDashboard() {
       href: "/admin/analytics",
     },
     {
-      label: "Paid Users",     value: s.paidUsers.toString(),
-      sub: `${s.proUsers} Pro · ${s.agencyUsers} Agency`, icon: UserCheck, color: "text-yellow-400", bg: "bg-yellow-500/10",
+      label: "Paid-plan access", value: s.paidUsers.toString(),
+      sub: "Includes manual grants, not proof of payment", icon: UserCheck, color: "text-yellow-400", bg: "bg-yellow-500/10",
       href: "/admin/revenue",
     },
     {
@@ -201,7 +197,7 @@ export default async function AdminDashboard() {
             </span>
           ))}
           <span className="w-full text-muted-foreground sm:ml-auto sm:w-auto">
-            Conversion: <strong className="text-accent">{s.convRate}%</strong>
+            Paid-plan access (including grants): <strong className="text-accent">{s.convRate}%</strong>
           </span>
         </div>
       </div>

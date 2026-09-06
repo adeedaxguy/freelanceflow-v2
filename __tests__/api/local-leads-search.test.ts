@@ -2,6 +2,7 @@
 
 jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
+jest.mock("@/lib/audit-log", () => ({ recordAuditLog: jest.fn(async () => undefined) }));
 jest.mock("@/lib/usage", () => ({
   checkAndIncrementLeads: jest.fn(),
   getUsageStats: jest.fn(),

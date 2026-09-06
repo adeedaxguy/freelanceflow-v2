@@ -19,7 +19,7 @@ export async function GET() {
     prisma.lead.count({ where: { userId } }),
     prisma.sentEmail.count({ where: { userId, status: { in: OUTREACH_STATUSES } } }),
     prisma.sentEmail.count({ where: { userId, status: { in: DIRECT_EMAIL_STATUSES } } }),
-    prisma.sentEmail.count({ where: { userId, status: { in: ["OPENED", "DELIVERED"] } } }),
+    prisma.sentEmail.count({ where: { userId, status: "OPENED" } }),
     prisma.sentEmail.findMany({
       where: { userId, status: { in: OUTREACH_STATUSES }, sentAt: { gte: thirtyDaysAgo } },
       select: { sentAt: true },

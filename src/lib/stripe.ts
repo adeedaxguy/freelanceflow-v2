@@ -52,15 +52,18 @@ export function verifyStripeSignature(
   });
 }
 
-export async function stripeRequest<T>(config: StripeConfig, path: string, body: URLSearchParams) {
+export async function stripeRequest<T>(config: StripeConfig, path: string, body?: URLSearchParams, idempotencyKey?: string) {
   if (!config.secretKey) throw new Error("Stripe secret key is not configured.");
   const response = await fetch(`https://api.stripe.com/v1${path}`, {
-    method: "POST",
+    method: body ? "POST" : "GET",
     headers: {
       Authorization: `Bearer ${config.secretKey}`,
       "Content-Type": "application/x-www-form-urlencoded",
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
     },
     body,
+    cache: "no-store",
+    signal: AbortSignal.timeout(15_000),
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -78,6 +81,7 @@ type CheckoutInput = {
   description?: string;
   amountCents: number;
   priceId?: string;
+  idempotencyKey?: string;
   currency?: string;
   interval?: "month" | "year";
   successUrl: string;
@@ -114,7 +118,7 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
     body.set(`metadata[${key}]`, String(value));
     body.set(`subscription_data[metadata][${key}]`, String(value));
   }
-  return stripeRequest<{ id: string; url: string | null }>(config, "/checkout/sessions", body);
+  return stripeRequest<{ id: string; url: string | null }>(config, "/checkout/sessions", body, input.idempotencyKey);
 }
 
 export function isStripeCheckoutConfigured(config: StripeConfig) {
@@ -123,11 +127,27 @@ export function isStripeCheckoutConfigured(config: StripeConfig) {
 
 export async function createStripeBillingPortalSession(
   config: StripeConfig,
-  input: { customerId: string; returnUrl: string },
+  input: { customerId: string; returnUrl: string; subscriptionId?: string; priceId?: string; completedUrl?: string },
 ) {
   const body = new URLSearchParams({
     customer: input.customerId,
     return_url: input.returnUrl,
   });
+  if (input.subscriptionId && input.priceId) {
+    const subscription = await stripeRequest<{
+      customer: string;
+      items: { data: Array<{ id: string; quantity: number }> };
+    }>(config, `/subscriptions/${encodeURIComponent(input.subscriptionId)}`);
+    if (subscription.customer !== input.customerId) throw new Error("Subscription customer does not match.");
+    const item = subscription.items.data[0];
+    if (!item || subscription.items.data.length !== 1) throw new Error("Manage this subscription in billing settings.");
+    body.set("flow_data[type]", "subscription_update_confirm");
+    body.set("flow_data[subscription_update_confirm][subscription]", input.subscriptionId);
+    body.set("flow_data[subscription_update_confirm][items][0][id]", item.id);
+    body.set("flow_data[subscription_update_confirm][items][0][price]", input.priceId);
+    body.set("flow_data[subscription_update_confirm][items][0][quantity]", String(item.quantity || 1));
+    body.set("flow_data[after_completion][type]", "redirect");
+    body.set("flow_data[after_completion][redirect][return_url]", input.completedUrl ?? input.returnUrl);
+  }
   return stripeRequest<{ id: string; url: string }>(config, "/billing_portal/sessions", body);
 }

@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { recordAuditLog } from "@/lib/audit-log";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -54,7 +55,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "You cannot suspend your own account" }, { status: 400 });
     }
 
-    const existing = await prisma.user.findUnique({ where: { id }, select: { suspended: true } });
+    const existing = await prisma.user.findUnique({ where: { id }, select: { suspended: true, plan: true } });
     if (!existing) return NextResponse.json({ error: "User not found" }, { status: 404 });
     const data: Record<string, unknown> = {};
     if (plan !== undefined)      data.plan      = plan;
@@ -63,6 +64,9 @@ export async function PATCH(req: NextRequest) {
       if (suspended !== existing.suspended) data.sessionVersion = { increment: 1 };
     }
     await prisma.user.update({ where: { id }, data });
+    if (plan !== undefined && plan !== existing.plan) {
+      await recordAuditLog({ action: "plan_change", actorId: session.user.id, actorEmail: session.user.email, targetType: "User", targetId: id, details: { from: existing.plan, to: plan, source: "manual_admin_grant" } });
+    }
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: "Unable to update user" }, { status: 500 });

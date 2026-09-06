@@ -16,6 +16,8 @@ import MarketingEmailOptIn from "@/components/MarketingEmailOptIn";
 import { LeadStatusBadge, EmailStatusBadge } from "@/components/Badge";
 import { formatRelativeTime } from "@/lib/utils";
 import { DashboardOverviewAd } from "@/components/AdSenseUnit";
+import { getUsageStats } from "@/lib/usage";
+import { PLAN_MONTHLY_PRICES } from "@/lib/plan-pricing";
 
 const DIRECT_EMAIL_STATUSES = ["SENT", "DELIVERED", "OPENED", "BOUNCED", "FAILED"];
 const OUTREACH_STATUSES = [...DIRECT_EMAIL_STATUSES, "READY_TO_SEND"];
@@ -60,8 +62,8 @@ async function getDashboardData(userId: string) {
   const [directEmails, directEmailsPrev, openedEmails, openedEmailsPrev, responses, responsesPrev] = await Promise.all([
     prisma.sentEmail.count({ where: { userId, status: { in: DIRECT_EMAIL_STATUSES }, sentAt: { gte: thirtyDaysAgo } } }),
     prisma.sentEmail.count({ where: { userId, status: { in: DIRECT_EMAIL_STATUSES }, sentAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
-    prisma.sentEmail.count({ where: { userId, status: { in: ["OPENED", "DELIVERED"] } } }),
-    prisma.sentEmail.count({ where: { userId, status: { in: ["OPENED", "DELIVERED"] }, sentAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
+    prisma.sentEmail.count({ where: { userId, status: "OPENED", sentAt: { gte: thirtyDaysAgo } } }),
+    prisma.sentEmail.count({ where: { userId, status: "OPENED", sentAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
     prisma.lead.count({ where: { userId, status: "REPLIED" } }),
     prisma.lead.count({ where: { userId, status: "REPLIED", savedAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } } }),
   ]);
@@ -187,6 +189,14 @@ export default async function DashboardPage() {
 
   const firstName = session.user.name?.split(" ")[0] ?? "there";
   const isPro     = session.user.plan && session.user.plan !== "free";
+  const usage = await getUsageStats(session.user.id).catch(() => null);
+  const hasSavedLead = data.recentLeads.length > 0;
+  const hasOutreach = data.recentEmails.some(email => ["READY_TO_SEND", "SENT", "DELIVERED", "OPENED"].includes(email.status));
+  const nextAction = !hasSavedLead
+    ? { label: "Find your first prospect", href: "/dashboard/local-leads" }
+    : !hasOutreach
+      ? { label: "Prepare your first outreach", href: "/dashboard/saved-leads" }
+      : { label: "Review your follow-ups", href: "/dashboard/followups" };
 
   const greeting = (() => {
     const h = new Date().getHours();
@@ -235,7 +245,29 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {!marketingConsent && <MarketingEmailOptIn />}
+      {!dashboardDataError && (
+        <section aria-label="Your next step" className="border-y border-border py-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">{nextAction.label}</h2>
+              <ol className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2"><CheckCircle className={`h-4 w-4 ${hasSavedLead ? "text-accent" : ""}`} />{hasSavedLead ? "Prospect saved" : "1. Save a prospect"}</li>
+                <li className="flex items-center gap-2"><Send className={`h-4 w-4 ${hasOutreach ? "text-accent" : ""}`} />{hasOutreach ? "Outreach prepared" : "2. Prepare outreach"}</li>
+                <li className="flex items-center gap-2"><Bookmark className="h-4 w-4" />3. Track the conversation</li>
+              </ol>
+            </div>
+            <Link href={nextAction.href} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-white">
+              {hasSavedLead ? "Continue outreach" : "Find prospects"} <Search className="h-4 w-4" />
+            </Link>
+          </div>
+          {!isPro && usage && <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-t border-border pt-4">
+            <p className="text-sm text-muted-foreground">{usage.trialExpired
+              ? "Your trial has ended. Saved leads remain available; a paid plan continues discovery."
+              : `${usage.remaining} trial results remaining. Trial ends ${new Date(usage.trialEndsAt ?? usage.nextReset).toUTCString()}.`}</p>
+            <Link href="/dashboard/upgrade" className="shrink-0 text-sm font-semibold text-primary-light">Pro $${PLAN_MONTHLY_PRICES.pro} / Agency $${PLAN_MONTHLY_PRICES.agency} monthly</Link>
+          </div>}
+        </section>
+      )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)] gap-4">
         <DashboardStats stats={{
@@ -250,7 +282,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <DashboardOverviewAd />
+      {!isPro && hasSavedLead && <DashboardOverviewAd />}
+      {!marketingConsent && <MarketingEmailOptIn />}
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -270,10 +303,10 @@ export default async function DashboardPage() {
         {!isPro && (
           <div className="dashboard-surface flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="flex items-center gap-2 text-sm font-semibold text-accent">
-              <CheckCircle className="w-4 h-4" /> Free launch access is active
+              <CheckCircle className="w-4 h-4" /> {usage?.trialExpired ? "Trial complete" : "3-day trial"}
             </p>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Core lead discovery and proposal preparation are available now.
+              {usage?.trialExpired ? "Your saved work is still available." : "Up to 600 lead results. No automatic charge."}
             </p>
           </div>
         )}

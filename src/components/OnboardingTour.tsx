@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Zap, Search, GitMerge, Mail, CalendarDays, ArrowRight,
   X, ChevronLeft, CheckCircle,
@@ -48,28 +48,28 @@ const STEPS: TourStep[] = [
     cta:       "Let's go →",
   },
   {
-    id:        "email",
-    icon:      Mail,
-    iconColor: "text-blue-400",
-    title:     "Step 1 — Understand Gmail prepare mode",
-    body:      "No email connection is required. iCloseLeads prepares each proposal in Gmail compose so you can review it and click Send manually from your own inbox.",
-    mobileBody: "No email connection is required. Use the More menu for setup and outreach tools; proposals open as prepared Gmail drafts so you stay in control.",
-    selector:  'a[href="/dashboard/email-settings"]',
-    mobileSelector: '[data-tour="mobile-more"]',
-    href:      "/dashboard/email-settings",
-    cta:       "View setup →",
-  },
-  {
     id:        "leads",
     icon:      Search,
     iconColor: "text-primary-light",
-    title:     "Step 2 — Find your first leads",
-    body:      "Pick your niche, hit Search, and iCloseLeads pulls live opportunities from multiple lead channels. Each lead is scored by how well it matches your niche — filter by score to focus only on the best fits.",
-    mobileBody: "Tap Jobs to find remote opportunities matched to your niche. Your saved leads and AI proposal workflow stay connected as you move.",
-    selector:  'a[href="/dashboard/leads"]',
-    mobileSelector: '[data-tour="mobile-jobs"]',
-    href:      "/dashboard/leads",
-    cta:       "Find leads →",
+    title:     "Step 1 — Find a prospect",
+    body:      "Start with one business category and city. Check the website and contact evidence, then save businesses that fit your service.",
+    mobileBody: "Local opens business research by category and city. Remote and Live are also available for job and hiring opportunities.",
+    selector:  'a[href="/dashboard/local-leads"]',
+    mobileSelector: '[data-tour="mobile-local"]',
+    href:      "/dashboard/local-leads",
+    cta:       "Find prospects →",
+  },
+  {
+    id:        "outreach",
+    icon:      Mail,
+    iconColor: "text-blue-400",
+    title:     "Step 2 — Prepare a relevant message",
+    body:      "Choose a saved prospect and draft a proposal around their actual needs. Gmail prepare mode leaves the final review and sending to you.",
+    mobileBody: "Saved Leads is under More. Your prospects stay available as you research, prepare proposals and return to your shortlist.",
+    selector:  'a[href="/dashboard/saved-leads"]',
+    mobileSelector: '[data-tour="mobile-more"]',
+    href:      "/dashboard/saved-leads",
+    cta:       "Open saved leads →",
   },
   {
     id:        "pipeline",
@@ -88,7 +88,7 @@ const STEPS: TourStep[] = [
     icon:      Zap,
     iconColor: "text-yellow-400",
     title:     "Step 4 — Close deals with AI",
-    body:      "When a prospect replies, paste their message into AI Deal Closer. The AI detects their intent (price objection, timing issue, ready to buy…) and writes the perfect reply to move the deal forward.",
+    body:      "When a prospect replies, AI Deal Closer can help draft a response to their questions or objections. Review the facts and tone before sending.",
     mobileBody: "AI Deal Closer lives under More on mobile. Paste a prospect reply and get a clear next message without leaving the dashboard.",
     selector:  'a[href="/dashboard/deal-closer"]',
     mobileSelector: '[data-tour="mobile-more"]',
@@ -100,7 +100,7 @@ const STEPS: TourStep[] = [
     icon:      CalendarDays,
     iconColor: "text-orange-400",
     title:     "Step 5 — Plan follow-ups",
-    body:      "Most deals close on the 3rd or 4th touchpoint. Build a multi-step follow-up plan, then prepare each message in Gmail when it is time to reach out.",
+    body:      "Plan a relevant follow-up, keep track of the conversation, and respect opt-outs. Each Gmail message remains under your control.",
     mobileBody: "Follow-ups also live under More. Build your sequence, prepare each Gmail draft, and keep outreach moving without sending anything automatically.",
     selector:  'a[href="/dashboard/followups"]',
     mobileSelector: '[data-tour="mobile-more"]',
@@ -113,9 +113,9 @@ const STEPS: TourStep[] = [
     iconColor: "text-green-400",
     title:     "You're all set! 🎉",
     body:      "That's the full loop: find leads → prepare AI proposals in Gmail → close with AI → plan follow-ups. Go find your first lead and prepare your first proposal.",
-    mobileBody: "That's the mobile loop: Jobs for remote leads, Live for fresh hiring signals, Saved for follow-up, and More for the full toolkit.",
+    mobileBody: "Local, Remote and Live keep research together. Saved Leads and your follow-up tools are available under More.",
     cta:       "Start finding leads →",
-    href:      "/dashboard/leads",
+    href:      "/dashboard/local-leads",
   },
 ];
 
@@ -200,6 +200,7 @@ function tooltipPos(rect: Rect | null, cardW = 340, cardH = 260) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function OnboardingTour() {
   const router = useRouter();
+  const pathname = usePathname();
   const [step,    setStep]    = useState(0);
   const [visible, setVisible] = useState(false);
   const [rect,    setRect]    = useState<Rect | null>(null);
@@ -218,11 +219,11 @@ export default function OnboardingTour() {
   // Show tour only for users who haven't completed it
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (localStorage.getItem(STORAGE_KEY)) return;
+    if (localStorage.getItem(STORAGE_KEY) || pathname !== "/dashboard") return;
     // Small delay so the sidebar renders first
     const t = setTimeout(() => setVisible(true), 800);
     return () => clearTimeout(t);
-  }, []);
+  }, [pathname]);
 
   // Listen for the FloatingHelpButton restart event
   useEffect(() => {

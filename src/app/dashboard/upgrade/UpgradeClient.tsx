@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Zap, Crown, Loader2, ArrowRight, Shield, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { isPlanUpgrade } from "@/lib/plan-limits";
+import { PLAN_FEATURES } from "@/lib/plan-pricing";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 interface Props {
   currentPlan: string;
@@ -14,6 +17,8 @@ interface Props {
   canCheckout: boolean;
   hasBillingSubscription: boolean;
   checkoutReturned: boolean;
+  checkoutCancelled: boolean;
+  selectedPlan?: "pro" | "agency";
   pricing: {
     proPrice: string;
     agencyPrice: string;
@@ -31,24 +36,55 @@ export default function UpgradeClient({
   canCheckout,
   hasBillingSubscription,
   checkoutReturned,
+  checkoutCancelled,
+  selectedPlan,
 }: Props) {
+  const router = useRouter();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [loading, setLoading] = useState<string | null>(null);
-  const [message, setMessage] = useState(
-    checkoutReturned
-      ? "Checkout completed. Your plan activates after Stripe confirms the subscription. This normally takes a few seconds."
-      : "",
-  );
+  const [message, setMessage] = useState("");
+  const [activationPending, setActivationPending] = useState(checkoutReturned);
+  const [activationDelayed, setActivationDelayed] = useState(false);
 
-  const proMonthly    = parseInt(pricing.proPrice);
-  const agencyMonthly = parseInt(pricing.agencyPrice);
+  const proMonthly    = Number(pricing.proPrice);
+  const agencyMonthly = Number(pricing.agencyPrice);
   const proAnnual     = Math.round(proMonthly * 10);
   const agencyAnnual  = Math.round(agencyMonthly * 10);
   const hasHighestPlan = currentPlan === "agency";
 
+  useEffect(() => {
+    trackAnalyticsEvent("view_plans", { current_plan: currentPlan, selected_plan: selectedPlan });
+  }, [currentPlan, selectedPlan]);
+
+  useEffect(() => {
+    if (!checkoutReturned || billingTestMode) { setActivationPending(false); return; }
+    if (selectedPlan && currentPlan === selectedPlan) { setActivationPending(false); return; }
+    let attempts = 0;
+    const controller = new AbortController();
+    const timer = window.setInterval(async () => {
+      attempts++;
+      try {
+        const response = await fetch("/api/usage", { signal: controller.signal });
+        const usage = response.ok ? await response.json() : null;
+        if (usage && (selectedPlan ? usage.plan === selectedPlan : usage.plan !== "free")) {
+          window.clearInterval(timer);
+          setActivationPending(false);
+          router.refresh();
+          return;
+        }
+      } catch { /* A delayed webhook or connection can be retried without another charge. */ }
+      if (attempts >= 10) {
+        window.clearInterval(timer);
+        setActivationDelayed(true);
+      }
+    }, 3000);
+    return () => { controller.abort(); window.clearInterval(timer); };
+  }, [checkoutReturned, billingTestMode, currentPlan, selectedPlan, router]);
+
   async function handleUpgrade(plan: string) {
     setLoading(plan);
     setMessage("");
+    trackAnalyticsEvent("begin_checkout", { plan, billing_interval: billing });
     try {
       const res = await fetch("/api/user/upgrade", {
         method: "POST",
@@ -60,6 +96,7 @@ export default function UpgradeClient({
         window.location.href = data.url;
       } else if (data.error) {
         setMessage(data.error);
+        trackAnalyticsEvent("checkout_error", { plan, status: res.status });
       } else {
         setMessage("Something went wrong. Please contact support.");
       }
@@ -94,15 +131,7 @@ export default function UpgradeClient({
       description: "Explore the core workflow without a card",
       color: "border-border",
       badge: null,
-      features: [
-        "600 lead results during your 3-day trial",
-        "AI proposal drafting during the trial",
-        "Live job and local lead discovery",
-        "3 active campaigns",
-        "CRM pipeline and saved leads",
-        "Softphone option with paid number and minute add-ons",
-        "Community support",
-      ],
+      features: PLAN_FEATURES.free,
       cta: "Current Plan",
     },
     {
@@ -112,19 +141,8 @@ export default function UpgradeClient({
       price: { monthly: proMonthly, annual: proAnnual },
       description: "For freelancers landing clients consistently",
       color: "border-primary/40 shadow-glow-primary",
-      badge: "Most Popular",
-      features: [
-        `${pricing.proLeads} leads per week`,
-        "Unlimited AI proposals",
-        "Multi-niche lead scans",
-        "Priority freshness across lead discovery",
-        "10 active campaigns",
-        "CSV export and CRM sync",
-        "Analytics dashboard",
-        "Custom proposal templates",
-        "Softphone option with paid number and minute add-ons",
-        "Priority email support",
-      ],
+      badge: "For solo outreach",
+      features: PLAN_FEATURES.pro,
       cta: "Upgrade to Pro",
     },
     {
@@ -132,21 +150,10 @@ export default function UpgradeClient({
       name: "Agency",
       icon: <Crown className="w-5 h-5 text-gold" />,
       price: { monthly: agencyMonthly, annual: agencyAnnual },
-      description: "For teams running outreach at scale",
+      description: `More prospecting capacity for $${agencyMonthly - proMonthly}/mo extra`,
       color: "border-gold/30",
       badge: "Best Value",
-      features: [
-        "Unlimited leads",
-        "Unlimited AI proposals",
-        "Unlimited campaigns",
-        "White-label proposals",
-        "5 team seats",
-        "API access",
-        "Softphone option with paid number and minute add-ons",
-        "Custom integrations",
-        "Dedicated account manager",
-        "SLA guarantee",
-      ],
+      features: PLAN_FEATURES.agency,
       cta: "Upgrade to Agency",
     },
   ];
@@ -160,7 +167,7 @@ export default function UpgradeClient({
             <p className="text-muted-foreground mt-2">
               You&apos;re currently on the <span className="text-foreground font-semibold capitalize">{currentPlan}</span> plan.
               {hasHighestPlan
-                ? " Your complete plan is active. Use Manage billing for subscription changes."
+                ? " Agency access is active. Billing status is separate from account access."
                 : " Upgrade securely through Stripe for higher limits and more outreach capacity."}
             </p>
             <p className="text-xs text-muted-foreground mt-1">Account: {userEmail}</p>
@@ -182,8 +189,8 @@ export default function UpgradeClient({
       {!canCheckout && (
         <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
           {billingReady && billingTestMode
-            ? "Paid plans are in private Stripe checkout testing. Free access remains available while we finish verification."
-            : "Stripe checkout is being configured. You can keep using the Free plan without a card."}
+            ? "Paid plans are in private Stripe checkout testing. Your saved leads remain accessible."
+            : "Stripe checkout is temporarily unavailable. Your saved leads remain accessible. Please contact support if you need to renew."}
         </div>
       )}
       {canCheckout && billingTestMode && (
@@ -191,6 +198,17 @@ export default function UpgradeClient({
           Stripe test mode is active for admins. These checkouts do not change production plan access.
         </div>
       )}
+
+      {checkoutReturned && (
+        <div role="status" className="mb-6 border-l border-accent pl-4 text-sm text-foreground">
+          {billingTestMode ? "Test checkout returned. Test payments do not change your live plan." : activationPending
+            ? activationDelayed ? "Stripe confirmation is taking longer than usual. Do not pay again. Refresh this page or contact support with your receipt." : "Waiting for Stripe to confirm your subscription..."
+            : "Your paid-plan access is ready. Stripe sends your billing receipt separately."}
+          <Link href="/dashboard/local-leads" className="mt-2 inline-flex items-center gap-2 text-primary-light">Find prospects <ArrowRight className="h-4 w-4" /></Link>
+        </div>
+      )}
+      {checkoutCancelled && <p role="status" className="mb-6 text-sm text-muted-foreground">You returned from checkout. Review your plan below, or keep working with your saved leads.</p>}
+      <p className="mb-6 text-sm text-muted-foreground">Choose Pro for a focused solo workflow. Choose Agency for higher outreach volume or API access. Every plan uses the same lead-quality checks; results and replies are not guaranteed.</p>
 
       {/* Billing toggle */}
       <div className="flex items-center gap-3 mb-8">
@@ -211,7 +229,7 @@ export default function UpgradeClient({
       </div>
 
       {message && (
-        <div className="mb-6 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+        <div role="alert" className="mb-6 px-4 py-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
           {message}
         </div>
       )}
@@ -228,9 +246,9 @@ export default function UpgradeClient({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative bg-gradient-card border rounded-2xl p-6 flex flex-col ${plan.color} ${isCurrentPlan ? "ring-2 ring-primary/30" : ""}`}
+              className={`relative bg-card border rounded-lg p-6 flex flex-col ${plan.color} ${isCurrentPlan || selectedPlan === plan.id ? "ring-2 ring-primary/30" : ""}`}
             >
-              {plan.badge && (
+              {plan.badge && !isCurrentPlan && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-white text-xs font-bold shadow-glow-primary whitespace-nowrap">
                   {plan.badge}
                 </div>
@@ -289,7 +307,7 @@ export default function UpgradeClient({
               ) : (
                 <button
                   onClick={() => void handleUpgrade(plan.id)}
-                  disabled={!!loading || !canCheckout}
+                  disabled={!!loading || !canCheckout || activationPending}
                   className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white text-sm font-semibold transition-all disabled:opacity-60 ${
                     plan.id === "pro" ? "bg-primary hover:bg-primary-light shadow-glow-primary" : "bg-gradient-to-r from-gold/80 to-amber-500 hover:from-gold hover:to-amber-400 shadow-lg shadow-gold/20"
                   }`}
@@ -299,7 +317,7 @@ export default function UpgradeClient({
                   ) : (
                     <ArrowRight className="w-4 h-4" />
                   )}
-                  {canCheckout ? (billingTestMode ? `Test ${plan.name} checkout` : plan.cta) : "Coming soon"}
+                  {activationPending ? "Awaiting confirmation" : canCheckout ? (billingTestMode ? `Test ${plan.name} checkout` : plan.cta) : "Temporarily unavailable"}
                 </button>
               )}
             </motion.div>
@@ -319,11 +337,11 @@ export default function UpgradeClient({
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
-          Tax handled at checkout
+          Clear recurring billing
         </div>
         <div className="flex items-center gap-1.5">
           <Check className="w-4 h-4 text-accent" />
-          Works worldwide
+          USD pricing
         </div>
       </div>
 
