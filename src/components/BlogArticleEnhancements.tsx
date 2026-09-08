@@ -30,6 +30,74 @@ const GOOGLE_MAPS_PROSPECTING_SLUGS = new Set([
   "google-maps-prospecting-tool-for-agencies",
 ]);
 
+const GSC_INTENT_FUNNELS: Record<string, {
+  title: string;
+  summary: string;
+  ctaLabel: string;
+  intent: string;
+}> = {
+  "freelance-client-acquisition-system-free": {
+    title: "Build the free version of the system now",
+    summary: "Choose one service and market, use the weekly free lead allowance, save the evidence behind each prospect, and leave the session with a reviewed first message and follow-up date.",
+    ctaLabel: "Start the free workflow",
+    intent: "free-client-acquisition-system",
+  },
+  "freelance-client-acquisition-system-pdf": {
+    title: "Turn the PDF plan into a working pipeline",
+    summary: "Use the worksheet to define one offer and market, then run the lead search, qualification, proposal, and follow-up steps in the same session so the document becomes an operating plan.",
+    ctaLabel: "Run the client acquisition plan",
+    intent: "client-acquisition-system-pdf",
+  },
+  "outreach-to-businesses-with-no-website": {
+    title: "Turn a missing website into a useful first step",
+    summary: "Verify that the business is active, identify the customer action a website could improve, and prepare a small proof-led offer instead of sending a generic redesign pitch.",
+    ctaLabel: "Find qualified website leads",
+    intent: "businesses-without-websites",
+  },
+  "best-lead-sources-for-web-design-agencies": {
+    title: "Compare lead sources with a live campaign",
+    summary: "Test one source at a time, keep the niche and offer fixed, and compare qualified leads, usable contact routes, replies, and booked conversations instead of raw list size.",
+    ctaLabel: "Test a web design lead source",
+    intent: "web-design-lead-sources",
+  },
+  "find-clients-for-ai-consulting": {
+    title: "Find AI consulting leads with visible workflow pain",
+    summary: "Look for repetitive manual work, disconnected systems, slow reporting, or high-volume support tasks, then save the public evidence and propose one bounded automation discovery step.",
+    ctaLabel: "Find AI consulting leads",
+    intent: "ai-consulting-leads",
+  },
+  "web-design-leads-data-led-workflow": {
+    title: "Move from website signal to a proposal-ready lead",
+    summary: "Search one niche and city, verify the website or booking gap, save the proof, and use it to prepare a specific concept, proposal, email, or permitted call opener.",
+    ctaLabel: "Search web design leads",
+    intent: "web-design-leads",
+  },
+  "local-business-leads-scorecard-for-freelancers": {
+    title: "Score the next local lead before you contact it",
+    summary: "Use activity, customer-path friction, service fit, public contact routes, and a credible first offer to decide whether a local business belongs in the pipeline.",
+    ctaLabel: "Open local lead search",
+    intent: "local-lead-scorecard",
+  },
+  "proposal-ready-leads-for-freelancers": {
+    title: "Prepare one lead for a real proposal",
+    summary: "Keep the source, business signal, buyer fit, contact path, offer angle, and next action together so the proposal starts from evidence rather than a blank template.",
+    ctaLabel: "Build a proposal-ready lead",
+    intent: "proposal-ready-leads",
+  },
+  "600-free-leads-week-client-acquisition-plan": {
+    title: "Use the 600-lead allowance as a qualification budget",
+    summary: "Split the weekly allowance across focused searches, reject weak matches early, and measure saved qualified leads, reviewed outreach, replies, and follow-ups instead of celebrating exports.",
+    ctaLabel: "Start with 600 leads free",
+    intent: "600-free-leads-plan",
+  },
+  "600-free-leads-weekly-sprint-for-web-designers": {
+    title: "Run a focused web design lead sprint",
+    summary: "Choose one service-business niche, find active companies with a visible website or conversion gap, and turn the strongest evidence into a small audit, concept, proposal, or call opener.",
+    ctaLabel: "Start the web design sprint",
+    intent: "600-web-design-leads",
+  },
+};
+
 const CLIENT_ACQUISITION_SYSTEM_VISUALS = [
   {
     src: "/blog-images/freelancer-client-acquisition-system-funnel.svg",
@@ -162,6 +230,24 @@ function getDefaultConversionFunnel(post: BlogArticleSource) {
     return {
       ...GOOGLE_MAPS_PROSPECTING_FUNNEL,
       ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=organic-google-maps-guide`,
+    };
+  }
+
+  const gscFunnel = GSC_INTENT_FUNNELS[post.slug];
+  if (gscFunnel) {
+    return {
+      eyebrow: "From search to action",
+      title: gscFunnel.title,
+      summary: gscFunnel.summary,
+      ctaLabel: gscFunnel.ctaLabel,
+      ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(gscFunnel.intent)}&source=gsc-priority-guide`,
+      proofNote: "Start with one focused search and one qualified lead. Review every proposal, email, and call plan before it is used.",
+      steps: [
+        { title: "Choose one market", detail: "Keep the service, niche, location, and buyer problem specific enough to review each result." },
+        { title: "Verify the signal", detail: "Open the public source, confirm the business is active, and record the exact reason the lead fits." },
+        { title: "Prepare the first value", detail: "Use a small audit, proposal, website concept, email draft, or permitted call opener that matches the evidence." },
+        { title: "Schedule the follow-up", detail: "Save the lead, review the message manually, and record the next action before starting another search." },
+      ],
     };
   }
 
