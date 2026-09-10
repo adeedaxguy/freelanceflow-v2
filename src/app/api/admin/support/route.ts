@@ -6,17 +6,19 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
+import { createHash } from "crypto";
+import { notifySupportRequest } from "@/lib/support-notifications";
+import { sendPlatformEmail } from "@/lib/admin-notifications";
+import { emailToHtml } from "@/lib/resend";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id || !["ADMIN", "MANAGER"].includes(session.user.role ?? ""))
-    throw new Error("Forbidden");
-  return session;
+  return session?.user?.id && ["ADMIN", "MANAGER"].includes(session.user.role ?? "") ? session : null;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    await requireAdmin();
+    if (!await requireAdmin()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const { searchParams } = new URL(req.url);
     const status   = searchParams.get("status") ?? "all";
     const page     = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
@@ -82,7 +84,7 @@ export async function POST(req: NextRequest) {
       at: new Date().toISOString(),
     }]);
 
-    await prisma.supportTicket.create({
+    const ticket = await prisma.supportTicket.create({
       data: {
         userId:   session?.user?.id ?? null,
         email:    body.email,
@@ -92,6 +94,10 @@ export async function POST(req: NextRequest) {
         category: body.category ?? null,
       },
     });
+    await notifySupportRequest({
+      id: ticket.id, source: "ticket", email: body.email,
+      subject: body.subject, message: body.message,
+    });
     return NextResponse.json({ success: true }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Unable to create support ticket" }, { status: 500 });
@@ -99,16 +105,17 @@ export async function POST(req: NextRequest) {
 }
 
 const patchSchema = z.object({
-  id:       z.string(),
+  id:       z.string().min(1).max(128),
   status:   z.enum(["open", "in_progress", "resolved", "closed"]).optional(),
-  priority: z.string().optional(),
-  reply:    z.string().optional(),
+  priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
+  reply:    z.string().trim().min(1).max(5000).optional(),
   assignedTo: z.string().optional().nullable(),
 });
 
 export async function PATCH(req: NextRequest) {
   try {
     const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const body = await req.json() as unknown;
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 });
@@ -118,7 +125,7 @@ export async function PATCH(req: NextRequest) {
     // Fetch current ticket messages
     const existing = await prisma.supportTicket.findUnique({
       where: { id },
-      select: { messages: true },
+      select: { messages: true, email: true, subject: true },
     });
     if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -126,6 +133,15 @@ export async function PATCH(req: NextRequest) {
     try { messages = JSON.parse(existing.messages) as unknown[]; } catch { messages = []; }
 
     if (reply) {
+      if (!z.string().email().safeParse(existing.email).success || existing.email === "unknown@user.com") {
+        return NextResponse.json({ error: "This older ticket has no valid reply address. Do not send until the customer provides one." }, { status: 400 });
+      }
+      const delivery = await sendPlatformEmail({
+        recipient: existing.email, subject: `Re: ${existing.subject.replace(/[\r\n]/g, " ")}`,
+        text: reply, html: emailToHtml(reply), replyTo: "hello@icloseleads.com",
+        idempotencyKey: `support-reply:${id}:${createHash("sha256").update(existing.messages + reply).digest("hex")}`,
+      }).catch(() => null);
+      if (!delivery?.success) return NextResponse.json({ error: "Reply was not emailed. Please try again; your draft has not been saved as sent." }, { status: 502 });
       messages.push({ role: "admin", text: reply, adminEmail: session.user.email, at: new Date().toISOString() });
     }
 
@@ -134,9 +150,9 @@ export async function PATCH(req: NextRequest) {
     if (priority   !== undefined) updateData.priority   = priority;
     if (assignedTo !== undefined) updateData.assignedTo = assignedTo;
 
-    await prisma.supportTicket.update({ where: { id }, data: updateData });
+    const ticket = await prisma.supportTicket.update({ where: { id }, data: updateData });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, ticket });
   } catch {
     return NextResponse.json({ error: "Unable to update support ticket" }, { status: 500 });
   }

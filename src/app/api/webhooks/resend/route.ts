@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureAdminMailboxTable, extractEmailAddress, plainTextFromEmail } from "@/lib/admin-mailbox";
 import { prisma } from "@/lib/prisma";
 import { getResendClient } from "@/lib/resend";
+import { notifySupportRequest } from "@/lib/support-notifications";
 
 const DELIVERY_STATUSES: Record<string, string> = {
   "email.sent": "SENT",
@@ -40,13 +41,13 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "email.received") {
     const mailbox = (process.env.RESEND_FROM_EMAIL ?? "hello@icloseleads.com").toLowerCase();
-    const recipients = [...event.data.to, ...event.data.received_for].map((value) => extractEmailAddress(value).toLowerCase());
-    if (!recipients.includes(mailbox)) return NextResponse.json({ received: true, ignored: true });
+    const recipients = [...event.data.to, ...(event.data.received_for ?? [])].map((value) => extractEmailAddress(value).toLowerCase());
+    if (!recipients.some(recipient => [mailbox, "hello@icloseleads.com", "support@icloseleads.com"].includes(recipient))) return NextResponse.json({ received: true, ignored: true });
 
     const { data, error } = await getResendClient().emails.receiving.get(event.data.email_id);
     if (error || !data) return NextResponse.json({ error: "Email could not be retrieved." }, { status: 502 });
 
-    await prisma.adminMailboxMessage.upsert({
+    const message = await prisma.adminMailboxMessage.upsert({
       where: { externalId: data.id },
       update: {
         fromEmail: extractEmailAddress(data.from),
@@ -66,6 +67,14 @@ export async function POST(req: NextRequest) {
         createdAt: new Date(data.created_at),
       },
     });
+    // Our form notifications already alert the owner; do not forward them again.
+    const fromEmail = extractEmailAddress(data.from).toLowerCase();
+    if (![mailbox, "hello@icloseleads.com", "support@icloseleads.com", "adnan.webexpert@gmail.com"].includes(fromEmail)) {
+      await notifySupportRequest({
+        id: message.id, source: "email", email: fromEmail,
+        subject: message.subject, message: message.body,
+      });
+    }
     return NextResponse.json({ received: true });
   }
 

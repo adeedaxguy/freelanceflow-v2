@@ -6,7 +6,7 @@ import {
   ChevronDown, Send, RefreshCw, User, Shield,
 } from "lucide-react";
 
-interface TicketMessage { role: "user" | "admin"; text: string; adminEmail?: string; at: string; }
+interface TicketMessage { role: "user" | "admin" | "assistant"; text?: string; content?: string; adminEmail?: string; at?: string; }
 interface Ticket {
   id: string; userId: string | null; email: string; subject: string;
   messages: string; status: string; priority: string; category: string | null;
@@ -34,6 +34,7 @@ export default function AdminSupportPage() {
   const [selected, setSelected]   = useState<Ticket | null>(null);
   const [reply, setReply]         = useState("");
   const [sending, setSending]     = useState(false);
+  const [error, setError]         = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [counts, setCounts]       = useState<Record<string, number>>({});
 
@@ -55,17 +56,21 @@ export default function AdminSupportPage() {
   async function handleReply() {
     if (!selected || !reply.trim()) return;
     setSending(true);
-    await fetch("/api/admin/support", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selected.id, reply: reply.trim(), status: "in_progress" }),
-    });
-    setReply("");
-    setSending(false);
-    await load();
-    // Refresh selected ticket
-    const fresh = tickets.find(t => t.id === selected.id);
-    if (fresh) setSelected(fresh);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/support", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selected.id, reply: reply.trim(), status: "in_progress" }),
+      });
+      const data = await response.json() as { ticket?: Ticket; error?: string };
+      if (!response.ok || !data.ticket) throw new Error(data.error || "Reply could not be sent. Please try again.");
+      setReply("");
+      setSelected(data.ticket);
+      await load();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Reply could not be sent. Please try again.");
+    } finally { setSending(false); }
   }
 
   async function updateStatus(id: string, status: string) {
@@ -143,7 +148,7 @@ export default function AdminSupportPage() {
               const msgs = parsedMessages(t);
               const isSelected = selected?.id === t.id;
               return (
-                <button key={t.id} onClick={() => setSelected(t)}
+                <button key={t.id} disabled={sending} onClick={() => { setSelected(t); setReply(""); setError(""); }}
                   className={`w-full text-left p-4 border-b border-border/40 transition-all ${
                     isSelected ? "bg-primary/10 border-l-2 border-l-primary" : "hover:bg-primary/5"
                   }`}>
@@ -244,14 +249,14 @@ export default function AdminSupportPage() {
                 }`}>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-medium text-foreground">
-                      {msg.role === "admin" ? (msg.adminEmail ?? "Admin") : selected.email}
+                      {msg.role === "admin" ? (msg.adminEmail ?? "Admin") : msg.role === "assistant" ? "AI assistant" : selected.email}
                     </span>
                     <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
                       <Clock className="w-2.5 h-2.5" />
-                      {new Date(msg.at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      {new Date(msg.at || selected.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{msg.text}</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap break-words">{msg.text || msg.content}</p>
                 </div>
               </div>
             ))}
@@ -260,11 +265,14 @@ export default function AdminSupportPage() {
           {/* Reply box */}
           {!["resolved","closed"].includes(selected.status) && (
             <div className="border-t border-border p-4 flex-shrink-0">
+              {error && <p role="alert" className="mb-2 text-sm text-red-400">{error}</p>}
               <textarea
                 value={reply}
                 onChange={e => setReply(e.target.value)}
                 placeholder="Type your reply…"
                 rows={3}
+                maxLength={5000}
+                aria-label="Email reply"
                 className="w-full px-4 py-3 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 resize-none"
               />
               <div className="flex items-center justify-end gap-2 mt-2">

@@ -10,6 +10,7 @@ jest.mock("next/server", () => ({
 }));
 jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
+jest.mock("@/lib/support-notifications", () => ({ notifySupportRequest: jest.fn() }));
 jest.mock("@/lib/security-rate-limit", () => ({
   getClientIp: jest.fn(() => "127.0.0.1"),
   rateLimitHeaders: jest.fn(() => ({})),
@@ -27,6 +28,7 @@ jest.mock("@/lib/prisma", () => ({
 
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { notifySupportRequest } from "@/lib/support-notifications";
 import { GET, PATCH, POST } from "./route";
 
 function request(method: string, body?: unknown, query = "") {
@@ -75,6 +77,9 @@ describe("contact route authorization", () => {
       message: "Please help me with my account.",
     }));
     expect(response.status).toBe(201);
+    expect(notifySupportRequest).toHaveBeenCalledWith(expect.objectContaining({
+      id: "contact-1", source: "contact", email: "user@example.com",
+    }));
     await expect(response.json()).resolves.toEqual({ success: true });
     expect(prisma.contactSubmission.create).toHaveBeenCalledWith({ data: {
       name: "A User",

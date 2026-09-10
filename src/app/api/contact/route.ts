@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
+import { notifySupportRequest } from "@/lib/support-notifications";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -32,7 +33,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.contactSubmission.create({ data: parsed.data });
+    const submission = await prisma.contactSubmission.create({ data: parsed.data });
+    await notifySupportRequest({
+      id: submission.id, source: "contact", email: parsed.data.email,
+      subject: `Contact from ${parsed.data.name}`, message: parsed.data.message,
+    });
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (err) {
     console.error("Contact form error:", err);

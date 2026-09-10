@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
+import Link from "next/link";
 import { Send, Bot, Loader2, TicketCheck, MessageCircle, Sparkles, X } from "lucide-react";
 
 interface Message { role: "user" | "assistant"; content: string; }
@@ -38,15 +39,16 @@ export default function SupportPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [...messages, userMsg].filter((m, i) => !(m.role === "assistant" && i === 0)),
+          messages: [...messages, userMsg].filter((m, i) => !(m.role === "assistant" && i === 0)).slice(-40),
           email: email || undefined,
         }),
       });
       const data = await res.json() as { reply?: string; ticketCreated?: boolean; error?: string };
+      if (!res.ok) throw new Error(data.error || "Chat is unavailable. Please use Contact support.");
       setMessages(prev => [...prev, { role: "assistant", content: data.reply ?? "Sorry, I couldn't process that. Please try again." }]);
       if (data.ticketCreated) setTicketCreated(true);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Connection error. Please try again." }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: "assistant", content: error instanceof Error ? error.message : "Connection error. Please use Contact support." }]);
     } finally {
       setLoading(false);
     }
@@ -70,11 +72,16 @@ export default function SupportPage() {
         </div>
       </div>
 
+      <div className="mb-5 flex flex-wrap items-center gap-4 text-sm">
+        <Link href="/contact" className="font-semibold text-primary-light hover:underline">Contact support</Link>
+        <a href="mailto:hello@icloseleads.com" className="text-muted-foreground hover:underline">hello@icloseleads.com</a>
+      </div>
+
       {/* Ticket created banner */}
       {ticketCreated && (
         <div className="mb-4 flex items-center gap-3 px-4 py-3 bg-accent/10 border border-accent/30 rounded-xl text-accent text-sm">
           <TicketCheck className="w-4 h-4 flex-shrink-0" />
-          <span>Support ticket created — our team will follow up via email within 24 hours.</span>
+          <span>Support ticket saved. Our team will follow up by email.</span>
         </div>
       )}
 
@@ -105,11 +112,7 @@ export default function SupportPage() {
                 <Bot className="w-4 h-4 text-white" />
               </div>
               <div className="bg-surface border border-border rounded-2xl rounded-tl-sm px-4 py-3">
-                <div className="flex gap-1">
-                  {[0, 150, 300].map(d => (
-                    <div key={d} className="w-2 h-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: `${d}ms` }} />
-                  ))}
-                </div>
+                <Loader2 aria-label="Preparing reply" className="h-4 w-4 animate-spin text-primary-light" />
               </div>
             </div>
           )}
@@ -132,11 +135,11 @@ export default function SupportPage() {
         <div className="border-t border-border p-4">
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
-              value={input} onChange={e => setInput(e.target.value)}
+              value={input} onChange={e => setInput(e.target.value)} maxLength={4000} aria-label="Support message"
               placeholder="Describe your issue…"
               className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
             />
-            <button type="submit" disabled={loading || !input.trim()}
+            <button type="submit" disabled={loading || !input.trim()} aria-label="Send support message"
               className="w-10 h-10 rounded-xl bg-gradient-hero flex items-center justify-center text-white shadow-glow-primary hover:opacity-90 transition-opacity disabled:opacity-40">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             </button>

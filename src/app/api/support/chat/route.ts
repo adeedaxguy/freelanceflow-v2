@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { supportChat } from "@/lib/groq";
 import { z } from "zod";
 import { getClientIp, rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
+import { notifySupportRequest } from "@/lib/support-notifications";
 
 const schema = z.object({
   messages: z.array(z.object({
@@ -47,21 +48,38 @@ export async function POST(req: NextRequest) {
 
     let ticketCreated = false;
     if (shouldCreateTicket) {
-      const userEmail = email ?? session?.user?.email ?? "unknown@user.com";
+      const userEmail = session?.user?.email ?? email;
+      if (!userEmail) {
+        return NextResponse.json({
+          reply: "Please add your email below and send your request again, or use Contact support. We need a reply address to follow up.",
+          ticketCreated: false, needsEmail: true,
+        });
+      }
+      const ticketLimit = await securityRateLimit("support-ticket", session?.user?.id ?? getClientIp(req.headers), 5, 60 * 60 * 1000);
+      if (!ticketLimit.allowed) {
+        return NextResponse.json({ error: "Too many support requests. Please email hello@icloseleads.com." }, {
+          status: 429, headers: rateLimitHeaders(ticketLimit),
+        });
+      }
       const firstMsg = messages.find(m => m.role === "user")?.content ?? "Support request";
       try {
-        await prisma.supportTicket.create({
+        const ticket = await prisma.supportTicket.create({
           data: {
             userId:   session?.user?.id ?? null,
             email:    userEmail,
             subject:  firstMsg.slice(0, 100),
-            messages: JSON.stringify(messages),
+            messages: JSON.stringify(messages.map(message => ({ role: message.role, text: message.content, at: new Date().toISOString() }))),
             status:   "open",
           },
+        });
+        await notifySupportRequest({
+          id: ticket.id, source: "ticket", email: userEmail, subject: firstMsg.slice(0, 100),
+          message: messages.map(message => `${message.role}: ${message.content}`).join("\n\n"),
         });
         ticketCreated = true;
       } catch (ticketError) {
         console.error("Support ticket creation failed:", ticketError);
+        return NextResponse.json({ error: "We could not save your ticket. Please use Contact support or email hello@icloseleads.com." }, { status: 503 });
       }
     }
 

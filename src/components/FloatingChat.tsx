@@ -31,9 +31,10 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
   const pathname = usePathname();
   const [open,       setOpen]      = useState(initialOpen);
   const [messages,   setMessages]  = useState<Message[]>([
-    { role: "assistant", content: "Hi, I'm iCloseLeads AI. Tell me what kind of clients you want, and I'll point you to the best lead engine, explain the workflow, or draft a pitch. Free early access is open while Pro and Agency plans are being prepared." },
+    { role: "assistant", content: "Hi, I'm iCloseLeads AI. I can help with leads, proposals, billing, or calling. For account help from our team, choose Contact support below." },
   ]);
   const [input,      setInput]     = useState("");
+  const [email,      setEmail]     = useState("");
   const [loading,    setLoading]   = useState(false);
   const [ticket,     setTicket]    = useState(false);
   const [unread,     setUnread]    = useState(0);
@@ -67,21 +68,21 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
       const res = await fetch("/api/support/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updated.map(m => ({ role: m.role, content: m.content })) }),
+        body: JSON.stringify({ messages: updated.slice(-40).map(m => ({ role: m.role, content: m.content })), email: email.trim() || undefined }),
       });
-      if (!res.ok) throw new Error("Chat request failed");
       type ChatResponse = { reply?: string; ticketCreated?: boolean; error?: string };
       const data = await res.json() as ChatResponse;
+      if (!res.ok) throw new Error(data.error || "Chat is unavailable. Use Contact support below or email hello@icloseleads.com.");
       const reply = data.reply ?? "Sorry, I couldn't get a response. Please try again.";
       setMessages(prev => [...prev, { role: "assistant", content: reply }]);
       if (data.ticketCreated) setTicket(true);
       if (!open) setUnread(n => n + 1);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "I hit a connection issue, but you can try again right here. Ask for a remote job search workflow, a local business pitch, or a proposal draft." }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: "assistant", content: error instanceof Error ? error.message : "Chat is unavailable. Use Contact support below or email hello@icloseleads.com." }]);
     } finally {
       setLoading(false);
     }
-  }, [loading, messages, open]);
+  }, [loading, messages, open, email]);
 
   return (
     <>
@@ -89,9 +90,9 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
       {open && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setOpen(false)} />}
 
       {/* Chat panel */}
-      <div className={`fixed ${panelOffsetClass} right-4 sm:right-6 z-50 transition-all duration-300 ${open ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4 pointer-events-none"}`}>
+      {open && <div className={`fixed ${panelOffsetClass} right-4 sm:right-6 z-50`}>
         <div className="w-[calc(100vw-32px)] sm:w-[380px] bg-surface border border-border rounded-2xl shadow-card-hover overflow-hidden flex flex-col"
-          style={{ maxHeight: "min(560px, calc(100vh - 120px))" }}>
+          style={{ maxHeight: `min(600px, calc(100dvh - ${isDashboard ? 180 : 112}px))` }}>
 
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-primary/20 to-accent/10 border-b border-border flex-shrink-0">
@@ -113,14 +114,14 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-3" aria-live="polite">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                 <div className={`w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center ${msg.role === "user" ? "bg-primary text-white" : "bg-primary/15 text-primary-light"}`}>
                   {msg.role === "user" ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                 </div>
                 <div className="max-w-[80%]">
-                  <div className={`rounded-xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap ${msg.role === "user" ? "bg-primary text-white rounded-tr-sm" : "bg-background border border-border text-foreground rounded-tl-sm"}`}>
+                  <div className={`rounded-xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap break-words ${msg.role === "user" ? "bg-primary text-white rounded-tr-sm" : "bg-background border border-border text-foreground rounded-tl-sm"}`}>
                     {msg.content}
                   </div>
                   {shouldShowSignupCta(msg) && (
@@ -167,6 +168,13 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
 
           {/* Input */}
           <div className="px-4 py-3 border-t border-border flex-shrink-0">
+            <div className="mb-3 flex items-center justify-between gap-2 text-xs">
+              <Link href="/contact" className="font-semibold text-primary-light hover:underline">Contact support</Link>
+              <a href="mailto:hello@icloseleads.com" className="text-muted-foreground hover:underline">Email us</a>
+            </div>
+            <label htmlFor="chat-reply-email" className="mb-1 block text-xs text-muted-foreground">Reply email (for guest support)</label>
+            <input id="chat-reply-email" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} maxLength={254}
+              className="mb-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground" placeholder="you@example.com" />
             <form
               onSubmit={e => {
                 e.preventDefault();
@@ -174,7 +182,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
               }}
               className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2 focus-within:border-primary/50"
             >
-              <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+              <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)} maxLength={4000} aria-label="Support message"
                 onKeyDown={e => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -182,7 +190,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
                   }
                 }}
                 placeholder="Ask for leads, pitches, or help..."
-                className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground focus:outline-none" />
+                className="min-w-0 flex-1 bg-transparent text-base text-foreground placeholder-muted-foreground focus:outline-none" />
               <button type="submit" disabled={!input.trim() || loading}
                 aria-label="Send chat message"
                 className="p-1.5 rounded-lg bg-primary text-white hover:bg-primary-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0">
@@ -191,7 +199,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
             </form>
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* FAB button */}
       <button onClick={() => setOpen(o => !o)}

@@ -84,6 +84,7 @@ export async function sendPlatformEmail(params: {
   fromName?: string;
   headers?: Record<string, string>;
   idempotencyKey?: string;
+  replyTo?: string;
 }) {
   const config = await getPlatformEmailConfig();
   if (!config) return { success: false as const, skipped: true as const };
@@ -110,8 +111,9 @@ export async function sendPlatformEmail(params: {
     html: params.html,
     text: params.text,
     headers: params.headers,
+    replyTo: params.replyTo,
   }, params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined);
-  if (error) throw new Error(error.message);
+  if (error || !data?.id) throw new Error(error?.message || "Email provider returned no delivery ID");
   return { success: true as const, provider: "resend" as const, id: data?.id };
 }
 
