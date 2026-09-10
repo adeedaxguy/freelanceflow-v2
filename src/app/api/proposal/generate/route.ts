@@ -111,5 +111,7 @@ export async function POST(req: NextRequest) {
     await recordAuditLog({ action: "proposal_ai_fallback", actorId: session.user.id, details: { failures: ai.failures } });
   }
   const proposal = ai.proposal || buildTemplate(jobTitle, company, description, expertiseStr, userName, portfolioLinks);
-  return NextResponse.json({ ...proposal, source: ai.source, ...(ai.proposal ? {} : { warning: "AI is temporarily unavailable. This editable starting draft is not AI-generated. Replace bracketed details with your own verified experience before using it." }) });
+  return NextResponse.json({ ...proposal, source: ai.source, warning: ai.proposal
+    ? "Review before using: AI can make mistakes. Replace bracketed details with your own verified work and check every claim about your experience."
+    : "AI is temporarily unavailable. This editable starting draft is not AI-generated. Replace bracketed details with your own verified experience before using it." });
 }

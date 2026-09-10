@@ -30,6 +30,8 @@ it("passes the actual brief and truthful-claims instructions to the provider", a
   expect(body.max_tokens).toBeUndefined();
   expect(body.messages[1].content).toContain(input.description);
   expect(body.messages[0].content).toContain("Do not invent experience");
+  expect(body.messages[0].content).toContain("NOT the applicant's history");
+  expect(body.messages[0].content).toContain("[Add one truthful example of your relevant work.]");
 });
 it.each([[401, "authentication"], [429, "rate_limit"], [500, "provider_error"]])("diagnoses HTTP %s without leaking provider response or credentials", async (status, reason) => {
   process.env.GROQ_API_KEY = "secret-value";
