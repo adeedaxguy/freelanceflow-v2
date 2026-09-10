@@ -138,20 +138,25 @@ async function handleNumberCheckout(session: Record<string, unknown>, event: Str
   }
 
   const paid = ["paid", "no_payment_required"].includes(String(session.payment_status || ""));
-  await prisma.telephonyPurchase.update({
-    where: { id: purchase.id },
+  if (!paid) return NextResponse.json({ received: true, ignored: "awaiting_payment" }, { status: 202 });
+  // Stripe retries must not reset an active number or undo a later cancellation.
+  const updated = await prisma.telephonyPurchase.updateMany({
+    where: {
+      id: purchase.id,
+      status: { in: ["CHECKOUT_PENDING", "CHECKOUT_FAILED", "CHECKOUT_EXPIRED", "PAYMENT_CONFIRMED", "PROVISION_FAILED"] },
+    },
     data: {
       externalSubscriptionId: subscriptionId,
       externalCustomerId: stringValue(session.customer),
       externalOrderId: stringValue(session.id),
-      subscriptionStatus: paid ? "active" : stringValue(session.payment_status),
+      subscriptionStatus: "active",
       testMode,
-      status: testMode ? "PAID_TEST" : paid ? "PAYMENT_CONFIRMED" : purchase.status,
+      status: testMode ? "PAID_TEST" : "PAYMENT_CONFIRMED",
       lastError: null,
     },
   });
 
-  if (paid && !testMode && purchase.status !== "ACTIVE") {
+  if (!testMode && updated.count === 1) {
     await provisionPhoneNumber(purchase.id);
   }
 
@@ -239,10 +244,7 @@ async function handleMinutesCheckout(session: Record<string, unknown>, event: St
       provider: "STRIPE",
       externalCustomerId: stringValue(session.customer),
       externalOrderId: stringValue(session.id),
-      plan,
-      variantId: plan,
-      status: ["paid", "no_payment_required"].includes(String(session.payment_status || "")) ? "active" : String(session.payment_status || "checkout_completed"),
-      testMode,
+      // Subscription events own the current package and status after initial creation.
     },
   });
 
@@ -407,7 +409,10 @@ async function handleCheckoutIssue(session: Record<string, unknown>, event: Stri
 
   if (purchaseType === "softphone_number" && metadata.telephony_purchase_id) {
     await prisma.telephonyPurchase.updateMany({
-      where: { id: metadata.telephony_purchase_id },
+      where: {
+        id: metadata.telephony_purchase_id,
+        status: { in: ["CHECKOUT_PENDING", "CHECKOUT_FAILED", "CHECKOUT_EXPIRED"] },
+      },
       data: {
         status: status === "expired" ? "CHECKOUT_EXPIRED" : "CHECKOUT_FAILED",
         lastError: message.slice(0, 500),
@@ -504,6 +509,28 @@ async function handleInvoicePaymentFailed(invoice: Record<string, unknown>, even
   return NextResponse.json({ received: true, stripe: "invoice_payment_failed_logged" });
 }
 
+async function handlePaymentIntentFailed(intent: Record<string, unknown>, event: StripeEvent) {
+  const metadata = metadataOf(intent);
+  const error = intent.last_payment_error as Record<string, unknown> | undefined;
+  await recordAuditLog({
+    action: "payment_failed",
+    actorId: metadata.user_id || metadata.userId,
+    actorEmail: stringValue(intent.receipt_email),
+    targetType: "StripePaymentIntent",
+    targetId: stringValue(intent.id) || event.id || null,
+    details: {
+      gateway: "stripe", eventType: event.type,
+      paymentIntentId: stringValue(intent.id), customerId: stringValue(intent.customer),
+      amountDue: typeof intent.amount === "number" ? intent.amount : null,
+      currency: stringValue(intent.currency),
+      message: failureMessage(intent), code: stringValue(error?.code), declineCode: stringValue(error?.decline_code),
+      purchaseType: metadata.purchase_type || "unknown",
+      testMode: !(intent.livemode ?? event.livemode ?? false),
+    },
+  });
+  return NextResponse.json({ received: true, stripe: "payment_intent_failed_logged" });
+}
+
 async function getPlanFromPriceId(priceId: string | null): Promise<string | null> {
   if (!priceId) return null;
   for (const plan of ["pro", "agency"] as const) {
@@ -569,6 +596,10 @@ export async function POST(req: NextRequest) {
 
     if (event.type === "invoice.payment_failed") {
       return await handleInvoicePaymentFailed(event.data.object, event);
+    }
+
+    if (event.type === "payment_intent.payment_failed") {
+      return await handlePaymentIntentFailed(event.data.object, event);
     }
 
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {

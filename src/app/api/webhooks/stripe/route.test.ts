@@ -68,6 +68,63 @@ function request(body: string) {
 describe("Stripe webhook failure logging", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (prisma.telephonyPurchase.updateMany as jest.Mock).mockReset().mockResolvedValue({ count: 0 });
+  });
+
+  it.each(["ACTIVE", "EXPIRED", "PROVISIONING", "PAID_TEST"])("does not reset a settled number purchase (%s) on checkout retries", async status => {
+    (prisma.telephonyPurchase.findUnique as jest.Mock).mockResolvedValueOnce({
+      id: "purchase_settled", userId: "user_123", externalSubscriptionId: "sub_settled", status,
+    });
+    const response = await POST(request(JSON.stringify({
+      type: "checkout.session.completed", livemode: true,
+      data: { object: { id: "cs_settled", subscription: "sub_settled", payment_status: "paid",
+        metadata: { purchase_type: "softphone_number", telephony_purchase_id: "purchase_settled" },
+      } },
+    })));
+    expect(response.status).toBe(200);
+    expect(prisma.telephonyPurchase.update).not.toHaveBeenCalled();
+    expect(provisionPhoneNumber).not.toHaveBeenCalled();
+    expect(prisma.telephonyPurchase.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ status: { in: ["CHECKOUT_PENDING", "CHECKOUT_FAILED", "CHECKOUT_EXPIRED", "PAYMENT_CONFIRMED", "PROVISION_FAILED"] } }),
+    }));
+  });
+
+  it("does not let delayed minute checkout overwrite cancellation or a package change", async () => {
+    await POST(request(JSON.stringify({
+      type: "checkout.session.completed", livemode: true,
+      data: { object: { subscription: "sub_minutes_late", payment_status: "paid",
+        metadata: { purchase_type: "softphone_minutes", user_id: "user_123", package_id: "starter" },
+      } },
+    })));
+    const input = (prisma.billingSubscription.upsert as jest.Mock).mock.calls[0][0];
+    expect(input.create).toMatchObject({ status: "active", plan: "softphone_minutes_starter" });
+    expect(input.update).not.toHaveProperty("status");
+    expect(input.update).not.toHaveProperty("plan");
+  });
+
+  it("restricts number-checkout expiry updates to unsettled purchases", async () => {
+    await POST(request(JSON.stringify({
+      type: "checkout.session.expired", livemode: true,
+      data: { object: { id: "cs_old", metadata: { purchase_type: "softphone_number", telephony_purchase_id: "purchase_123" } } },
+    })));
+    expect(prisma.telephonyPurchase.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { id: "purchase_123", status: { in: ["CHECKOUT_PENDING", "CHECKOUT_FAILED", "CHECKOUT_EXPIRED"] } },
+    }));
+  });
+
+  it("never provisions a real number for a successful sandbox payment", async () => {
+    (prisma.telephonyPurchase.findUnique as jest.Mock).mockResolvedValueOnce({ id: "purchase_test", userId: "admin_123", status: "CHECKOUT_PENDING" });
+    (prisma.telephonyPurchase.updateMany as jest.Mock).mockResolvedValueOnce({ count: 1 });
+    const response = await POST(request(JSON.stringify({
+      type: "checkout.session.completed", livemode: false,
+      data: { object: { id: "cs_test_paid", subscription: "sub_test_paid", payment_status: "paid",
+        metadata: { purchase_type: "softphone_number", telephony_purchase_id: "purchase_test" },
+      } },
+    })));
+    expect(response.status).toBe(200);
+    expect(prisma.telephonyPurchase.updateMany).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ testMode: true, status: "PAID_TEST" }) }));
+    expect(provisionPhoneNumber).not.toHaveBeenCalled();
+    expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
   it("records failed checkout sessions in the audit log", async () => {
@@ -98,6 +155,23 @@ describe("Stripe webhook failure logging", () => {
       targetId: "cs_test_failed",
       details: expect.objectContaining({ testMode: true }),
     }));
+  });
+
+  it.each(["card_declined", "payment_intent_authentication_failure"])("logs immediate %s failures even before Stripe creates an invoice", async code => {
+    const response = await POST(request(JSON.stringify({
+      id: "evt_intent_failed", type: "payment_intent.payment_failed", livemode: false,
+      data: { object: { id: "pi_failed", amount: 1000, currency: "usd", customer: null,
+        last_payment_error: { code, message: "Payment attempt failed", decline_code: "generic_decline" },
+      } },
+    })));
+    expect(response.status).toBe(200);
+    expect(recordAuditLog).toHaveBeenCalledWith(expect.objectContaining({
+      action: "payment_failed", targetType: "StripePaymentIntent", targetId: "pi_failed",
+      details: expect.objectContaining({ code, amountDue: 1000, testMode: true, message: "Payment attempt failed" }),
+    }));
+    expect(prisma.user.update).not.toHaveBeenCalled();
+    expect(prisma.billingSubscription.upsert).not.toHaveBeenCalled();
+    expect(provisionPhoneNumber).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -171,6 +245,7 @@ describe("Stripe webhook failure logging", () => {
   });
 
   it("confirms a paid phone-number checkout and provisions the number", async () => {
+    (prisma.telephonyPurchase.updateMany as jest.Mock).mockResolvedValueOnce({ count: 1 });
     (prisma.telephonyPurchase.findUnique as jest.Mock).mockResolvedValueOnce({
       id: "purchase_123",
       userId: "user_123",
@@ -198,8 +273,8 @@ describe("Stripe webhook failure logging", () => {
     })));
 
     expect(response.status).toBe(200);
-    expect(prisma.telephonyPurchase.update).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: "purchase_123" },
+    expect(prisma.telephonyPurchase.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: "purchase_123" }),
       data: expect.objectContaining({ status: "PAYMENT_CONFIRMED", subscriptionStatus: "active" }),
     }));
     expect(provisionPhoneNumber).toHaveBeenCalledWith("purchase_123");
