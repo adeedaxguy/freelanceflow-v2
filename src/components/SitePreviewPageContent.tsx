@@ -1479,12 +1479,13 @@ export function SitePreviewContent({ searchParams }: { searchParams?: SitePrevie
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <MessageCircle className="mb-5 h-8 w-8" style={{ color: identity.accent }} />
         <p className={`text-sm font-black uppercase tracking-[0.2em] ${isLight ? "text-slate-500" : "text-white/45"}`}>
-          Customer confidence
+          Example testimonial
         </p>
         <blockquote className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
           "{identity.testimonial.quote}"
         </blockquote>
         <p className={`mt-5 font-bold ${mutedClass(isLight)}`}>{identity.testimonial.name}</p>
+        <p className={`mt-3 text-sm ${mutedClass(isLight)}`}>Illustrative copy, not a verified customer review. Replace before publishing.</p>
       </div>
       <div className={`rounded-[2rem] border p-6 sm:p-8 ${panelClass(isLight)}`}>
         <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: identity.accent }}>

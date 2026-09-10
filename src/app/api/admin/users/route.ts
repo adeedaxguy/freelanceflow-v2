@@ -10,13 +10,13 @@ import { recordAuditLog } from "@/lib/audit-log";
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id || session.user.role !== "ADMIN")
-    throw new Error("Forbidden");
+    return null;
   return session;
 }
 
 export async function GET(req: NextRequest) {
   try {
-    await requireAdmin();
+    if (!await requireAdmin()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const { searchParams } = new URL(req.url);
     const search = searchParams.get("search") ?? "";
     const limit  = Math.min(50, parseInt(searchParams.get("limit") ?? "20"));
@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await requireAdmin();
+    if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const parsed = z.object({
       id: z.string().min(1).max(128),
       plan: z.enum(["free", "pro", "agency"]).optional(),

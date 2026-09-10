@@ -16,7 +16,6 @@ const categories = [
     title: "Getting Started",
     color: "text-primary-light",
     bg: "bg-primary/10",
-    count: 12,
     href: "#getting-started",
   },
   {
@@ -24,7 +23,6 @@ const categories = [
     title: "Finding Leads",
     color: "text-blue-400",
     bg: "bg-blue-500/10",
-    count: 18,
     href: "#finding-leads",
   },
   {
@@ -32,7 +30,6 @@ const categories = [
     title: "Proposals & Email",
     color: "text-green-400",
     bg: "bg-green-500/10",
-    count: 14,
     href: "#proposals",
   },
   {
@@ -40,7 +37,6 @@ const categories = [
     title: "Billing & Plans",
     color: "text-yellow-400",
     bg: "bg-yellow-500/10",
-    count: 10,
     href: "#billing",
   },
   {
@@ -48,7 +44,6 @@ const categories = [
     title: "Account Settings",
     color: "text-orange-400",
     bg: "bg-orange-500/10",
-    count: 8,
     href: "#account",
   },
   {
@@ -56,7 +51,6 @@ const categories = [
     title: "API & Integrations",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
-    count: 6,
     href: "#api",
   },
 ];
@@ -76,7 +70,7 @@ const faqs = [
       },
       {
         q: "How long does it take to land a client using iCloseLeads?",
-        a: "Most users find relevant leads in under 2 minutes. The time to land a client depends on your niche, outreach quality, and follow-up consistency. Users who send 10+ personalized proposals per week report landing their first new client within 2 weeks.",
+        a: "Results depend on your niche, offer, outreach quality, and follow-up consistency. Start by checking a lead's original source, tailor your message to its actual needs, and track replies in your pipeline. Finding a lead does not guarantee a client or income.",
       },
       {
         q: "What happens during and after my free 3-day trial?",
@@ -138,7 +132,7 @@ const faqs = [
     questions: [
       {
         q: "How does billing work?",
-        a: "Free lead search is available without a card. Pro and Agency upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
+        a: "New accounts receive a free 3-day trial without a card. Continued searches after the trial require Pro or Agency. Upgrades, softphone numbers, and calling-minute packages use secure Stripe checkout, with subscription changes managed from the billing portal.",
       },
       {
         q: "What payment methods do you accept?",
@@ -149,14 +143,36 @@ const faqs = [
         a: "Your first paid subscription includes a 14-day money-back guarantee. See the Refund Policy for eligibility and contact billing@icloseleads.com for help.",
       },
       {
-        q: "What happens to my leads if I downgrade to Free?",
-        a: "Your saved leads are retained. Your account moves to the current Free allowance, and phone numbers or calling minutes remain separate paid add-ons.",
+        q: "What happens to my leads if I cancel my plan?",
+        a: "Your saved leads are retained. After paid access ends, new searches, AI tools, and outreach require an active plan once your original 3-day trial has expired. Cancelling does not restart the trial. Phone numbers and calling minutes remain separate paid add-ons.",
       },
+    ],
+  },
+  {
+    id: "account",
+    title: "Account Settings",
+    questions: [
+      { q: "Where can I update my profile?", a: "Open Profile in the dashboard to update your freelance details, niche, and portfolio links. These details help personalize your proposals." },
+      { q: "How can I reset my password?", a: "Use Forgot password on the sign-in page and enter your account email. Follow the link sent to that inbox to choose a password. If it does not arrive, check spam or contact support." },
+    ],
+  },
+  {
+    id: "api",
+    title: "API & Integrations",
+    questions: [
+      { q: "Which plan includes API access?", a: "API access is available to Agency accounts. Open the API page in your dashboard to manage keys, and see the developer documentation for endpoints and usage limits. Keep API keys on your server, not in browser code." },
+      { q: "Are softphone costs included in my subscription?", a: "No. The calling workspace is available with separate paid phone-number and calling-minute add-ons. Buying Pro or Agency alone does not include a phone number or minutes." },
     ],
   },
 ];
 
-export default function HelpPage() {
+export default async function HelpPage({ searchParams }: { searchParams?: Promise<{ q?: string | string[] }> }) {
+  const params = await searchParams;
+  const query = (typeof params?.q === "string" ? params.q : "").trim().slice(0, 200);
+  const matchingSections = faqs.map(section => ({
+    ...section,
+    questions: section.questions.filter(({ q, a }) => `${q} ${a}`.toLowerCase().includes(query.toLowerCase())),
+  })).filter(section => section.questions.length > 0);
   return (
     <>
       <Navbar />
@@ -168,14 +184,21 @@ export default function HelpPage() {
               How can we <span className="gradient-text">help you?</span>
             </h1>
             <p className="text-muted-foreground mb-8">Search our knowledge base or browse categories below.</p>
-            <div className="relative max-w-xl mx-auto">
+            <form action="/help" method="get" role="search" className="relative max-w-xl mx-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="search"
+                name="q"
+                aria-label="Search help articles"
+                defaultValue={query}
+                maxLength={200}
                 placeholder="Search for answers..."
-                className="w-full pl-12 pr-4 py-4 bg-background border border-border rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 text-base"
+                className="w-full pl-12 pr-16 py-4 bg-background border border-border rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 text-base"
               />
-            </div>
+              <button type="submit" aria-label="Search help" title="Search help" className="absolute right-2 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+                <Search className="h-5 w-5" />
+              </button>
+            </form>
           </div>
         </section>
 
@@ -184,20 +207,24 @@ export default function HelpPage() {
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-6">Browse by Category</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {categories.map(({ icon: Icon, title, color, bg, count, href }) => (
-                <a key={title} href={href} className="p-5 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-all group">
+              {categories.map(({ icon: Icon, title, color, bg, href }) => (
+                <a key={title} href={query ? `/help${href}` : href} className="p-5 rounded-2xl bg-surface border border-border hover:border-primary/30 transition-all group">
                   <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-3`}>
                     <Icon className={`w-5 h-5 ${color}`} />
                   </div>
                   <h3 className="font-semibold text-foreground text-sm mb-1">{title}</h3>
-                  <p className="text-xs text-muted-foreground">{count} articles</p>
+                  <p className="text-xs text-muted-foreground">{faqs.find(section => `#${section.id}` === href)?.questions.length ?? 0} answers</p>
                 </a>
               ))}
             </div>
           </section>
 
           {/* FAQs */}
-          {faqs.map((section) => (
+          {query && <div role="status">
+            <p className="text-foreground">{matchingSections.length ? `Answers matching "${query}"` : `No answers found for "${query}".`}</p>
+            <Link href="/help" className="mt-2 inline-block text-primary-light underline">Show all answers</Link>
+          </div>}
+          {matchingSections.map((section) => (
             <section key={section.id} id={section.id}>
               <h2 className="text-2xl font-bold text-foreground mb-6">{section.title}</h2>
               <div className="space-y-3">
@@ -221,7 +248,7 @@ export default function HelpPage() {
             <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 text-center">
               <MessageCircle className="w-8 h-8 text-primary-light mx-auto mb-3" />
               <h3 className="font-bold text-foreground mb-2">Chat with Support</h3>
-              <p className="text-muted-foreground text-sm mb-4">Can&apos;t find your answer? Our team typically replies in under 2 hours.</p>
+              <p className="text-muted-foreground text-sm mb-4">Can&apos;t find your answer? Send the team a message and track your request.</p>
               <Link href="/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-light text-white rounded-xl text-sm font-medium transition-colors">
                 Open a Ticket
               </Link>
@@ -230,7 +257,7 @@ export default function HelpPage() {
               <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
               <h3 className="font-bold text-foreground mb-2">API Documentation</h3>
               <p className="text-muted-foreground text-sm mb-4">Building on top of iCloseLeads? Check out our developer docs.</p>
-              <Link href="/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface border border-border hover:border-primary/30 text-foreground rounded-xl text-sm font-medium transition-all">
+              <Link href="/developers" className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface border border-border hover:border-primary/30 text-foreground rounded-xl text-sm font-medium transition-all">
                 View API Docs
               </Link>
             </div>
@@ -241,7 +268,7 @@ export default function HelpPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        "mainEntity": faqs.flatMap(section =>
+        "mainEntity": matchingSections.flatMap(section =>
           section.questions.map(({ q, a }) => ({
             "@type": "Question",
             "name": q,

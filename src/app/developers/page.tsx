@@ -39,7 +39,7 @@ export default function DevelopersPage() {
       <main className="pt-16">
         <section className="border-b border-border">
           <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-24">
-            <div className="max-w-3xl">
+            <div className="min-w-0 max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">iCloseLeads API v1</p>
               <h1 className="mt-4 text-4xl font-bold leading-tight sm:text-6xl">Lead intelligence for your own workflow.</h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
@@ -55,7 +55,7 @@ export default function DevelopersPage() {
               </div>
             </div>
 
-            <div className="border border-border bg-surface p-5 sm:p-6">
+            <div className="min-w-0 border border-border bg-surface p-5 sm:p-6">
               <div className="flex items-center gap-3 border-b border-border pb-4">
                 <KeyRound className="h-5 w-5 text-accent" />
                 <div><h2 className="font-semibold">Server-side authentication</h2><p className="text-sm text-muted-foreground">Keep keys out of browser and mobile bundles.</p></div>
@@ -90,13 +90,13 @@ export default function DevelopersPage() {
 
         <section className="py-16">
           <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">Local business search</p>
               <h2 className="mt-2 text-2xl font-bold">Find businesses with a reason to buy</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">Required: <code>keyword</code> and <code>location</code>. Optional filters include website status, page size, and cursor.</p>
               <pre className="mt-5 overflow-x-auto border border-border bg-surface p-4 text-xs leading-6 text-muted-foreground"><code>{localExample}</code></pre>
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-light">Job search</p>
               <h2 className="mt-2 text-2xl font-bold">Match fresh work to one or more niches</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">Pass comma-separated niche slugs, a freshness window, confidence threshold, and optional contact or urgency filters.</p>

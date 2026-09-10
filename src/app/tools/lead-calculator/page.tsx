@@ -16,7 +16,7 @@ function Slider({ label, min, max, step, value, onChange, format }: {
         <span className="text-muted-foreground">{label}</span>
         <span className="font-bold text-foreground">{format(value)}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={value}
+      <input type="range" aria-label={label} min={min} max={max} step={step} value={value}
         onChange={e => onChange(Number(e.target.value))}
         className="w-full h-2 rounded-full appearance-none bg-muted cursor-pointer accent-primary" />
       <div className="flex justify-between text-xs text-muted-foreground/60">
@@ -163,7 +163,7 @@ export default function LeadCalculatorPage() {
 
               {/* CTA */}
               <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 text-center">
-                <p className="text-foreground font-semibold mb-2">iCloseLeads finds your leads for free</p>
+                <p className="text-foreground font-semibold mb-2">Try iCloseLeads free for 3 days</p>
                 <p className="text-muted-foreground text-sm mb-4">
                   Stop spending {fmt(calc.timeCostPerWeek)}/week on manual prospecting.
                   iCloseLeads finds, scores, and surfaces live opportunities automatically.
@@ -171,7 +171,7 @@ export default function LeadCalculatorPage() {
                 <Link href="/auth?mode=signup&intent=lead-calculator&source=tool-cta"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
                   <Zap className="w-4 h-4" />
-                  Start Finding Leads Free
+                  Start Free 3-Day Trial
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
