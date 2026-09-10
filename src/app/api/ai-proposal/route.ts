@@ -8,6 +8,7 @@ import { getPlatformSetting } from "@/lib/platform-secrets";
 import { rateLimit } from "@/lib/rate-limit";
 import { getTrialAccessError } from "@/lib/trial-access";
 import { z } from "zod";
+import { groqCompletionOptions } from "@/lib/groq-model";
 
 const schema = z.object({
   company:   z.string().trim().min(1).max(160),
@@ -71,12 +72,11 @@ async function callGroqAPI(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        ...groqCompletionOptions(400),
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user",   content: userPrompt },
         ],
-        max_tokens: 400,
         temperature: 0.75,
       }),
       signal: AbortSignal.timeout(15000),

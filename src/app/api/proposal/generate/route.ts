@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { getTrialAccessError } from "@/lib/trial-access";
 import { generateProposalAI } from "@/lib/proposal-ai";
 import { recordAuditLog } from "@/lib/audit-log";
+import { rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 import { z } from "zod";
 
 const schema = z.object({
@@ -66,6 +67,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
   const { jobTitle, company, description, niche, portfolioLinks: incomingLinks } = parsed.data;
+  const limit = await securityRateLimit("proposal-generate", session.user.id, 15, 60_000);
+  if (!limit.allowed) return NextResponse.json({ error: "Too many generations. Please wait a minute before trying again." }, { status: 429, headers: rateLimitHeaders(limit) });
 
   let userName = "[Your name]";
   let expertiseStr = niche || "freelance services";

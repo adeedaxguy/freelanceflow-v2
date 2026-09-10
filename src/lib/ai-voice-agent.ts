@@ -1,3 +1,5 @@
+import { groqCompletionOptions } from "./groq-model";
+
 export type AgentStage = "INTRO" | "DISCOVERY" | "CALLBACK";
 export type AgentOutcome =
   | "ACTIVE"
@@ -151,9 +153,8 @@ export async function generateVoiceAgentTurn(
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        ...groqCompletionOptions(220),
         temperature: 0.35,
-        max_tokens: 220,
         response_format: { type: "json_object" },
         messages: [
           {

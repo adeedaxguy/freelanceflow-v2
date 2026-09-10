@@ -10,6 +10,7 @@ import {
 import { signOut } from "next-auth/react";
 import ConfirmModal from "@/components/ConfirmModal";
 import { copyText } from "@/lib/clipboard";
+import { GROQ_MODEL } from "@/lib/groq-model";
 
 type Tab = "notifications" | "ai-models" | "security" | "integrations" | "danger";
 
@@ -24,16 +25,16 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 const AI_MODELS = [
   {
     provider: "Groq LPU",
-    model: "llama-3.3-70b-versatile",
+    model: GROQ_MODEL,
     usedFor: ["AI Proposals", "Deal Closer", "Follow-Up Generation"],
-    speed: "~200ms",
+    speed: "Variable",
     icon: "⚡",
     color: "text-accent",
     bg: "bg-accent/10",
     border: "border-accent/20",
-    description: "LLaMA 3.3 70B on Groq's custom hardware — sub-200ms inference. Powers every AI proposal, deal reply, and follow-up.",
-    status: "operational" as const,
-    stats: [{ label: "Avg latency", value: "~200ms" }, { label: "Parameters", value: "70B" }, { label: "Context", value: "128K" }],
+    description: "GPT-OSS 120B on Groq powers AI-assisted drafts and replies. Review every result before using it. Service availability and response times can vary.",
+    status: "integrated" as const,
+    stats: [{ label: "Review", value: "Required" }, { label: "Parameters", value: "120B" }, { label: "Context", value: "128K" }],
   },
   {
     provider: "Contact Enrichment",
@@ -45,8 +46,8 @@ const AI_MODELS = [
     bg: "bg-primary/10",
     border: "border-primary/20",
     description: "Optional enrichment helps verify professional contact paths before outreach.",
-    status: "operational" as const,
-    stats: [{ label: "Accuracy", value: "95%+" }, { label: "DB size", value: "100M+" }, { label: "Domains", value: "50M+" }],
+    status: "optional" as const,
+    stats: [{ label: "Coverage", value: "Varies" }, { label: "Contact quality", value: "Verify first" }],
   },
   {
     provider: "Advanced AI",
@@ -324,7 +325,7 @@ export default function SettingsPage() {
         {TABS.map(t => {
           const Icon = t.icon;
           return (
-            <button key={t.id} onClick={() => setTab(t.id)}
+            <button key={t.id} onClick={() => setTab(t.id)} aria-label={t.label} title={t.label} aria-pressed={tab === t.id}
               className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                 tab === t.id ? "bg-primary text-white shadow-glow-primary/30"
                   : t.id === "danger" ? "text-red-400/70 hover:text-red-400"
@@ -383,13 +384,13 @@ export default function SettingsPage() {
               <div>
                 <h2 className="text-foreground font-bold text-base sm:text-lg">Enterprise AI Stack</h2>
                 <p className="text-muted-foreground text-sm mt-1 leading-relaxed">
-                  Purpose-built ensemble of best-in-class AI — each model selected for what it does best. Sub-second inference, 99.5% email deliverability.
+                  AI-assisted drafts with human review. Availability and speed depend on the connected service; these are integration details, not live health measurements.
                 </p>
                 <div className="flex items-center gap-4 mt-3 flex-wrap">
                   {[
-                    { icon: Cpu,   label: "6 AI models",  color: "text-accent" },
+                    { icon: Cpu,   label: "AI-assisted drafts",  color: "text-accent" },
                     { icon: Globe, label: "Live channels", color: "text-primary-light" },
-                    { icon: Clock, label: "<200ms avg",    color: "text-blue-400" },
+                    { icon: Clock, label: "Review-first outreach", color: "text-blue-400" },
                   ].map(({ icon: Icon, label, color }) => (
                     <div key={label} className="flex items-center gap-1.5">
                       <Icon className={`w-3.5 h-3.5 ${color}`} />
@@ -413,9 +414,9 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <h3 className={`font-bold text-sm sm:text-base ${m.color}`}>{m.provider}</h3>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                        m.status === "operational" ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-muted text-muted-foreground border border-border"
+                        m.status === "integrated" ? "bg-primary/10 text-primary-light border border-primary/20" : "bg-muted text-muted-foreground border border-border"
                       }`}>
-                        {m.status === "operational" ? "● Live" : "⏳ Soon"}
+                        {m.status === "integrated" ? "Integrated" : m.status === "optional" ? "Optional" : "Soon"}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground font-mono mb-2">{m.model}</p>

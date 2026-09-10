@@ -3,6 +3,8 @@
  * The app still generates useful proposals and support replies without a key.
  */
 
+import { groqCompletionOptions } from "./groq-model";
+
 export interface ProposalInput {
   jobTitle:    string;
   company:     string;
@@ -106,13 +108,12 @@ Return JSON only:
         "Content-Type":  "application/json",
       },
       body: JSON.stringify({
-        model:       "llama-3.3-70b-versatile",
+        ...groqCompletionOptions(800),
         messages:    [
           { role: "system", content: systemPrompt },
           { role: "user",   content: userPrompt },
         ],
         temperature:    0.7,
-        max_tokens:     800,
         response_format: { type: "json_object" },
       }),
     });
@@ -400,13 +401,12 @@ Answer helpfully and concisely. Explain how to use the product; direct personali
         "Content-Type":  "application/json",
       },
       body: JSON.stringify({
-        model:       "llama-3.3-70b-versatile",
+        ...groqCompletionOptions(400),
         messages:    [
           { role: "system", content: systemPrompt },
           ...messages,
         ],
         temperature: 0.4,
-        max_tokens:  400,
       }),
     });
 

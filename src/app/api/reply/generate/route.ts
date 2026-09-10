@@ -7,6 +7,7 @@ import { getTrialAccessError } from "@/lib/trial-access";
 import { rateLimit } from "@/lib/rate-limit";
 import { getPlatformSetting } from "@/lib/platform-secrets";
 import { z } from "zod";
+import { groqCompletionOptions } from "@/lib/groq-model";
 
 const schema = z.object({
   replyText:    z.string().trim().min(1, "Reply text required").max(5_000),
@@ -102,12 +103,12 @@ async function callGroqReply(
       method: "POST",
       headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        ...groqCompletionOptions(500),
         messages: [
           { role: "system", content: "You are an expert freelance sales closer. Write concise, persuasive email replies that move deals forward. Under 180 words. Sound human and confident." },
           { role: "user", content: `Freelancer: ${userName} | Niche: ${niche || "freelance"} | Company: ${company}\n\nDetected intent: ${intentLabel}\n\nOriginal proposal:\n${originalBody.slice(0, 400)}\n\nClient reply:\n${replyText.slice(0, 500)}\n\nWrite a reply that advances this deal given the "${intentLabel}" intent.\nReturn JSON: {"subject":"...","body":"..."}` },
         ],
-        temperature: 0.7, max_tokens: 500, response_format: { type: "json_object" },
+        temperature: 0.7, response_format: { type: "json_object" },
       }),
       signal: AbortSignal.timeout(15000),
     });

@@ -24,6 +24,10 @@ it("passes the actual brief and truthful-claims instructions to the provider", a
   fetchMock.mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content: JSON.stringify(proposal) } }] })));
   expect(await generateProposalAI(input)).toMatchObject({ proposal, source: "groq" });
   const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+  expect(body.model).toBe("openai/gpt-oss-120b");
+  expect(body.include_reasoning).toBe(false);
+  expect(body.max_completion_tokens).toBeGreaterThan(900);
+  expect(body.max_tokens).toBeUndefined();
   expect(body.messages[1].content).toContain(input.description);
   expect(body.messages[0].content).toContain("Do not invent experience");
 });
