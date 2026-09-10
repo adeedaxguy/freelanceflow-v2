@@ -333,8 +333,8 @@ const DEFAULT_INTERNAL_LINKS: BlogLinkItem[] = [
   },
   {
     href: "/auth?mode=signup",
-    label: "Start free",
-    description: "Try iCloseLeads while early access is open.",
+    label: "Try Free for 3 Days",
+    description: "Get up to 600 lead results during a free 3-day trial.",
   },
 ];
 
@@ -342,7 +342,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   "freelance-client-acquisition-system": [
     {
       href: "/blog/600-free-leads-week-client-acquisition-plan",
-      label: "600 free leads weekly sprint",
+      label: "600-lead prospecting sprint",
       description: "Use the new iCloseLeads allowance page to turn free searches into a focused weekly acquisition sprint.",
     },
     {
@@ -384,7 +384,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
     },
     {
       href: "/blog/600-free-leads-week-client-acquisition-plan",
-      label: "600 free leads weekly sprint",
+      label: "600-lead prospecting sprint",
       description: "Use the free allowance to test one web design market before expanding.",
     },
   ],
@@ -428,7 +428,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
     },
     {
       href: "/blog/600-free-leads-week-client-acquisition-plan",
-      label: "600 free leads weekly sprint",
+      label: "600-lead prospecting sprint",
       description: "Use the scorecard to keep free-plan lead searches focused.",
     },
   ],
@@ -445,7 +445,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
     },
     {
       href: "/blog/600-free-leads-week-client-acquisition-plan",
-      label: "600 free leads weekly sprint",
+      label: "600-lead prospecting sprint",
       description: "Use the free allowance to find enough leads to reject weak matches.",
     },
     {
@@ -457,7 +457,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   "client-acquisition-software-free-plan-test": [
     {
       href: "/blog/600-free-leads-week-client-acquisition-plan",
-      label: "600 free leads weekly sprint",
+      label: "600-lead prospecting sprint",
       description: "Use the free-plan page to test whether the software creates useful saved leads.",
     },
     {
@@ -545,7 +545,7 @@ const STRATEGIC_INTERNAL_LINKS: Record<string, BlogLinkItem[]> = {
   "free-leads-for-freelancers-qualification-workflow": [
     {
       href: "/blog/600-free-leads-per-week-for-freelancers",
-      label: "600 free leads per week",
+      label: "600-lead trial workflow",
       description: "Use the larger free allowance as a weekly client-acquisition sprint.",
     },
     {

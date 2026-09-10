@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { sendMail } from "@/lib/mailer";
 import { prisma } from "@/lib/prisma";
 import { getResolvedOutreachUsage } from "@/lib/outreach-limits";
@@ -21,6 +22,8 @@ const sendSchema = z.object({
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
 
   const requestLimit = await securityRateLimit(
     "email-send",

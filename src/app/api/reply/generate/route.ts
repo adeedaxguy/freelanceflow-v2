@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { rateLimit } from "@/lib/rate-limit";
 import { getPlatformSetting } from "@/lib/platform-secrets";
 import { z } from "zod";
@@ -122,6 +123,8 @@ async function callGroqReply(
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
 
   // Rate limit: 20 AI calls per minute per user
   const rl = rateLimit(`reply:${session.user.id}`, 20, 60_000);

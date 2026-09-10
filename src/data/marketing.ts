@@ -28,12 +28,12 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const PRICING_TIERS: PricingTier[] = [
   {
-    name: "3-Day Trial",
+    name: "Free 3-Day Trial",
     price: "$0",
     description: "Find your first prospects and prepare your pitch. No card required.",
     limit: "600 leads for 3 days",
     features: [...PLAN_FEATURES.free],
-    cta: "Start 3-Day Trial",
+    cta: "Try Free for 3 Days",
     href: "/auth?mode=signup",
   },
   {

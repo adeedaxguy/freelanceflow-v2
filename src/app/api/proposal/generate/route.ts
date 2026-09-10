@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getUsageStats } from "@/lib/usage";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { getPlatformSetting } from "@/lib/platform-secrets";
 import { z } from "zod";
 
@@ -117,10 +117,8 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const usage = await getUsageStats(session.user.id).catch(() => null);
-  if (usage?.plan === "free" && usage.trialExpired) {
-    return NextResponse.json({ error: "Your 3-day trial has ended. Upgrade to generate new proposals.", upgrade: true }, { status: 403 });
-  }
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
 
   let rawBody: unknown;
   try { rawBody = await req.json(); } catch { rawBody = {}; }

@@ -84,7 +84,7 @@ export default function OgImage() {
 
         {/* Badges */}
         <div style={{ display: "flex", gap: 16 }}>
-          {["Remote Jobs", "Local Leads", "AI Proposals", "Free Plan"].map(badge => (
+          {["Remote Jobs", "Local Leads", "AI Proposals", "3-Day Trial"].map(badge => (
             <div key={badge} style={{
               padding: "10px 20px",
               borderRadius: 50,

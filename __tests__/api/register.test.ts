@@ -112,4 +112,21 @@ describe("POST /api/auth/register", () => {
     expect(notifyNewUserSignup).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
+
+  it("ignores attempts to set a paid plan or extend the signup timestamp", async () => {
+    const { POST } = await import("@/app/api/auth/register/route");
+    const res = await POST(registerRequest({ ...validBody, plan: "agency", createdAt: "2099-01-01", trialEndsAt: "2099-01-04" }));
+    expect(res.status).toBe(201);
+    const data = (prisma.user.create as jest.Mock).mock.calls[0][0].data;
+    expect(data.plan).toBe("free");
+    expect(data).not.toHaveProperty("createdAt");
+    expect(data).not.toHaveProperty("trialEndsAt");
+  });
+
+  it("does not create a second trial for an existing email", async () => {
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: "existing-user" });
+    const { POST } = await import("@/app/api/auth/register/route");
+    expect((await POST(registerRequest())).status).toBe(409);
+    expect(prisma.user.create).not.toHaveBeenCalled();
+  });
 });

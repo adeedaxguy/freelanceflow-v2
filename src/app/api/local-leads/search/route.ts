@@ -7,7 +7,6 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { searchLocalBusinesses, checkRateLimit, type LocalBizLead } from "@/lib/local-leads-engine";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
-import { FREE_TRIAL_LEAD_LIMIT, PRO_WEEKLY_LEAD_LIMIT } from "@/lib/plan-limits";
 import { getPlatformSettings } from "@/lib/platform-secrets";
 import { recordAuditLog } from "@/lib/audit-log";
 
@@ -44,41 +43,25 @@ export async function POST(req: NextRequest) {
   }
   const { keyword, location, filter, limit } = parsed.data;
 
-  const userPlan = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { plan: true },
-  }).then(user => user?.plan ?? (session.user as { plan?: string }).plan ?? "free").catch(() => "free");
-  const isAgencyPlan = userPlan === "agency";
-
-  let usage = {
-    plan: userPlan,
-    limit: isAgencyPlan ? 99999 : userPlan === "pro" ? PRO_WEEKLY_LEAD_LIMIT : FREE_TRIAL_LEAD_LIMIT,
-    used: 0,
-    remaining: isAgencyPlan ? 99999 : userPlan === "pro" ? PRO_WEEKLY_LEAD_LIMIT : FREE_TRIAL_LEAD_LIMIT,
-    nextReset: new Date(Date.now() + 7 * 86_400_000).toISOString(),
-    percentage: 0,
-    unlimited: isAgencyPlan,
-    trialEndsAt: userPlan === "free" ? new Date(Date.now() + 3 * 86_400_000).toISOString() : null,
-    trialExpired: false,
-  };
-
-  try {
-    const nextUsage = await getUsageStats(session.user.id);
-    if (nextUsage) usage = nextUsage;
-  } catch {
-    // Non-fatal: the search can still run, but the UI may fall back to defaults.
+  const usage = await getUsageStats(session.user.id).catch(() => null);
+  if (!usage) {
+    return NextResponse.json({ error: "We could not verify your lead allowance. Please try again shortly." }, { status: 503 });
   }
+  const isAgencyPlan = usage.plan === "agency" || usage.unlimited;
 
   if (usage.remaining === 0) {
     return NextResponse.json({
       error: usage.trialExpired
         ? "Your 3-day trial has ended. Upgrade to Pro or Agency to keep finding leads."
-        : "Trial limit reached. You have used your included lead allowance.",
+        : usage.plan === "free"
+          ? "Trial limit reached. You have used your included lead allowance."
+          : "Your weekly lead allowance is used. Upgrade or wait for your next reset.",
       plan: usage.plan,
       limit: usage.limit,
       nextReset: usage.nextReset,
       upgrade: true,
-      bonusAvailable: !usage.trialExpired,
+      bonusAvailable: usage.plan === "free" && !usage.trialExpired && !usage.shareBonusClaimed,
+      trialExpired: usage.trialExpired,
       usage,
     }, { status: 429 });
   }

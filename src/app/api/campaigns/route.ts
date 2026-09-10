@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -34,6 +35,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
 
   const body = (await req.json()) as unknown;
   const parsed = campaignSchema.safeParse(body);
@@ -54,6 +57,10 @@ export async function PATCH(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 });
 
   const { id, ...data } = parsed.data;
+  if (data.status === "RUNNING") {
+    const accessError = await getTrialAccessError(session.user.id);
+    if (accessError) return NextResponse.json(accessError, { status: accessError.status });
+  }
   await prisma.campaign.updateMany({
     where: { id, userId: session.user.id },
     data,

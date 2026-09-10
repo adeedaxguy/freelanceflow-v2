@@ -143,7 +143,7 @@ const audiences = [
 
 const faq = [
   ["What does iCloseLeads actually do?", "It brings local business leads, remote jobs, live opportunity signals, decision-maker research, AI proposals, outreach preparation, softphone calling, and CRM follow-up into one freelancer-focused workflow."],
-  ["Is it free to start?", "Yes. You get up to 600 lead results over a 3-day trial, without a credit card. Choose Pro or Agency to continue discovery after the trial. Saved leads remain accessible."],
+  ["Is it free to start?", "Yes. You get up to 600 lead results over a 3-day trial, without a credit card. Choose Pro or Agency to continue new searches, AI tools, and outreach after the trial. Saved leads remain accessible."],
   ["Can I call leads from iCloseLeads?", "Yes. Every plan can access the softphone option. You can buy a dedicated phone number and monthly calling minutes, then call prospects from the dashboard while keeping the lead context nearby."],
   ["Where do the leads come from?", "iCloseLeads monitors public opportunity signals and business data paths, then normalizes and scores the results so you can search them from one place."],
   ["Does AI send messages automatically?", "No. AI helps create a stronger draft, but you review the message and stay in control of what is sent."],
@@ -365,7 +365,7 @@ function LeadEngineSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                 onClick={() => marketingEvent("homepage_engine_cta", { engine: engine.id })}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-bold text-background"
               >
-                {isAuthenticated ? "Open search" : "Try it free"} <ArrowRight className="h-4 w-4" />
+                {isAuthenticated ? "Open search" : "Try free for 3 days"} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </motion.div>
@@ -404,7 +404,7 @@ function SoftphoneInfographic({ isAuthenticated }: { isAuthenticated: boolean })
                 onClick={() => marketingEvent("homepage_softphone_cta", { state: isAuthenticated ? "authenticated" : "guest" })}
                 className="marketing-primary-cta"
               >
-                {isAuthenticated ? "Open softphone" : "Start free, add calling later"}
+                {isAuthenticated ? "Open softphone" : "Try 3 days free, add calling later"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/features/softphone" className="marketing-secondary-cta">
@@ -552,7 +552,7 @@ export default function HomepageClient() {
                   onClick={() => marketingEvent("homepage_primary_cta", { state: isAuthenticated ? "authenticated" : "guest" })}
                   className="marketing-primary-cta"
                 >
-                  {isAuthenticated ? "Open your lead workspace" : "Start free with 600 leads"}
+                  {isAuthenticated ? "Open your lead workspace" : "Try free for 3 days"}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link href="#how-it-works" className="marketing-secondary-cta">See how it works</Link>
@@ -723,7 +723,7 @@ export default function HomepageClient() {
         <section id="pricing" className="marketing-section">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <Eyebrow>Start free, continue when ready</Eyebrow>
+              <Eyebrow>Try free for 3 days, then choose a plan</Eyebrow>
               <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">Find out if the leads are worth pitching first.</h2>
               <p className="mt-5 text-base leading-8 text-muted-foreground">Start with up to 600 lead results over 3 days. Pro keeps discovery active at 1,000 results per week. Agency adds higher volume, a larger outreach allowance, and API access. Phone numbers and calling minutes are paid add-ons on every plan.</p>
             </div>
@@ -738,7 +738,7 @@ export default function HomepageClient() {
             <div>
               <Eyebrow>Frequently asked</Eyebrow>
               <h2 className="marketing-display mt-5 text-4xl font-bold text-foreground sm:text-5xl">Questions before your first search.</h2>
-              <p className="mt-5 text-base leading-8 text-muted-foreground">Still unsure? Start free and judge the workflow by the leads it gives you.</p>
+              <p className="mt-5 text-base leading-8 text-muted-foreground">Try the workflow free for 3 days. Continue with Pro at $10/month or Agency at $15/month.</p>
             </div>
             <div className="divide-y divide-border border-y border-border">
               {faq.map(([question, answer], index) => {
@@ -779,7 +779,7 @@ export default function HomepageClient() {
             </div>
             <div className="border-t border-white/20 p-7 lg:border-l lg:border-t-0 lg:p-12">
               <Link href={primaryHref} prefetch={false} className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-blue-800">
-                {isAuthenticated ? "Open workspace" : "Start free"} <ArrowRight className="h-4 w-4" />
+                {isAuthenticated ? "Open workspace" : "Try free for 3 days"} <ArrowRight className="h-4 w-4" />
               </Link>
               <p className="mt-3 text-xs text-blue-100">No card. Cancel nothing.</p>
             </div>

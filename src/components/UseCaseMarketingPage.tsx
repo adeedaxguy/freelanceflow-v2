@@ -118,7 +118,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
     },
     {
       title: "Turn the signal into signup",
-      detail: "Start free, run the first local search, then use the saved lead as the reason to draft outreach instead of leaving with theory.",
+      detail: "Try free for 3 days, run the first local search, then use the saved lead as the reason to draft outreach instead of leaving with theory.",
     },
   ];
 
@@ -231,7 +231,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                     href={signupHref(page, "gsc-local-business-boost")}
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-bold text-background transition-all hover:bg-accent/90"
                   >
-                    Start free with 600 leads
+                    Try Free for 3 Days
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
@@ -400,7 +400,7 @@ export default function UseCaseMarketingPage({ page }: { page: UseCasePageData }
                   href={signupHref(page, "use-case-secondary-cta")}
                   className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-7 py-3 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Create free account
+                  Try Free for 3 Days
                 </Link>
               </div>
             </div>

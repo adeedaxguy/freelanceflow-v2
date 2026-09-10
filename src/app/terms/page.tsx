@@ -53,7 +53,8 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-xl font-bold text-foreground mb-3">6. Subscription and Billing</h2>
-              <p>Paid subscriptions are billed monthly or annually. We reserve the right to change pricing with 30 days notice. Free plan features may change at any time. Paid plans include a 14-day money-back guarantee.</p>
+              <p>New accounts receive a free 3-day trial lasting 72 hours from registration, with up to 600 lead results shared across the lead tools. No card is required and the trial does not charge automatically. After expiry, new searches, AI tools, website concepts, and outreach require a paid plan. Saved work remains accessible. Phone numbers and calling minutes are separately billed add-ons.</p>
+              <p>Paid subscriptions are billed monthly or annually. We reserve the right to change pricing with 30 days notice. Paid plans include a 14-day money-back guarantee.</p>
             </section>
 
             <section>

@@ -1368,18 +1368,19 @@ export default function LocalLeadsPage() {
               ? "Upgrade to Pro or Agency to keep finding leads. Your saved leads and CRM remain available."
               : shareBonusClaimed
                 ? "Your share bonus is active. Upgrade for continued lead access."
-                : "Unlock +300 more leads before your trial ends."}
+                : "Choose a paid plan to keep searching. A share bonus does not extend your trial."}
           </p>
-          {trialExpired ? (
+          <div className="flex flex-wrap justify-center gap-3">
             <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white hover:bg-primary-light">
-              <Zap className="h-4 w-4" /> Choose a paid plan
+              <Zap className="h-4 w-4" /> View paid plans
             </Link>
-          ) : (
+          {!trialExpired && !shareBonusClaimed && (
             <button onClick={() => setShowBonus(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all shadow-glow-primary">
-              {shareBonusClaimed ? "Upgrade for More Leads" : "Unlock +300 Free Leads"}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-foreground font-semibold text-sm hover:border-primary/50 transition-colors">
+              Claim a share bonus
             </button>
           )}
+          </div>
         </div>
       )}
 

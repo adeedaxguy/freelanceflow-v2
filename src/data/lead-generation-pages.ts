@@ -40,17 +40,17 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "web-design-leads",
     path: "/lead-generation/web-design-leads",
     primaryKeyword: "web design leads",
-    metaTitle: "Web Design Leads: Search 600 Free",
+    metaTitle: "Web Design Leads: Free 3-Day Trial",
     metaDescription:
-      "Find web design leads from local businesses, weak websites, no-website prospects, and remote hiring signals. Search 600 leads free each week.",
+      "Find web design leads from local businesses, weak websites, no-website prospects, and remote hiring signals. Search 600 lead results during a free 3-day trial.",
     eyebrow: "Web Design Leads",
     title: "Find web design leads",
     accentTitle: "with a real reason to pitch today",
     summary:
-      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals. Start with 600 free weekly lead searches before buying any list.",
+      "iCloseLeads helps web designers, WordPress developers, Webflow builders, and small agencies find free-to-start prospects with visible website, conversion, SEO, booking, or launch signals. Start with 600 lead results during your free 3-day trial before buying any list.",
     directAnswer:
-      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads lets free users start with 600 weekly lead searches and keeps those signals in one workflow so you can search, save, draft, and follow up.",
-    primaryCta: "Search 600 Leads Free",
+      "The fastest way to find web design leads for free is to search for businesses with a visible website gap, recent hiring demand, or a weak Google Maps-to-website path, then pitch a specific outcome instead of sending a generic portfolio link. iCloseLeads lets trial users start with 600 lead results during a free 3-day trial and keeps those signals in one workflow so you can search, save, draft, and follow up.",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See local lead workflow",
     dashboardPath: "/dashboard/local-leads",
     audience:
@@ -58,7 +58,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A focused first search that produces website prospects with context, pitch angles, and a next action.",
     proofPoints: [
-      "Free users can start with 600 weekly lead searches before buying a list or upgrading.",
+      "Trial users can start with 600 lead results during a free 3-day trial before buying a list or upgrading.",
       "Search local businesses by city and website status.",
       "Use remote job signals when companies are hiring for website, design, or marketing work.",
       "Move high-fit leads into AI proposals, owner checks, and CRM follow-up.",
@@ -122,7 +122,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       },
       {
         q: "Can I get web design leads for free?",
-        a: "Yes. Free users can start with 600 weekly lead searches. The best workflow is to focus those searches on one niche, verify the business context, save only pitchable prospects, and then draft outreach from the visible website gap.",
+        a: "Yes. Trial users can start with 600 lead results during a free 3-day trial. The best workflow is to focus those searches on one niche, verify the business context, save only pitchable prospects, and then draft outreach from the visible website gap.",
       },
       {
         q: "Is this only for web designers?",
@@ -138,17 +138,17 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     slug: "freelance-client-leads",
     path: "/lead-generation/freelance-client-leads",
     primaryKeyword: "freelance client leads",
-    metaTitle: "Freelance Client Leads | Search 600 Leads Free Weekly",
+    metaTitle: "Freelance Client Leads | Search 600 Results in a Free 3-Day Trial",
     metaDescription:
-      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Search 600 leads free weekly.",
+      "Find freelance client leads from remote jobs, live hiring signals, local businesses, owner paths, and AI-assisted outreach. Search 600 lead results during a free 3-day trial.",
     eyebrow: "Freelance Client Leads",
     title: "Find freelance client leads",
     accentTitle: "without living inside job boards",
     summary:
-      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. Free users can use 600 weekly lead searches instead of forcing you to juggle tabs, lists, and generic templates.",
+      "iCloseLeads gives freelancers one place to discover leads, qualify fit, write outreach, and track follow-up. Trial users can use 600 lead results during a free 3-day trial instead of forcing you to juggle tabs, lists, and generic templates.",
     directAnswer:
-      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets free users search 600 leads weekly and turn those signals into a smaller, better list of prospects.",
-    primaryCta: "Find 600 Leads Free",
+      "Freelance client leads convert better when they come from a recent signal: a company hiring, a local business with a website gap, a public request for help, or a visible decision-maker path. iCloseLeads lets trial users search 600 lead results during a free 3-day trial and turn those signals into a smaller, better list of prospects.",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "Explore use cases",
     dashboardPath: "/dashboard/leads",
     audience:
@@ -156,7 +156,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     outcome:
       "A repeatable prospecting workflow that moves from search to saved lead to draft to follow-up.",
     proofPoints: [
-      "Free users can run 600 lead searches per week before upgrading.",
+      "Trial users can run 600 lead results during a free 3-day trial before upgrading.",
       "Remote, local, and live job lead paths in one product.",
       "AI proposal drafting uses the lead context so messages are less generic.",
       "Softphone number packages for US, Canada, and UK calling can be added when phone outreach fits.",
@@ -168,7 +168,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { group: "Software intent", terms: ["freelance lead generation software", "freelance CRM", "AI proposal tool"] },
     ],
     workflow: [
-      { title: "Use the weekly free allowance", description: "Start with 600 lead searches and focus them on one service, niche, or local market." },
+      { title: "Use your 3-day trial allowance", description: "Start with 600 lead searches and focus them on one service, niche, or local market." },
       { title: "Filter by fit", description: "Use niche, freshness, location, website status, budget clues, or contact signals to cut weak prospects before saving them." },
       { title: "Save only pitchable leads", description: "Keep the leads where you can explain the problem and first message in one sentence." },
       { title: "Prepare outreach and follow-up", description: "Draft the email, review it, and track the next step without losing context." },
@@ -222,8 +222,8 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
         a: "The safe workflow prepares Gmail-ready drafts and keeps outreach tracked. You review the message and stay in control.",
       },
       {
-        q: "Can free users try this?",
-        a: "Yes. Free users can run up to 600 lead searches per week, then save the best matches, draft outreach, and decide whether the workflow fits their service.",
+        q: "Can trial users try this?",
+        a: "Yes. Trial users can run up to 600 lead results during a free 3-day trial, then save the best matches, draft outreach, and decide whether the workflow fits their service.",
       },
     ],
   },
@@ -233,7 +233,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     primaryKeyword: "remote freelance jobs",
     metaTitle: "Remote Freelance Jobs and Leads | Find Fresh Contract Opportunities",
     metaDescription:
-      "Find remote freelance jobs, contract roles, public hiring signals, and proposal-ready opportunities by niche. Start your first search free.",
+      "Find remote freelance jobs, contract roles, public hiring signals, and proposal-ready opportunities by niche. Start a free 3-day trial.",
     eyebrow: "Remote Freelance Jobs",
     title: "Find remote freelance jobs",
     accentTitle: "that can become direct clients",
@@ -241,7 +241,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       "iCloseLeads treats remote job posts as client acquisition signals, then helps you sort by freshness, niche fit, contact data, and pitch quality.",
     directAnswer:
       "The best remote freelance jobs to pitch are fresh, niche-specific, and tied to a clear business problem. Instead of applying to everything, use iCloseLeads to search recent opportunities, save strong matches, and write a proposal from the actual job context.",
-    primaryCta: "Search Remote Jobs Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See remote lead use case",
     dashboardPath: "/dashboard/leads",
     audience:
@@ -330,7 +330,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       "iCloseLeads helps freelancers find local businesses that may need websites, SEO, branding, booking flows, ads, content, or modernization, then route the best prospects into saved proof, proposals, and follow-up.",
     directAnswer:
       "Good local business leads are not just names on a map. They have a visible pitch reason: no website, an outdated site, weak local presence, a public phone route, recent reviews, or a category where better digital presence can create more calls and bookings. The best ones can move straight into signup, saved notes, and a proposal-ready pitch path.",
-    primaryCta: "Search Local Leads Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See businesses without websites",
     dashboardPath: "/dashboard/local-leads",
     audience:
@@ -419,7 +419,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       "iCloseLeads helps web designers and local marketers find businesses with no or unclear website presence, then verify whether the lead is worth pitching.",
     directAnswer:
       "Businesses without websites can be strong web design leads, but only when they are active, reachable, and likely to benefit from more calls, bookings, trust, or local search visibility. iCloseLeads helps you filter for that signal before you spend time pitching.",
-    primaryCta: "Find No-Website Leads Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See web design leads",
     dashboardPath: "/dashboard/local-leads",
     audience:

@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     if (config.testMode && user?.role !== "ADMIN") {
       await recordAuditLog({ action: "payment_checkout_blocked", actorId: session.user.id, details: { plan, reason: "private_test_mode" } });
       return NextResponse.json({
-        error: "Paid plans are still in private checkout testing. Your free account remains active.",
+        error: "Checkout is temporarily unavailable while billing is being tested. Your existing trial deadline or paid access is unchanged. Please contact support.",
       }, { status: 503 });
     }
 

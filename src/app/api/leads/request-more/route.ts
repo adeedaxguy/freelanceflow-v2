@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { notifyMoreLeadsRequest } from "@/lib/admin-notifications";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rate-limit";
@@ -40,6 +41,9 @@ export async function POST(req: NextRequest) {
   }
 
   const parsed = schema.safeParse(await req.json().catch(() => ({})));
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
+
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { prisma } from "@/lib/prisma";
-import { FREE_SHARE_BONUS_LEADS, FREE_TRIAL_LEAD_LIMIT } from "@/lib/plan-limits";
+import { FREE_SHARE_BONUS_LEADS, FREE_TRIAL_LEAD_LIMIT, getFreeTrialWindow } from "@/lib/plan-limits";
 import { z } from "zod";
 import { createHash, randomBytes } from "crypto";
 const genCode = () => randomBytes(4).toString("hex").toUpperCase();
@@ -74,6 +75,9 @@ export async function POST(req: NextRequest) {
   }
 
   const body = (await req.json()) as unknown;
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
+
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 400 });
 
@@ -182,7 +186,7 @@ export async function GET(req: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { bonusLeads: true, bonusClaimed: true, referralCode: true, whatsapp: true },
+    select: { bonusLeads: true, bonusClaimed: true, referralCode: true, whatsapp: true, createdAt: true, plan: true },
   });
 
   const claimed = parseClaimed(user?.bonusClaimed);
@@ -192,6 +196,6 @@ export async function GET(req: NextRequest) {
     claimed,
     referralCode:  user?.referralCode,
     whatsapp:      user?.whatsapp,
-    canClaimShare: !hasShareClaim(claimed),
+    canClaimShare: Boolean(user && user.plan === "free" && new Date() < getFreeTrialWindow(user.createdAt).endsAt && !hasShareClaim(claimed)),
   });
 }

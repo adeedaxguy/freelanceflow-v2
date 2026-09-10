@@ -22,6 +22,9 @@ const freeUser = {
 };
 
 describe("free trial usage", () => {
+  beforeEach(() => {
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue(freeUser);
+  });
   afterEach(() => {
     jest.useRealTimers();
     jest.clearAllMocks();
@@ -77,5 +80,50 @@ describe("free trial usage", () => {
       allowed: false,
       plan: "free",
     }));
+  });
+
+  it("allows the last millisecond and rejects the exact 72-hour boundary", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-09-13T11:59:59.999Z"));
+    await expect(checkAndIncrementLeads("user_123", 1)).resolves.toMatchObject({ allowed: true });
+    jest.setSystemTime(new Date("2026-09-13T12:00:00.000Z"));
+    await expect(checkAndIncrementLeads("user_123", 1)).resolves.toMatchObject({ allowed: false });
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ trialExpired: true, remaining: 0 });
+  });
+
+  it("does not renew an expired trial weekly or extend it with bonus credits", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-10-01T12:00:00.000Z"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ ...freeUser, bonusLeads: 300, weeklyLeads: 0 });
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ limit: 900, remaining: 0, trialExpired: true, trialEndsAt: "2026-09-13T12:00:00.000Z" });
+    await expect(checkAndIncrementLeads("user_123", 1)).resolves.toMatchObject({ allowed: false });
+    expect(prisma.user.updateMany).not.toHaveBeenCalled();
+  });
+
+  it.each(["pro", "agency"])("keeps %s usable after the signup trial deadline", async plan => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-09-14T12:00:00.000Z"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ ...freeUser, plan });
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ trialExpired: false, trialEndsAt: null });
+    await expect(checkAndIncrementLeads("user_123", 1)).resolves.toMatchObject({ allowed: true });
+  });
+
+  it("does not restart a trial after a paid account returns to free", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-09-14T12:00:00.000Z"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ ...freeUser, plan: "agency" });
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ trialExpired: false });
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue(freeUser);
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ trialExpired: true });
+  });
+
+  it("gives admins unlimited test usage without giving that bypass to regular users", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-09-14T12:00:00.000Z"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ ...freeUser, role: "ADMIN" });
+    await expect(getUsageStats("user_123")).resolves.toMatchObject({ trialExpired: false, unlimited: true });
+    await expect(checkAndIncrementLeads("user_123", 1000)).resolves.toMatchObject({ allowed: true });
+  });
+
+  it("enforces the final result and refuses over-reservation", async () => {
+    jest.useFakeTimers().setSystemTime(new Date("2026-09-11T12:00:00.000Z"));
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ ...freeUser, weeklyLeads: 599 });
+    await expect(checkAndIncrementLeads("user_123", 2)).resolves.toMatchObject({ allowed: false, remaining: 1 });
+    await expect(checkAndIncrementLeads("user_123", 1)).resolves.toMatchObject({ allowed: true, remaining: 0 });
   });
 });

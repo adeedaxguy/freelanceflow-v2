@@ -29,7 +29,7 @@ export interface OutreachUsage extends OutreachPlanLimit {
 }
 
 const LIMITS = {
-  free:   { daily: 50,  monthly: 400,  perMinute: 5,  label: "Free" },
+  free:   { daily: 50,  monthly: 400,  perMinute: 5,  label: "3-Day Trial" },
   pro:    { daily: 150, monthly: 2000, perMinute: 8,  label: "Pro" },
   agency: { daily: 400, monthly: 8000, perMinute: 10, label: "Agency" },
 } satisfies Record<string, OutreachPlanLimit>;

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { useSession } from "next-auth/react";
-import { Clock3, Lock, Plus, ShieldCheck, Trash2, Mail } from "lucide-react";
+import { Clock3, Lock, Plus, ShieldCheck, Trash2, Mail, Loader2 } from "lucide-react";
 import { CampaignStatusBadge } from "@/components/Badge";
 import ConfirmModal from "@/components/ConfirmModal";
 import { formatDate } from "@/lib/utils";
@@ -15,6 +15,8 @@ export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [createError, setCreateError] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", niche: "" });
   const isAdmin = session?.user?.role === "ADMIN";
@@ -30,8 +32,20 @@ export default function CampaignsPage() {
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
-    await fetch("/api/campaigns", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    setCreating(false); setForm({ name: "", niche: "" }); void fetchCampaigns();
+    if (saving) return;
+    setSaving(true);
+    setCreateError("");
+    try {
+      const res = await fetch("/api/campaigns", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const data = await res.json().catch(() => ({})) as { error?: string };
+      if (!res.ok) {
+        setCreateError(data.error ?? "Could not create this campaign. Please try again.");
+        return;
+      }
+      setCreating(false); setForm({ name: "", niche: "" }); void fetchCampaigns();
+    } catch {
+      setCreateError("Connection failed. Your draft is still here; please try again.");
+    } finally { setSaving(false); }
   }
 
   async function handleDelete() {
@@ -153,9 +167,10 @@ export default function CampaignsPage() {
                   className="w-full px-4 py-2.5 bg-background border border-border rounded-xl text-foreground focus:outline-none focus:border-primary/50" placeholder="web-development" />
               </div>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setCreating(false)} className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium">Create Campaign</button>
+                <button type="button" disabled={saving} onClick={() => setCreating(false)} className="px-4 py-2 rounded-lg border border-border text-sm text-muted-foreground">Cancel</button>
+                <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white text-sm font-medium disabled:opacity-60">{saving && <Loader2 className="h-4 w-4 animate-spin" />}Create Campaign</button>
               </div>
+              {createError && <p role="alert" className="text-sm text-destructive">{createError}</p>}
             </form>
           </div>
         </div>

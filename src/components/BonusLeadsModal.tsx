@@ -44,17 +44,17 @@ interface BonusLeadsModalProps {
 const SOURCE_COPY: Record<string, { title: string; body: string; bonus: number }> = {
   "live-jobs": {
     title: "Extra Live Job Leads",
-    body: "Free early access is active. Claim a fresh lead allowance and keep searching for client opportunities.",
+    body: "Claim a one-time share bonus during your 3-day trial. Bonus results do not extend the trial deadline.",
     bonus: 300,
   },
   "remote-leads": {
     title: "Extra Remote Job Leads",
-    body: "Free early access is active. Add more remote lead allowance and keep finding niche-matched opportunities.",
+    body: "Claim a one-time share bonus during your 3-day trial. Bonus results do not extend the trial deadline.",
     bonus: 300,
   },
   "local-leads": {
     title: "Extra Local Business Leads",
-    body: "Free early access is active. Add more local lead allowance and keep finding real businesses to pitch.",
+    body: "Claim a one-time share bonus during your 3-day trial. Bonus results do not extend the trial deadline.",
     bonus: 300,
   },
 };
@@ -170,7 +170,7 @@ export default function BonusLeadsModal({
         : "track fresh client opportunities from live job feeds before they get crowded";
 
     return [
-      "I am using iCloseLeads during its free early access launch.",
+      "I am trying iCloseLeads with a free 3-day trial.",
       `It helps freelancers and agencies ${useCase}, then turn those leads into AI-assisted proposals.`,
       "Worth checking out while it is free:",
       shareUrl,
@@ -299,7 +299,7 @@ export default function BonusLeadsModal({
               <Gift className="h-7 w-7" />
             </div>
             <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-primary-light">{planLabel} early access</p>
+              <p className="mb-1 text-xs font-bold uppercase tracking-wide text-primary-light">{planLabel} trial allowance</p>
               <h2 id="bonus-leads-title" className="text-xl font-bold text-foreground">
                 {copy.title}
               </h2>

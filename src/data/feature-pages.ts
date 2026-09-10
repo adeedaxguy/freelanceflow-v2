@@ -242,7 +242,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       heading: "Find the next prospect worth pitching",
       subheading:
         "Start with one niche, run one focused search, and turn the best result into a proposal in minutes.",
-      button: "Find Leads Free",
+      button: "Try Free for 3 Days",
     },
   },
   {
@@ -604,7 +604,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       "Proposal pages support Gmail compose preparation instead of forcing a black-box sender.",
       "GA4 is already showing engagement and form-start activity around outreach-oriented landing paths.",
       "Landing-page behavior already shows `/auth`, `/resources`, and `/dashboard/local-leads` as real workflow entry points even while key-event tracking remains incomplete.",
-      "Outreach usage limits are visible, which makes the free-plan workflow predictable for early users.",
+      "Outreach usage limits are visible, which makes the 3-day trial workflow predictable.",
       "Saved lead records and email history give every follow-up a single place to live.",
     ],
     stats: [
@@ -713,7 +713,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       heading: "Prepare better outreach without losing control",
       subheading:
         "Write the message, review the context, open Gmail, and send only when it feels right.",
-      button: "Prepare Outreach Free",
+      button: "Try Free for 3 Days",
     },
   },
   {
@@ -1019,7 +1019,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       heading: "Stop letting good leads disappear",
       subheading:
         "Save the prospect, write the pitch, track the stage, and know exactly who needs your next follow-up.",
-      button: "Open Your Free CRM",
+      button: "Try Free for 3 Days",
     },
   },
   {
@@ -1062,7 +1062,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     proof: [
       "Dashboard stats connect to real saved leads, sent/prepared email records, and usage activity.",
       "Source and pipeline views make weekly review faster than spreadsheet maintenance.",
-      "Usage limits and weekly activity make the free plan easier to understand.",
+      "The trial deadline and shared usage allowance make the free 3-day trial easier to understand.",
     ],
     stats: [
       { value: "30 days", label: "Recent activity views" },
@@ -1146,7 +1146,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       "Measures the prospecting workflow, not vanity dashboard metrics.",
       "Built around freelancers who need weekly action, not enterprise reporting.",
       "Connects discovery, proposals, outreach, and CRM in one funnel.",
-      "Keeps limits and usage visible so free-plan users know where they stand.",
+      "Keeps limits and usage visible so trial users know when to upgrade.",
     ],
     faqs: [
       {
@@ -1170,7 +1170,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
       heading: "Make prospecting measurable",
       subheading:
         "See what is working, what is stuck, and where your next outreach block should go.",
-      button: "View Analytics Free",
+      button: "Try Free for 3 Days",
     },
   },
   {
@@ -1218,7 +1218,7 @@ export const FEATURE_PAGES: FeaturePageData[] = [
     stats: [
       { value: "6", label: "Tools in the dashboard" },
       { value: "Instant", label: "No waiting for simple calculations" },
-      { value: "Free", label: "Available during launch access" },
+      { value: "Free", label: "Standalone utilities; no paid plan required" },
       { value: "Practical", label: "Built for real outreach decisions" },
     ],
     workflow: [

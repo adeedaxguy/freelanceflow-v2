@@ -1,7 +1,7 @@
 import type { ResourcePage } from "./resource-pages";
 
 const internalLinks = [
-  { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
+  { label: "600-lead trial sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
   { label: "Web design leads workflow", href: "/blog/web-design-leads-data-led-workflow" },
   { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
   { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
@@ -75,7 +75,7 @@ function buildResourcePage(input: ResourceInput): ResourcePage {
     ],
     proofPoints: [
       "Fresh DataForSEO pulled exact U.S. demand around lead generation for freelancers, while GSC already shows client acquisition content is an iCloseLeads entry point.",
-      "The 600-free-leads weekly offer gives visitors a low-friction reason to test the product before paying.",
+      "The 600-results, free 3-day trial gives visitors a low-friction reason to test the product before paying.",
       input.competitorGap,
     ],
     pitch: input.pitch,
@@ -160,7 +160,7 @@ export const AUGUST_20_2026_RESOURCE_PAGES: ResourcePage[] = [
   }),
   buildResourcePage({
     slug: "client-acquisition-software-for-freelancers-free-plan",
-    title: "Client Acquisition Software for Freelancers With a Free Plan",
+    title: "Client Acquisition Software for Freelancers With a Free 3-Day Trial",
     keyword: "client acquisition software for freelancers free plan",
     relatedSearches: [
       "client acquisition software for freelancers",
@@ -173,7 +173,7 @@ export const AUGUST_20_2026_RESOURCE_PAGES: ResourcePage[] = [
     intent: "The searcher wants software that helps win clients, but they need a free way to test the workflow first.",
     searcherJob: "Compare tools by whether one search can become one qualified saved lead, one reviewed pitch, and one follow-up.",
     competitorGap: "Most software comparisons list features; this page frames the decision around the complete acquisition workflow and a no-risk first search.",
-    workflowNudge: "Test the free plan by running one narrow search and checking whether the saved leads create useful outreach context.",
+    workflowNudge: "Test the free 3-day trial by running one narrow search and checking whether the saved leads create useful outreach context.",
     conversionPath: "Signup for free, run one acquisition sprint, save qualified leads, draft outreach, and review pipeline activity.",
     leadIn: "Use this when you are comparing client acquisition tools and want to know whether the system actually helps you move from search to conversation.",
     pitch: "Hi, I found your business while testing a client acquisition workflow for freelancers. The useful test is simple: can one search produce a qualified lead and a message worth sending?",

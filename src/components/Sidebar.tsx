@@ -241,10 +241,13 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
   const { data: session, status } = useSession();
   const [loggingOut, setLoggingOut] = useState(false);
   const [resolvedPlan, setResolvedPlan] = useState<string | null>(null);
+  const [trialExpired, setTrialExpired] = useState(false);
+  const pathname = usePathname();
 
   const user    = session?.user;
   const planKey = (resolvedPlan ?? user?.plan ?? "free").toLowerCase();
-  const plan: PlanCfg = PLAN_CONFIG[planKey] ?? PLAN_CONFIG.free!;
+  const plan: PlanCfg = { ...(PLAN_CONFIG[planKey] ?? PLAN_CONFIG.free!) };
+  if (planKey === "free" && trialExpired) { plan.label = "Trial ended"; plan.leadsPerWeek = "Upgrade to continue"; }
   const PlanIcon = plan.icon;
 
   useEffect(() => {
@@ -257,15 +260,16 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
 
     fetch("/api/usage", { cache: "no-store" })
       .then(r => (r.ok ? r.json() : null))
-      .then((data: { plan?: string } | null) => {
+      .then((data: { plan?: string; trialExpired?: boolean } | null) => {
         if (active && data?.plan) setResolvedPlan(data.plan.toLowerCase());
+        if (active && data) setTrialExpired(Boolean(data.trialExpired));
       })
       .catch(() => {
         if (active) setResolvedPlan(null);
       });
 
     return () => { active = false; };
-  }, [user?.id, user?.plan]);
+  }, [user?.id, user?.plan, pathname]);
 
   const initials = user?.name
     ? user.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
@@ -359,7 +363,7 @@ function UserPanel({ onLinkClick, collapsed }: { onLinkClick?: () => void; colla
       <div className={`rounded-lg border ${plan.border} bg-surface overflow-hidden`}>
         <div className={`flex items-center gap-2 px-3 py-1.5 ${plan.bg} border-b ${plan.border}`}>
           <PlanIcon className={`w-3 h-3 ${plan.color}`} />
-          <span className={`text-[11px] font-bold tracking-wide ${plan.color}`}>{plan.label} Plan</span>
+          <span className={`text-[11px] font-bold tracking-wide ${plan.color}`}>{plan.label}{planKey !== "free" ? " Plan" : ""}</span>
           <span className="text-[9px] text-muted-foreground ml-auto font-medium">{plan.leadsPerWeek}</span>
         </div>
 

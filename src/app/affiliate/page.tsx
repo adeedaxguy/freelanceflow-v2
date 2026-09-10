@@ -53,7 +53,7 @@ const faqs = [
   { q: "How long does the cookie last?", a: "Our tracking cookie lasts 90 days. If someone clicks your link and upgrades within 90 days, you get credit for the referral." },
   { q: "Do I earn commission on upgrades?", a: "Yes. If a user you referred upgrades from Free to Pro or Agency, you earn commission on their new plan." },
   { q: "When do I get paid?", a: "Payouts are processed on the 15th of each month for the previous month's commissions. Minimum payout is $50." },
-  { q: "Can I be an affiliate if I'm not a iCloseLeads user?", a: "Yes, but we recommend using the product yourself so you can give authentic recommendations. You can sign up for a free account to try it." },
+  { q: "Can I be an affiliate if I'm not a iCloseLeads user?", a: "Yes, but we recommend using the product yourself so you can give authentic recommendations. You can start a free 3-day trial to try it." },
   { q: "Are there any restrictions on promotion?", a: "You may not use paid ads that target iCloseLeads's brand name keywords, send spam, or misrepresent the product. Full details are in our affiliate agreement." },
 ];
 

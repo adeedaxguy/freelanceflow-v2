@@ -63,7 +63,7 @@ function LeadGenerationJsonLd({ page }: { page: LeadGenerationPageData }) {
         "@type": "Offer",
         price: "0",
         priceCurrency: "USD",
-        description: "Free early access account available.",
+        description: "Free 3-day trial with up to 600 lead results. Paid subscription required afterward.",
       },
       potentialAction: {
         "@type": "RegisterAction",
@@ -414,7 +414,7 @@ export default function LeadGenerationMarketingPage({ page }: { page: LeadGenera
             <Users className="mx-auto mb-5 h-10 w-10 text-primary-light" />
             <h2 className="break-words text-3xl font-extrabold text-foreground">Run one focused search before you decide</h2>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
-              Create a free account, choose the lead engine that matches your service, and see whether the first results are worth pitching.
+              Start your free 3-day trial, choose the lead engine that matches your service, and see whether the first results are worth pitching.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link

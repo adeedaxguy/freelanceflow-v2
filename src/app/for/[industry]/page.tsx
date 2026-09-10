@@ -220,7 +220,7 @@ export default async function ForIndustryPage({ params }: { params: Promise<{ in
                 Read the guides
               </Link>
             </div>
-            <p className="text-xs text-muted-foreground mt-4">Free during Early Access · No credit card · Cancel anytime</p>
+            <p className="text-xs text-muted-foreground mt-4">Free 3-day trial · No credit card · No automatic charge</p>
           </div>
         </section>
 
@@ -277,7 +277,7 @@ export default async function ForIndustryPage({ params }: { params: Promise<{ in
               { icon: <Zap className="w-5 h-5 text-primary-light" />, stat: "Multi", label: "Lead channels" },
               { icon: <MapPin className="w-5 h-5 text-accent" />, stat: "Local", label: "Business discovery" },
               { icon: <Target className="w-5 h-5 text-gold" />, stat: "AI", label: "Proposal drafting" },
-              { icon: <TrendingUp className="w-5 h-5 text-primary-light" />, stat: "Free", label: "Early access" },
+              { icon: <TrendingUp className="w-5 h-5 text-primary-light" />, stat: "3 days", label: "Free trial" },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center gap-2">
                 {s.icon}
@@ -304,7 +304,7 @@ export default async function ForIndustryPage({ params }: { params: Promise<{ in
               {data.cta}
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <p className="text-xs text-muted-foreground mt-4">100% free during Early Access · No credit card needed</p>
+            <p className="text-xs text-muted-foreground mt-4">Free 3-day trial · No credit card needed</p>
           </div>
         </section>
 

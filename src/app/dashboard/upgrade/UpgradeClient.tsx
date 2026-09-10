@@ -125,7 +125,7 @@ export default function UpgradeClient({
   const plans = [
     {
       id: "free",
-      name: "3-Day Trial",
+      name: "Free 3-Day Trial",
       icon: <Zap className="w-5 h-5" />,
       price: { monthly: 0, annual: 0 },
       description: "Explore the core workflow without a card",

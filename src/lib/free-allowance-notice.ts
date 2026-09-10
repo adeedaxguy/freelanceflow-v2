@@ -9,11 +9,11 @@ export function freeAllowanceNoticeKey(userId: string) {
 export function freeAllowanceNoticeContent() {
   return {
     subject: FREE_ALLOWANCE_NOTICE_SUBJECT,
-    title: "Your 3-day trial allowance is active",
+    title: "Your trial allowance and ongoing access",
     lines: [
       "We're writing to confirm a change to your iCloseLeads account.",
-      "<strong>Your trial includes up to 600 lead results for three days.</strong> The trial begins when you create your account; existing accounts receive a three-day rollout window.",
-      "No action is required to start. After the trial ends, choose Pro or Agency through secure Stripe checkout to continue finding new leads.",
+      "<strong>Your trial includes up to 600 shared lead results for 72 hours from registration.</strong> Older accounts received a one-time rollout window ending September 1, 2026; this notice does not restart it.",
+      "Check your dashboard for your deadline. After expiry, choose Pro ($10/month) or Agency ($15/month) through Stripe for new searches, AI tools, and outreach. Saved work remains available. No card or automatic charge for the trial.",
       '<a href="https://icloseleads.com/dashboard" style="color:#9f67ff;font-weight:700;">View your current usage</a>',
       "The iCloseLeads team",
     ],

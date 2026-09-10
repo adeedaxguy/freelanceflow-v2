@@ -55,4 +55,14 @@ describe("authenticated session revocation", () => {
       plan: "agency",
     }));
   });
+
+  it("keeps the original signup time when an existing Google user signs in again", async () => {
+    const createdAt = new Date("2026-09-01T12:00:00Z");
+    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: "google-user", role: "USER", plan: "free", suspended: false, createdAt, sessionVersion: 0 });
+    const user = { id: "google-id", email: "returning@example.com" };
+    const signIn = authOptions.callbacks!.signIn!;
+    const result = await signIn({ user, account: { provider: "google", providerAccountId: "google-id", type: "oauth" } } as never);
+    expect(result).toBe(true);
+    expect(user).toMatchObject({ id: "google-user", createdAt: createdAt.toISOString() });
+  });
 });

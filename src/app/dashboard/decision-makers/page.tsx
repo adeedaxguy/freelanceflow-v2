@@ -550,7 +550,7 @@ function DecisionMakerFinderInner() {
       return;
     }
     if (!canUseFinder) {
-      setError("Decision Maker Finder is coming soon for free accounts.");
+      setError("Decision Maker Finder is included with Pro and Agency. Choose a paid plan to continue.");
       return;
     }
 
@@ -649,9 +649,9 @@ function DecisionMakerFinderInner() {
               <Lock className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="font-bold text-foreground">Coming soon for free accounts</h2>
+              <h2 className="font-bold text-foreground">Included with Pro and Agency</h2>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                Decision Maker Finder is being kept as an Agency workflow because it uses deeper verification and registry checks. You can still save leads and prepare outreach from the other lead engines.
+                Contact research uses deeper verification and registry checks. Upgrade to Pro or Agency to use it. During your trial, you can still search the lead engines and prepare outreach.
               </p>
             </div>
           </div>

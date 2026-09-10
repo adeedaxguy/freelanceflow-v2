@@ -58,7 +58,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Stop refreshing job boards after everyone else has already applied. iCloseLeads helps freelancers find fresh remote opportunities, qualify the real buyer intent, and turn the best matches into human-sounding proposals.",
-    primaryCta: "Find Remote Leads Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See Lead Discovery",
     dashboardPath: "/dashboard/leads",
     searchIntent:
@@ -170,7 +170,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Cold outreach works when the first message has a real reason to exist. iCloseLeads helps freelancers find timely lead signals, verify the contact path, and write outreach that feels researched instead of copied, then move the best replies toward a saved lead, Gmail draft, and follow-up workflow instead of another disconnected spreadsheet.",
-    primaryCta: "Start Outreach Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See AI Proposals",
     dashboardPath: "/dashboard/leads",
     searchIntent:
@@ -281,14 +281,14 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     accentTitle: "for web designers, SEO consultants, and marketers",
     metaTitle: "Local Business Leads for Freelancers",
     metaDescription:
-      "Find local business leads using website gaps, Google Maps signals, phone routes, and owner checks. Start with 600 free weekly lead searches.",
+      "Find local business leads using website gaps, Google Maps signals, phone routes, and owner checks. Start with 600 lead results during a free 3-day trial.",
     keywords: [
       "local business leads",
       "free local business leads",
       "local business leads for web designers",
       "web design leads",
       "web design leads for free",
-      "600 free leads per week",
+      "600 leads in a free 3-day trial",
       "leads for web design",
       "exclusive web design leads",
       "businesses without websites",
@@ -304,7 +304,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Find local business leads that already show a reason to pitch: no website, outdated site, weak Google Maps-to-website flow, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into signup, a real local lead search, proposal drafting, and saved-lead follow-up without losing context or bouncing between tools.",
-    primaryCta: "Search 600 Local Leads Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See Google Maps Pitch Workflow",
     dashboardPath: "/dashboard/local-leads",
     searchIntent:
@@ -354,7 +354,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     keywordsCluster: [
       { group: "Core", terms: ["local business leads", "small business leads", "local client leads"] },
       { group: "Web design", terms: ["businesses without websites", "outdated website leads", "find web design clients"] },
-      { group: "Free offer", terms: ["free local business leads", "600 free leads per week", "web design leads free"] },
+      { group: "Free offer", terms: ["free local business leads", "600 leads in a free 3-day trial", "web design leads free"] },
       { group: "Google Maps pitch", terms: ["the pitch google maps listing", "Google Maps listing pitch", "Google Maps prospecting tool"] },
       { group: "Decision makers", terms: ["business owner name finder", "find business owner contact", "decision maker finder for local business"] },
       { group: "Marketing", terms: ["local SEO client leads", "lead generation for local marketing agencies", "website redesign leads"] },
@@ -435,7 +435,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Some opportunities are won because your offer is better. Others are won because you show up while the need is still hot. Live Job Leads is built for fast-moving public demand.",
-    primaryCta: "Open Live Jobs Free",
+    primaryCta: "Try Free for 3 Days",
     secondaryCta: "See Remote Leads",
     dashboardPath: "/dashboard/live-jobs",
     searchIntent:

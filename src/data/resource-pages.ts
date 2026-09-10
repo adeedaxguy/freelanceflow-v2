@@ -2208,7 +2208,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
       { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
       { label: "Find local business leads", href: "/use-cases/local-business-leads" },
-      { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
+      { label: "600-lead trial sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
     ],
     faqs: [
       {
@@ -2409,7 +2409,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     internalLinks: [
       { label: "Proposal-ready leads", href: "/blog/proposal-ready-leads-for-freelancers" },
       { label: "Local business leads scorecard", href: "/blog/local-business-leads-scorecard-for-freelancers" },
-      { label: "600 free leads weekly sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
+      { label: "600-lead trial sprint", href: "/blog/600-free-leads-week-client-acquisition-plan" },
       { label: "Cold outreach use case", href: "/use-cases/freelance-cold-outreach" },
       { label: "Lead qualification checklist", href: "/resources/lead-qualification-checklist-for-freelancers" },
     ],
@@ -5252,7 +5252,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       href: "/blog/web-design-leads-data-led-workflow"
     },
     {
-      label: "600 free leads weekly sprint",
+      label: "600-lead trial sprint",
       href: "/blog/600-free-leads-week-client-acquisition-plan"
     },
     {
@@ -6119,7 +6119,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
   proofPoints: [
     "Google related searches include free and Reddit modifiers for freelance outreach.",
     "The user intent is practical and budget-conscious, so the page needs to show how to get to a real lead search without paying for a list first.",
-    "This page supports first activation for free account users."
+    "This page supports first activation during a free 3-day trial."
   ],
   pitch: "Hi, I found [signal] while researching [buyer type]. I had one quick idea for [outcome] and can send it over if useful.",
   internalLinks: [
@@ -6132,7 +6132,7 @@ export const RESOURCE_PAGES: ResourcePage[] = [
       href: "/resources/cold-outreach-examples"
     },
     {
-      label: "Start free",
+      label: "Try Free for 3 Days",
       href: "/auth?mode=signup"
     }
   ],
@@ -7018,7 +7018,7 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
     metaDescription: page.slug === "google-maps-listing-pitch-for-freelancers"
       ? "Use a proof-led Google Maps listing pitch for email, phone, or a mini audit. Qualify the business, choose the right script, and search 600 leads free."
       : page.slug === "google-maps-prospecting-tool-for-freelancers"
-        ? "Turn Google Maps business signals into qualified leads, saved CRM context, reviewed proposals, and follow-up. Start with 600 free weekly leads."
+        ? "Turn Google Maps business signals into qualified leads, saved CRM context, reviewed proposals, and follow-up. Start with 600 lead results during a free 3-day trial."
       : "Use iCloseLeads to turn " + page.keyword + " research into verified prospects, saved context, proposal drafts, Gmail-ready outreach, and CRM follow-up.",
     keyword: page.keyword,
     relatedSearches: page.relatedSearches,

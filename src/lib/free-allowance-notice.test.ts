@@ -10,8 +10,9 @@ describe("Free allowance account notice", () => {
     const copy = `${notice.subject} ${notice.title} ${notice.lines.join(" ")}`.toLowerCase();
 
     expect(notice.subject).toBe(FREE_ALLOWANCE_NOTICE_SUBJECT);
-    expect(copy).toContain("600 lead results for three days");
-    expect(copy).toContain("no action is required");
+    expect(copy).toContain("600 shared lead results for 72 hours");
+    expect(copy).toContain("this notice does not restart it");
+    expect(copy).toContain("no card or automatic charge");
     expect(copy).not.toMatch(/unlock|limited-time|upgrade now|sale|discount|blog/);
   });
 

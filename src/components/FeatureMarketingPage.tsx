@@ -200,7 +200,7 @@ export default function FeatureMarketingPage({ page }: { page: FeaturePageData }
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-3 text-sm text-muted-foreground">
-                {["No credit card", "Free during launch", "Built for freelancers"].map(label => (
+                {["No credit card", "Free 3-day trial", "Built for freelancers"].map(label => (
                   <span key={label} className="inline-flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-accent" />
                     {label}

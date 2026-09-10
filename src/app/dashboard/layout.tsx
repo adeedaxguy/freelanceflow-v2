@@ -9,10 +9,13 @@ import OnboardingTour from "@/components/OnboardingTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 import SignupAnalytics from "@/components/SignupAnalytics";
 import { DashboardRouteMotion } from "@/components/AppRouteMotion";
+import TrialAccessBoundary from "@/components/TrialAccessBoundary";
+import { getUsageStats } from "@/lib/usage";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/auth");
+  const usage = await getUsageStats(session.user.id).catch(() => null);
 
   return (
     <div className="dashboard-shell flex min-h-screen bg-background">
@@ -25,7 +28,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           pb-20 lg:pb-0 = clearance for the mobile bottom nav (h-16 + safe area) */}
       <main className="dashboard-content flex-1 min-w-0 overflow-auto pt-14 pb-20 lg:pt-0 lg:pb-0">
         <ErrorBoundary section="Dashboard">
-          <DashboardRouteMotion>{children}</DashboardRouteMotion>
+          <TrialAccessBoundary initialUsage={usage}>
+            <DashboardRouteMotion>{children}</DashboardRouteMotion>
+          </TrialAccessBoundary>
         </ErrorBoundary>
       </main>
 

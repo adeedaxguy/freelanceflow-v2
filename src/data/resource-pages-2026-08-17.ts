@@ -1,7 +1,7 @@
 import type { ResourcePage } from "./resource-pages";
 
 const internalLinks = [
-  { label: "600 free leads per week", href: "/blog/600-free-leads-per-week-for-freelancers" },
+  { label: "600 leads in a free 3-day trial", href: "/blog/600-free-leads-per-week-for-freelancers" },
   { label: "Freelance client acquisition system", href: "/blog/freelance-client-acquisition-system" },
   { label: "Lead discovery", href: "/features/lead-discovery" },
   { label: "AI proposals", href: "/features/ai-proposals" },
@@ -85,7 +85,7 @@ function buildResourcePage(input: August17ResourceInput): ResourcePage {
         a: "Start with one offer and one buyer type, then search for prospects with a visible business reason to contact them.",
       },
       {
-        q: "Should I use all 600 free weekly leads at once?",
+        q: "Should I use all 600 trial lead results at once?",
         a: "No. Use the weekly allowance to run several focused searches, save only qualified prospects, and learn which niche responds before scaling.",
       },
       {
@@ -146,7 +146,7 @@ export const AUGUST_17_2026_RESOURCE_PAGES: ResourcePage[] = [
       "free lead finder for freelancers",
       "lead generation tools for freelancers",
       "freelance client acquisition tool",
-      "600 free leads per week",
+      "600 leads in a free 3-day trial",
     ],
     audience: "Freelancers comparing free lead tools before committing to a paid prospecting stack",
     intent: "The searcher wants to test a tool without paying before they know whether the lead source fits their niche.",

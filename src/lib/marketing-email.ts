@@ -37,7 +37,7 @@ function messageHtml(message: string): string {
       : null;
     if (ownUrl) {
       const label = ownUrl.includes("600-free-leads")
-        ? "Read the 600-lead weekly playbook"
+        ? "Read the 600-lead prospecting playbook"
         : "Open this iCloseLeads page";
       return `<p style="margin:0 0 22px"><a href="${escapeHtml(ownUrl)}" style="color:#5235b8;font-size:15px;font-weight:700;text-decoration:underline;text-underline-offset:3px">${label} &rarr;</a></p>`;
     }
@@ -155,7 +155,7 @@ export function renderWelcomeEmail(params: { name: string | null }) {
         </td></tr>
         <tr><td colspan="4" class="mobile-pad" style="padding:18px 34px 34px;background:#10111c">
           <h1 class="mobile-title" style="margin:0;max-width:560px;color:#ffffff;font-size:38px;line-height:1.1;letter-spacing:0;font-weight:800">Turn one good lead into your next client.</h1>
-          <p style="margin:18px 0 0;max-width:560px;color:#c9ccda;font-size:16px;line-height:1.65">Hi ${safeFirstName}, your iCloseLeads workspace is ready. Your 3-day trial includes up to 600 lead results and the complete workflow for turning an opportunity into a focused outreach plan.</p>
+          <p style="margin:18px 0 0;max-width:560px;color:#c9ccda;font-size:16px;line-height:1.65">Hi ${safeFirstName}, your iCloseLeads workspace is ready. Your free 3-day trial includes up to 600 lead results shared across Local, Remote, and Live Jobs. It starts at registration and ends after 72 hours.</p>
         </td></tr>
         <tr><td colspan="4" class="mobile-pad" style="padding:0 34px 30px;background:#10111c">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
@@ -212,6 +212,7 @@ export function renderWelcomeEmail(params: { name: string | null }) {
           </table>
         </td></tr>
         <tr><td colspan="4" class="mobile-pad" style="padding:0 34px 34px">
+          <p style="margin:0 0 16px;color:#626979;font-size:14px;line-height:1.65">After 72 hours, choose <a href="https://icloseleads.com/dashboard/upgrade" style="color:#4930bd;font-weight:700">Pro ($10/month) or Agency ($15/month)</a> for new searches, AI tools, and outreach. Saved work stays available. No card is required for the trial and there is no automatic charge. Phone numbers and minutes are billed separately.</p>
           <p style="margin:0 0 10px;color:#30313a;font-size:13px;font-weight:800">Other places to start</p>
           <p style="margin:0;color:#626979;font-size:14px;line-height:1.8"><a href="${remoteJobsUrl}" style="color:#4930bd;font-weight:700;text-decoration:underline">Browse remote jobs</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="${liveJobsUrl}" style="color:#4930bd;font-weight:700;text-decoration:underline">See live opportunities</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="https://icloseleads.com/dashboard/softphone" style="color:#4930bd;font-weight:700;text-decoration:underline">Set up calling</a></p>
         </td></tr>
@@ -226,7 +227,7 @@ export function renderWelcomeEmail(params: { name: string | null }) {
 </html>`;
   const text = `Hi ${firstName},
 
-Your iCloseLeads workspace is ready. Your 3-day trial includes up to 600 lead results.
+Your iCloseLeads workspace is ready. Your free 3-day trial includes up to 600 shared lead results for 72 hours from registration. After expiry, Pro ($10/month) or Agency ($15/month) is required for new searches, AI tools, and outreach. Saved work stays available. No card or automatic charge. Phone numbers and minutes are billed separately.
 
 Your first client-winning loop:
 1. Discover a real opportunity in Local Business Leads, Remote Jobs, or Live Jobs.

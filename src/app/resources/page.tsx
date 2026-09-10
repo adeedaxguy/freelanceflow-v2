@@ -126,7 +126,7 @@ export default function ResourcesPage() {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/auth?mode=signup&intent=resources-overview&source=resources-hero" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
-                Start Free and Run a Search
+                Try Free for 3 Days
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/use-cases/local-business-leads" className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">

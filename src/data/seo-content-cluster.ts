@@ -578,15 +578,15 @@ const topics: SeoTopic[] = [
   },
   {
     slug: "freelance-client-acquisition-system",
-    title: "Freelance Client Acquisition System: Run a 21-Day Sprint With 600 Free Weekly Leads",
+    title: "Freelance Client Acquisition System: Start a Client Acquisition Sprint With a Free 3-Day Trial",
     excerpt: "A freelance client acquisition system should move visitors from search into a free lead search, qualification notes, proposal drafts, and follow-up instead of generic advice or disconnected templates.",
     metaTitle: "Freelance Client Acquisition System",
-    metaDescription: "Run a 21-day client acquisition sprint with 600 free weekly leads, qualification notes, proposal drafts, and a practical follow-up workflow.",
+    metaDescription: "Start a client acquisition sprint with 600 lead results during a free 3-day trial, qualification notes, proposal drafts, and a practical follow-up workflow.",
     category: "Strategy",
     focusKeyword: "freelance client acquisition system",
     audience: "freelancers who want predictable pipeline",
     leadType: "multi-channel client leads",
-    offer: "a signup-first client acquisition system that lets a freelancer use 600 free weekly leads to run a 21-day sprint, save proof-led prospects, and keep a 30-day pipeline moving",
+    offer: "a signup-first client acquisition system that lets a freelancer use 600 trial lead results over three days to start a prospecting sprint, then subscribe for ongoing discovery, save proof-led prospects, and keep a 30-day pipeline moving",
     pain: "Many freelancers prospect only when work gets slow, then bounce between blog advice, Google Maps, job boards, proposal docs, and spreadsheets without a single path to a saved lead, reviewed pitch, or signup.",
     promise: "This guide shows how to make client acquisition a repeatable weekly system, route readers into a real lead search, and keep proposals, saved proof, and follow-up connected.",
     internalPath: "/use-cases/local-business-leads",
@@ -1914,7 +1914,7 @@ function getSupportPageSection(topic: SeoTopic) {
 
 This article is the strategy hub. The next best page depends on the lead source the freelancer is ready to test.
 
-- Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly sprint</a> when the reader wants to test the free allowance before paying.
+- Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600-lead trial sprint</a> when the reader wants to test the free allowance before paying.
 - Use the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> or <a href="/resources/web-design-lead-generation">web design lead generation resource</a> when the offer is website, redesign, booking-flow, or local SEO work.
 - Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects from a city or category search.
 - Use the <a href="/resources/google-maps-listing-pitch-for-freelancers">Google Maps listing pitch builder</a> when a listing exposes a real website, booking, quote, or phone-flow gap and the reader needs an email, phone, or mini-audit script.

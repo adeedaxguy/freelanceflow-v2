@@ -172,7 +172,7 @@ function hasAny(text: string, terms: string[]): boolean {
   return terms.some(term => text.includes(term));
 }
 
-function withSignupFlow(answer: string, nextStep = "Create a free account, run one real search, and save the first lead worth pursuing. No card is needed to start; Pro and Agency upgrades are available when you need higher limits."): string {
+function withSignupFlow(answer: string, nextStep = "Start a free 3-day trial with up to 600 lead results, run one focused search, and save the best matches. No card is needed. After 72 hours, choose Pro ($10/month) or Agency ($15/month) to continue searches, AI tools, and outreach."): string {
   return `${answer}
 
 Best next step: ${nextStep}`;
@@ -232,7 +232,7 @@ function buildLocalSupportReply(messages: Array<{ role: "user" | "assistant"; co
 
   if (!urgentBug && hasAny(lower, ["sign up", "signup", "create account", "get started", "start free", "free account", "join", "try it"])) {
     return {
-      reply: `Yes - the best move is to start with the free account.
+      reply: `Start with a free 3-day trial, including up to 600 lead results shared across the lead tools.
 
 You do not need a card to start. Inside, you can test the real workflow:
 1. Find remote job leads, local business leads, or live job signals.
@@ -240,7 +240,7 @@ You do not need a card to start. Inside, you can test the real workflow:
 3. Generate a draft proposal or pitch.
 4. Prepare Gmail outreach and track follow-up.
 
-Pro and Agency are available when you need higher limits, more campaigns, or agency features.`,
+After 72 hours, a paid plan is required for new searches, AI tools, and outreach: Pro is $10/month and Agency is $15/month. Saved work stays accessible. No automatic charge.`,
       shouldCreateTicket: false,
     };
   }
@@ -249,7 +249,7 @@ Pro and Agency are available when you need higher limits, more campaigns, or age
     return {
       reply: `${buildLocalContentDraft(lastMessage)}
 
-If you want this to be sharper, use the free account with a real lead selected. The AI proposal flow can pull in the lead context, business type, niche, and outreach angle so the message feels less generic.`,
+For a personalised draft, use AI Proposals with a real lead during your 3-day trial or on a paid plan.`,
       shouldCreateTicket: false,
     };
   }
@@ -301,16 +301,16 @@ Try this:
 
   if (hasAny(lower, ["free", "price", "pricing", "plan", "paid", "cost", "agency", "pro", "card", "trial"])) {
     return {
-      reply: `The cleanest path is to start free, then upgrade when the limits matter.
+      reply: `Start with a free 3-day trial: up to 600 lead results shared across Local, Remote, and Live Jobs.
 
-No card is needed for the Free plan. Pro and Agency upgrades use secure Stripe checkout, and softphone numbers and calling minutes are separate paid add-ons. The free account lets you test the core product honestly:
+No card is needed and the trial does not charge automatically. After 72 hours, new searches, AI tools, and outreach require Pro ($10/month) or Agency ($15/month), through Stripe. Phone numbers and calling minutes are separate paid add-ons. During the trial, you can use:
 1. Remote job lead discovery.
 2. Local business lead discovery.
 3. Live job signals.
 4. AI proposals and pitch drafts.
 5. Saved leads, Gmail-ready outreach, and follow-up tracking.
 
-Best next step: start free, run one search in your niche, and upgrade only when you need higher limits or agency workflows.`,
+Saved work remains accessible after expiry. Start your 3-day trial and run one focused search in your niche.`,
       shouldCreateTicket: false,
     };
   }
@@ -373,19 +373,20 @@ Common issues and fixes:
 - "No leads found" → Try a broader niche, a longer date range, or switch between Remote Jobs, Local Business Leads, and Live Jobs
 - "AI proposal not working" → Try regenerate, verify the lead has enough context, and use the template fallback if needed
 - "Can't log in" → Try resetting password; check email/password are correct; if OAuth fails, ask for the provider and error
-- "Lead limit reached" → Explain the current plan limit and suggest waiting for reset or upgrading to Pro or Agency
+- "Lead limit reached" → The trial has 600 shared results over 72 hours from signup, with no weekly renewal. After expiry, upgrade to Pro or Agency. Only paid Pro lead allowances reset weekly.
 - "Email not sending" → iCloseLeads prepares Gmail drafts by default; users review and send inside Gmail
 
 Conversion guidance:
 - Answer the user's actual question first.
 - Then suggest the best next step inside iCloseLeads.
-- Free is available without a card. Pro and Agency upgrades use secure Stripe checkout.
+- The free 3-day trial starts at signup, includes 600 shared lead results, and never charges automatically. New searches, AI tools, and outreach require payment after expiry. Saved work stays accessible.
+- Pro is $10/month with 1,000 lead results/week. Agency is $15/month with unlimited results subject to source availability and rate limits. Upgrades use Stripe.
 - Softphone access is available on every plan, but phone numbers and calling minutes are separate paid add-ons.
 - Do not tell users to buy or configure an external AI API.
 - Do not name raw data providers or imply the platform is built from free sources.
 - Avoid fake guarantees, fake revenue claims, and pushy language.
 
-Answer helpfully and concisely. You may draft short proposal, pitch, subject line, and outreach content directly. If it is relevant, end with a natural free signup next step such as: "Best next step: create a free early access account and run one search in your niche." If you cannot resolve an account or product issue after 2 exchanges, say: "ESCALATE: [brief description of issue]" so a ticket can be raised.`;
+Answer helpfully and concisely. Explain how to use the product; direct personalised content generation to AI Proposals during an active trial or paid plan. If relevant, suggest: "Start your free 3-day trial and run one focused search." If you cannot resolve an account or product issue after 2 exchanges, say: "ESCALATE: [brief description of issue]" so a ticket can be raised.`;
 
   if (!apiKey) {
     return buildLocalSupportReply(messages);

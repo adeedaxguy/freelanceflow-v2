@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { prisma } from "@/lib/prisma";
 import { sendMail } from "@/lib/mailer";
 import { z } from "zod";
@@ -63,6 +64,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
 
   let rawBody: unknown;
   try { rawBody = await req.json(); } catch { rawBody = {}; }
@@ -114,6 +117,8 @@ export async function PATCH(req: NextRequest) {
   // ── If marking as SENT, actually deliver the email ────────────────────────
   let emailError: string | null = null;
   if (status === "SENT" && existing.status !== "SENT") {
+    const accessError = await getTrialAccessError(session.user.id);
+    if (accessError) return NextResponse.json(accessError, { status: accessError.status });
     const toEmail = existing.lead?.email as string | undefined;
     const subject = (rest.subject ?? existing.subject) as string;
     const body    = (rest.body    ?? existing.body)    as string;

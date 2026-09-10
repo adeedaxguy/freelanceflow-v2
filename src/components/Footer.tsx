@@ -166,7 +166,7 @@ export default function Footer() {
                   href="/auth?mode=signup"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-hero px-4 py-2.5 text-sm font-semibold text-white shadow-glow-primary transition-transform hover:-translate-y-0.5"
                 >
-                  Start free
+                  Try free for 3 days
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a

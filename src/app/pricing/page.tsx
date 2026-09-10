@@ -10,7 +10,7 @@ import { seoDescription, seoTitle } from "@/lib/seo-copy";
 
 export const metadata: Metadata = {
   title: { absolute: seoTitle("Pricing Plans for Freelancers") },
-  description: seoDescription(`Start free, upgrade when ready. Plans run from $0 to $${PLAN_MONTHLY_PRICES.agency}/mo with lead discovery, AI proposals, outreach, CRM, and optional softphone add-ons.`),
+  description: seoDescription(`Try iCloseLeads free for 3 days with 600 lead results. Then choose Pro at $${PLAN_MONTHLY_PRICES.pro}/month or Agency at $${PLAN_MONTHLY_PRICES.agency}/month. No card required for the trial.`),
   alternates: { canonical: "https://icloseleads.com/pricing" },
 };
 
@@ -18,7 +18,9 @@ const billingFAQ = [
   { q: "Can I change plans anytime?", a: "Yes. Paid subscriptions are managed through the secure Stripe billing portal." },
   { q: "Can every plan use the softphone?", a: "Yes. Every plan can access the softphone option. Phone numbers and monthly calling minute packages are separate paid add-ons, so calling costs stay tied to actual phone usage." },
   { q: "How are payments handled?", a: "Pro, Agency, softphone number subscriptions, and calling-minute packages use secure Stripe Checkout. iCloseLeads does not store card details." },
-  { q: "What happens after the free trial?", a: "You get up to 600 lead results over 3 days, starting when you register. After that, choose Pro or Agency to continue new lead searches and AI proposals. Your saved leads and outreach history remain accessible. There is no automatic charge." },
+  { q: "What happens after the free trial?", a: "Your trial lasts 72 hours from registration, with up to 600 lead results shared across Local, Remote, and Live Jobs. After that, choose Pro or Agency for new searches, AI tools, website concepts, and outreach. Saved leads, history, and shared previews remain accessible. No card is required and there is no automatic charge." },
+  { q: "Do bonus leads extend my trial?", a: "No. A one-time share bonus can add 300 results during an active trial, but your original 72-hour deadline does not change. Unused trial or bonus results do not renew weekly." },
+  { q: "What stays available without a subscription?", a: "You can sign in, review and export saved leads, manage your account, and contact support. Public calculators and existing shared previews remain available. Purchased phone numbers and calling minutes keep their separate billing and usage rules." },
   { q: "When should I choose Agency?", a: "Choose Agency for more than 1,000 lead results a week, a larger outreach allowance, or API access. It is a single-user account, not a shared team workspace. Lead availability varies by source and location." },
   { q: "What happens when I hit my weekly lead limit?", a: "You will be notified and can upgrade your plan. Existing saved leads and emails remain accessible." },
   { q: "Do you offer annual billing?", a: "Yes. Annual billing is available from the dashboard upgrade page and is shown before checkout." },
@@ -36,7 +38,7 @@ export default function PricingPage() {
                 Simple Pricing, <span className="gradient-text">No Surprises</span>
               </h1>
               <p className="text-muted-foreground text-xl max-w-xl mx-auto">
-                Start free. Upgrade as you grow. Add softphone calling when you are ready.
+                Try free for 3 days. Then Pro is $10/month or Agency is $15/month. Calling add-ons are billed separately.
               </p>
             </div>
 
@@ -50,8 +52,8 @@ export default function PricingPage() {
                 <Shield className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <div className="text-foreground font-semibold">Start free, upgrade through Stripe</div>
-                <div className="text-muted-foreground text-sm">Try the core workflow without a card. Paid plans, softphone numbers, and calling minutes use secure Stripe checkout.</div>
+                <div className="text-foreground font-semibold">3 days free. No card. No automatic charge.</div>
+                <div className="text-muted-foreground text-sm">Your trial starts at registration. Choose a paid plan through Stripe to continue after it ends.</div>
               </div>
             </div>
 

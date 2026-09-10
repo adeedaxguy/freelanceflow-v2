@@ -79,8 +79,8 @@ const faqs = [
         a: "Most users find relevant leads in under 2 minutes. The time to land a client depends on your niche, outreach quality, and follow-up consistency. Users who send 10+ personalized proposals per week report landing their first new client within 2 weeks.",
       },
       {
-        q: "What's the difference between the free and Pro plans?",
-        a: "New users get up to 600 lead results over 3 days, with AI proposal drafting and Gmail compose outreach. After the trial, upgrade to continue new discovery and AI proposals. Saved leads remain accessible.",
+        q: "What happens during and after my free 3-day trial?",
+        a: "Your trial lasts 72 hours from registration and includes up to 600 lead results shared across Local, Remote, and Live Jobs, AI drafts, website concepts, and up to 50 outreach messages per day. No card or automatic charge. After expiry, new searches, AI tools, and outreach require Pro ($10/month) or Agency ($15/month). Saved work and support remain available; paid calling add-ons are separate.",
       },
     ],
   },

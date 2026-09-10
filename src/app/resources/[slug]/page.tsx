@@ -213,11 +213,11 @@ function GoogleMapsLeadSystem({ page }: { page: ResourcePageData }) {
 
       <div className="mt-8 grid gap-4 rounded-lg border border-accent/25 bg-accent/10 p-5 md:grid-cols-[1fr_auto] md:items-center">
         <div>
-          <h3 className="text-lg font-extrabold text-foreground">Build the first campaign with 600 free weekly leads</h3>
+          <h3 className="text-lg font-extrabold text-foreground">Build your shortlist with 600 trial lead results</h3>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">Start narrow, save only qualified prospects, review every message, and keep the next action attached to the lead.</p>
         </div>
         <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=maps-lead-system`} className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
-          Start free
+          Try Free for 3 Days
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
@@ -487,7 +487,7 @@ export default async function ResourcePage({ params }: Props) {
   if (!page) notFound();
   const shortAnswer = `${page.summary} iCloseLeads helps ${page.audience.toLowerCase()} turn that workflow into a focused search, a saved lead, and a first outreach draft without bouncing between separate tools.`;
   const workflowKickoff = [
-    "Create a free account and run one focused search tied to this page's keyword.",
+    "Start a free 3-day trial and run one focused search tied to this page's keyword.",
     "Save the best lead while the map, job, or website context is still open.",
     "Turn the saved lead into a proposal draft or Gmail-ready outreach before the reason goes stale.",
   ];
@@ -517,7 +517,7 @@ export default async function ResourcePage({ params }: Props) {
                 </div>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-hero`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white shadow-glow-primary transition hover:bg-primary-light">
-                    Start Free and Run This Workflow
+                    Try This Workflow Free for 3 Days
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link href={page.internalLinks[0] ? publicResourceHref(page.internalLinks[0].href, page) : "/features/lead-discovery"} className="inline-flex items-center justify-center rounded-xl border border-border bg-surface px-6 py-3 text-sm font-semibold text-muted-foreground transition hover:text-foreground">
@@ -632,7 +632,7 @@ export default async function ResourcePage({ params }: Props) {
                       ))}
                     </div>
                     <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-activation-plan`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-accent">
-                      Start free with this plan
+                      Try This Plan Free for 3 Days
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </section>
@@ -713,7 +713,7 @@ export default async function ResourcePage({ params }: Props) {
                     ))}
                   </div>
                   <Link href={`/auth?mode=signup&intent=${encodeURIComponent(page.slug)}&source=resource-workflow-panel`} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-accent">
-                    Start free and test the workflow
+                    Try the Workflow Free for 3 Days
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>

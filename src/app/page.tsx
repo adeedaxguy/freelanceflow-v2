@@ -119,7 +119,7 @@ const softwareJsonLd = {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "USD",
-    "description": "Free early access plan available.",
+    "description": "Free 3-day trial with up to 600 lead results. Paid subscription required afterward.",
   },
   "potentialAction": {
     "@type": "RegisterAction",

@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
   const canUseFinder = plan === "agency" || plan === "pro";
   if (!canUseFinder) {
     return NextResponse.json({
-      error: "Decision Maker Finder is an Agency preview. Free accounts will see this tab as coming soon.",
+      error: "Decision Maker Finder is included with Pro and Agency. Choose a paid plan to use contact research.",
       requiresAgency: true,
       plan,
     }, { status: 403 });

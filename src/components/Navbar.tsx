@@ -207,7 +207,7 @@ export default function Navbar() {
                 {isAuthenticated ? "Dashboard" : "Sign in"}
               </Link>
               <Link href={primaryHref} prefetch={false} className="marketing-primary-cta">
-                {isAuthenticated ? "Find leads" : "Start free"}
+                {isAuthenticated ? "Find leads" : "Try free for 3 days"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </>
@@ -249,7 +249,7 @@ export default function Navbar() {
                 {isAuthenticated ? "Dashboard" : "Sign in"}
               </Link>
               <Link href={primaryHref} prefetch={false} className="marketing-primary-cta">
-                {isAuthenticated ? "Find leads" : "Start free"}
+                {isAuthenticated ? "Find leads" : "Try free for 3 days"}
               </Link>
             </div>
           </div>

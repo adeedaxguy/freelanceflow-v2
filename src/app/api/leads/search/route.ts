@@ -8,7 +8,6 @@ import {
   type AggregatedLead,
 } from "@/lib/leads-aggregator";
 import { checkAndIncrementLeads, getUsageStats } from "@/lib/usage";
-import { FREE_TRIAL_LEAD_LIMIT } from "@/lib/plan-limits";
 import { z } from "zod";
 import { recordAuditLog } from "@/lib/audit-log";
 
@@ -34,12 +33,6 @@ const VALID_SOURCES: LeadSource[] = [
   "himalayas", "nodesk", "greenhouse", "lever", "ashby",
   "remotefirstjobs", "web3jobsradar",
 ];
-
-const UNLIMITED_EMAILS = new Set([
-  "adeedaxguy@gmail.com",
-  "adnan@technodigg.com",
-  "adnanaimanager@gmail.com",
-]);
 
 const MIN_USEFUL_FRESH_RESULTS = 12;
 
@@ -79,37 +72,23 @@ export async function POST(req: NextRequest) {
       ? niches
       : (niche ? [niche] : ["web-development"]);
 
-    const userEmail = (session.user.email ?? "").toLowerCase();
-    const isUnlimitedUser = UNLIMITED_EMAILS.has(userEmail);
-
-    // Usage stats — agency/pro bypass first; fall back to free defaults if DB unavailable.
-    let usage = {
-      plan: isUnlimitedUser ? "agency" : "free",
-      limit: isUnlimitedUser ? 99999 : FREE_TRIAL_LEAD_LIMIT,
-      used: 0,
-      remaining: isUnlimitedUser ? 99999 : FREE_TRIAL_LEAD_LIMIT,
-      nextReset: new Date(Date.now() + 3 * 86_400_000).toISOString(),
-      percentage: 0,
-      trialEndsAt: isUnlimitedUser ? null : new Date(Date.now() + 3 * 86_400_000).toISOString(),
-      trialExpired: false,
-    };
-    if (!isUnlimitedUser) {
-      try {
-        const u = await getUsageStats(session.user.id);
-        if (u) usage = u;
-      } catch { /* non-fatal */ }
+    const usage = await getUsageStats(session.user.id).catch(() => null);
+    if (!usage) {
+      return NextResponse.json({ error: "We could not verify your lead allowance. Please try again shortly." }, { status: 503 });
     }
 
     if (usage.remaining === 0) {
       return NextResponse.json({
         error:     usage.trialExpired
           ? "Your 3-day trial has ended. Upgrade to Pro or Agency to keep finding leads."
-          : `Trial limit reached. You have used your ${usage.limit} included leads.`,
+          : usage.plan === "free"
+            ? `Trial limit reached. You have used your ${usage.limit} included leads.`
+            : "Your weekly lead allowance is used. Upgrade or wait for your next reset.",
         plan:      usage.plan,
         limit:     usage.limit,
         nextReset: usage.nextReset,
         upgrade:   true,
-        bonusAvailable: !usage.trialExpired,
+        bonusAvailable: usage.plan === "free" && !usage.trialExpired && !usage.shareBonusClaimed,
         trialExpired: usage.trialExpired,
       }, { status: 429 });
     }

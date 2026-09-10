@@ -503,7 +503,6 @@ export default function LeadsPage() {
 
       if (res.status === 429) {
         setLimitHit({ nextReset: data.nextReset ?? null, trialExpired: Boolean(data.trialExpired) });
-        if (!data.trialExpired) setShowBonus(true);
         return;
       }
       if (!res.ok) throw new Error(data.error ?? "Failed to fetch leads");
@@ -744,18 +743,18 @@ export default function LeadsPage() {
             </div>
             <div className="flex-1">
               <p className="font-bold text-foreground mb-1">
-                {limitHit.trialExpired ? "Your 3-day trial has ended" : `You've used your ${usage?.limit ?? 600} trial leads`}
+                {limitHit.trialExpired ? "Your 3-day trial has ended" : usage?.plan === "free" ? "Your trial lead allowance is used" : "Your weekly lead allowance is used"}
               </p>
               <p className="text-muted-foreground text-sm mb-3">
                 {limitHit.trialExpired
                   ? "Upgrade to Pro or Agency to continue finding new leads. Your saved leads and CRM stay available."
-                  : "Upgrade now or unlock the share bonus before your trial ends."}
+                  : usage?.plan === "free" ? "Choose a paid plan to keep searching. A share bonus does not extend your trial." : `Upgrade to Agency or wait for your reset${limitHit.nextReset ? ` on ${new Date(limitHit.nextReset).toLocaleDateString()}` : ""}.`}
               </p>
-              {limitHit.trialExpired ? (
+              <div className="flex flex-wrap gap-3">
                 <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-light">
-                  <Zap className="w-4 h-4" /> Choose a paid plan
+                  <Zap className="w-4 h-4" /> View paid plans
                 </Link>
-              ) : (
+              {!limitHit.trialExpired && usage?.plan === "free" && (
                 <button
                   type="button"
                   onClick={() => setShowBonus(true)}
@@ -765,6 +764,7 @@ export default function LeadsPage() {
                   {usage?.shareBonusClaimed ? "Request more leads" : "Unlock +300 free leads"}
                 </button>
               )}
+              </div>
             </div>
           </div>
         </div>

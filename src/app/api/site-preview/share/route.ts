@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import type { SitePreviewSearchParams } from "@/components/SitePreviewPageContent";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { encodeSiteShare } from "@/lib/site-share";
 import { rateLimitHeaders, securityRateLimit } from "@/lib/security-rate-limit";
 
@@ -34,6 +35,8 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const accessError = await getTrialAccessError(session.user.id);
+    if (accessError) return NextResponse.json(accessError, { status: accessError.status });
     const limit = await securityRateLimit("site-share", session.user.id, 30, 60 * 60 * 1000);
     if (!limit.allowed) {
       return NextResponse.json({ error: "Too many share links. Please try again later." }, {

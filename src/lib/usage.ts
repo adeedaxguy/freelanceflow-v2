@@ -51,6 +51,7 @@ export async function checkAndIncrementLeads(
     where: { id: userId },
     select: {
       email: true,
+      role: true,
       plan: true,
       weeklyLeads: true,
       weeklyLeadReset: true,
@@ -62,7 +63,7 @@ export async function checkAndIncrementLeads(
   if (!user) return { allowed: false, remaining: 0, plan: "free" };
 
   // Unlimited bypass
-  if (UNLIMITED_EMAILS.includes(user.email ?? "")) {
+  if (user.role === "ADMIN" || UNLIMITED_EMAILS.includes((user.email ?? "").toLowerCase())) {
     return { allowed: true, remaining: 99999, plan: user.plan ?? "agency" };
   }
 
@@ -86,6 +87,7 @@ export async function checkAndIncrementLeads(
         where: { id: userId },
         select: {
           email: true,
+          role: true,
           plan: true,
           weeklyLeads: true,
           weeklyLeadReset: true,
@@ -126,6 +128,7 @@ export async function checkAndIncrementLeads(
       where: { id: userId },
       select: {
         email: true,
+        role: true,
         plan: true,
         weeklyLeads: true,
         weeklyLeadReset: true,
@@ -158,12 +161,12 @@ export async function checkAndIncrementLeads(
 export async function getUsageStats(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true, bonusClaimed: true, createdAt: true },
+    select: { email: true, role: true, plan: true, weeklyLeads: true, weeklyLeadReset: true, bonusLeads: true, bonusClaimed: true, createdAt: true },
   });
   if (!user) return null;
 
   // Unlimited bypass
-  if (UNLIMITED_EMAILS.includes(user.email ?? "")) {
+  if (user.role === "ADMIN" || UNLIMITED_EMAILS.includes((user.email ?? "").toLowerCase())) {
     return {
       plan: user.plan ?? "agency",
       limit: 99999,

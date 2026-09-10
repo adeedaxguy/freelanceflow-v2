@@ -11,7 +11,7 @@ const QUICK_QUESTIONS = [
   "What happens after I sign up?",
   "Which lead engine should I use?",
   "Find remote job leads",
-  "Is it free right now?",
+  "How does the 3-day trial work?",
 ];
 
 function shouldShowSignupCta(message: Message): boolean {
@@ -129,7 +129,7 @@ export default function FloatingChat({ initialOpen = false }: { initialOpen?: bo
                       href="/auth?mode=signup&intent=chat-first-search&source=floating-chat"
                       className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-accent/25 bg-accent/10 px-3 py-1.5 text-[11px] font-semibold text-accent hover:border-accent/45 hover:bg-accent/15 transition-colors"
                     >
-                      Run first search free
+                      Try free for 3 days
                       <ArrowRight className="w-3 h-3" />
                     </Link>
                   )}

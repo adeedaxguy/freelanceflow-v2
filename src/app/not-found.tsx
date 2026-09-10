@@ -39,7 +39,7 @@ export default function NotFound() {
               href="/auth?mode=signup&intent=dashboard&source=404"
               className="inline-flex items-center gap-2 px-6 py-3 bg-surface border border-border hover:border-primary/30 text-foreground rounded-xl font-semibold transition-all"
             >
-              <Search className="w-4 h-4" /> Create Free Account
+              <Search className="w-4 h-4" /> Try Free for 3 Days
             </Link>
           </div>
 

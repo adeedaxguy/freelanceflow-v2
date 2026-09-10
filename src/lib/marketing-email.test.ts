@@ -49,7 +49,7 @@ describe("marketing email", () => {
     });
 
     expect(rendered.html).toContain("<ol");
-    expect(rendered.html).toContain("Read the 600-lead weekly playbook");
+    expect(rendered.html).toContain("Read the 600-lead prospecting playbook");
     expect(rendered.html).toContain("https://icloseleads.com/blog/600-free-leads-per-week-for-freelancers");
   });
 

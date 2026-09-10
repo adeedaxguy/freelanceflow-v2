@@ -11,7 +11,9 @@ export const PLAN_FEATURES = {
     "600 lead results over 3 days, no card required",
     "Local businesses, remote jobs and live opportunities",
     "AI proposal drafts and website concepts",
+    "Up to 50 outreach messages per day during the trial",
     "Saved leads and CRM pipeline",
+    "Paid plan required after 72 hours; no automatic charge",
     "Paid phone number and calling-minute add-ons",
   ],
   pro: [

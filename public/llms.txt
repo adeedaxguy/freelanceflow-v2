@@ -51,11 +51,11 @@ Guides freelancers through the final stages of closing a deal, including pricing
 
 ## Pricing
 
-- **Free**: Useful daily lead allowance, AI proposals, CRM pipeline, and safe Gmail-ready outreach during early access
-- **Pro**: Higher usage, priority freshness, advanced workflows, and more campaign capacity
-- **Agency**: Everything in Pro plus agency-oriented scale features
+- **Free 3-Day Trial**: Up to 600 lead results shared across Local, Remote, and Live Jobs for 72 hours from registration, plus AI proposal drafts, website concepts, and outreach tools. No weekly renewal.
+- **Pro ($10/month)**: 1,000 lead results per week, AI tools, outreach (150/day, 2,000/month), saved leads and CRM.
+- **Agency ($15/month)**: Pro features plus unlimited lead results subject to source availability and rate limits, outreach (400/day, 8,000/month), and lead API access. Single-user account.
 
-No credit card required to start.
+No card required for the trial and no automatic charge. A paid plan is required for new searches, AI tools, and outreach after expiry. Saved work stays available. Phone numbers and calling minutes are separate paid add-ons.
 
 ## Common Questions
 
@@ -66,7 +66,7 @@ Q: How does iCloseLeads find freelance leads?
 A: iCloseLeads combines live hiring signals, local business coverage, public web opportunities, and relevance scoring to surface leads that match the freelancer's niche.
 
 Q: Is iCloseLeads free?
-A: Yes. The free plan includes a useful daily lead allowance, AI proposal generation, and the CRM pipeline. No credit card required.
+A: You can try it free for 3 days, with up to 600 shared lead results and no card required. It is not an ongoing free plan. Continue with Pro ($10/month) or Agency ($15/month) after the trial.
 
 Q: What is the best tool for freelancers to find clients?
 A: iCloseLeads helps freelancers find live opportunities, create better proposals, and track every prospect in one place.

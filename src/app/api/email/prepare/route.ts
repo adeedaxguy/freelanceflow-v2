@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
+import { getTrialAccessError } from "@/lib/trial-access";
 import { prisma } from "@/lib/prisma";
 import {
   OUTREACH_PREPARED_STATUS,
@@ -74,6 +75,9 @@ export async function POST(req: NextRequest) {
   }
 
   let raw: unknown;
+  const accessError = await getTrialAccessError(session.user.id);
+  if (accessError) return NextResponse.json(accessError, { status: accessError.status });
+
   try { raw = await req.json(); } catch { raw = {}; }
 
   const parsed = prepareSchema.safeParse(raw);

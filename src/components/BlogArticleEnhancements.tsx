@@ -297,6 +297,7 @@ export function BlogArticleRoadmap({ post, headings }: BlogArticleEnhancementPro
 
   return (
     <aside className="my-10 rounded-2xl border border-primary/20 bg-primary/5 p-5 sm:p-6">
+      <p className="mb-5 border-b border-border pb-4 text-sm leading-6 text-foreground"><strong>Current offer:</strong> Try iCloseLeads free for 3 days with up to 600 shared lead results, then choose Pro ($10/month) or Agency ($15/month). Older articles may reference a previous weekly allowance. <Link href="/pricing" className="font-semibold text-primary-light underline">View current plans</Link>.</p>
       <div className="flex flex-col gap-5">
         <div className="flex items-start gap-3">
           <span className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary-light">
@@ -464,7 +465,7 @@ export function BlogConversionPanel({ post }: { post: BlogArticleSource }) {
           href={`/auth?mode=signup&intent=${encodeURIComponent(post.slug)}&source=blog-conversion-panel`}
           className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-glow-primary transition-all hover:bg-primary-light"
         >
-          Start free with 600 leads
+          Try Free for 3 Days
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

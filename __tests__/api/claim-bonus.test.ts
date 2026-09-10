@@ -1,4 +1,5 @@
 /** @jest-environment node */
+jest.mock("@/lib/trial-access", () => ({ getTrialAccessError: jest.fn(async () => null) }));
 
 jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));

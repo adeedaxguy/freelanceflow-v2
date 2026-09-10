@@ -27,37 +27,37 @@ const SIGNUP_INTENT_COPY = {
   webDesign: {
     badge: "Web design lead search ready",
     title: "Find web design leads",
-    body: "Create your free account, then search businesses and remote opportunities with clear website, conversion, or local SEO signals.",
+    body: "Start your free 3-day trial, then search businesses and remote opportunities with clear website, conversion, or local SEO signals.",
   },
   freelanceClients: {
     badge: "Client lead search ready",
     title: "Find freelance client leads",
-    body: "Create your free account, then choose the lead path that fits your service and save the prospects worth pitching.",
+    body: "Start your free 3-day trial, then choose the lead path that fits your service and save the prospects worth pitching.",
   },
   noWebsite: {
     badge: "No-website lead search ready",
     title: "Find businesses without websites",
-    body: "Create your free account, then search local businesses with no or unknown website status and verify the best ones before outreach.",
+    body: "Start your free 3-day trial, then search local businesses with no or unknown website status and verify the best ones before outreach.",
   },
   remote: {
     badge: "Remote job search ready",
     title: "Find remote client leads",
-    body: "Create your free account, then search fresh remote jobs by niche and turn the best match into a proposal.",
+    body: "Start your free 3-day trial, then search fresh remote jobs by niche and turn the best match into a proposal.",
   },
   local: {
     badge: "Local lead search ready",
     title: "Find local business leads",
-    body: "Create your free account, then search local businesses, save prospects, and open owner/contact checks.",
+    body: "Start your free 3-day trial, then search local businesses, save prospects, and open owner/contact checks.",
   },
   live: {
     badge: "Live job search ready",
     title: "Find urgent client signals",
-    body: "Create your free account, then review fresh live job signals and draft outreach while the need is still warm.",
+    body: "Start your free 3-day trial, then review fresh live job signals and draft outreach while the need is still warm.",
   },
   default: {
     badge: "First search ready",
     title: "Run your first lead search",
-    body: "Create your free account, then choose local businesses, remote jobs, or live job signals from the dashboard.",
+    body: "Start your free 3-day trial, then choose local businesses, remote jobs, or live job signals from the dashboard.",
   },
 };
 
@@ -518,7 +518,8 @@ function AuthForm() {
                     </div>
                     <div className="relative">
                       <input type={showPwd ? "text" : "password"} autoComplete={mode === "signup" ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} required
-                        placeholder={mode === "signup" ? "Min 8 characters" : "Your password"}
+                        placeholder={mode === "signup" ? "Min 10 characters" : "Your password"}
+                        minLength={mode === "signup" ? 10 : undefined} maxLength={128}
                         className="w-full px-4 py-3 pr-10 bg-surface border border-border rounded-xl text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 text-sm" />
                       <button type="button" onClick={() => setShowPwd(p => !p)} className="absolute right-3 top-3.5 text-muted-foreground">
                         {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -539,17 +540,17 @@ function AuthForm() {
                   <button type="submit" disabled={loading}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold transition-all shadow-glow-primary disabled:opacity-60">
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                    {mode === "signin" ? "Sign In" : "Create free account"}
+                    {mode === "signin" ? "Sign In" : "Start free 3-day trial"}
                   </button>
 
                   {mode === "signup" && (
-                    <p className="text-center text-xs text-muted-foreground">No card required. Your account opens directly into your first search.</p>
+                    <p className="text-center text-xs leading-5 text-muted-foreground">600 shared lead results for 72 hours from signup. Then Pro is $10/month or Agency is $15/month. No card or automatic charge.</p>
                   )}
 
                   {mode === "signin" ? (
                     <p className="text-center text-sm text-muted-foreground">
                       Don&apos;t have an account?{" "}
-                      <button type="button" onClick={() => setMode("signup")} className="text-primary-light hover:underline font-medium">Sign up free</button>
+                      <button type="button" onClick={() => setMode("signup")} className="text-primary-light hover:underline font-medium">Try 3 days free</button>
                     </p>
                   ) : (
                     <p className="text-center text-xs text-muted-foreground">
