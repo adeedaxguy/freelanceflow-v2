@@ -12,15 +12,17 @@ import {
 import { getPlatformEmailStatus, sendPlatformEmail } from "@/lib/admin-notifications";
 import { renderMarketingEmail } from "@/lib/marketing-email";
 import { prisma } from "@/lib/prisma";
+import { newsletterCount, newsletterRecipients, newsletterUnsubscribeUrl } from "@/lib/newsletter";
 
 const MAX_BATCH_SIZE = 200;
-const segmentSchema = z.enum(["all", "free", "pro", "agency"]);
+const segmentSchema = z.enum(["all", "free", "pro", "agency", "updates", "status"]);
 const campaignSchema = z.object({
   campaignId: z.string().uuid(),
   subject: z.string().trim().min(3).max(180),
   message: z.string().trim().min(20).max(10_000),
   segment: segmentSchema,
   confirm: z.literal("SEND_CONSENTED_CAMPAIGN"),
+  publishStatus: z.boolean().default(false),
 });
 
 async function requireAdmin() {
@@ -41,7 +43,7 @@ export async function GET() {
   const session = await requireAdmin();
   if (!session) return NextResponse.json({ error: "Admin access required." }, { status: 403 });
 
-  const [sender, all, free, pro, agency, totalAll, totalFree, totalPro, totalAgency] = await Promise.all([
+  const [sender, all, free, pro, agency, totalAll, totalFree, totalPro, totalAgency, updates, status] = await Promise.all([
     getPlatformEmailStatus(),
     prisma.user.count({ where: recipientWhere("all") }),
     prisma.user.count({ where: recipientWhere("free") }),
@@ -51,12 +53,14 @@ export async function GET() {
     prisma.user.count({ where: { suspended: false, plan: "free" } }),
     prisma.user.count({ where: { suspended: false, plan: "pro" } }),
     prisma.user.count({ where: { suspended: false, plan: "agency" } }),
+    newsletterCount("updates"),
+    newsletterCount("status"),
   ]);
 
   return NextResponse.json({
     sender,
-    counts: { all, free, pro, agency },
-    totals: { all: totalAll, free: totalFree, pro: totalPro, agency: totalAgency },
+    counts: { all, free, pro, agency, updates, status },
+    totals: { all: totalAll, free: totalFree, pro: totalPro, agency: totalAgency, updates, status },
     maxBatchSize: MAX_BATCH_SIZE,
   });
 }
@@ -78,6 +82,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { campaignId, subject, message, segment } = parsed.data;
+  const topic = segment === "updates" || segment === "status" ? segment : null;
+  if (segment === "status" && !parsed.data.publishStatus) {
+    return NextResponse.json({ error: "Confirm that this status notice will also be published publicly." }, { status: 400 });
+  }
   const deliveryKey = `marketing_broadcast_${campaignId}`;
   const contentHash = campaignContentHash(subject, message);
   const contentLockKey = `marketing_broadcast_content_${new Date().toISOString().slice(0, 10)}_${contentHash}`;
@@ -109,7 +117,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "This campaign was already started. Duplicate delivery was blocked." }, { status: 409 });
   }
 
-  const users = await prisma.user.findMany({
+  const users = topic ? await newsletterRecipients(topic, MAX_BATCH_SIZE) : await prisma.user.findMany({
     where: recipientWhere(segment),
     select: { id: true, email: true, name: true },
     orderBy: { createdAt: "asc" },
@@ -127,6 +135,10 @@ export async function POST(req: NextRequest) {
         email: user.email,
         subject,
         message,
+        ...(topic ? {
+          unsubscribeUrl: newsletterUnsubscribeUrl({ id: user.id, email: user.email, topic }),
+          category: topic === "status" ? "Service status notices" : "Product updates",
+        } : {}),
       });
       const delivery = await sendPlatformEmail({
         recipient: user.email,
@@ -150,7 +162,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const eligibleCount = await prisma.user.count({ where: recipientWhere(segment) });
+  const eligibleCount = topic ? await newsletterCount(topic) : await prisma.user.count({ where: recipientWhere(segment) });
   const skipped = Math.max(0, eligibleCount - users.length);
   const completedAt = new Date().toISOString();
   const completedState = JSON.stringify({
@@ -168,6 +180,10 @@ export async function POST(req: NextRequest) {
     prisma.platformSetting.update({ where: { key: deliveryKey }, data: { value: completedState } }),
     prisma.platformSetting.update({ where: { key: contentLockKey }, data: { value: completedState } }),
   ]);
+  if (segment === "status") {
+    const value = JSON.stringify({ subject, message, publishedAt: completedAt });
+    await prisma.platformSetting.upsert({ where: { key: "public_status_notice" }, create: { key: "public_status_notice", value }, update: { value } });
+  }
 
   try {
     await prisma.$executeRawUnsafe(

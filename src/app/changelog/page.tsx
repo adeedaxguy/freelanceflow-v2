@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Zap, Bug, Sparkles, Shield, ArrowUpRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import NewsletterForm from "@/components/NewsletterForm";
 
 export const metadata: Metadata = {
   title: "Changelog — iCloseLeads",
@@ -158,16 +159,7 @@ export default function ChangelogPage() {
             <div className="mt-16 p-8 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 text-center">
               <h3 className="text-xl font-bold text-foreground mb-2">Get notified about updates</h3>
               <p className="text-muted-foreground text-sm mb-5">Subscribe to our newsletter for product updates and freelance growth tips.</p>
-              <form className="flex gap-2 max-w-sm mx-auto" action="#">
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  className="flex-1 px-4 py-2.5 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
-                />
-                <button type="submit" className="px-4 py-2.5 bg-primary hover:bg-primary-light text-white rounded-xl text-sm font-medium transition-colors whitespace-nowrap">
-                  Subscribe
-                </button>
-              </form>
+              <NewsletterForm topic="updates" />
             </div>
           </div>
         </section>

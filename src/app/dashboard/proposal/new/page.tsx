@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { copyText } from "@/lib/clipboard";
 
-interface ProposalResult { subject: string; body: string; source: string; }
+interface ProposalResult { subject: string; body: string; source: string; warning?: string; }
 interface PortfolioLink { label: string; url: string; }
 interface OutreachUsage {
   daily: number;
@@ -56,6 +56,7 @@ function CopyButton({ text, label = "Copy Proposal" }: { text: string; label?: s
 }
 
 function NewProposalInner() {
+  const [warning, setWarning] = useState("");
   const params = useSearchParams();
   const company     = params.get("company") ?? "";
   const domain      = params.get("domain") ?? "";
@@ -136,6 +137,7 @@ function NewProposalInner() {
       setSubject(data.subject);
       setBody(data.body);
       setAiSource(data.source);
+      setWarning(data.warning || "");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Generation failed. Please try again.");
     } finally {
@@ -214,7 +216,7 @@ function NewProposalInner() {
                   ? "bg-accent/10 text-accent border-accent/20"
                   : "bg-primary/10 text-primary-light border-primary/20"
               }`}>
-                {aiSource === "groq" ? "✦ AI Generated" : "✦ Template"}
+                {aiSource !== "template" ? "✦ AI Generated" : "✦ Template"}
               </span>
             )}
           </div>
@@ -432,6 +434,7 @@ function NewProposalInner() {
             </div>
           </div>
 
+          {warning && <p role="status" className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-foreground">{warning}</p>}
           {error && (
             <div className="text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">
               {error}

@@ -45,6 +45,8 @@
  *  - Added 5 new niches: Blockchain/Web3, Cybersecurity, Game Dev, Technical Writing, VA
  */
 
+import { companyWebsiteDomain, requiresOfficeWork } from "./job-data";
+
 export type LeadSource =
   | "remoteok"
   | "remotive"
@@ -276,10 +278,6 @@ function extractDomain(url: string): string {
   catch { return url.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] ?? url; }
 }
 
-function companyToDomain(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 20) + ".com";
-}
-
 function stripHtml(text: string): string {
   return (text ?? "")
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, " ")
@@ -433,7 +431,7 @@ function calcQuality(lead: {
   if (dl > 500) score += 6;
   if ((lead.tags?.length ?? 0) > 0) score += 5;
   if ((lead.tags?.length ?? 0) > 3) score += 4;
-  if (lead.domain && !["reddit.com","weworkremotely.com","news.ycombinator.com","craigslist.org"].includes(lead.domain)) score += 6;
+  if (companyWebsiteDomain(lead.domain)) score += 6;
   if ((lead.title?.length ?? 0) > 12) score += 3;
   return Math.min(100, score);
 }
@@ -576,13 +574,15 @@ interface RemoteOKJob {
 async function fetchRemoteOK(keywords: string[], maxHours: number, freshOnly: boolean): Promise<{ leads: AggregatedLead[]; raw: number }> {
   const res = await withTimeout(
     fetch("https://remoteok.com/api", {
-      headers: { "User-Agent": "Mozilla/5.0 iCloseLeads/4.0" },
+      headers: { "User-Agent": "iCloseLeads/7.0 (+https://icloseleads.com)", "Accept": "application/json" },
+      signal: AbortSignal.timeout(15000),
       ...cacheOpts(freshOnly, 600),
     }),
-    9000
+    15000
   );
   if (!res.ok) throw new Error(`RemoteOK ${res.status}`);
   const raw = await res.json() as RemoteOKJob[];
+  if (!Array.isArray(raw)) throw new Error("RemoteOK returned an invalid feed");
   let inWindow = 0;
   const leads = raw.flatMap((job): AggregatedLead[] => {
     if (job.legal || (!job.title && !job.position) || !job.company) return [];
@@ -598,7 +598,7 @@ async function fetchRemoteOK(keywords: string[], maxHours: number, freshOnly: bo
     const budget  = extractBudget(desc);
     const urgency = detectUrgency(title + " " + desc);
     const email  = extractEmail(desc);
-    const domain = job.company_url ? extractDomain(job.company_url) : companyToDomain(job.company);
+    const domain = companyWebsiteDomain(job.company_url);
     return [{
       id: `rok-${String(job.id ?? job.slug ?? Math.random())}`,
       company: job.company.trim(), domain, email, title: title.trim(),
@@ -652,7 +652,7 @@ async function fetchRemotive(niche: string, keywords: string[], maxHours: number
     const budget  = extractBudget(desc);
     const urgency = detectUrgency(job.title + " " + desc);
     const email  = extractEmail(desc);
-    const domain = companyToDomain(job.company_name);
+    const domain = "";
     return [{
       id: `rem-${job.id ?? Math.random()}`,
       company: job.company_name.trim(), domain, email, title: job.title.trim(),
@@ -877,7 +877,7 @@ async function fetchRemoteFirstJobs(
     const budget = extractBudget(description);
     const urgency = detectUrgency(`${title} ${description}`);
     const email = extractEmail(description);
-    const domain = companyToDomain(company);
+    const domain = "";
 
     leads.push({
       id: `rfj-${guid || link.split("/").filter(Boolean).pop() || Math.random()}`,
@@ -1070,7 +1070,7 @@ async function fetchGreenhouseBoards(keywords: string[], maxHours: number, fresh
   const results = await Promise.all(GREENHOUSE_BOARDS.map(async board => {
     try {
       const res = await withTimeout(
-        fetch(`https://boards-api.greenhouse.io/v1/boards/${board.token}/jobs`, {
+        fetch(`https://boards-api.greenhouse.io/v1/boards/${board.token}/jobs?content=true`, {
           headers: { "User-Agent": "iCloseLeads/5.0", "Accept": "application/json" },
           ...cacheOpts(freshOnly, 900),
         }),
@@ -1091,7 +1091,7 @@ async function fetchGreenhouseBoards(keywords: string[], maxHours: number, fresh
           ...(job.offices ?? []).map(o => o.name ?? ""),
           job.location?.name ?? "",
         ].filter(Boolean).slice(0, 8);
-        const desc = stripHtml([job.content, job.location?.name, ...tags].filter(Boolean).join(" "));
+        const desc = stripHtml(stripHtml(job.content ?? "")) || [...new Set(tags)].join(" ");
         if (!hasRemoteSignal(job.title, desc, tags)) return [];
         inWindow++;
         const confidence = atsQualityBoost(scoreMatch(job.title, desc, tags, keywords), job.title, desc);
@@ -1100,13 +1100,13 @@ async function fetchGreenhouseBoards(keywords: string[], maxHours: number, fresh
         const urgency = detectUrgency(`${job.title} ${desc}`);
         const email   = extractEmail(desc);
         const company = (job.company_name || board.company).trim();
-        const domain  = companyToDomain(company);
+        const domain  = "";
         const id      = String(job.id ?? job.absolute_url ?? Math.random());
         return [{
           id: `gh-${board.token}-${id}`,
           company, domain, email,
           title: job.title.trim(),
-          description: truncate(desc || `${company} public job-board posting.`),
+          description: truncate(desc || `${company} public job-board posting.`, 1600),
           url: job.absolute_url ?? `https://job-boards.greenhouse.io/${board.token}`,
           source: "greenhouse", sourceLabel: ALL_SOURCE_LABELS.greenhouse,
           postedAt: posted.toISOString(), hoursAgo: hrs, niche: "",
@@ -1162,7 +1162,7 @@ async function fetchLeverBoards(keywords: string[], maxHours: number, freshOnly:
         const budget  = extractBudget(desc);
         const urgency = detectUrgency(`${job.text} ${desc}`);
         const email   = extractEmail(desc);
-        const domain  = companyToDomain(board.company);
+        const domain  = "";
         return [{
           id: `lever-${board.token}-${job.id ?? Math.random()}`,
           company: board.company, domain, email,
@@ -1221,7 +1221,7 @@ async function fetchAshbyBoards(keywords: string[], maxHours: number, freshOnly:
         const budget  = extractBudget(desc);
         const urgency = detectUrgency(`${job.title} ${desc}`);
         const email   = extractEmail(desc);
-        const domain  = companyToDomain(board.company);
+        const domain  = "";
         return [{
           id: `ashby-${board.token}-${job.id ?? Math.random()}`,
           company: board.company, domain, email,
@@ -1316,7 +1316,7 @@ async function fetchWWRFeed(feedUrl: string, keywords: string[], maxHours: numbe
       const budget  = extractBudget(cleanDesc);
       const urgency = detectUrgency(title + " " + cleanDesc);
       const email   = extractEmail(cleanDesc);
-      const domain  = extractDomain(link) !== "weworkremotely.com" ? extractDomain(link) : companyToDomain(company);
+      const domain  = extractDomain(link) !== "weworkremotely.com" ? extractDomain(link) : "";
       leads.push({
         id: `wwr-${link.split("/").pop()?.replace(/[^a-z0-9]/gi, "") ?? Math.random()}`,
         company, domain, email, title: cleanTitle || title, description: truncate(cleanDesc),
@@ -1380,7 +1380,7 @@ async function fetchArbeitnow(keywords: string[], maxHours: number, freshOnly: b
     const budget  = extractBudget(desc);
     const urgency = detectUrgency(job.title + " " + desc);
     const email   = extractEmail(desc);
-    const domain  = companyToDomain(job.company_name);
+    const domain  = "";
     return [{
       id: `arb-${job.slug ?? Math.random()}`,
       company: job.company_name.trim(), domain, email, title: job.title.trim(),
@@ -1444,7 +1444,7 @@ async function fetchRemoteJobsOrg(niche: string, keywords: string[], maxHours: n
     const budget = job.salary_text ?? extractBudget(desc);
     const urgency = detectUrgency(`${job.title} ${desc}`);
     const email = extractEmail(desc);
-    const domain = job.company.website ? extractDomain(job.company.website) : companyToDomain(job.company.name);
+    const domain = companyWebsiteDomain(job.company.website);
     return [{
       id: `rjo-${job.id ?? Math.random()}`,
       company: job.company.name.trim(), domain, email, title: job.title.trim(),
@@ -1501,7 +1501,7 @@ async function fetchJobicy(keywords: string[], maxHours: number, freshOnly: bool
         const budget  = extractBudget(desc);
         const urgency = detectUrgency(job.jobTitle + " " + desc);
         const email   = extractEmail(desc);
-        const domain  = companyToDomain(job.companyName);
+        const domain  = "";
         const url     = job.url ?? (job.jobSlug ? `https://jobicy.com/jobs/${job.jobSlug}` : "https://jobicy.com");
         return [{
           id: `jobicy-${job.id ?? Math.random()}`,
@@ -1554,7 +1554,7 @@ async function fetchJobicy(keywords: string[], maxHours: number, freshOnly: bool
       const budget  = extractBudget(cleanDesc);
       const urgency = detectUrgency(title + " " + cleanDesc);
       const email   = extractEmail(cleanDesc);
-      const domain  = companyToDomain(company);
+      const domain  = "";
       leads.push({
         id: `jobicy-rss-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
         company: company.slice(0, 80), domain, email, title: cleanTitle || title,
@@ -1607,7 +1607,7 @@ async function fetchWorkingNomads(keywords: string[], maxHours: number, freshOnl
     const budget  = extractBudget(desc);
     const urgency = detectUrgency(job.title + " " + desc);
     const email   = extractEmail(desc);
-    const domain  = job.url ? extractDomain(job.url) : companyToDomain(company);
+    const domain  = job.url ? extractDomain(job.url) : "";
     const tags    = (job.tags ?? "").split(",").map(t => t.trim()).filter(Boolean).slice(0, 8);
     return [{
       id: `wn-${job.id ?? Math.random()}`,
@@ -1767,7 +1767,7 @@ async function fetchYCJobs(keywords: string[], maxHours: number, freshOnly: bool
     const urgency = detectUrgency(item.title + " " + body);
     const email   = extractEmail(body);
     const url     = item.url ?? `https://news.ycombinator.com/item?id=${item.id}`;
-    const domain  = item.url ? extractDomain(item.url) : companyToDomain(company);
+    const domain  = item.url ? extractDomain(item.url) : "";
 
     leads.push({
       id: `yc-${item.id}`,
@@ -1833,7 +1833,7 @@ async function fetchAuthenticJobs(keywords: string[], maxHours: number, freshOnl
     const budget  = extractBudget(cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "authenticjobs.com" ? extractDomain(link) : companyToDomain(company);
+    const domain  = extractDomain(link) !== "authenticjobs.com" ? extractDomain(link) : "";
 
     leads.push({
       id: `aj-${link.split("/").filter(Boolean).pop() ?? Math.random()}`,
@@ -1967,7 +1967,7 @@ async function fetchFreelancermap(keywords: string[], maxHours: number, freshOnl
     const budget  = extractBudget(title + " " + cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "jobspresso.co" ? extractDomain(link) : companyToDomain(company);
+    const domain  = extractDomain(link) !== "jobspresso.co" ? extractDomain(link) : "";
     const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
 
     leads.push({
@@ -2031,7 +2031,7 @@ async function fetchSmashingJobs(keywords: string[], maxHours: number, freshOnly
     const budget  = extractBudget(cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = extractDomain(link) !== "jobs.smashingmagazine.com" ? extractDomain(link) : companyToDomain(company);
+    const domain  = extractDomain(link) !== "jobs.smashingmagazine.com" ? extractDomain(link) : "";
     const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
 
     leads.push({
@@ -2092,7 +2092,7 @@ async function fetchDribbbleJobs(keywords: string[], maxHours: number, freshOnly
     const budget  = extractBudget(cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = companyToDomain(company);
+    const domain  = "";
     const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
 
     leads.push({
@@ -2169,7 +2169,7 @@ async function fetchHimalayas(niche: string, keywords: string[], maxHours: numbe
     const url = job.applicationLink ?? job.guid ?? `https://himalayas.app/companies/${job.companySlug ?? ""}`;
     const urgency = detectUrgency(`${job.title} ${desc}`);
     const email = extractEmail(desc);
-    const domain = companyToDomain(job.companyName);
+    const domain = "";
     return [{
       id: `him-${job.guid ?? url}`,
       company: job.companyName.trim().slice(0, 80), domain, email, title: job.title.trim(),
@@ -2228,7 +2228,7 @@ async function fetchNoDesk(keywords: string[], maxHours: number, freshOnly: bool
     const budget  = extractBudget(title + " " + cleanDesc);
     const urgency = detectUrgency(title + " " + cleanDesc);
     const email   = extractEmail(cleanDesc);
-    const domain  = companyToDomain(company);
+    const domain  = "";
     const slug    = link.split("/").filter(Boolean).pop() ?? Math.random().toString(36).slice(2);
 
     leads.push({
@@ -2332,8 +2332,9 @@ export async function aggregateLeadsWithDiagnostics(
   const results = await Promise.all(runners.map(async (r) => {
     try {
       const { leads, raw } = await r.run(resolved, keywords, maxHours, freshOnly);
-      sourceDiagnostics.push({ source: r.name, ok: true, fetched: raw, kept: leads.length });
-      return leads;
+      const remoteLeads = leads.filter(lead => !requiresOfficeWork(lead.title, lead.description));
+      sourceDiagnostics.push({ source: r.name, ok: true, fetched: raw, kept: remoteLeads.length });
+      return remoteLeads;
     } catch (err) {
       sourceDiagnostics.push({
         source: r.name, ok: false, fetched: 0, kept: 0,
@@ -2344,7 +2345,7 @@ export async function aggregateLeadsWithDiagnostics(
   }));
 
   const totalFetched = sourceDiagnostics.reduce((s, d) => s + d.fetched, 0);
-  let all = results.flat().map(lead => ({ ...lead, title: stripHtml(lead.title), company: stripHtml(lead.company) })).flatMap((lead): AggregatedLead[] => {
+  let all = results.flat().map(lead => ({ ...lead, domain: companyWebsiteDomain(lead.domain), title: stripHtml(lead.title), company: stripHtml(lead.company) })).flatMap((lead): AggregatedLead[] => {
     const match = bestNicheMatch(lead, nicheKeywordSets);
     if (!match) return [];
     return [{ ...lead, niche: match.niche, confidence: Math.min(100, Math.max(lead.confidence, match.confidence)) }];

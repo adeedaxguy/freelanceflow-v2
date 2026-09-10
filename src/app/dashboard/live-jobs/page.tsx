@@ -417,7 +417,7 @@ export default function LiveJobsPage() {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
           company: lead.company.trim().slice(0,200)||"Unknown",
-          domain:  (lead.domain??"").trim().slice(0,200)||"unknown.com",
+          domain:  (lead.domain??"").trim().slice(0,200),
           email:   lead.email?.trim()||null,
           confidence: lead.confidence, qualityScore: lead.qualityScore,
           bestMatchScore: lead.bmScore,
@@ -767,7 +767,7 @@ export default function LiveJobsPage() {
                             className={`flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 rounded-lg text-xs font-medium transition-all ${isSaved?"bg-accent/10 text-accent border border-accent/30 cursor-default":"bg-primary/10 text-primary-light border border-primary/30 hover:bg-primary/20"}`}>
                             {isSaved?<><CheckCircle className="w-3.5 h-3.5"/> Saved</>:<><Bookmark className="w-3.5 h-3.5"/>{isSaving?"…":"Save Lead"}</>}
                           </button>
-                          <Link href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(stripHtml(lead.description).slice(0,400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email??"")}`}
+                          <Link href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(stripHtml(lead.description).slice(0, 1200))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email??"")}`}
                             className="flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all">
                             <Sparkles className="w-3.5 h-3.5"/> AI Proposal
                           </Link>

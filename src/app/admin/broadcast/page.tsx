@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 
-type Segment = "all" | "free" | "pro" | "agency";
+type Segment = "all" | "free" | "pro" | "agency" | "updates" | "status";
 type Status = {
   sender: { configured: boolean; provider: "resend" | "smtp" | null; fromEmail: string };
   counts: Record<Segment, number>;
@@ -82,6 +82,8 @@ const SEGMENTS: Array<{ key: Segment; label: string; description: string }> = [
   { key: "free", label: "Free", description: "Opted-in users on the free plan" },
   { key: "pro", label: "Pro", description: "Opted-in users on the Pro plan" },
   { key: "agency", label: "Agency", description: "Opted-in users on the Agency plan" },
+  { key: "updates", label: "Product newsletter", description: "Confirmed product newsletter subscribers" },
+  { key: "status", label: "Service notices", description: "Confirmed status subscribers, plus the public status page" },
 ];
 
 export default function AdminBroadcastPage() {
@@ -156,6 +158,7 @@ export default function AdminBroadcastPage() {
           message,
           segment,
           confirm: "SEND_CONSENTED_CAMPAIGN",
+          publishStatus: segment === "status",
         }),
       });
       const data = await response.json() as {
@@ -290,7 +293,7 @@ export default function AdminBroadcastPage() {
                 </button>
               ))}
             </div>
-            {!loadingStatus && excludedCount > 0 && (
+            {!loadingStatus && excludedCount > 0 && segment !== "updates" && segment !== "status" && (
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
                 {excludedCount} active {segment === "all" ? "accounts are" : `${segment} accounts are`} excluded because product emails are disabled. They become eligible immediately after opting in from their dashboard or Settings.
               </p>
@@ -337,7 +340,7 @@ export default function AdminBroadcastPage() {
               />
             </div>
             <div className="border-b border-[#dfd9ff] bg-[#f0edff] px-6 py-6">
-              <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#5b3de1]">Product update</p>
+              <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.13em] text-[#5b3de1]">{segment === "status" ? "Service status notice" : "Product update"}</p>
               <p className="text-xl font-bold leading-7 tracking-tight text-[#17181d]">{subject || "Your subject will appear here"}</p>
             </div>
             <div className="px-6 pt-6">
@@ -380,7 +383,8 @@ export default function AdminBroadcastPage() {
               <ShieldCheck className="h-4 w-4 text-emerald-500" /> Delivery safeguards
             </p>
             <ul className="mt-3 space-y-2 text-xs leading-5 text-muted-foreground">
-              <li>Only active users with marketing consent are included.</li>
+              <li>{segment === "updates" || segment === "status" ? "Only confirmed subscribers to this topic are included." : "Only active users with marketing consent are included."}</li>
+              {segment === "status" && <li className="text-amber-500">The subject and message will also appear publicly on /status. Do not include private information.</li>}
               <li>Identical campaign content cannot be sent twice within 24 hours.</li>
               <li>The current batch is capped at {status?.maxBatchSize ?? 200} recipients.</li>
             </ul>
@@ -395,16 +399,16 @@ export default function AdminBroadcastPage() {
                   onChange={(event) => setConfirmed(event.target.checked)}
                   className="mt-1 h-4 w-4 rounded border-border accent-primary"
                 />
-                I reviewed this email and confirm delivery to {audienceCount} opted-in {segment === "all" ? "users" : `${segment} users`}.
+                I reviewed this email and confirm delivery to {Math.min(audienceCount, status?.maxBatchSize ?? 200)} opted-in recipients{segment === "status" ? " and publication on the public status page" : ""}.
               </label>
               <button
                 type="button"
                 onClick={() => void sendCampaign()}
-                disabled={!confirmed || sending || !status?.sender.configured || audienceCount === 0}
+                disabled={!confirmed || sending || !status?.sender.configured || (audienceCount === 0 && segment !== "status")}
                 className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-45"
               >
                 {sending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {sending ? "Delivering" : `Send to ${audienceCount} opted-in users`}
+                {sending ? "Delivering" : segment === "status" ? "Publish and email status notice" : `Send to ${Math.min(audienceCount, status?.maxBatchSize ?? 200)} recipients`}
               </button>
             </div>
           )}

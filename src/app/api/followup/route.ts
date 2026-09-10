@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ followUps });
   } catch (err) {
     console.error("FollowUp GET error:", err);
-    return NextResponse.json({ followUps: [] });
+    return NextResponse.json({ error: "Follow-ups could not be loaded. Please retry." }, { status: 503 });
   }
 }
 

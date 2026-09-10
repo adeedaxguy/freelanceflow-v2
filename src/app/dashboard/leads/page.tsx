@@ -1054,7 +1054,7 @@ export default function LeadsPage() {
                             }
                           </button>
                           <Link
-                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 1200))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
                             className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all shadow-glow-primary/20">
                             <Sparkles className="w-3.5 h-3.5" /> AI Proposal
                           </Link>
@@ -1088,7 +1088,7 @@ export default function LeadsPage() {
                           }
                         </button>
                         <Link
-                          href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                          href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 1200))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
                           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-gradient-hero text-white text-xs font-semibold transition-all">
                           <Sparkles className="w-3.5 h-3.5" /> AI Proposal
                         </Link>
@@ -1209,7 +1209,7 @@ export default function LeadsPage() {
                             }
                           </button>
                           <Link
-                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 400))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
+                            href={`/dashboard/proposal/new?company=${encodeURIComponent(lead.company)}&domain=${encodeURIComponent(lead.domain)}&title=${encodeURIComponent(lead.title)}&description=${encodeURIComponent(lead.description.slice(0, 1200))}&url=${encodeURIComponent(lead.url)}&niche=${encodeURIComponent(lead.niche)}&email=${encodeURIComponent(lead.email ?? "")}`}
                             className="flex items-center justify-center gap-1.5 py-2.5 rounded-lg bg-gradient-hero text-white text-xs font-semibold hover:opacity-90 transition-all shadow-glow-primary/20">
                             <Sparkles className="w-3.5 h-3.5" /> AI Proposal
                           </Link>

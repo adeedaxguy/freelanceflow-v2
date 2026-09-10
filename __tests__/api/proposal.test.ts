@@ -3,6 +3,7 @@ jest.mock("@/lib/trial-access", () => ({ getTrialAccessError: jest.fn(async () =
 
 jest.mock("next-auth", () => ({ getServerSession: jest.fn() }));
 jest.mock("@/lib/auth", () => ({ authOptions: {} }));
+jest.mock("@/lib/audit-log", () => ({ recordAuditLog: jest.fn(async () => undefined) }));
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn() },
@@ -56,6 +57,8 @@ describe("POST /api/proposal/generate", () => {
     expect(data.subject).toBeTruthy();
     expect(data.body).toContain("Stripe");
     expect(data.source).toBe("template");
+    expect(data.body).toContain("[Add one relevant example");
+    expect(data.body).not.toContain("I've helped");
   });
 
   it("returns 400 when required fields missing", async () => {

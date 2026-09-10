@@ -126,6 +126,16 @@ describe("POST /api/leads/save", () => {
     (prisma.lead.findFirst as jest.Mock).mockResolvedValue(null);
   });
 
+  it("saves a real job with no known company website, scoped to its user", async () => {
+    (getServerSession as jest.Mock).mockResolvedValue(mockSession);
+    (prisma.lead.create as jest.Mock).mockResolvedValue({ id: "unknown-job", company: "Example", domain: "" });
+    const { POST } = await import("@/app/api/leads/save/route");
+    const response = await POST(new NextRequest("http://localhost/api/leads/save", { method: "POST", body: JSON.stringify({ company: "Example", title: "React developer", source: "greenhouse", sourceUrl: "https://boards.greenhouse.io/example/jobs/123" }) }));
+    expect(response.status).toBe(201);
+    expect(prisma.lead.create).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ userId: "user-1", domain: "", title: "React developer" }) }));
+    expect(prisma.lead.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ userId: "user-1", OR: expect.arrayContaining([{ company: "Example", domain: "", title: "React developer" }]) }) }));
+  });
+
   it("saves a lead and returns 201", async () => {
     (getServerSession as jest.Mock).mockResolvedValue(mockSession);
     const mockLead = { id: "lead-1", company: "Stripe", domain: "stripe.com", email: "john@stripe.com", userId: "user-1" };

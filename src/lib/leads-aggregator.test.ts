@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import { aggregateLeadsWithDiagnostics } from "./leads-aggregator";
 
 describe("remote lead ranking", () => {
@@ -315,6 +316,37 @@ describe("remote lead ranking", () => {
       company: "Fresh Remote Co",
       title: "Senior React Developer",
     });
+  });
+
+  it("requests full Greenhouse briefs and never guesses the company domain", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ jobs: [{
+      id: 123, title: "Remote React developer", location: { name: "Remote" },
+      absolute_url: "https://boards.greenhouse.io/test/jobs/123", updated_at: "2026-08-26T10:00:00Z",
+      content: "&lt;p&gt;Build accessible React booking flows with TypeScript and automated tests.&lt;/p&gt;",
+    }] }) });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "greenhouse", maxHours: 72, minConfidence: 0 });
+    expect(fetchMock.mock.calls.every(call => String(call[0]).includes("content=true"))).toBe(true);
+    expect(leads.length).toBeGreaterThan(0);
+    expect(leads[0]?.description).toContain("accessible React booking flows");
+    expect(leads[0]?.description).not.toContain("&lt;");
+    expect(leads[0]?.domain).toBe("");
+  });
+
+  it("excludes hybrid Remote First Jobs entries while keeping remote work", async () => {
+    fetchMock.mockResolvedValue({ ok: true, text: async () => `<rss><channel>
+      <item><title>React Developer (Hybrid) at Office Co</title><link>https://remotefirstjobs.com/jobs/hybrid</link><guid>hybrid</guid><pubDate>Wed, 26 Aug 2026 10:00:00 +0000</pubDate><description>React TypeScript web development.</description></item>
+      <item><title>Remote React Developer at Remote Co</title><link>https://remotefirstjobs.com/jobs/remote</link><guid>remote</guid><pubDate>Wed, 26 Aug 2026 10:00:00 +0000</pubDate><description>Remote React TypeScript web development.</description></item>
+    </channel></rss>` });
+    const { leads } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "remotefirstjobs", maxHours: 72, minConfidence: 0 });
+    expect(leads.map(lead => lead.id)).toEqual(["rfj-remote"]);
+    expect(leads[0]?.domain).toBe("");
+  });
+
+  it("reports an invalid RemoteOK feed as a source failure", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ error: "blocked" }) });
+    const { leads, diagnostics } = await aggregateLeadsWithDiagnostics("web-development", { filterSource: "remoteok", maxHours: 72, minConfidence: 0 });
+    expect(leads).toEqual([]);
+    expect(diagnostics.sources[0]?.ok).toBe(false);
   });
 
   it("uses Web3 Jobs Radar only for blockchain searches", async () => {

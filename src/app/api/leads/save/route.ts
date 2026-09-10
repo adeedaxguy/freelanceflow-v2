@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sanitizeLegacyJobDomain } from "@/lib/job-data";
 import type { Lead as PrismaLead, Prisma } from "@prisma/client";
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,7 @@ export const dynamic = 'force-dynamic';
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 const saveSchema = z.object({
   company:        z.string().min(1).max(200),
-  domain:         z.string().min(1).max(200),
+  domain:         z.string().max(200).default(""),
   email:          z.string().email().optional().nullable().catch(null),
   phone:          z.string().max(30).optional().nullable(),
   confidence:     z.number().min(0).max(100).optional().nullable()
@@ -111,7 +112,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid data", details: parsed.error.flatten() }, { status: 400 });
     }
-    const d = parsed.data;
+    const d = sanitizeLegacyJobDomain(parsed.data);
     const company = d.company.trim();
     const domain = d.domain.trim().toLowerCase();
     const phone = d.phone?.trim() || null;
@@ -204,7 +205,7 @@ export async function GET(req: NextRequest) {
   if (singleId) {
     const lead = await prisma.lead.findFirst({ where: { id: singleId, userId: session.user.id } });
     if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json({ lead });
+    return NextResponse.json({ lead: sanitizeLegacyJobDomain(lead) });
   }
 
   const page   = Math.max(1, parseInt(searchParams.get("page")  ?? "1"));
@@ -233,7 +234,7 @@ export async function GET(req: NextRequest) {
     });
     const filtered = candidates.filter(lead => matchesCountryFilter(lead, country));
     return NextResponse.json({
-      leads: filtered.slice((page - 1) * limit, page * limit),
+      leads: filtered.slice((page - 1) * limit, page * limit).map(sanitizeLegacyJobDomain),
       total: filtered.length,
       page,
       totalPages: Math.ceil(filtered.length / limit),
@@ -244,7 +245,7 @@ export async function GET(req: NextRequest) {
     prisma.lead.findMany({ where, orderBy: { savedAt: "desc" }, skip: (page - 1) * limit, take: limit }),
     prisma.lead.count({ where }),
   ]);
-  return NextResponse.json({ leads, total, page, totalPages: Math.ceil(total / limit) });
+  return NextResponse.json({ leads: leads.map(sanitizeLegacyJobDomain), total, page, totalPages: Math.ceil(total / limit) });
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────

@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
+import AIConnectionCheck from "@/components/AIConnectionCheck";
 import {
   Settings, Save, CheckCircle, Key, Globe, AlertTriangle, CreditCard,
   Mail, DollarSign, Users, Eye, EyeOff, RefreshCw, Zap
@@ -263,6 +264,7 @@ export default function AdminSettingsClient({ initialSettings, stripeEnvironment
 
       {/* ── API Keys ── */}
       <Section title="API Keys" icon={<Key className="w-4 h-4 text-accent" />}>
+        <AIConnectionCheck />
         <form onSubmit={(e: FormEvent) => { e.preventDefault(); void saveSection("apikeys", ["groq_api_key", "resend_api_key", "resend_from_email", "yelp_api_key", "here_api_key", "hunter_api_key", "opencorporates_api_key", "companies_house_key"]); }}
           className="space-y-4">
           <Field label="Groq API Key" value={get("groq_api_key")} onChange={v => set("groq_api_key", v)}

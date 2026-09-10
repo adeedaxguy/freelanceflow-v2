@@ -61,11 +61,13 @@ export function renderMarketingEmail(params: {
   email: string;
   subject: string;
   message: string;
+  unsubscribeUrl?: string;
+  category?: string;
 }) {
   const firstName = params.name?.trim().split(/\s+/)[0] || "there";
   const personalized = params.message.replaceAll("{name}", firstName);
   const token = createUnsubscribeToken(params.userId, params.email);
-  const unsubscribeUrl = `https://icloseleads.com/api/email/unsubscribe?token=${encodeURIComponent(token)}`;
+  const unsubscribeUrl = params.unsubscribeUrl || `https://icloseleads.com/api/email/unsubscribe?token=${encodeURIComponent(token)}`;
   const subject = params.subject.replaceAll("{name}", firstName);
   const loginUrl = "https://icloseleads.com/auth";
   const localLeadsUrl = "https://icloseleads.com/dashboard/local-leads";
@@ -86,7 +88,7 @@ export function renderMarketingEmail(params: {
           <img src="https://icloseleads.com/brand/icloseleads-email-logo.png" width="190" height="46" alt="iCloseLeads" style="display:block;width:190px;height:auto;border:0;outline:none;text-decoration:none">
         </td></tr>
         <tr><td colspan="4" style="padding:34px 30px 28px;background:#f0edff;border-bottom:1px solid #dfd9ff">
-          <p style="margin:0 0 11px;color:#5b3de1;font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase">Product update</p>
+          <p style="margin:0 0 11px;color:#5b3de1;font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase">${escapeHtml(params.category || "Product update")}</p>
           <h1 style="margin:0;max-width:540px;color:#17181d;font-size:29px;line-height:1.18;letter-spacing:-.55px">${escapeHtml(subject)}</h1>
         </td></tr>
         <tr><td colspan="4" style="padding:26px 30px 6px">
@@ -104,8 +106,8 @@ export function renderMarketingEmail(params: {
         </td></tr>
         <tr><td colspan="4" style="padding:21px 30px;background:#f7f8fb;border-top:1px solid #e2e5ed;color:#697080;font-size:12px;line-height:1.65">
           <strong style="color:#30313a">iCloseLeads</strong> &middot; Client acquisition software<br>
-          You received this because you opted in to iCloseLeads product emails.
-          <a href="${unsubscribeUrl}" style="color:#4930bd">Unsubscribe</a> or update your email preferences in Settings.
+          You received this because you opted in to iCloseLeads ${escapeHtml(params.category?.toLowerCase() || "product emails")}.
+          <a href="${escapeHtml(unsubscribeUrl)}" style="color:#4930bd">Unsubscribe from these emails</a>.
         </td></tr>
       </table>
     </td></tr>
