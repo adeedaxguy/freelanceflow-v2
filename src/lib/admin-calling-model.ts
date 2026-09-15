@@ -46,6 +46,7 @@ export type CallingAttempt = {
   status: "dispatching" | "active" | "done" | "failed" | "uncertain";
   conversationId: string | null; createdAt: string; summary: string;
   transcript: { role: string; message: string }[]; duration: number;
+  workspaceId?: string; fromNumber?: string; twilioCallSid?: string; agentId?: string;
 };
 export type CallingSetup = {
   profile: StudioProfile; voiceId: string; phoneId: string; agentId: string;
@@ -105,7 +106,8 @@ export function managedAgentConfig(voiceId: string, toolUrl: string) {
     name: "iCloseLeads admin pilot - Lofts Studio",
     conversation_config: {
       conversation: { max_duration_seconds: CALL_SECONDS },
-      tts: { voice_id: voiceId, model_id: "eleven_v3_conversational", speed: 0.95, expressive_mode: true },
+      asr: { user_input_audio_format: "ulaw_8000" },
+      tts: { voice_id: voiceId, model_id: "eleven_v3_conversational", speed: 0.95, expressive_mode: true, agent_output_audio_format: "ulaw_8000" },
       agent: {
         first_message: "Hello, I'm Maya, an AI assistant calling for {{studio_name}} about website services. This call uses speech recognition and keeps written notes. You can ask me to stop at any time. Is now a good time for one quick question?",
         language: "en",

@@ -13,7 +13,7 @@ Review handoff: ship; all five material findings resolved. Live calling readines
 
 ## Task Flow
 
-1. Save the ElevenLabs key, load female voices and dedicated Twilio numbers, approve Lofts Studio facts/offer limits, select the voice/number and verify the agent.
+1. Select your existing admin softphone number, which is available before connecting ElevenLabs. Save the ElevenLabs key, load female voices, approve Lofts Studio facts/offer limits and verify the agent. Already-connected dedicated numbers remain an alternative.
 2. Find and research an Australia/Canada category and city; review saved business evidence, recipient timezone and per-number express AI-call consent. Prepare an owned, consenting test contact before business calling.
 3. Review today's holidays and calling-list requirements, approve a supervised run, keep the page open, then inspect summaries/transcripts and handle follow-up personally.
 
@@ -28,7 +28,7 @@ Review handoff: ship; all five material findings resolved. Live calling readines
 ## Boundaries
 
 - Private admin surface: page and API authorization include a fresh database role check. Credentials stay in encrypted settings; the UI receives connection state. Customer softphone routes, numbers, billing and allowances retain their existing behavior.
-- Agent configured is setup state. Live provider verification, voice/latency checks and a consenting test call still require the owner's ElevenLabs account and a separate dedicated Twilio number. Every dial remains gated by consent, fresh research, suppression, local-time checks and pilot limits: one concurrent call, three minutes, ten attempts per rolling 24 hours and seven-day duplicate exclusion.
+- Agent configured is setup state. Live provider verification, voice/latency checks and a consenting test call still require the owner's ElevenLabs account and an eligible outgoing number. The administrator's existing number can be reused without changing incoming routing. Every dial remains gated by consent, fresh research, suppression, local-time checks and pilot limits: one concurrent call, three minutes, ten attempts per rolling 24 hours and seven-day duplicate exclusion.
 - Calendar booking, SMS, unattended scheduling and automatic CRM promotion are unavailable; audio recording is disabled. Operator review of applicable calling obligations remains required; this surface does not certify legal compliance.
 
 Sources: [Product context](../PRODUCT.md), [design guidance](../DESIGN.md), [implemented form and states](../src/components/admin/AdminCallingClient.tsx), [admin navigation and mobile shell](../src/components/AdminSidebar.tsx), [pilot workflow and boundaries](admin-calling-pilot.md).

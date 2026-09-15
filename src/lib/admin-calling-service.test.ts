@@ -8,6 +8,8 @@ jest.mock("./safe-fetch", () => ({ safeFetch: jest.fn(), readLimitedText: jest.f
 jest.mock("./audit-log", () => ({ recordAuditLog: jest.fn() }));
 jest.mock("./secret-box", () => ({ readStoredSecret: (value: string) => value }));
 jest.mock("./admin-calling-store", () => ({ callingTransaction: jest.fn(), getCampaign: jest.fn(), saveCampaign: jest.fn(), saveAttempt: jest.fn(), insertCampaign: jest.fn(), callingSnapshot: jest.fn() }));
+jest.mock("./admin-calling-twilio", () => ({ existingCallingNumbers: jest.fn(), isExistingCallingNumber: (id: string) => id.startsWith("workspace:"), verifyExistingCallingNumber: jest.fn(), startRegisteredCallingAttempt: jest.fn(), readRegisteredCallingAttempt: jest.fn() }));
+import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
 import { getPlatformSetting } from "./platform-secrets";
 import { callingTransaction, getCampaign, saveAttempt, callingSnapshot } from "./admin-calling-store";
 import { tickCallingCampaign, refreshCallingAttempts, suppressCallingToken, callingProviderOptions, researchCallingLead } from "./admin-calling-service";
@@ -27,6 +29,7 @@ beforeEach(() => {
   jest.useFakeTimers({ doNotFake: ["nextTick", "setImmediate", "setTimeout"] });
   jest.setSystemTime(new Date("2026-09-15T02:00:00Z"));
   busy = false; optedOut = false; campaign = sample();
+  (existingCallingNumbers as jest.Mock).mockResolvedValue([]);
   (getPlatformSetting as jest.Mock).mockImplementation(key => Promise.resolve(key === "admin_calling_setup" ? JSON.stringify(setup) : "provider-test-key"));
   (getCampaign as jest.Mock).mockImplementation(() => Promise.resolve(campaign));
   db.platformSetting.findMany.mockResolvedValue([{ key: "admin_calling_setup", value: JSON.stringify(setup) }, { key: "admin_calling_elevenlabs_key", value: "test-key" }]);
@@ -79,7 +82,7 @@ it("holds an ambiguous call, pauses the campaign and never blindly retries", asy
 it("redacts provider errors and pauses definite rejections", async () => {
   fetchMock.mockImplementation(async (url: string) => url.includes("outbound-call") ? { ok: false, status: 402, json: async () => ({ secret: "never-return-this" }) } : { ok: true, json: async () => managedAgentConfig("voice", "https://icloseleads.com/api/admin-calling/opt-out") });
   await tickCallingCampaign("campaign", "admin");
-  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "failed", summary: expect.stringContaining("402") }));
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "failed", summary: expect.stringContaining("rejected") }));
   expect(JSON.stringify((saveAttempt as jest.Mock).mock.calls)).not.toContain("never-return-this");
 });
 it("rejects missing and expired per-call opt-out tokens", async () => {
@@ -99,9 +102,96 @@ it("excludes customer-owned and disabled phone numbers and non-female voices", a
   (prisma.telephonyPurchase.findMany as jest.Mock).mockResolvedValue([{ phoneNumber: "+61280002222" }]);
   const number = (phone_number: string, supports_outbound = true) => ({ phone_number, supports_outbound, phone_number_id: phone_number, provider: "twilio" });
   fetchMock.mockImplementation(async (url: string) => ({ ok: true, json: async () => url.includes("phone-numbers") ? [number("+61280001111"), number("+61280002222"), number("+61280003333"), number("+61280004444", false)] : { voices: [{ voice_id: "f", name: "Voice", labels: { gender: "female" } }, { voice_id: "m", name: "Other", labels: { gender: "male" } }] } }));
-  const result = await callingProviderOptions();
+  const result = await callingProviderOptions("admin");
   expect(result.numbers.map(n => n.phone_number)).toEqual(["+61280003333"]);
   expect(result.voices.map(v => v.id)).toEqual(["f"]);
+});
+
+function useExistingNumber() {
+  const config = { ...setup, phoneId: "workspace:owned" };
+  (getPlatformSetting as jest.Mock).mockImplementation(key => Promise.resolve(key === "admin_calling_setup" ? JSON.stringify(config) : "test-key"));
+  db.platformSetting.findMany.mockResolvedValue([{ key: "admin_calling_setup", value: JSON.stringify(config) }, { key: "admin_calling_elevenlabs_key", value: "test-key" }]);
+  (verifyExistingCallingNumber as jest.Mock).mockResolvedValue({ workspaceId: "owned", fromNumber: "+16506634744" });
+  (startRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ sid: "CA" + "a".repeat(32) });
+  fetchMock.mockImplementation(async (url: string) => ({
+    ok: true, headers: new Headers({ "content-type": "application/json" }),
+    json: async () => url.includes("register-call") ? "<Response><Connect><Stream url='wss://example.test'/></Connect></Response>" : managedAgentConfig("voice", "https://icloseleads.com/api/admin-calling/opt-out"),
+  }));
+}
+it("registers before dialing the existing number and retains the atomic one-call guard", async () => {
+  useExistingNumber();
+  await Promise.all([tickCallingCampaign("campaign", "admin"), tickCallingCampaign("campaign", "admin")]);
+  expect(startRegisteredCallingAttempt).toHaveBeenCalledTimes(1);
+  const registration = fetchMock.mock.calls.find(([url]) => url.includes("register-call"));
+  expect(JSON.parse(registration![1].body)).toEqual(expect.objectContaining({ from_number: "+16506634744", to_number: "+61280001234", direction: "outbound" }));
+  expect(fetchMock.mock.calls.some(([url]) => url.includes("outbound-call"))).toBe(false);
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "active", workspaceId: "owned", twilioCallSid: "CA" + "a".repeat(32), agentId: "agent" }));
+});
+it("does not dial if AI registration fails or returns an invalid body", async () => {
+  useExistingNumber();
+  fetchMock.mockImplementation(async (url: string) => ({ ok: true, headers: new Headers({ "content-type": "application/json" }), json: async () => url.includes("register-call") ? {} : managedAgentConfig("voice", "https://icloseleads.com/api/admin-calling/opt-out") }));
+  await tickCallingCampaign("campaign", "admin");
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "failed", summary: expect.stringContaining("No telephone call") }));
+});
+it("does not dial if paused while ElevenLabs prepares the call", async () => {
+  useExistingNumber();
+  fetchMock.mockImplementation(async (url: string) => {
+    if (url.includes("register-call")) campaign.status = "paused";
+    return { ok: true, headers: new Headers({ "content-type": "application/json" }), json: async () => url.includes("register-call") ? "<Response><Connect><Stream url='wss://example.test'/></Connect></Response>" : managedAgentConfig("voice", "https://icloseleads.com/api/admin-calling/opt-out") };
+  });
+  await tickCallingCampaign("campaign", "admin");
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "failed", summary: expect.stringContaining("No telephone call") }));
+});
+it.each([400, 500, "timeout"])("does not retry Twilio dispatch failure: %s", async status => {
+  useExistingNumber();
+  (startRegisteredCallingAttempt as jest.Mock).mockRejectedValue(status === "timeout" ? new Error("timeout") : { status, message: "secret-provider-details" });
+  await tickCallingCampaign("campaign", "admin");
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: status === 400 ? "failed" : "uncertain" }));
+  expect(campaign.status).toBe("paused");
+  await tickCallingCampaign("campaign", "admin");
+  expect(startRegisteredCallingAttempt).toHaveBeenCalledTimes(1);
+  expect(JSON.stringify((saveAttempt as jest.Mock).mock.calls)).not.toContain("secret-provider-details");
+});
+const registeredAttempt = { id: "attempt", campaignId: "campaign", leadId: "lead", phone: "+61280001234", status: "active", workspaceId: "owned", fromNumber: "+16506634744", twilioCallSid: "CA" + "a".repeat(32), agentId: "agent", conversationId: null, createdAt: "2026-09-15T01:59:00Z" };
+it("does not release a registered call until Twilio itself is terminal", async () => {
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [registeredAttempt] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "in-progress" });
+  await refreshCallingAttempts("admin");
+  expect(saveAttempt).not.toHaveBeenCalled();
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+it("handles an unanswered Twilio call without requiring an AI conversation", async () => {
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [registeredAttempt] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "no-answer" });
+  await refreshCallingAttempts("admin");
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "failed", summary: expect.stringContaining("no-answer") }));
+  expect(fetchMock).not.toHaveBeenCalled();
+});
+it("matches the registered conversation to its exact attempt and saves opt-outs", async () => {
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [{ ...registeredAttempt }] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "completed" });
+  fetchMock.mockImplementation(async (url: string) => ({ ok: true, json: async () => url.includes("?") ? { conversations: [{ agent_id: "agent", conversation_id: "conversation" }] } : { conversation_id: "conversation", agent_id: "agent", user_id: "attempt", status: "done", transcript: [{ role: "user", message: "Do not call me again" }] } }));
+  await refreshCallingAttempts("admin");
+  expect(fetchMock.mock.calls[0][0]).toContain("user_id=attempt");
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ conversationId: "conversation", status: "done" }));
+  expect(db.$executeRawUnsafe).toHaveBeenCalledWith(expect.stringContaining("AdminCallingSuppression"), "+61280001234");
+});
+it("rejects a conversation returned for another attempt", async () => {
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [{ ...registeredAttempt, conversationId: "conversation" }] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "completed" });
+  fetchMock.mockResolvedValue({ ok: true, json: async () => ({ user_id: "other", agent_id: "agent", conversation_id: "conversation", status: "done" }) });
+  await expect(refreshCallingAttempts("admin")).rejects.toThrow("does not belong");
+  expect(saveAttempt).not.toHaveBeenCalled();
+});
+it("holds a completed call with missing AI notes instead of blindly starting another", async () => {
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [{ ...registeredAttempt, createdAt: "2026-09-15T01:00:00Z" }] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "completed" });
+  fetchMock.mockResolvedValue({ ok: true, json: async () => ({ conversations: [] }) });
+  await refreshCallingAttempts("admin");
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "uncertain" }));
+  expect(campaign.status).toBe("paused");
 });
 it("will not dispatch if someone removed the provider duration limit", async () => {
   const config = managedAgentConfig("voice", "https://icloseleads.com/api/admin-calling/opt-out");

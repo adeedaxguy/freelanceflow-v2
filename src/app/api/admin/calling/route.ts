@@ -11,6 +11,7 @@ import { campaignInputSchema, studioProfileSchema, localCallDate, callWindowOpen
 import { callingSnapshot, callingTransaction, getCampaign, saveCampaign, saveAttempt } from "@/lib/admin-calling-store";
 import { getCallingSetup, saveCallingSetup, callingProviderOptions, provisionCallingAgent, discoverCallingBusinesses, researchCallingLead, tickCallingCampaign, refreshCallingAttempts, elevenRequest } from "@/lib/admin-calling-service";
 import { randomUUID } from "node:crypto";
+import { existingCallingNumbers, isExistingCallingNumber, readRegisteredCallingAttempt } from "@/lib/admin-calling-twilio";
 
 const id = z.string().uuid();
 const schema = z.discriminatedUnion("action", [
@@ -41,7 +42,7 @@ export async function GET() {
   try {
     const user = await admin();
     if (!user) return json({ error: "Forbidden" }, 403);
-    return json({ setup: await getCallingSetup(), ...await callingSnapshot(user.id) });
+    return json({ setup: await getCallingSetup(), existingNumbers: await existingCallingNumbers(user.id), ...await callingSnapshot(user.id) });
   } catch { return json({ error: "Calling workspace could not be loaded. Please retry." }, 503); }
 }
 
@@ -57,31 +58,45 @@ export async function POST(req: NextRequest) {
     const bucket = ["search", "research", "provision"].includes(body.action) ? body.action : "controls";
     const rate = await securityRateLimit(`admin-calling:${bucket}`, user.id, bucket === "search" ? 12 : bucket === "provision" ? 10 : 400, 3600000);
     if (!rate.allowed) return json({ error: "Too many requests. Wait before trying again." }, 429);
-    if (body.action === "options") return json(await callingProviderOptions());
-    if (body.action === "setup") await saveCallingSetup(body);
+    if (body.action === "options") return json(await callingProviderOptions(user.id));
+    if (body.action === "setup") {
+      if (isExistingCallingNumber(body.phoneId) && !(await existingCallingNumbers(user.id)).some(n => n.phone_number_id === body.phoneId)) {
+        throw new Error("Select the outgoing number assigned to your own admin softphone.");
+      }
+      await saveCallingSetup(body);
+    }
     else if (body.action === "provision") await provisionCallingAgent(user.id);
     else if (body.action === "search") return json({ campaign: await discoverCallingBusinesses(body.campaign, user.id) });
     else if (body.action === "research") await researchCallingLead(body.campaignId, body.leadId, user.id);
     else if (body.action === "refresh") await refreshCallingAttempts(user.id);
     else if (body.action === "tick") {
-      await refreshCallingAttempts(user.id);
-      await tickCallingCampaign(body.campaignId, user.id);
+      // Reconciliation and the next dial get separate request budgets.
+      if (!await refreshCallingAttempts(user.id)) await tickCallingCampaign(body.campaignId, user.id);
     } else if (body.action === "resolve_unconfirmed") {
+      const candidate = (await callingSnapshot(user.id)).attempts.find(a => a.id === body.attemptId && a.campaignId === body.campaignId);
+      if (!candidate) throw new Error("Call attempt not found.");
+      if (candidate.twilioCallSid) {
+        const call = await readRegisteredCallingAttempt(user.id, candidate);
+        if (!["completed", "busy", "no-answer", "failed", "canceled"].includes(call.status)) throw new Error("Twilio still has an active call. This hold cannot be released.");
+      }
       await callingTransaction(async db => {
         const campaign = await getCampaign(db, body.campaignId, user.id);
         const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1 AND "campaignId"=$2`, body.attemptId, campaign.id);
         const attempt = rows[0]?.data;
-        if (!attempt || !["dispatching", "uncertain"].includes(attempt.status) || attempt.conversationId) throw new Error("Only an unconfirmed call without a provider conversation ID can be reviewed here.");
+        if (!attempt || !["dispatching", "uncertain"].includes(attempt.status) || attempt.conversationId || attempt.twilioCallSid !== candidate.twilioCallSid) throw new Error("The call changed or already has an AI conversation. Refresh or reconcile it first.");
         if (Date.now() - Date.parse(attempt.createdAt) < 900000) throw new Error("Wait at least 15 minutes and check both providers before releasing this hold.");
         await saveAttempt(db, { ...attempt, status: "failed", summary: `Admin confirmed no active call after checking providers. No automatic retry. Review: ${body.evidence}` });
         campaign.status = "paused"; campaign.lastMessage = "The reviewed hold was released. Calls remain paused.";
         await saveCampaign(db, campaign);
       });
     } else if (body.action === "reconcile") {
-      const result = await elevenRequest<{ user_id?: string; conversation_id: string }>(`/convai/conversations/${encodeURIComponent(body.conversationId)}`);
+      const result = await elevenRequest<{ user_id?: string; conversation_id: string; agent_id?: string }>(`/convai/conversations/${encodeURIComponent(body.conversationId)}`);
       if (result.user_id !== body.attemptId || result.conversation_id !== body.conversationId) throw new Error("This provider conversation does not belong to the selected call attempt.");
       await callingTransaction(async db => {
         await getCampaign(db, body.campaignId, user.id);
+        const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1 AND "campaignId"=$2`, body.attemptId, body.campaignId);
+        const attempt = rows[0]?.data;
+        if (!attempt || (attempt.workspaceId && (!attempt.twilioCallSid || result.agent_id !== attempt.agentId))) throw new Error("Reconcile the Twilio call before linking this conversation.");
         await db.$executeRawUnsafe(`UPDATE "AdminCallingAttempt" SET "data"=jsonb_set(jsonb_set("data",'{conversationId}',to_jsonb($3::text)),'{status}','"active"'::jsonb) WHERE "id"=$1 AND "campaignId"=$2 AND "data"->>'status' IN ('uncertain','dispatching')`, body.attemptId, body.campaignId, body.conversationId);
       });
       await refreshCallingAttempts(user.id);
@@ -127,7 +142,7 @@ export async function POST(req: NextRequest) {
       });
     }
     if (!["tick", "refresh", "research"].includes(body.action)) await recordAuditLog({ action: `admin_calling_${body.action}`, actorId: user.id, targetId: "campaignId" in body ? body.campaignId : null });
-    return json({ ok: true, setup: await getCallingSetup(), ...await callingSnapshot(user.id) });
+    return json({ ok: true, setup: await getCallingSetup(), existingNumbers: await existingCallingNumbers(user.id), ...await callingSnapshot(user.id) });
   } catch (error) {
     const message = error instanceof Error && !/prisma|SQL|database|connect ECONN|Invalid.*invocation/i.test(error.message) ? error.message : "The request could not be completed. Your saved campaign is unchanged; refresh before retrying.";
     await recordAuditLog({ action: "admin_calling_error", actorId, details: { message: message.slice(0, 500) } });

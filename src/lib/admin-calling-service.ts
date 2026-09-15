@@ -11,6 +11,7 @@ import { searchLocalBusinesses } from "./local-leads-engine";
 import { recordAuditLog } from "./audit-log";
 import { readStoredSecret } from "./secret-box";
 import { isOptOut } from "./ai-voice-agent";
+import { existingCallingNumbers, isExistingCallingNumber, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
 import { callingTransaction, getCampaign, saveCampaign, saveAttempt, insertCampaign, callingSnapshot } from "./admin-calling-store";
 import {
   CALL_SECONDS, DAILY_CALL_LIMIT, COUNTRIES, LOFTS_PROFILE, CALL_AGENT_PROMPT,
@@ -35,9 +36,9 @@ export async function getCallingSetup(db?: Prisma.TransactionClient): Promise<Ca
 }
 
 class ProviderError extends Error {
-  constructor(public status: number) { super(`Voice provider rejected the request (${status}). Check the dedicated number, agent permissions and provider balance.`); }
+  constructor(public status: number) { super(`Voice provider rejected the request (${status}). Check the outgoing number, agent permissions and provider balance.`); }
 }
-export async function elevenRequest<T>(path: string, init: RequestInit = {}, keyOverride?: string): Promise<T> {
+async function elevenResponse(path: string, init: RequestInit = {}, keyOverride?: string) {
   const key = keyOverride || await getPlatformSetting(SECRET_KEY) || process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error("Connect ElevenLabs before enabling AI calls.");
   const response = await fetch(`https://api.elevenlabs.io/v1${path}`, {
@@ -45,11 +46,14 @@ export async function elevenRequest<T>(path: string, init: RequestInit = {}, key
     signal: AbortSignal.timeout(18000), cache: "no-store", redirect: "error",
   });
   if (!response.ok) throw new ProviderError(response.status);
-  return response.json() as Promise<T>;
+  return response;
+}
+export async function elevenRequest<T>(path: string, init: RequestInit = {}, keyOverride?: string): Promise<T> {
+  return (await elevenResponse(path, init, keyOverride)).json() as Promise<T>;
 }
 
 export async function saveCallingSetup(input: Pick<CallingSetup, "profile" | "voiceId" | "phoneId"> & { apiKey?: string }) {
-  if (input.apiKey) await elevenRequest("/convai/phone-numbers?provider=twilio", {}, input.apiKey);
+  if (input.apiKey) await elevenRequest("/voices", {}, input.apiKey);
   await callingTransaction(async db => {
     const active = await db.$queryRawUnsafe<{ id: string }[]>(`SELECT "id" FROM "AdminCallingAttempt" WHERE "data"->>'status'=ANY($1::text[]) LIMIT 1`, ACTIVE);
     if (active.length) throw new Error("Finish or reconcile the active call before changing the agent setup.");
@@ -61,22 +65,23 @@ export async function saveCallingSetup(input: Pick<CallingSetup, "profile" | "vo
   });
 }
 
-export async function callingProviderOptions() {
+export async function callingProviderOptions(userId: string) {
   const numbers = await elevenRequest<Phone[]>("/convai/phone-numbers?provider=twilio");
   const voices = await elevenRequest<{ voices: { voice_id: string; name: string; labels?: Record<string, string> }[] }>("/voices");
   const inUse = await prisma.telephonyWorkspace.findMany({ select: { phoneNumber: true } });
   const purchased = await prisma.telephonyPurchase.findMany({ where: { phoneNumberSid: { not: null } }, select: { phoneNumber: true } });
   const protectedNumbers = new Set([...inUse, ...purchased].map(n => n.phoneNumber));
-  return { numbers: numbers.filter(n => n.provider === "twilio" && n.supports_outbound && !protectedNumbers.has(n.phone_number)),
+  return { numbers: [...await existingCallingNumbers(userId), ...numbers.filter(n => n.provider === "twilio" && n.supports_outbound && !protectedNumbers.has(n.phone_number))],
     voices: voices.voices.filter(v => v.labels?.gender === "female").map(v => ({ id: v.voice_id, name: v.name, accent: v.labels?.accent || "" })) };
 }
 
 export async function provisionCallingAgent(userId: string) {
   const config = await getCallingSetup();
-  if (!config.profile.approved || !config.voiceId || !config.phoneId) throw new Error("Approve the service knowledge, select a female voice and select a dedicated Twilio number first.");
-  const options = await callingProviderOptions();
+  if (!config.profile.approved || !config.voiceId || !config.phoneId) throw new Error("Approve the service knowledge, select a female voice and select an outgoing Twilio number first.");
+  const options = await callingProviderOptions(userId);
   if (!options.numbers.some(n => n.phone_number_id === config.phoneId)) throw new Error("The selected number is unavailable or belongs to the customer softphone.");
   if (!options.voices.some(v => v.id === config.voiceId)) throw new Error("Select an available female voice.");
+  if (isExistingCallingNumber(config.phoneId)) await verifyExistingCallingNumber(userId, config.phoneId);
   const reservation = new Date().toISOString();
   await callingTransaction(async db => {
     const current = await getCallingSetup(db);
@@ -182,6 +187,7 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
   const managed = await elevenRequest<{ conversation_config: ReturnType<typeof managedAgentConfig>["conversation_config"]; platform_settings: ReturnType<typeof managedAgentConfig>["platform_settings"] }>(`/convai/agents/${encodeURIComponent(config.agentId)}`);
   const expected = managedAgentConfig(config.voiceId, toolUrl());
   if (managed.conversation_config.conversation.max_duration_seconds !== CALL_SECONDS
+    || (isExistingCallingNumber(config.phoneId) && (managed.conversation_config.asr?.user_input_audio_format !== "ulaw_8000" || managed.conversation_config.tts.agent_output_audio_format !== "ulaw_8000"))
     || managed.conversation_config.agent.prompt.prompt !== CALL_AGENT_PROMPT
     || managed.conversation_config.agent.first_message !== expected.conversation_config.agent.first_message
     || managed.conversation_config.tts.voice_id !== config.voiceId
@@ -191,6 +197,7 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
     || managed.platform_settings.auth.enable_auth !== true
     || managed.conversation_config.agent.prompt.tools?.length !== 1
     || managed.conversation_config.agent.prompt.tools[0]?.api_schema.url !== toolUrl()) throw new Error("The provider agent changed. Re-verify setup before calling.");
+  const existingNumber = isExistingCallingNumber(config.phoneId) ? await verifyExistingCallingNumber(userId, config.phoneId) : null;
   const token = randomBytes(32).toString("hex");
   const prepared = await callingTransaction(async db => {
     const campaign = await getCampaign(db, campaignId, userId);
@@ -208,28 +215,56 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
     if (!lead) { campaign.status = "completed"; campaign.lastMessage = "No further approved, unsuppressed, uncalled contacts."; await saveCampaign(db, campaign); return null; }
     const blocker = leadCallBlocker(campaign, lead);
     if (blocker) { campaign.status = "paused"; campaign.lastMessage = blocker; await saveCampaign(db, campaign); return null; }
-    const attempt: CallingAttempt = { id: randomUUID(), campaignId, leadId: lead.id, phone: lead.phone, status: "dispatching", conversationId: null, createdAt: new Date().toISOString(), summary: "", transcript: [], duration: 0 };
+    if (lead.phone === existingNumber?.fromNumber) throw new Error("The recipient must be different from your outgoing number.");
+    const attempt: CallingAttempt = { id: randomUUID(), campaignId, leadId: lead.id, phone: lead.phone, status: "dispatching", conversationId: null, createdAt: new Date().toISOString(), summary: "", transcript: [], duration: 0, agentId: config.agentId, ...existingNumber };
     await db.$executeRawUnsafe(`INSERT INTO "AdminCallingAttempt" ("id","campaignId","leadId","phone","data","tokenHash") VALUES ($1,$2,$3,$4,$5::jsonb,$6)`, attempt.id, campaignId, lead.id, lead.phone, JSON.stringify(attempt), tokenHash(token));
     return { attempt, lead };
   });
   if (!prepared) return;
   const { attempt, lead } = prepared;
+  const clientData = { user_id: attempt.id, dynamic_variables: {
+    studio_name: config.profile.company, seller_knowledge: config.profile.services, approved_pricing: config.profile.pricing,
+    business_brief: JSON.stringify({ name: lead.name, ...lead.brief }), contact_email: config.profile.contactEmail, secret__call_token: token,
+  } };
+  let dialRequested = false;
   try {
-    const result = await elevenRequest<{ success: boolean; conversation_id?: string }>("/convai/twilio/outbound-call", { method: "POST", body: JSON.stringify({
-      agent_id: config.agentId, agent_phone_number_id: config.phoneId, to_number: lead.phone,
-      call_recording_enabled: false, telephony_call_config: { ringing_timeout_secs: 25, twilio_call_recording_enabled: false },
-      conversation_initiation_client_data: { user_id: attempt.id, dynamic_variables: {
-        studio_name: config.profile.company, seller_knowledge: config.profile.services, approved_pricing: config.profile.pricing,
-        business_brief: JSON.stringify({ name: lead.name, ...lead.brief }), contact_email: config.profile.contactEmail, secret__call_token: token,
-      } },
-    }) });
-    attempt.conversationId = result.conversation_id || null;
-    attempt.status = result.success && result.conversation_id ? "active" : "uncertain";
-    if (attempt.status === "uncertain") attempt.summary = "Provider did not confirm the call. Check its dashboard; no automatic retry.";
+    if (existingNumber) {
+      const response = await elevenResponse("/convai/twilio/register-call", { method: "POST", body: JSON.stringify({
+        agent_id: config.agentId, from_number: existingNumber.fromNumber, to_number: lead.phone, direction: "outbound",
+        conversation_initiation_client_data: clientData,
+      }) });
+      const twiml = z.string().min(20).max(64000).parse(response.headers.get("content-type")?.includes("json") ? await response.json() : await response.text());
+      await callingTransaction(async db => {
+        const current = await getCampaign(db, campaignId, userId);
+        const contact = current.leads.find(l => l.id === lead.id);
+        const suppressed = await db.$queryRawUnsafe<{ phone: string }[]>(`SELECT "phone" FROM "AdminCallingSuppression" WHERE "phone"=$1`, lead.phone);
+        if (current.status !== "running" || !contact || leadCallBlocker(current, contact) || suppressed.length) {
+          throw new Error("Calling approval changed while preparing the call.");
+        }
+      });
+      dialRequested = true;
+      const call = await startRegisteredCallingAttempt(userId, attempt, twiml);
+      if (!/^CA[a-f0-9]{32}$/i.test(call.sid)) throw new Error("Twilio did not confirm a call ID.");
+      attempt.twilioCallSid = call.sid;
+      attempt.status = "active";
+    } else {
+      dialRequested = true;
+      const result = await elevenRequest<{ success: boolean; conversation_id?: string }>("/convai/twilio/outbound-call", { method: "POST", body: JSON.stringify({
+        agent_id: config.agentId, agent_phone_number_id: config.phoneId, to_number: lead.phone,
+        call_recording_enabled: false, telephony_call_config: { ringing_timeout_secs: 25, twilio_call_recording_enabled: false },
+        conversation_initiation_client_data: clientData,
+      }) });
+      attempt.conversationId = result.conversation_id || null;
+      attempt.status = result.success && result.conversation_id ? "active" : "uncertain";
+      if (attempt.status === "uncertain") attempt.summary = "Provider did not confirm the call. Check its dashboard; no automatic retry.";
+    }
   } catch (error) {
     // A timeout or 5xx can happen AFTER dialing. Keep the global lock until reconciled.
-    attempt.status = error instanceof ProviderError && [400, 401, 402, 403, 404, 422, 429].includes(error.status) ? "failed" : "uncertain";
-    attempt.summary = error instanceof ProviderError ? error.message : "Call outcome unconfirmed. Check ElevenLabs before continuing; no automatic retry.";
+    const rejected = [400, 401, 402, 403, 404, 422, 429].includes(Number((error as { status?: number })?.status));
+    attempt.status = !dialRequested || rejected ? "failed" : "uncertain";
+    attempt.summary = !dialRequested ? "AI call preparation failed. No telephone call was placed; check the voice connection."
+      : rejected ? "The calling provider rejected the call. Check permissions, number and balance; no automatic retry."
+      : "Call outcome unconfirmed. Check Twilio and ElevenLabs before continuing; no automatic retry.";
   }
   await callingTransaction(async db => {
     await saveAttempt(db, attempt);
@@ -240,13 +275,41 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
       await saveCampaign(db, campaign);
     }
   });
-  await recordAuditLog({ action: `admin_calling_${attempt.status}`, actorId: userId, targetId: attempt.id, details: { campaignId, conversationId: attempt.conversationId } });
+  await recordAuditLog({ action: `admin_calling_${attempt.status}`, actorId: userId, targetId: attempt.id, details: { campaignId, conversationId: attempt.conversationId, twilioCallSid: attempt.twilioCallSid } });
 }
 
 export async function refreshCallingAttempts(userId: string) {
   const snapshot = await callingSnapshot(userId);
-  for (const attempt of snapshot.attempts.filter(a => ACTIVE.includes(a.status) && a.conversationId).slice(0, 1)) {
-    const result = await elevenRequest<{ conversation_id: string; agent_id: string; status: string; metadata?: { call_duration_secs?: number }; transcript?: { role: string; message: string | null }[]; analysis?: { transcript_summary?: string } }>(`/convai/conversations/${encodeURIComponent(attempt.conversationId!)}`);
+  const active = snapshot.attempts.filter(a => ACTIVE.includes(a.status));
+  for (const attempt of active.filter(a => a.conversationId || a.twilioCallSid).slice(0, 1)) {
+    if (attempt.workspaceId) {
+      if (!attempt.twilioCallSid) throw new Error("Reconcile this unconfirmed Twilio call before continuing.");
+      const call = await readRegisteredCallingAttempt(userId, attempt);
+      if (!["completed", "busy", "no-answer", "failed", "canceled"].includes(call.status)) continue;
+      if (call.status !== "completed") {
+        await callingTransaction(db => saveAttempt(db, { ...attempt, status: "failed", summary: `Twilio: ${call.status}. No conversation connected; no automatic retry.`, duration: 0 }));
+        continue;
+      }
+      if (!attempt.conversationId) {
+        const query = new URLSearchParams({ user_id: attempt.id, agent_id: attempt.agentId || "", page_size: "2" });
+        const matches = await elevenRequest<{ conversations: { conversation_id: string; agent_id: string }[] }>(`/convai/conversations?${query}`);
+        const match = matches.conversations[0];
+        if (matches.conversations.length !== 1 || !match || match.agent_id !== attempt.agentId) {
+          if (Date.now() - Date.parse(attempt.createdAt) > (CALL_SECONDS + 120) * 1000) {
+            await callingTransaction(async db => {
+              await saveAttempt(db, { ...attempt, status: "uncertain", summary: "Twilio ended the call but its AI conversation is unconfirmed. Check both providers before continuing." });
+              const campaign = await getCampaign(db, attempt.campaignId, userId);
+              campaign.status = "paused"; campaign.lastMessage = "Call notes need reconciliation. No automatic retry.";
+              await saveCampaign(db, campaign);
+            });
+          }
+          continue;
+        }
+        attempt.conversationId = match.conversation_id;
+      }
+    }
+    const result = await elevenRequest<{ conversation_id: string; agent_id: string; user_id?: string; status: string; metadata?: { call_duration_secs?: number }; transcript?: { role: string; message: string | null }[]; analysis?: { transcript_summary?: string } }>(`/convai/conversations/${encodeURIComponent(attempt.conversationId!)}`);
+    if (attempt.workspaceId && (result.user_id !== attempt.id || result.agent_id !== attempt.agentId)) throw new Error("The AI conversation does not belong to this call. Manual review is required.");
     if (result.conversation_id !== attempt.conversationId || !["done", "failed"].includes(result.status)) continue;
     const transcript = (result.transcript || []).filter(t => typeof t.message === "string").slice(0, 100).map(t => ({ role: t.role, message: t.message!.slice(0, 1500) }));
     await callingTransaction(async db => {
@@ -254,6 +317,7 @@ export async function refreshCallingAttempts(userId: string) {
       if (transcript.some(t => t.role === "user" && isOptOut(t.message))) await db.$executeRawUnsafe(`INSERT INTO "AdminCallingSuppression" ("phone") VALUES ($1) ON CONFLICT DO NOTHING`, attempt.phone);
     });
   }
+  return active.length > 0;
 }
 
 export async function suppressCallingToken(token: string) {
