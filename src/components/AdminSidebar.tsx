@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Users, Settings, BarChart2, Shield, LogOut, Zap,
   MessageSquare, DollarSign, Megaphone, UserCheck, FileText, BookOpen,
-  Inbox, Mail, ChevronRight, Menu, X, MessageCircle, BellRing,
+  Inbox, Mail, ChevronRight, Menu, X, MessageCircle, BellRing, PhoneCall,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import ThemeToggle from "./ThemeToggle";
@@ -36,6 +36,7 @@ const NAV_GROUPS = [
   {
     label: "Communication",
     items: [
+      { label: "AI Calling",       href: "/admin/softphone", icon: PhoneCall     },
       { label: "Mailbox",          href: "/admin/inbox",     icon: Inbox         },
       { label: "Account Notices",  href: "/admin/account-notices", icon: BellRing },
       { label: "Support Tickets",  href: "/admin/support",   icon: MessageSquare },

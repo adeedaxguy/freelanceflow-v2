@@ -38,7 +38,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    const settings = await prisma.platformSetting.findMany({ orderBy: { key: "asc" } });
+    const settings = await prisma.platformSetting.findMany({ where: { NOT: { key: { startsWith: "admin_calling_" } } }, orderBy: { key: "asc" } });
     // Mask sensitive values before sending
     const masked = settings.map(s => ({
       key: s.key,

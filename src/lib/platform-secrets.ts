@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { readStoredSecret, sealSecret } from "@/lib/secret-box";
 
 export const PLATFORM_SECRET_KEYS = new Set([
+  "admin_calling_elevenlabs_key",
   "stripe_secret_key",
   "stripe_webhook_secret",
   "lemonsqueezy_api_key",
