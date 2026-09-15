@@ -32,7 +32,7 @@ it("redacts provider rejection bodies and never retries", async () => {
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(fetch).toHaveBeenCalledWith("https://api.retellai.com/list-voices", expect.objectContaining({ redirect: "error", cache: "no-store" }));
 });
-it.each(["valid", "duration", "privacy", "prompt", "tool", "extra-tool", "webhook", "model", "states"])("verifies the managed Retell configuration: %s", async mode => {
+it.each(["valid", "omitted-null-fields", "duration", "privacy", "prompt", "tool", "extra-tool", "webhook", "model", "states", "mcps", "ambient", "missing-privacy", "missing-recording-url-setting", "missing-tools"])("verifies the managed Retell configuration: %s", async mode => {
   const agent = retellAgentConfig(config.voiceId, config.llmId!, webhook);
   const llm = retellLlmConfig(tool);
   const changed = JSON.parse(JSON.stringify({ agent, llm }));
@@ -44,7 +44,18 @@ it.each(["valid", "duration", "privacy", "prompt", "tool", "extra-tool", "webhoo
   if (mode === "webhook") changed.agent.webhook_url = "https://attacker.test";
   if (mode === "model") changed.llm.model = "expensive-model";
   if (mode === "states") changed.llm.states = [{ name: "unsafe" }];
+  if (mode === "mcps") changed.llm.mcps = [{ url: "https://attacker.test" }];
+  if (mode === "ambient") changed.agent.ambient_sound = "call-center";
+  if (mode === "missing-privacy") delete changed.agent.data_storage_setting;
+  if (mode === "missing-recording-url-setting") delete changed.agent.opt_in_signed_url;
+  if (mode === "missing-tools") delete changed.llm.general_tools;
+  if (mode === "omitted-null-fields") {
+    delete changed.agent.ambient_sound;
+    delete changed.llm.states;
+    delete changed.llm.mcps;
+    expect(changed.llm.general_tools[1].parameters).toEqual({ type: "object", properties: {} });
+  }
   (fetch as jest.Mock).mockImplementation(async (url: string) => ({ ok: true, json: async () => url.includes("get-agent/") ? changed.agent : changed.llm }));
-  if (mode === "valid") await expect(verifyRetell(config, tool, webhook)).resolves.toBeUndefined();
+  if (["valid", "omitted-null-fields"].includes(mode)) await expect(verifyRetell(config, tool, webhook)).resolves.toBeUndefined();
   else await expect(verifyRetell(config, tool, webhook)).rejects.toThrow("changed");
 });

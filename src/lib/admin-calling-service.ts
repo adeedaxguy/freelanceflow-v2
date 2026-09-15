@@ -103,8 +103,8 @@ export async function provisionCallingAgent(userId: string) {
     if (busy.length) throw new Error("A call still needs completion or reconciliation.");
     await db.platformSetting.update({ where: { key: SETUP_KEY }, data: { value: JSON.stringify({ ...config, ready: false, provisioning: reservation }) } });
   });
+  let identifiers: { agentId: string; llmId?: string } | undefined;
   try {
-    let identifiers: { agentId: string; llmId?: string };
     if (config.provider === "retell") {
       identifiers = await provisionRetell(config, toolUrl(), retellWebhookUrl());
       await verifyRetell({ ...config, ...identifiers }, toolUrl(), retellWebhookUrl());
@@ -125,7 +125,7 @@ export async function provisionCallingAgent(userId: string) {
   } catch (error) {
     await callingTransaction(async db => {
       const latest = await getCallingSetup(db);
-      if (latest.provisioning === reservation) await db.platformSetting.update({ where: { key: SETUP_KEY }, data: { value: JSON.stringify({ ...latest, ready: false, provisioning: undefined }) } });
+      if (latest.provisioning === reservation) await db.platformSetting.update({ where: { key: SETUP_KEY }, data: { value: JSON.stringify({ ...latest, ...identifiers, ready: false, provisioning: undefined }) } });
     });
     throw error;
   }

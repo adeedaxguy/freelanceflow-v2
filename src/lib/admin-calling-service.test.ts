@@ -12,7 +12,7 @@ jest.mock("./admin-calling-twilio", () => ({ existingCallingNumbers: jest.fn(), 
 import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
 import { getPlatformSetting } from "./platform-secrets";
 import { callingTransaction, getCampaign, saveAttempt, callingSnapshot } from "./admin-calling-store";
-import { tickCallingCampaign, refreshCallingAttempts, suppressCallingToken, callingProviderOptions, researchCallingLead, saveRetellNotes, saveCallingSetup, getCallingSetup } from "./admin-calling-service";
+import { tickCallingCampaign, refreshCallingAttempts, suppressCallingToken, callingProviderOptions, researchCallingLead, saveRetellNotes, saveCallingSetup, getCallingSetup, provisionCallingAgent } from "./admin-calling-service";
 import { retellAgentConfig, retellLlmConfig, type RetellCall } from "./admin-calling-retell";
 import { prisma } from "./prisma";
 import { safeFetch } from "./safe-fetch";
@@ -20,7 +20,7 @@ import { saveCampaign } from "./admin-calling-store";
 import { LOFTS_PROFILE, managedAgentConfig, type CallingCampaign, type CallingSetup } from "./admin-calling-model";
 const setup: CallingSetup = { profile: { ...LOFTS_PROFILE, approved: true }, voiceId: "voice", phoneId: "phone", agentId: "agent", ready: true, connected: true };
 const sample = (): CallingCampaign => ({ id: "campaign", userId: "admin", category: "Dentists", city: "Sydney", country: "AU", timezone: "Australia/Sydney", createdAt: "2026-09-15T00:00:00Z", status: "running", approvedDate: "2026-09-15", sources: [], leads: [{ id: "lead", phone: "+61280001234", name: "Consenting test", address: "Sydney", source: "https://example.com", website: "", countryVerified: true, brief: { facts: "Test prospect", offer: "Website review", question: "What matters?", sources: [], status: "unavailable", checkedAt: "2026-09-15T00:00:00Z" }, consent: { evidence: "Owner has consented specifically to Lofts Studio AI test calls to this number.", obtainedAt: "2026-09-14T00:00:00Z", approvedAt: "2026-09-15T00:00:00Z", approvedBy: "admin" } }] });
-const db = { $queryRawUnsafe: jest.fn(), $executeRawUnsafe: jest.fn(), voiceCall: { findMany: jest.fn() }, platformSetting: { findMany: jest.fn(), upsert: jest.fn() } };
+const db = { $queryRawUnsafe: jest.fn(), $executeRawUnsafe: jest.fn(), voiceCall: { findMany: jest.fn() }, platformSetting: { findMany: jest.fn(), upsert: jest.fn(), update: jest.fn() } };
 
 const retellSetup: CallingSetup = { ...setup, provider: "retell", voiceId: "cartesia-test", phoneId: "workspace:owned", agentId: "agent-retell", llmId: "llm-test" };
 function useRetell() {
@@ -79,6 +79,31 @@ it("switches providers without reusing the other provider's agent", async () => 
   await saveCallingSetup({ provider: "retell", profile: setup.profile, voiceId: "cartesia-test", phoneId: "workspace:owned" });
   const stored = JSON.parse(db.platformSetting.upsert.mock.calls[0][0].update.value);
   expect(stored).toMatchObject({ provider: "retell", agentId: "", ready: false });
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+});
+it("retains a created Retell agent after failed verification and updates it on retry without dialing", async () => {
+  let current: CallingSetup = { ...retellSetup, agentId: "", llmId: undefined, ready: false };
+  let invalid = true;
+  (getPlatformSetting as jest.Mock).mockImplementation(key => Promise.resolve(key === "admin_calling_setup" ? JSON.stringify(current) : "test-key"));
+  db.platformSetting.findMany.mockImplementation(async () => [{ key: "admin_calling_setup", value: JSON.stringify(current) }, { key: "admin_calling_retell_key", value: "test-key" }]);
+  db.platformSetting.update.mockImplementation(async ({ data }) => { current = JSON.parse(data.value); });
+  (existingCallingNumbers as jest.Mock).mockResolvedValue([{ phone_number_id: current.phoneId }]);
+  fetchMock.mockImplementation(async (url: string) => ({ ok: true, json: async () => {
+    if (url.endsWith("/list-voices")) return [{ voice_id: "cartesia-test", voice_name: "Test", provider: "cartesia", gender: "female" }];
+    if (/\/(create|update)-retell-llm/.test(url)) return { llm_id: "llm-created" };
+    if (/\/(create|update)-agent/.test(url)) return { agent_id: "agent-created" };
+    if (url.includes("/get-agent/")) return { ...retellAgentConfig(current.voiceId, "llm-created", "https://icloseleads.com/api/admin-calling/retell"), max_call_duration_ms: invalid ? 3600000 : 180000 };
+    return retellLlmConfig("https://icloseleads.com/api/admin-calling/opt-out");
+  } }));
+  await expect(provisionCallingAgent("admin")).rejects.toThrow("changed");
+  expect(current).toMatchObject({ agentId: "agent-created", llmId: "llm-created", ready: false });
+  expect(current.provisioning).toBeUndefined();
+  invalid = false;
+  await expect(provisionCallingAgent("admin")).resolves.toBeUndefined();
+  expect(current.ready).toBe(true);
+  expect(fetchMock.mock.calls.filter(([url]) => String(url).endsWith("/create-agent"))).toHaveLength(1);
+  expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/update-agent/agent-created"))).toBe(true);
+  expect(fetchMock.mock.calls.some(([url]) => String(url).endsWith("/update-retell-llm/llm-created"))).toBe(true);
   expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
 });
 it("prepares Retell before dialing once through the existing Twilio workspace", async () => {

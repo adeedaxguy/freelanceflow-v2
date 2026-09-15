@@ -36,7 +36,7 @@ export function retellLlmConfig(toolUrl: string) {
       { type: "end_call", name: "end_call", description: "End immediately on refusal, voicemail or when the conversation is finished." },
       { type: "custom", name: "record_opt_out", description: "Suppress this caller immediately when they withdraw consent or ask not to be called. Takes no arguments.",
         url: toolUrl, method: "POST", headers: { "x-call-token": "{{secret__call_token}}" },
-        parameters: { type: "object", properties: {}, required: [] },
+        parameters: { type: "object", properties: {} },
         speak_during_execution: false, speak_after_execution: true, timeout_ms: 5000, max_retry: 0 },
     ],
   };
@@ -68,6 +68,8 @@ export async function provisionRetell(config: CallingSetup, toolUrl: string, web
 
 // Compare our managed fields while allowing harmless provider response metadata.
 function matches(actual: unknown, expected: unknown): boolean {
+  // Retell omits nullable fields after null clears their configuration.
+  if (expected === null) return actual === null || actual === undefined;
   if (Array.isArray(expected)) return Array.isArray(actual) && actual.length === expected.length && expected.every((v, i) => matches(actual[i], v));
   if (expected && typeof expected === "object") return Boolean(actual && typeof actual === "object")
     && Object.entries(expected).every(([key, value]) => matches((actual as Record<string, unknown>)[key], value));
