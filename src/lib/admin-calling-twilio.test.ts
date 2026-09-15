@@ -8,7 +8,7 @@ import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCal
 import type { CallingAttempt } from "./admin-calling-model";
 
 const callSid = "CA" + "a".repeat(32);
-const workspace = { id: "owned", userId: "admin", status: "ACTIVE", phoneNumber: "+16506634744", phoneNumberSid: "PNowned", twilioAccountSid: "ACowned", twilioAuthTokenEncrypted: "encrypted" };
+const workspace = { id: "owned", userId: "admin", status: "READY", phoneNumber: "+16506634744", phoneNumberSid: "PNowned", twilioAccountSid: "ACowned", twilioAuthTokenEncrypted: "encrypted" };
 const attempt = { id: "attempt", workspaceId: "owned", fromNumber: workspace.phoneNumber, phone: "+14165550123", twilioCallSid: callSid } as CallingAttempt;
 const numberFetch = jest.fn();
 const callFetch = jest.fn();
@@ -24,7 +24,7 @@ beforeEach(() => {
 });
 it("shows only the current admin's existing number, without returning credentials or contacting Twilio", async () => {
   expect(await existingCallingNumbers("admin")).toEqual([{ phone_number_id: "workspace:owned", phone_number: "+16506634744", label: "Your existing softphone number" }]);
-  expect(prisma.telephonyWorkspace.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: "admin", user: { role: "ADMIN" }, status: "ACTIVE" } }));
+  expect(prisma.telephonyWorkspace.findFirst).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: "admin", user: { role: "ADMIN" }, status: "READY" } }));
   expect(twilio).not.toHaveBeenCalled();
 });
 it("verifies ownership with a read-only number fetch", async () => {
@@ -32,9 +32,10 @@ it("verifies ownership with a read-only number fetch", async () => {
   expect(client.incomingPhoneNumbers).toHaveBeenCalledWith("PNowned");
   expect(create).not.toHaveBeenCalled();
 });
-it.each(["missing", "suspended", "wrong-number", "wrong-account", "no-voice"])("blocks unavailable or mismatched numbers: %s", async mode => {
+it.each(["missing", "suspended", "subscription-status", "wrong-number", "wrong-account", "no-voice"])("blocks unavailable or mismatched numbers: %s", async mode => {
   if (mode === "missing") (prisma.telephonyWorkspace.findFirst as jest.Mock).mockResolvedValue(null);
   if (mode === "suspended") (prisma.telephonyWorkspace.findFirst as jest.Mock).mockResolvedValue({ ...workspace, status: "SUSPENDED" });
+  if (mode === "subscription-status") (prisma.telephonyWorkspace.findFirst as jest.Mock).mockResolvedValue({ ...workspace, status: "ACTIVE" });
   if (mode === "wrong-number") numberFetch.mockResolvedValue({ accountSid: "ACowned", phoneNumber: "+14165550124", capabilities: { voice: true } });
   if (mode === "wrong-account") numberFetch.mockResolvedValue({ accountSid: "ACother", phoneNumber: workspace.phoneNumber, capabilities: { voice: true } });
   if (mode === "no-voice") numberFetch.mockResolvedValue({ accountSid: "ACowned", phoneNumber: workspace.phoneNumber, capabilities: { voice: false } });

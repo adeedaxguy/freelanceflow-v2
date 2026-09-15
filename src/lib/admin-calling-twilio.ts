@@ -7,7 +7,7 @@ export const isExistingCallingNumber = (id: string) => id.startsWith("workspace:
 
 export async function existingCallingNumbers(userId: string) {
   const workspace = await prisma.telephonyWorkspace.findFirst({
-    where: { userId, user: { role: "ADMIN" }, status: "ACTIVE" },
+    where: { userId, user: { role: "ADMIN" }, status: "READY" },
     select: { id: true, phoneNumber: true, phoneNumberSid: true, twilioAccountSid: true, twilioAuthTokenEncrypted: true },
   });
   if (!workspace?.phoneNumber || !workspace.phoneNumberSid || !workspace.twilioAccountSid || !workspace.twilioAuthTokenEncrypted) return [];
@@ -28,7 +28,7 @@ async function workspaceClient(userId: string, workspaceId: string) {
 export async function verifyExistingCallingNumber(userId: string, phoneId: string) {
   if (!isExistingCallingNumber(phoneId)) throw new Error("Select your existing softphone number.");
   const { workspace, client } = await workspaceClient(userId, phoneId.slice("workspace:".length));
-  if (workspace.status !== "ACTIVE" || !workspace.phoneNumber || !workspace.phoneNumberSid) throw new Error("Your softphone number is not active.");
+  if (workspace.status !== "READY" || !workspace.phoneNumber || !workspace.phoneNumberSid) throw new Error("Your softphone number is not ready.");
   const number = await client.incomingPhoneNumbers(workspace.phoneNumberSid).fetch();
   if (number.accountSid !== workspace.twilioAccountSid || number.phoneNumber !== workspace.phoneNumber || !number.capabilities.voice) {
     throw new Error("Twilio could not verify ownership and voice capability for this number.");
@@ -38,7 +38,7 @@ export async function verifyExistingCallingNumber(userId: string, phoneId: strin
 
 export async function startRegisteredCallingAttempt(userId: string, attempt: CallingAttempt, twiml: string) {
   const { workspace, client } = await workspaceClient(userId, attempt.workspaceId || "");
-  if (workspace.status !== "ACTIVE" || workspace.phoneNumber !== attempt.fromNumber || !attempt.fromNumber || attempt.fromNumber === attempt.phone) {
+  if (workspace.status !== "READY" || workspace.phoneNumber !== attempt.fromNumber || !attempt.fromNumber || attempt.fromNumber === attempt.phone) {
     throw new Error("The outgoing number changed or matches the recipient.");
   }
   // Per-call TwiML only: never update the number, TwiML app or incoming routing.
