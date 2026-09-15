@@ -47,10 +47,12 @@ export type CallingAttempt = {
   conversationId: string | null; createdAt: string; summary: string;
   transcript: { role: string; message: string }[]; duration: number;
   workspaceId?: string; fromNumber?: string; twilioCallSid?: string; agentId?: string;
+  provider?: "elevenlabs" | "retell"; notesReceived?: boolean; analysisReceived?: boolean;
 };
 export type CallingSetup = {
   profile: StudioProfile; voiceId: string; phoneId: string; agentId: string;
   connected: boolean; ready: boolean; provisioning?: string;
+  provider?: "elevenlabs" | "retell"; llmId?: string;
 };
 
 export function normalizeCallingNumber(raw: string, country: "AU" | "CA"): string {

@@ -1,10 +1,10 @@
 /** @jest-environment node */
 jest.mock("server-only", () => ({}));
 jest.mock("./prisma", () => ({ prisma: { telephonyWorkspace: { findFirst: jest.fn() } } }));
-jest.mock("./telephony", () => ({ decryptTelephonySecret: jest.fn(() => "secret"), twilio: jest.fn() }));
+jest.mock("./telephony", () => ({ decryptTelephonySecret: jest.fn(() => "secret"), twilio: Object.assign(jest.fn(), { twiml: jest.requireActual("twilio").twiml }) }));
 import { prisma } from "./prisma";
 import { twilio } from "./telephony";
-import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
+import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt, retellCallingTwiml } from "./admin-calling-twilio";
 import type { CallingAttempt } from "./admin-calling-model";
 
 const callSid = "CA" + "a".repeat(32);
@@ -14,6 +14,15 @@ const numberFetch = jest.fn();
 const callFetch = jest.fn();
 const create = jest.fn();
 const client = { incomingPhoneNumbers: jest.fn(() => ({ fetch: numberFetch })), calls: Object.assign(jest.fn(() => ({ fetch: callFetch })), { create }) };
+it("bridges only a validated Retell ID, limits duration, disables recordings and hangs up the parent", () => {
+  const xml = retellCallingTwiml("call_test123");
+  expect(xml).toContain('record="do-not-record"');
+  expect(xml).toContain('timeLimit="180"');
+  expect(xml).toContain('sip:call_test123@sip.retellai.com;transport=tls');
+  expect(xml).toContain('<Hangup/>');
+  expect(() => retellCallingTwiml("evil@other.test")).toThrow();
+  expect(create).not.toHaveBeenCalled();
+});
 beforeEach(() => {
   jest.clearAllMocks();
   (prisma.telephonyWorkspace.findFirst as jest.Mock).mockResolvedValue(workspace);

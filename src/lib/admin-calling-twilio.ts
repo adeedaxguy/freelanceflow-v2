@@ -5,6 +5,14 @@ import { CALL_SECONDS, type CallingAttempt } from "./admin-calling-model";
 
 export const isExistingCallingNumber = (id: string) => id.startsWith("workspace:");
 
+export function retellCallingTwiml(callId: string) {
+  if (!/^[a-zA-Z0-9_-]{5,100}$/.test(callId)) throw new Error("Retell did not return a valid call ID.");
+  const response = new twilio.twiml.VoiceResponse();
+  response.dial({ record: "do-not-record", timeout: 25, timeLimit: CALL_SECONDS }).sip(`sip:${callId}@sip.retellai.com;transport=tls`);
+  response.hangup();
+  return response.toString();
+}
+
 export async function existingCallingNumbers(userId: string) {
   const workspace = await prisma.telephonyWorkspace.findFirst({
     where: { userId, user: { role: "ADMIN" }, status: "READY" },

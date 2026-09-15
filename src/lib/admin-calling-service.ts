@@ -11,7 +11,8 @@ import { searchLocalBusinesses } from "./local-leads-engine";
 import { recordAuditLog } from "./audit-log";
 import { readStoredSecret } from "./secret-box";
 import { isOptOut } from "./ai-voice-agent";
-import { existingCallingNumbers, isExistingCallingNumber, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
+import { existingCallingNumbers, isExistingCallingNumber, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt, retellCallingTwiml } from "./admin-calling-twilio";
+import { RETELL_SECRET_KEY, retellRequest, retellVoices, provisionRetell, verifyRetell, retellCallSchema, getRetellCall, type RetellCall } from "./admin-calling-retell";
 import { callingTransaction, getCampaign, saveCampaign, saveAttempt, insertCampaign, callingSnapshot } from "./admin-calling-store";
 import {
   CALL_SECONDS, DAILY_CALL_LIMIT, COUNTRIES, LOFTS_PROFILE, CALL_AGENT_PROMPT,
@@ -24,15 +25,18 @@ const SECRET_KEY = "admin_calling_elevenlabs_key";
 const ACTIVE = ["dispatching", "active", "uncertain"];
 const tokenHash = (token: string) => createHash("sha256").update(token).digest("hex");
 const toolUrl = () => new URL("/api/admin-calling/opt-out", process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
+const retellWebhookUrl = () => new URL("/api/admin-calling/retell", process.env.NEXT_PUBLIC_APP_URL || "https://icloseleads.com").toString();
 type Phone = { phone_number_id: string; phone_number: string; label: string; supports_outbound: boolean; provider: string };
 
 export async function getCallingSetup(db?: Prisma.TransactionClient): Promise<CallingSetup> {
-  const rows = db ? await db.platformSetting.findMany({ where: { key: { in: [SETUP_KEY, SECRET_KEY] } } }) : null;
+  const rows = db ? await db.platformSetting.findMany({ where: { key: { in: [SETUP_KEY, SECRET_KEY, RETELL_SECRET_KEY] } } }) : null;
   const stored = rows ? rows.find(r => r.key === SETUP_KEY)?.value || "" : await getPlatformSetting(SETUP_KEY);
-  const key = rows ? readStoredSecret(rows.find(r => r.key === SECRET_KEY)?.value || "") : await getPlatformSetting(SECRET_KEY);
   const config = stored ? JSON.parse(stored) : {};
+  const provider = config.provider === "retell" ? "retell" : "elevenlabs";
+  const keyName = provider === "retell" ? RETELL_SECRET_KEY : SECRET_KEY;
+  const key = rows ? readStoredSecret(rows.find(r => r.key === keyName)?.value || "") : await getPlatformSetting(keyName);
   return { profile: LOFTS_PROFILE, voiceId: "", phoneId: "", agentId: "", ready: false, ...config,
-    connected: Boolean(key || process.env.ELEVENLABS_API_KEY) };
+    provider, connected: Boolean(key || (provider === "retell" ? process.env.RETELL_API_KEY : process.env.ELEVENLABS_API_KEY)) };
 }
 
 class ProviderError extends Error {
@@ -52,20 +56,28 @@ export async function elevenRequest<T>(path: string, init: RequestInit = {}, key
   return (await elevenResponse(path, init, keyOverride)).json() as Promise<T>;
 }
 
-export async function saveCallingSetup(input: Pick<CallingSetup, "profile" | "voiceId" | "phoneId"> & { apiKey?: string }) {
-  if (input.apiKey) await elevenRequest("/voices", {}, input.apiKey);
+export async function saveCallingSetup(input: Pick<CallingSetup, "profile" | "voiceId" | "phoneId" | "provider"> & { apiKey?: string }) {
+  const provider = input.provider || (await getCallingSetup()).provider || "elevenlabs";
+  if (provider === "retell" && input.phoneId && !isExistingCallingNumber(input.phoneId)) throw new Error("Retell requires your existing admin softphone number.");
+  if (input.apiKey) {
+    if (provider === "retell") await retellVoices(input.apiKey);
+    else await elevenRequest("/voices", {}, input.apiKey);
+  }
   await callingTransaction(async db => {
     const active = await db.$queryRawUnsafe<{ id: string }[]>(`SELECT "id" FROM "AdminCallingAttempt" WHERE "data"->>'status'=ANY($1::text[]) LIMIT 1`, ACTIVE);
     if (active.length) throw new Error("Finish or reconcile the active call before changing the agent setup.");
     const current = await getCallingSetup(db);
     if (current.provisioning && Date.now() - Date.parse(current.provisioning) < 120000) throw new Error("Agent setup is still being verified. Wait before saving again.");
-    const data = { ...current, profile: input.profile, voiceId: input.voiceId, phoneId: input.phoneId, ready: false };
+    const data = { ...current, provider, profile: input.profile, voiceId: input.voiceId, phoneId: input.phoneId, ready: false,
+      ...(provider !== current.provider ? { agentId: "", llmId: undefined } : {}) };
     await db.platformSetting.upsert({ where: { key: SETUP_KEY }, create: { key: SETUP_KEY, value: JSON.stringify(data) }, update: { value: JSON.stringify(data) } });
-    if (input.apiKey) await db.platformSetting.upsert({ where: { key: SECRET_KEY }, create: { key: SECRET_KEY, value: encodePlatformSetting(SECRET_KEY, input.apiKey) }, update: { value: encodePlatformSetting(SECRET_KEY, input.apiKey) } });
+    const keyName = provider === "retell" ? RETELL_SECRET_KEY : SECRET_KEY;
+    if (input.apiKey) await db.platformSetting.upsert({ where: { key: keyName }, create: { key: keyName, value: encodePlatformSetting(keyName, input.apiKey) }, update: { value: encodePlatformSetting(keyName, input.apiKey) } });
   });
 }
 
 export async function callingProviderOptions(userId: string) {
+  if ((await getCallingSetup()).provider === "retell") return { numbers: await existingCallingNumbers(userId), voices: await retellVoices() };
   const numbers = await elevenRequest<Phone[]>("/convai/phone-numbers?provider=twilio");
   const voices = await elevenRequest<{ voices: { voice_id: string; name: string; labels?: Record<string, string> }[] }>("/voices");
   const inUse = await prisma.telephonyWorkspace.findMany({ select: { phoneNumber: true } });
@@ -92,10 +104,17 @@ export async function provisionCallingAgent(userId: string) {
     await db.platformSetting.update({ where: { key: SETUP_KEY }, data: { value: JSON.stringify({ ...config, ready: false, provisioning: reservation }) } });
   });
   try {
-    const result = await elevenRequest<{ agent_id: string }>(config.agentId ? `/convai/agents/${encodeURIComponent(config.agentId)}` : "/convai/agents/create", {
-      method: config.agentId ? "PATCH" : "POST", body: JSON.stringify(managedAgentConfig(config.voiceId, toolUrl())),
-    });
-    const updated = { ...config, agentId: result.agent_id || config.agentId, ready: true, provisioning: undefined };
+    let identifiers: { agentId: string; llmId?: string };
+    if (config.provider === "retell") {
+      identifiers = await provisionRetell(config, toolUrl(), retellWebhookUrl());
+      await verifyRetell({ ...config, ...identifiers }, toolUrl(), retellWebhookUrl());
+    } else {
+      const result = await elevenRequest<{ agent_id: string }>(config.agentId ? `/convai/agents/${encodeURIComponent(config.agentId)}` : "/convai/agents/create", {
+        method: config.agentId ? "PATCH" : "POST", body: JSON.stringify(managedAgentConfig(config.voiceId, toolUrl())),
+      });
+      identifiers = { agentId: result.agent_id || config.agentId };
+    }
+    const updated = { ...config, ...identifiers, ready: true, provisioning: undefined };
     if (!updated.agentId) throw new Error("Voice provider did not return an agent ID.");
     await callingTransaction(async db => {
       const latest = await getCallingSetup(db);
@@ -184,6 +203,10 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
   const config = await getCallingSetup();
   if (!config.ready || !config.agentId || !config.profile.approved) throw new Error("Complete and verify the agent setup first.");
   // Verify the managed agent has not been loosened in the provider dashboard.
+  if (config.provider === "retell") {
+    if (!isExistingCallingNumber(config.phoneId)) throw new Error("Retell requires your existing admin softphone number.");
+    await verifyRetell(config, toolUrl(), retellWebhookUrl());
+  } else {
   const managed = await elevenRequest<{ conversation_config: ReturnType<typeof managedAgentConfig>["conversation_config"]; platform_settings: ReturnType<typeof managedAgentConfig>["platform_settings"] }>(`/convai/agents/${encodeURIComponent(config.agentId)}`);
   const expected = managedAgentConfig(config.voiceId, toolUrl());
   if (managed.conversation_config.conversation.max_duration_seconds !== CALL_SECONDS
@@ -197,6 +220,7 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
     || managed.platform_settings.auth.enable_auth !== true
     || managed.conversation_config.agent.prompt.tools?.length !== 1
     || managed.conversation_config.agent.prompt.tools[0]?.api_schema.url !== toolUrl()) throw new Error("The provider agent changed. Re-verify setup before calling.");
+  }
   const existingNumber = isExistingCallingNumber(config.phoneId) ? await verifyExistingCallingNumber(userId, config.phoneId) : null;
   const token = randomBytes(32).toString("hex");
   const prepared = await callingTransaction(async db => {
@@ -216,7 +240,7 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
     const blocker = leadCallBlocker(campaign, lead);
     if (blocker) { campaign.status = "paused"; campaign.lastMessage = blocker; await saveCampaign(db, campaign); return null; }
     if (lead.phone === existingNumber?.fromNumber) throw new Error("The recipient must be different from your outgoing number.");
-    const attempt: CallingAttempt = { id: randomUUID(), campaignId, leadId: lead.id, phone: lead.phone, status: "dispatching", conversationId: null, createdAt: new Date().toISOString(), summary: "", transcript: [], duration: 0, agentId: config.agentId, ...existingNumber };
+    const attempt: CallingAttempt = { id: randomUUID(), campaignId, leadId: lead.id, phone: lead.phone, status: "dispatching", conversationId: null, createdAt: new Date().toISOString(), summary: "", transcript: [], duration: 0, agentId: config.agentId, provider: config.provider, ...existingNumber };
     await db.$executeRawUnsafe(`INSERT INTO "AdminCallingAttempt" ("id","campaignId","leadId","phone","data","tokenHash") VALUES ($1,$2,$3,$4,$5::jsonb,$6)`, attempt.id, campaignId, lead.id, lead.phone, JSON.stringify(attempt), tokenHash(token));
     return { attempt, lead };
   });
@@ -229,11 +253,25 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
   let dialRequested = false;
   try {
     if (existingNumber) {
+      let twiml: string;
+      if (config.provider === "retell") {
+        const result = retellCallSchema.parse(await retellRequest("/v2/register-phone-call", { method: "POST", body: JSON.stringify({
+          agent_id: config.agentId, from_number: existingNumber.fromNumber, to_number: lead.phone, direction: "outbound",
+          metadata: { attemptId: attempt.id }, retell_llm_dynamic_variables: clientData.dynamic_variables,
+        }) }));
+        assertRetellAttempt(attempt, result);
+        if (result.call_status !== "registered") throw new Error("Retell did not prepare a new call.");
+        attempt.conversationId = result.call_id;
+        // Save the exact registration before any telephone call can be placed.
+        await callingTransaction(db => saveAttempt(db, { ...attempt }));
+        twiml = retellCallingTwiml(result.call_id);
+      } else {
       const response = await elevenResponse("/convai/twilio/register-call", { method: "POST", body: JSON.stringify({
         agent_id: config.agentId, from_number: existingNumber.fromNumber, to_number: lead.phone, direction: "outbound",
         conversation_initiation_client_data: clientData,
       }) });
-      const twiml = z.string().min(20).max(64000).parse(response.headers.get("content-type")?.includes("json") ? await response.json() : await response.text());
+      twiml = z.string().min(20).max(64000).parse(response.headers.get("content-type")?.includes("json") ? await response.json() : await response.text());
+      }
       await callingTransaction(async db => {
         const current = await getCampaign(db, campaignId, userId);
         const contact = current.leads.find(l => l.id === lead.id);
@@ -264,9 +302,14 @@ export async function tickCallingCampaign(campaignId: string, userId: string) {
     attempt.status = !dialRequested || rejected ? "failed" : "uncertain";
     attempt.summary = !dialRequested ? "AI call preparation failed. No telephone call was placed; check the voice connection."
       : rejected ? "The calling provider rejected the call. Check permissions, number and balance; no automatic retry."
-      : "Call outcome unconfirmed. Check Twilio and ElevenLabs before continuing; no automatic retry.";
+      : "Call outcome unconfirmed. Check Twilio and the voice provider before continuing; no automatic retry.";
   }
   await callingTransaction(async db => {
+    if (attempt.provider === "retell") {
+      const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1`, attempt.id);
+      const current = rows[0]?.data;
+      if (current?.notesReceived) Object.assign(attempt, { transcript: current.transcript, summary: attempt.summary || current.summary, duration: current.duration, notesReceived: true, analysisReceived: current.analysisReceived });
+    }
     await saveAttempt(db, attempt);
     if (attempt.status === "failed" || attempt.status === "uncertain") {
       const campaign = await getCampaign(db, campaignId, userId);
@@ -291,6 +334,7 @@ export async function refreshCallingAttempts(userId: string) {
         continue;
       }
       if (!attempt.conversationId) {
+        if (attempt.provider === "retell") throw new Error("The Retell call ID is missing. Manual review is required.");
         const query = new URLSearchParams({ user_id: attempt.id, agent_id: attempt.agentId || "", page_size: "2" });
         const matches = await elevenRequest<{ conversations: { conversation_id: string; agent_id: string }[] }>(`/convai/conversations?${query}`);
         const match = matches.conversations[0];
@@ -308,6 +352,29 @@ export async function refreshCallingAttempts(userId: string) {
         attempt.conversationId = match.conversation_id;
       }
     }
+    if (attempt.provider === "retell") {
+      const result = await getRetellCall(attempt.conversationId!);
+      assertRetellAttempt(attempt, result);
+      if (!["ended", "error", "not_connected"].includes(result.call_status)) continue;
+      await callingTransaction(async db => {
+        const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1`, attempt.id);
+        const current = rows[0]?.data || attempt;
+        if (!ACTIVE.includes(current.status)) return;
+        if (result.call_status === "ended" && !current.notesReceived) {
+          if (Date.now() - Date.parse(attempt.createdAt) > (CALL_SECONDS + 120) * 1000) {
+            await saveAttempt(db, { ...current, status: "uncertain", summary: "Call ended but written notes were not received. Check Retell webhook delivery and reconcile before continuing." });
+            const campaign = await getCampaign(db, attempt.campaignId, userId);
+            campaign.status = "paused"; campaign.lastMessage = "Call notes are missing; no automatic retry.";
+            await saveCampaign(db, campaign);
+          }
+          return;
+        }
+        await saveAttempt(db, { ...current, status: result.call_status === "ended" ? "done" : "failed",
+          duration: (result.duration_ms || 0) / 1000,
+          summary: current.summary || `Retell: ${result.disconnection_reason || result.call_status}. Written notes ${current.notesReceived ? "received" : "not received; check webhook delivery"}.` });
+      });
+      continue;
+    }
     const result = await elevenRequest<{ conversation_id: string; agent_id: string; user_id?: string; status: string; metadata?: { call_duration_secs?: number }; transcript?: { role: string; message: string | null }[]; analysis?: { transcript_summary?: string } }>(`/convai/conversations/${encodeURIComponent(attempt.conversationId!)}`);
     if (attempt.workspaceId && (result.user_id !== attempt.id || result.agent_id !== attempt.agentId)) throw new Error("The AI conversation does not belong to this call. Manual review is required.");
     if (result.conversation_id !== attempt.conversationId || !["done", "failed"].includes(result.status)) continue;
@@ -318,6 +385,30 @@ export async function refreshCallingAttempts(userId: string) {
     });
   }
   return active.length > 0;
+}
+
+export function assertRetellAttempt(attempt: CallingAttempt, call: RetellCall) {
+  if (attempt.provider !== "retell" || call.metadata.attemptId !== attempt.id || call.agent_id !== attempt.agentId
+    || call.from_number !== attempt.fromNumber || call.to_number !== attempt.phone
+    || (attempt.conversationId && call.call_id !== attempt.conversationId)) throw new Error("This Retell conversation does not belong to the selected call attempt.");
+}
+
+export async function saveRetellNotes(call: RetellCall, analyzed: boolean) {
+  await callingTransaction(async db => {
+    const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1`, call.metadata.attemptId);
+    const attempt = rows[0]?.data;
+    if (!attempt) throw new Error("Call registration is not saved yet.");
+    assertRetellAttempt(attempt, call);
+    if (!attempt.conversationId) throw new Error("Call registration is not confirmed yet.");
+    if (Date.now() - Date.parse(attempt.createdAt) > 30 * 86400000) return;
+    const transcript = (call.transcript_object || []).slice(0, 100).map(t => ({ role: t.role, message: t.content.slice(0, 1500) }));
+    if (transcript.some(t => t.role === "user" && isOptOut(t.message))) await db.$executeRawUnsafe(`INSERT INTO "AdminCallingSuppression" ("phone") VALUES ($1) ON CONFLICT DO NOTHING`, attempt.phone);
+    // Webhooks save notes only; Twilio must independently confirm the call ended.
+    await saveAttempt(db, { ...attempt, transcript: transcript.length && (!attempt.analysisReceived || analyzed) ? transcript : attempt.transcript,
+      summary: analyzed && call.call_analysis?.call_summary ? call.call_analysis.call_summary.slice(0, 4000) : attempt.summary,
+      duration: Math.max(attempt.duration, (call.duration_ms || 0) / 1000), notesReceived: true,
+      analysisReceived: attempt.analysisReceived || analyzed });
+  });
 }
 
 export async function suppressCallingToken(token: string) {

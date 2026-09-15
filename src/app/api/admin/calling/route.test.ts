@@ -7,6 +7,7 @@ jest.mock("@/lib/audit-log", () => ({ recordAuditLog: jest.fn() }));
 jest.mock("@/lib/admin-calling-store", () => ({ callingSnapshot: jest.fn(), callingTransaction: jest.fn(), getCampaign: jest.fn(), saveCampaign: jest.fn(), saveAttempt: jest.fn() }));
 jest.mock("@/lib/admin-calling-service", () => ({ getCallingSetup: jest.fn(), saveCallingSetup: jest.fn(), callingProviderOptions: jest.fn(), provisionCallingAgent: jest.fn(), discoverCallingBusinesses: jest.fn(), researchCallingLead: jest.fn(), tickCallingCampaign: jest.fn(), refreshCallingAttempts: jest.fn(), elevenRequest: jest.fn() }));
 jest.mock("@/lib/admin-calling-twilio", () => ({ existingCallingNumbers: jest.fn(), isExistingCallingNumber: (id: string) => id.startsWith("workspace:"), readRegisteredCallingAttempt: jest.fn() }));
+jest.mock("@/lib/admin-calling-retell", () => ({ getRetellCall: jest.fn() }));
 import { existingCallingNumbers, readRegisteredCallingAttempt } from "@/lib/admin-calling-twilio";
 import { LOFTS_PROFILE } from "@/lib/admin-calling-model";
 import { NextRequest } from "next/server";

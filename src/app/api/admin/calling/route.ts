@@ -9,13 +9,14 @@ import { securityRateLimit } from "@/lib/security-rate-limit";
 import { recordAuditLog } from "@/lib/audit-log";
 import { campaignInputSchema, studioProfileSchema, localCallDate, callWindowOpen, normalizeCallingNumber, type CallingAttempt } from "@/lib/admin-calling-model";
 import { callingSnapshot, callingTransaction, getCampaign, saveCampaign, saveAttempt } from "@/lib/admin-calling-store";
-import { getCallingSetup, saveCallingSetup, callingProviderOptions, provisionCallingAgent, discoverCallingBusinesses, researchCallingLead, tickCallingCampaign, refreshCallingAttempts, elevenRequest } from "@/lib/admin-calling-service";
+import { getCallingSetup, saveCallingSetup, callingProviderOptions, provisionCallingAgent, discoverCallingBusinesses, researchCallingLead, tickCallingCampaign, refreshCallingAttempts, elevenRequest, assertRetellAttempt } from "@/lib/admin-calling-service";
+import { getRetellCall } from "@/lib/admin-calling-retell";
 import { randomUUID } from "node:crypto";
 import { existingCallingNumbers, isExistingCallingNumber, readRegisteredCallingAttempt } from "@/lib/admin-calling-twilio";
 
 const id = z.string().uuid();
 const schema = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("setup"), profile: studioProfileSchema, voiceId: z.string().max(100), phoneId: z.string().max(100), apiKey: z.string().max(300).optional() }),
+  z.object({ action: z.literal("setup"), provider: z.enum(["elevenlabs", "retell"]).optional(), profile: studioProfileSchema, voiceId: z.string().max(100), phoneId: z.string().max(100), apiKey: z.string().max(300).optional() }),
   z.object({ action: z.literal("options") }),
   z.object({ action: z.literal("provision") }),
   z.object({ action: z.literal("search"), campaign: campaignInputSchema }),
@@ -75,6 +76,11 @@ export async function POST(req: NextRequest) {
     } else if (body.action === "resolve_unconfirmed") {
       const candidate = (await callingSnapshot(user.id)).attempts.find(a => a.id === body.attemptId && a.campaignId === body.campaignId);
       if (!candidate) throw new Error("Call attempt not found.");
+      if (candidate.provider === "retell" && candidate.conversationId) {
+        const result = await getRetellCall(candidate.conversationId);
+        assertRetellAttempt(candidate, result);
+        if (!["ended", "error", "not_connected"].includes(result.call_status)) throw new Error("Retell still has a pending or active call. This hold cannot be released.");
+      }
       if (candidate.twilioCallSid) {
         const call = await readRegisteredCallingAttempt(user.id, candidate);
         if (!["completed", "busy", "no-answer", "failed", "canceled"].includes(call.status)) throw new Error("Twilio still has an active call. This hold cannot be released.");
@@ -83,14 +89,21 @@ export async function POST(req: NextRequest) {
         const campaign = await getCampaign(db, body.campaignId, user.id);
         const rows = await db.$queryRawUnsafe<{ data: CallingAttempt }[]>(`SELECT "data" FROM "AdminCallingAttempt" WHERE "id"=$1 AND "campaignId"=$2`, body.attemptId, campaign.id);
         const attempt = rows[0]?.data;
-        if (!attempt || !["dispatching", "uncertain"].includes(attempt.status) || attempt.conversationId || attempt.twilioCallSid !== candidate.twilioCallSid) throw new Error("The call changed or already has an AI conversation. Refresh or reconcile it first.");
+        if (!attempt || !["dispatching", "uncertain"].includes(attempt.status) || (attempt.conversationId && attempt.provider !== "retell") || attempt.conversationId !== candidate.conversationId || attempt.twilioCallSid !== candidate.twilioCallSid) throw new Error("The call changed or already has an AI conversation. Refresh or reconcile it first.");
         if (Date.now() - Date.parse(attempt.createdAt) < 900000) throw new Error("Wait at least 15 minutes and check both providers before releasing this hold.");
         await saveAttempt(db, { ...attempt, status: "failed", summary: `Admin confirmed no active call after checking providers. No automatic retry. Review: ${body.evidence}` });
         campaign.status = "paused"; campaign.lastMessage = "The reviewed hold was released. Calls remain paused.";
         await saveCampaign(db, campaign);
       });
     } else if (body.action === "reconcile") {
-      const result = await elevenRequest<{ user_id?: string; conversation_id: string; agent_id?: string }>(`/convai/conversations/${encodeURIComponent(body.conversationId)}`);
+      const candidate = (await callingSnapshot(user.id)).attempts.find(a => a.id === body.attemptId && a.campaignId === body.campaignId);
+      if (!candidate) throw new Error("Call attempt not found.");
+      let result: { user_id?: string; conversation_id: string; agent_id?: string };
+      if (candidate.provider === "retell") {
+        const call = await getRetellCall(body.conversationId);
+        assertRetellAttempt(candidate, call);
+        result = { user_id: call.metadata.attemptId, conversation_id: call.call_id, agent_id: call.agent_id };
+      } else result = await elevenRequest<{ user_id?: string; conversation_id: string; agent_id?: string }>(`/convai/conversations/${encodeURIComponent(body.conversationId)}`);
       if (result.user_id !== body.attemptId || result.conversation_id !== body.conversationId) throw new Error("This provider conversation does not belong to the selected call attempt.");
       await callingTransaction(async db => {
         await getCampaign(db, body.campaignId, user.id);

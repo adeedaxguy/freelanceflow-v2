@@ -8,18 +8,41 @@ jest.mock("./safe-fetch", () => ({ safeFetch: jest.fn(), readLimitedText: jest.f
 jest.mock("./audit-log", () => ({ recordAuditLog: jest.fn() }));
 jest.mock("./secret-box", () => ({ readStoredSecret: (value: string) => value }));
 jest.mock("./admin-calling-store", () => ({ callingTransaction: jest.fn(), getCampaign: jest.fn(), saveCampaign: jest.fn(), saveAttempt: jest.fn(), insertCampaign: jest.fn(), callingSnapshot: jest.fn() }));
-jest.mock("./admin-calling-twilio", () => ({ existingCallingNumbers: jest.fn(), isExistingCallingNumber: (id: string) => id.startsWith("workspace:"), verifyExistingCallingNumber: jest.fn(), startRegisteredCallingAttempt: jest.fn(), readRegisteredCallingAttempt: jest.fn() }));
+jest.mock("./admin-calling-twilio", () => ({ existingCallingNumbers: jest.fn(), isExistingCallingNumber: (id: string) => id.startsWith("workspace:"), verifyExistingCallingNumber: jest.fn(), startRegisteredCallingAttempt: jest.fn(), readRegisteredCallingAttempt: jest.fn(), retellCallingTwiml: jest.fn(() => "<Response><Dial><Sip>sip:call_test@sip.retellai.com</Sip></Dial><Hangup/></Response>") }));
 import { existingCallingNumbers, verifyExistingCallingNumber, startRegisteredCallingAttempt, readRegisteredCallingAttempt } from "./admin-calling-twilio";
 import { getPlatformSetting } from "./platform-secrets";
 import { callingTransaction, getCampaign, saveAttempt, callingSnapshot } from "./admin-calling-store";
-import { tickCallingCampaign, refreshCallingAttempts, suppressCallingToken, callingProviderOptions, researchCallingLead } from "./admin-calling-service";
+import { tickCallingCampaign, refreshCallingAttempts, suppressCallingToken, callingProviderOptions, researchCallingLead, saveRetellNotes, saveCallingSetup, getCallingSetup } from "./admin-calling-service";
+import { retellAgentConfig, retellLlmConfig, type RetellCall } from "./admin-calling-retell";
 import { prisma } from "./prisma";
 import { safeFetch } from "./safe-fetch";
 import { saveCampaign } from "./admin-calling-store";
 import { LOFTS_PROFILE, managedAgentConfig, type CallingCampaign, type CallingSetup } from "./admin-calling-model";
 const setup: CallingSetup = { profile: { ...LOFTS_PROFILE, approved: true }, voiceId: "voice", phoneId: "phone", agentId: "agent", ready: true, connected: true };
 const sample = (): CallingCampaign => ({ id: "campaign", userId: "admin", category: "Dentists", city: "Sydney", country: "AU", timezone: "Australia/Sydney", createdAt: "2026-09-15T00:00:00Z", status: "running", approvedDate: "2026-09-15", sources: [], leads: [{ id: "lead", phone: "+61280001234", name: "Consenting test", address: "Sydney", source: "https://example.com", website: "", countryVerified: true, brief: { facts: "Test prospect", offer: "Website review", question: "What matters?", sources: [], status: "unavailable", checkedAt: "2026-09-15T00:00:00Z" }, consent: { evidence: "Owner has consented specifically to Lofts Studio AI test calls to this number.", obtainedAt: "2026-09-14T00:00:00Z", approvedAt: "2026-09-15T00:00:00Z", approvedBy: "admin" } }] });
-const db = { $queryRawUnsafe: jest.fn(), $executeRawUnsafe: jest.fn(), voiceCall: { findMany: jest.fn() }, platformSetting: { findMany: jest.fn() } };
+const db = { $queryRawUnsafe: jest.fn(), $executeRawUnsafe: jest.fn(), voiceCall: { findMany: jest.fn() }, platformSetting: { findMany: jest.fn(), upsert: jest.fn() } };
+
+const retellSetup: CallingSetup = { ...setup, provider: "retell", voiceId: "cartesia-test", phoneId: "workspace:owned", agentId: "agent-retell", llmId: "llm-test" };
+function useRetell() {
+  (getPlatformSetting as jest.Mock).mockImplementation(key => Promise.resolve(key === "admin_calling_setup" ? JSON.stringify(retellSetup) : "test-key"));
+  db.platformSetting.findMany.mockResolvedValue([{ key: "admin_calling_setup", value: JSON.stringify(retellSetup) }, { key: "admin_calling_retell_key", value: "test-key" }]);
+  (verifyExistingCallingNumber as jest.Mock).mockResolvedValue({ workspaceId: "owned", fromNumber: "+16506634744" });
+  (startRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ sid: "CA" + "a".repeat(32) });
+  fetchMock.mockImplementation(async (url: string, init?: RequestInit) => {
+    const body = init?.body ? JSON.parse(String(init.body)) : {};
+    const value = url.includes("register-phone-call") ? { ...body, call_id: "call_retell", call_type: "phone_call", call_status: "registered" }
+      : url.includes("get-agent/") ? retellAgentConfig("cartesia-test", "llm-test", "https://icloseleads.com/api/admin-calling/retell")
+      : retellLlmConfig("https://icloseleads.com/api/admin-calling/opt-out");
+    return { ok: true, json: async () => value };
+  });
+}
+function retellResult(): RetellCall {
+  return { call_id: "call_retell", agent_id: "agent-retell", metadata: { attemptId: "cf10257b-7f66-4cf0-82f2-2b089c610119" }, call_type: "phone_call", direction: "outbound", from_number: "+16506634744", to_number: "+61280001234", call_status: "ended", duration_ms: 15000, transcript_object: [{ role: "user", content: "Please do not call me again" }], call_analysis: { call_summary: "Do not call requested." } };
+}
+function retellAttempt() {
+  const call = retellResult();
+  return { id: call.metadata.attemptId, campaignId: "campaign", leadId: "lead", provider: "retell" as const, agentId: call.agent_id, workspaceId: "owned", fromNumber: call.from_number, phone: call.to_number, conversationId: call.call_id, twilioCallSid: "CA" + "a".repeat(32), status: "active" as const, createdAt: "2026-09-15T01:59:00Z", transcript: [], summary: "", duration: 0 };
+}
 let busy = false;
 let optedOut = false;
 let campaign: CallingCampaign;
@@ -47,6 +70,99 @@ beforeEach(() => {
   global.fetch = fetchMock;
 });
 afterEach(() => { jest.useRealTimers(); });
+it("keeps legacy setup on ElevenLabs and returns no provider secrets", async () => {
+  const current = await getCallingSetup();
+  expect(current.provider).toBe("elevenlabs");
+  expect(JSON.stringify(current)).not.toContain("provider-test-key");
+});
+it("switches providers without reusing the other provider's agent", async () => {
+  await saveCallingSetup({ provider: "retell", profile: setup.profile, voiceId: "cartesia-test", phoneId: "workspace:owned" });
+  const stored = JSON.parse(db.platformSetting.upsert.mock.calls[0][0].update.value);
+  expect(stored).toMatchObject({ provider: "retell", agentId: "", ready: false });
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+});
+it("prepares Retell before dialing once through the existing Twilio workspace", async () => {
+  useRetell();
+  await tickCallingCampaign("campaign", "admin");
+  expect(fetchMock.mock.calls.some(([url]) => String(url).includes("elevenlabs"))).toBe(false);
+  expect(startRegisteredCallingAttempt).toHaveBeenCalledTimes(1);
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "dispatching", provider: "retell", conversationId: "call_retell" }));
+  expect((saveAttempt as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan((startRegisteredCallingAttempt as jest.Mock).mock.invocationCallOrder[0]!);
+  expect(saveAttempt).toHaveBeenLastCalledWith(db, expect.objectContaining({ status: "active", twilioCallSid: "CA" + "a".repeat(32) }));
+});
+it.each(["no-consent", "suppressed", "paused", "daily-limit", "busy"])("Retell retains the existing call blockers: %s", async mode => {
+  useRetell();
+  if (mode === "no-consent") delete campaign.leads[0]!.consent;
+  if (mode === "suppressed") optedOut = true;
+  if (mode === "paused") campaign.status = "paused";
+  if (mode === "busy") busy = true;
+  if (mode === "daily-limit") db.$queryRawUnsafe.mockImplementation((q: string) => Promise.resolve(q.includes("count(*)") ? [{ count: BigInt(10) }] : []));
+  await tickCallingCampaign("campaign", "admin").catch(() => undefined);
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+});
+it("never dials when Retell rejects registration", async () => {
+  useRetell();
+  const original = fetchMock.getMockImplementation()!;
+  fetchMock.mockImplementation((url: string, init: RequestInit) => url.includes("register-phone-call") ? Promise.resolve({ ok: false, status: 402 }) : original(url, init));
+  await tickCallingCampaign("campaign", "admin");
+  expect(startRegisteredCallingAttempt).not.toHaveBeenCalled();
+  expect(saveAttempt).toHaveBeenLastCalledWith(db, expect.objectContaining({ status: "failed" }));
+  expect(campaign.status).toBe("paused");
+});
+it("retains the registered Retell ID on an uncertain Twilio dispatch without retry", async () => {
+  useRetell();
+  (startRegisteredCallingAttempt as jest.Mock).mockRejectedValueOnce(new Error("timeout"));
+  await tickCallingCampaign("campaign", "admin");
+  expect(saveAttempt).toHaveBeenLastCalledWith(db, expect.objectContaining({ status: "uncertain", conversationId: "call_retell" }));
+  expect(startRegisteredCallingAttempt).toHaveBeenCalledTimes(1);
+  expect(campaign.status).toBe("paused");
+});
+it("stores signed Retell notes and opt-outs without releasing an active call", async () => {
+  const attempt = retellAttempt();
+  db.$queryRawUnsafe.mockResolvedValue([{ data: attempt }]);
+  await saveRetellNotes(retellResult(), true);
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "active", summary: "Do not call requested.", notesReceived: true, analysisReceived: true }));
+  expect(db.$executeRawUnsafe).toHaveBeenCalledWith(expect.stringContaining("AdminCallingSuppression"), attempt.phone);
+  expect(JSON.stringify((saveAttempt as jest.Mock).mock.calls)).not.toContain("recording_url");
+});
+it("rejects Retell notes for a different caller or agent", async () => {
+  db.$queryRawUnsafe.mockResolvedValue([{ data: retellAttempt() }]);
+  await expect(saveRetellNotes({ ...retellResult(), to_number: "+14165550123" }, true)).rejects.toThrow("does not belong");
+  await expect(saveRetellNotes({ ...retellResult(), agent_id: "agent-other" }, true)).rejects.toThrow("does not belong");
+  expect(saveAttempt).not.toHaveBeenCalled();
+});
+it("does not restore expired notes or let a delayed call-ended event downgrade analysis", async () => {
+  const attempt = { ...retellAttempt(), notesReceived: true, analysisReceived: true, summary: "Final analysis", transcript: [{ role: "user", message: "Final transcript" }] };
+  db.$queryRawUnsafe.mockResolvedValue([{ data: attempt }]);
+  await saveRetellNotes(retellResult(), false);
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ summary: "Final analysis", transcript: attempt.transcript }));
+  (saveAttempt as jest.Mock).mockClear();
+  db.$queryRawUnsafe.mockResolvedValue([{ data: { ...attempt, createdAt: "2026-01-01" } }]);
+  await saveRetellNotes(retellResult(), true);
+  expect(saveAttempt).not.toHaveBeenCalled();
+});
+it.each(["in-progress", "completed"])("Retell result cannot release Twilio until terminal: %s", async status => {
+  useRetell();
+  const attempt = { ...retellAttempt(), notesReceived: true, summary: "Signed notes", transcript: [{ role: "user", message: "Hello" }] };
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [attempt] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status });
+  db.$queryRawUnsafe.mockResolvedValue([{ data: attempt }]);
+  fetchMock.mockResolvedValue({ ok: true, json: async () => retellResult() });
+  await refreshCallingAttempts("admin");
+  if (status === "in-progress") expect(saveAttempt).not.toHaveBeenCalled();
+  else expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "done", summary: "Signed notes", transcript: attempt.transcript }));
+});
+it("holds missing Retell notes instead of skipping opt-out reconciliation", async () => {
+  useRetell();
+  const attempt = { ...retellAttempt(), createdAt: "2026-09-15T01:50:00Z" };
+  (callingSnapshot as jest.Mock).mockResolvedValue({ attempts: [attempt] });
+  (readRegisteredCallingAttempt as jest.Mock).mockResolvedValue({ status: "completed" });
+  db.$queryRawUnsafe.mockResolvedValue([{ data: attempt }]);
+  fetchMock.mockResolvedValue({ ok: true, json: async () => retellResult() });
+  await refreshCallingAttempts("admin");
+  expect(saveAttempt).toHaveBeenCalledWith(db, expect.objectContaining({ status: "uncertain" }));
+  expect(campaign.status).toBe("paused");
+});
 it("claims one call atomically before a concurrent second request can dispatch", async () => {
   await Promise.all([tickCallingCampaign("campaign", "admin"), tickCallingCampaign("campaign", "admin")]);
   const outbound = fetchMock.mock.calls.filter(([url]) => String(url).includes("outbound-call"));
