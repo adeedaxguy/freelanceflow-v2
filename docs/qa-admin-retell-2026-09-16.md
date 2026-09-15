@@ -12,6 +12,8 @@ Optional Retell provider for the private Lofts Studio caller. Existing ElevenLab
 - Isolated browser QA: desktop 1440px and mobile 390px passed. Retell selection preserves the existing number; key input clears after save; provider/voice/number survive reload; unapproved seller facts still block verification. Loading, failed requests, saved searches, consent dates, keyboard navigation, unsaved setup guards and global pause remain covered. No page errors or horizontal overflow. Temporary browser/server processes closed in finally.
 - Visual review: desktop and mobile Retell setup screenshots inspected, no blocking layout defects.
 - Trial account: signed up with owner-authorized Google account, owner completed MFA. Billing displayed $10.00 credit. Auto-recharge was off; extra-cost burst capacity switched off. No card or purchase added.
+- Live deployment: `b3b3e23` completed successfully on Vercel. Retell's webhook-designated API key was saved through the admin form; the live voice-list request succeeded. Selected `cartesia-Emily` and retained the existing +1 650 663 4744 workspace number. Provider, voice and number persisted after reload, and the secret input stayed empty. Temporary credential memory was cleared.
+- Live regression check: the manual softphone retained the same number, unlimited admin test minutes and existing call history. Saved AI campaigns remained drafts with consent required and starting disabled. No phone call was placed.
 
 ## Safety Coverage
 
@@ -24,4 +26,4 @@ Optional Retell provider for the private Lofts Studio caller. Existing ElevenLab
 
 ## Provider-Dependent Checks
 
-Live key connection, voice selection and agent verification are completed separately after deployment and reported in the task. Mock tests do not establish real SIP audio quality, latency, interruptions, caller-ID display or successful end-to-end telephone delivery. A consenting owned-number pilot is still required before business calling. Retell credits do not cover Twilio PSTN/SIP usage. Retell temporary audio processing is disclosed; iCloseLeads stores written notes only.
+Live key connection and voice selection passed after deployment. Agent creation and managed-configuration verification remain pending the owner's approval of the Lofts Studio service brief; the approval checkbox was not selected on the owner's behalf. No agent or call has been created in Retell yet. Mock tests do not establish real SIP audio quality, latency, interruptions, caller-ID display or successful end-to-end telephone delivery. A consenting owned-number pilot is still required before business calling. Retell credits do not cover Twilio PSTN/SIP usage. Retell temporary audio processing is disclosed; iCloseLeads stores written notes only.
