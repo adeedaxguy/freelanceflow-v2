@@ -1,4 +1,5 @@
 import type { BlogPost } from "@/types";
+import { SEPTEMBER_22_2026_BLOG_POSTS } from "@/data/blog-posts-2026-09-22";
 import { SEPTEMBER_21_2026_BLOG_POSTS } from "@/data/blog-posts-2026-09-21";
 import { SEPTEMBER_10_2026_BLOG_POSTS } from "@/data/blog-posts-2026-09-10";
 import { SEPTEMBER_1_2026_BLOG_POSTS } from "@/data/blog-posts-2026-09-01";
@@ -13,6 +14,7 @@ import { SEO_CONTENT_CLUSTER } from "@/data/seo-content-cluster";
 import { PILLAR_POSTS } from "@/data/pillar-posts";
 
 export const STATIC_POSTS: BlogPost[] = [
+  ...SEPTEMBER_22_2026_BLOG_POSTS,
   ...SEPTEMBER_21_2026_BLOG_POSTS,
   ...SEPTEMBER_10_2026_BLOG_POSTS,
   ...SEPTEMBER_1_2026_BLOG_POSTS,
