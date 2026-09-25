@@ -58,5 +58,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LocalizedPage({ params }: Props) {
   const resolved = resolve(await params);
   if (!resolved) notFound();
-  return <LocalizedMarketingPage locale={resolved.locale} pageKey={resolved.pageKey} />;
+  return (
+    <>
+      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.lang=${JSON.stringify(resolved.locale)}` }} />
+      <LocalizedMarketingPage locale={resolved.locale} pageKey={resolved.pageKey} />
+    </>
+  );
 }
