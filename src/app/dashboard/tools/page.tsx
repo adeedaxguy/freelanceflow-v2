@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import {
   Calculator, Mail, DollarSign, Clock, Zap, CheckCircle, XCircle,
   Loader2, Copy, RefreshCw, Target, TrendingUp, FileText,
@@ -586,10 +587,10 @@ export default function ToolsPage() {
             AI Proposal Writer, Competitor Analyser, Invoice Generator, Contract Builder, and more — coming for Pro users.
           </p>
         </div>
-        <a href="/dashboard/upgrade"
+        <Link href="/dashboard/upgrade"
           className="flex-shrink-0 px-5 py-2.5 bg-white text-primary font-bold text-sm rounded-xl hover:bg-white/90 transition-all whitespace-nowrap">
           Upgrade to Pro →
-        </a>
+        </Link>
       </div>
     </div>
   );

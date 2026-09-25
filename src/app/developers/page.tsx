@@ -49,7 +49,7 @@ export default function DevelopersPage() {
                 <Link href={developerSignupHref} className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white">
                   Create an API key <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a href="/api/v1/openapi" className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground">
+                <a href="https://icloseleads.com/api/v1/openapi" className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-semibold text-foreground">
                   OpenAPI specification <Braces className="h-4 w-4" />
                 </a>
               </div>

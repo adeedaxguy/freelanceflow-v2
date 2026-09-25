@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Shield, Eye, EyeOff, Loader2, Lock, AlertTriangle } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -152,9 +153,9 @@ export default function AdminLoginPage() {
           <div className="px-6 pb-5 text-center">
             <p className="text-xs text-muted-foreground">
               Not an admin?{" "}
-              <a href="/dashboard" className="text-primary-light hover:underline">
+              <Link href="/dashboard" className="text-primary-light hover:underline">
                 Go to user dashboard
-              </a>
+              </Link>
             </p>
           </div>
         </div>

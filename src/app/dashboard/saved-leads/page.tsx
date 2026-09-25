@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Bookmark, Download, Trash2, RefreshCw, StickyNote, Check, Globe,
@@ -564,9 +565,9 @@ export default function SavedLeadsPage() {
           <Bookmark className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <h3 className="text-foreground font-semibold mb-2">No leads saved yet</h3>
           <p className="text-muted-foreground text-sm mb-4">Find leads and click Save to start your pipeline.</p>
-          <a href="/dashboard/leads" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-light transition-all">
+          <Link href="/dashboard/leads" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-light transition-all">
             <Search className="w-4 h-4" /> Find Leads
-          </a>
+          </Link>
         </div>
       ) : viewMode === "pipeline" ? (
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
