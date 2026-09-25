@@ -30,6 +30,10 @@ export default function LocaleSwitcher() {
   const options = useMemo(() => ["en", ...SUPPORTED_LOCALES] as const, []);
 
   useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
+  useEffect(() => {
     if (hidden || locale !== "en") return;
     const saved = window.localStorage.getItem(STORAGE_KEY);
     const browserLocale = navigator.language.toLowerCase().split("-")[0] ?? "";
@@ -46,6 +50,7 @@ export default function LocaleSwitcher() {
   function saveLocale(nextLocale: "en" | SupportedLocale) {
     window.localStorage.setItem(STORAGE_KEY, nextLocale);
     document.cookie = `site_locale=${nextLocale}; path=/; max-age=31536000; samesite=lax`;
+    document.documentElement.lang = nextLocale;
     setOpen(false);
     setSuggested(null);
   }
