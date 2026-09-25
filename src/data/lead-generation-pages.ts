@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { seoDescription, seoTitle } from "@/lib/seo-copy";
+import { localeAlternates } from "@/lib/i18n";
 
 export type LeadGenerationSlug =
   | "web-design-leads"
@@ -515,7 +516,12 @@ export function leadGenerationMetadata(page: LeadGenerationPageData): Metadata {
       "cold outreach for freelancers",
       "AI proposal generator",
     ],
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      ...(page.slug === "web-design-leads"
+        ? { languages: localeAlternates("/lead-generation/web-design-leads") }
+        : {}),
+    },
     openGraph: {
       type: "website",
       url: canonical,

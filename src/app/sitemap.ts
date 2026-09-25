@@ -7,6 +7,7 @@ import { USE_CASE_PAGES } from "@/data/use-case-pages";
 import { isHiddenBlogSlug } from "@/lib/blog-images";
 import { prisma } from "@/lib/prisma";
 import { redirectedResourceSlugs } from "@/lib/seo-redirects";
+import { LOCALIZED_PATHS, SUPPORTED_LOCALES, localeAlternates, localizedPath, type LocalizedPath } from "@/lib/i18n";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com";
 const INDUSTRY_PAGES = [
@@ -113,7 +114,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
     changeFrequency,
     priority,
+    ...(LOCALIZED_PATHS.includes(url as LocalizedPath)
+      ? { alternates: { languages: localeAlternates(url as LocalizedPath) } }
+      : {}),
   }));
+
+  const localizedEntries: MetadataRoute.Sitemap = SUPPORTED_LOCALES.flatMap(locale =>
+    LOCALIZED_PATHS.map(path => ({
+      url: `${BASE_URL}${localizedPath(locale, path)}`,
+      lastModified: new Date(),
+      changeFrequency: path.includes("/blog/") ? "weekly" as const : "monthly" as const,
+      priority: path === "" ? 0.85 : 0.78,
+      alternates: { languages: localeAlternates(path) },
+    })),
+  );
 
   // Dynamic blog posts
   let blogEntries: MetadataRoute.Sitemap = [];
@@ -148,12 +162,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: post.updatedAt,
       changeFrequency: "weekly" as const,
       priority: BLOG_PRIORITY_OVERRIDES[post.slug] ?? 0.8,
+      ...(post.slug === "freelance-client-acquisition-system"
+        ? { alternates: { languages: localeAlternates("/blog/freelance-client-acquisition-system") } }
+        : {}),
     }))
     .filter(entry => !dbBlogUrls.has(entry.url));
 
   const seenUrls = new Set<string>();
 
-  return [...staticEntries, ...blogEntries, ...staticBlogEntries].filter(entry => {
+  return [...staticEntries, ...localizedEntries, ...blogEntries, ...staticBlogEntries].filter(entry => {
     if (seenUrls.has(entry.url)) return false;
     seenUrls.add(entry.url);
     return true;

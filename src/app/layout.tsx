@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import DeferredClientChrome from "@/components/DeferredClientChrome";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { MarketingRouteMotion } from "@/components/AppRouteMotion";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <MarketingRouteMotion>{children}</MarketingRouteMotion>
           <DeferredClientChrome />
+          <LocaleSwitcher />
         </Providers>
       </body>
     </html>

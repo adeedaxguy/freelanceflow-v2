@@ -30,6 +30,7 @@ import { STATIC_POSTS } from "@/data/blog-posts";
 import { prisma } from "@/lib/prisma";
 import { seoDescription, seoTitle } from "@/lib/seo-copy";
 import type { BlogPost } from "@/types";
+import { localeAlternates } from "@/lib/i18n";
 
 export const dynamic = 'force-dynamic';
 
@@ -154,7 +155,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: title },
     description,
     keywords: post.focusKeyword ? [post.focusKeyword, ...(post.tags ?? [])] : undefined,
-    alternates: { canonical: `${BASE_URL}/blog/${post.slug}` },
+    alternates: {
+      canonical: `${BASE_URL}/blog/${post.slug}`,
+      ...(post.slug === "freelance-client-acquisition-system"
+        ? { languages: localeAlternates("/blog/freelance-client-acquisition-system") }
+        : {}),
+    },
     openGraph: {
       title,
       description,

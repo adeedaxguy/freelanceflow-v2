@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomepageClient from "@/components/HomepageClient";
+import { localeAlternates } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://icloseleads.com"),
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "https://icloseleads.com",
+    languages: localeAlternates(""),
   },
   openGraph: {
     type: "website",
