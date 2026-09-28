@@ -128,7 +128,7 @@ function formatExact(iso: string) {
 function CopyButton({ text }: { text: string }) {
   const [ok, setOk] = useState(false);
   return (
-    <button onClick={() => void copyText(text).then(()=>{setOk(true);setTimeout(()=>setOk(false),1500);})}
+    <button aria-label={ok ? "Email copied" : "Copy email"} onClick={() => void copyText(text).then(()=>{setOk(true);setTimeout(()=>setOk(false),1500);})}
       className="ml-1 p-0.5 rounded text-muted-foreground hover:text-accent transition-colors">
       {ok ? <CheckCircle className="w-3 h-3 text-accent"/> : <Copy className="w-3 h-3"/>}
     </button>
@@ -166,21 +166,22 @@ function BestMatchModal({ prefs, onSave, onClose }: {
   }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-5">
-        <div className="flex items-center justify-between">
+      <div role="dialog" aria-labelledby="best-match-heading" onKeyDown={e => { if (e.key === "Escape") onClose(); }}
+        className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain p-6 space-y-5">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-foreground font-bold text-lg flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary-light"/> Best Match Settings
+            <h3 id="best-match-heading" className="text-foreground font-bold text-lg flex items-center gap-2">
+              <Target className="w-5 h-5 shrink-0 text-primary-light"/> Best Match Settings
             </h3>
             <p className="text-muted-foreground text-xs mt-0.5">Set preferences to score leads automatically</p>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5"/></button>
+          <button autoFocus aria-label="Close Best Match settings" onClick={onClose} className="shrink-0 text-muted-foreground hover:text-foreground"><X className="w-5 h-5"/></button>
         </div>
         <div>
           <label className="text-sm font-medium text-foreground flex justify-between mb-1.5">
             Minimum Match Score <span className="text-primary-light font-bold">{local.minConfidence}%</span>
           </label>
-          <input type="range" min={20} max={80} step={10} value={local.minConfidence}
+          <input aria-label="Minimum Match Score" type="range" min={20} max={80} step={10} value={local.minConfidence}
             onChange={e=>setLocal(p=>({...p,minConfidence:Number(e.target.value)}))} className="w-full accent-primary"/>
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>20% (More leads)</span><span>80% (Highest quality)</span>
@@ -191,21 +192,22 @@ function BestMatchModal({ prefs, onSave, onClose }: {
           {key:"requireEmail",   label:"Require contact email",        Icon:Mail},
           {key:"preferShortTerm",label:"Prefer quick/short-term gigs", Icon:Zap},
         ] as const).map(({key,label,Icon})=>(
-          <div key={key} className="flex items-center justify-between">
+          <div key={key} className="flex min-h-9 items-center justify-between gap-3">
             <span className="text-sm text-foreground flex items-center gap-2">
-              <Icon className="w-3.5 h-3.5 text-muted-foreground"/> {label}
+              <Icon className="w-3.5 h-3.5 shrink-0 text-muted-foreground"/> {label}
             </span>
-            <div className={`w-9 h-5 rounded-full transition-colors cursor-pointer relative ${local[key]?"bg-accent":"bg-muted"}`}
+            <button type="button" role="switch" aria-label={label} aria-checked={local[key]}
+              className={`w-9 h-5 min-h-0 shrink-0 rounded-full transition-colors cursor-pointer relative ${local[key]?"bg-accent":"bg-muted"}`}
               onClick={()=>setLocal(p=>({...p,[key]:!p[key]}))}>
               <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${local[key]?"left-4":"left-0.5"}`}/>
-            </div>
+            </button>
           </div>
         ))}
         <div>
           <label className="text-sm font-medium text-foreground mb-2 block">Preferred Niches</label>
           <div className="flex flex-wrap gap-1.5">
             {niches.map(n=>(
-              <button key={n} onClick={()=>toggleNiche(n)}
+              <button key={n} aria-pressed={local.preferredNiches.includes(n)} onClick={()=>toggleNiche(n)}
                 className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${local.preferredNiches.includes(n)?"bg-primary/20 border-primary/40 text-primary-light":"border-border text-muted-foreground hover:border-primary/30"}`}>
                 {n.replace(/-/g," ")}
               </button>
@@ -527,7 +529,7 @@ export default function LiveJobsPage() {
                 <span className="hidden sm:inline">until refresh</span>
               </div>
             )}
-            <button onClick={()=>setShowBMModal(true)}
+            <button aria-label="Best Match settings" title="Best Match settings" onClick={()=>setShowBMModal(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/30 bg-primary/5 text-primary-light text-sm font-medium hover:bg-primary/10 transition-all">
               <Target className="w-3.5 h-3.5"/> <span className="hidden sm:inline">Best Match</span>
             </button>
@@ -541,7 +543,7 @@ export default function LiveJobsPage() {
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${showFilter?"bg-primary/10 border-primary/40 text-primary-light":"border-border text-muted-foreground hover:border-primary/30"}`}>
               <Filter className="w-3.5 h-3.5"/> <ChevronDown className={`w-3 h-3 transition-transform ${showFilter?"rotate-180":""}`}/>
             </button>
-            <button onClick={()=>void fetchLive()} disabled={loading||isOnCooldown}
+            <button aria-label={isOnCooldown ? "Cooldown" : "Refresh"} title={isOnCooldown ? "Refresh is cooling down" : "Refresh jobs"} onClick={()=>void fetchLive()} disabled={loading||isOnCooldown}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${isOnCooldown?"bg-muted border border-border text-muted-foreground cursor-not-allowed opacity-60":"bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20"}`}>
               <RefreshCw className={`w-3.5 h-3.5 ${loading?"animate-spin":""}`}/>
               <span className="hidden sm:inline">{isOnCooldown?"Cooldown":"Refresh"}</span>

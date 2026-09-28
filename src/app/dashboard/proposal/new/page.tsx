@@ -294,10 +294,10 @@ function NewProposalInner() {
             {portfolioLinks.map((link, i) => (
               <div key={i} className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2">
                 <LinkIcon className="w-3.5 h-3.5 text-primary-light flex-shrink-0" />
-                <span className="text-xs font-medium text-foreground flex-shrink-0">{link.label}</span>
+                <span className="max-w-[40%] break-words text-xs font-medium text-foreground">{link.label}</span>
                 <span className="text-muted-foreground text-xs">·</span>
                 <span className="text-xs text-accent truncate flex-1">{link.url}</span>
-                <button type="button" onClick={() => removeLink(i)}
+                <button type="button" aria-label={`Remove ${link.label || "portfolio link"}`} onClick={() => removeLink(i)}
                   className="p-1 rounded text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -306,24 +306,26 @@ function NewProposalInner() {
           </div>
         )}
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <input
+            aria-label="Portfolio link label"
             type="text"
             value={newLink.label}
             onChange={e => setNewLink(prev => ({ ...prev, label: e.target.value }))}
             placeholder="Label (e.g. GitHub, Dribbble)"
-            className="w-36 px-3 py-2 bg-background border border-border rounded-xl text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 flex-shrink-0"
+            className="w-full sm:w-36 px-3 py-2 bg-background border border-border rounded-xl text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 flex-shrink-0"
           />
           <input
+            aria-label="Portfolio link URL"
             type="url"
             value={newLink.url}
             onChange={e => setNewLink(prev => ({ ...prev, url: e.target.value }))}
             onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addLink())}
             placeholder="https://..."
-            className="flex-1 px-3 py-2 bg-background border border-border rounded-xl text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
+            className="min-w-0 flex-1 px-3 py-2 bg-background border border-border rounded-xl text-foreground text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
           />
           <button type="button" onClick={addLink} disabled={!newLink.url}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-primary/15 text-primary-light border border-primary/30 hover:bg-primary/25 text-xs font-medium transition-all disabled:opacity-40 flex-shrink-0">
+            className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-primary/15 text-primary-light border border-primary/30 hover:bg-primary/25 text-xs font-medium transition-all disabled:opacity-40 flex-shrink-0">
             <Plus className="w-3.5 h-3.5" /> Add
           </button>
         </div>

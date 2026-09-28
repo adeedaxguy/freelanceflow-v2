@@ -279,18 +279,18 @@ function ContactInfo({ lead }: { lead: LeadExt }) {
         <Phone className="w-3.5 h-3.5 text-accent" />
         Contact Info
       </div>
-      <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground sm:grid-cols-2">
         {contact.address && (
           <div className="flex items-start gap-2 sm:col-span-2">
             <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary-light" />
-            <span>
+            <span className="min-w-0 break-words">
               {contact.address}
               {contact.country && !contact.address.toLowerCase().includes(contact.country.toLowerCase()) ? `, ${contact.country}` : ""}
             </span>
           </div>
         )}
         {contact.phone && (
-          <a href={`tel:${contact.phone}`} className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 text-accent transition-colors hover:border-accent/40">
+          <a href={`tel:${contact.phone}`} className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border border-border/60 bg-surface/60 px-2.5 py-2 text-accent transition-colors hover:border-accent/40">
             <Phone className="h-3.5 w-3.5 flex-shrink-0" />
             <span className="truncate font-mono">{contact.phone}</span>
             <span className={`ml-auto rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${contact.phoneTypeTone}`}>
@@ -513,7 +513,7 @@ export default function SavedLeadsPage() {
               </button>
             ))}
           </div>
-          <button onClick={() => void fetchLeads()} className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
+          <button aria-label="Refresh saved leads" title="Refresh saved leads" onClick={() => void fetchLeads()} className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
             <RefreshCw className="w-4 h-4" />
           </button>
           <button onClick={exportCSV} disabled={displayedLeads.length === 0}
@@ -597,11 +597,11 @@ export default function SavedLeadsPage() {
         <div className="space-y-3">
           {displayedLeads.map(lead => (
             <div key={lead.id} className="group bg-gradient-card border border-border hover:border-primary/30 rounded-2xl p-5 transition-all">
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col items-start gap-4 sm:flex-row">
                 <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 font-bold text-primary-light text-sm">
                   {lead.company.slice(0,2).toUpperCase()}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="w-full flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -612,7 +612,7 @@ export default function SavedLeadsPage() {
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
                       {lead.sourceUrl && (
-                        <a href={lead.sourceUrl} target="_blank" rel="noopener noreferrer"
+                        <a href={lead.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open source for ${lead.company}`}
                           className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors">
                           <ExternalLink className="w-3.5 h-3.5" />
                         </a>
@@ -631,7 +631,7 @@ export default function SavedLeadsPage() {
                           <Palette className="w-3.5 h-3.5" /> Design Site
                         </button>
                       )}
-                      <button onClick={() => setDeleteId(lead.id)}
+                      <button aria-label={`Remove ${lead.company}`} onClick={() => setDeleteId(lead.id)}
                         className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -640,8 +640,8 @@ export default function SavedLeadsPage() {
                   <div className="flex items-center flex-wrap gap-3 text-xs text-muted-foreground mb-3">
                     <span className="flex items-center gap-1 whitespace-nowrap"><CalendarClock className="w-3 h-3" />Saved {formatSavedDateTime(lead.savedAt)}</span>
                     {countryLabel(inferLeadCountry(lead)) && <span className="flex items-center gap-1 whitespace-nowrap"><MapPin className="w-3 h-3" />{countryLabel(inferLeadCountry(lead))}</span>}
-                    <span className="flex items-center gap-1"><Globe className="w-3 h-3" />{lead.domain}</span>
-                    {lead.email && <span className="flex items-center gap-1 text-accent"><Mail className="w-3 h-3" />{cleanEmailValue(lead.email)}</span>}
+                    <span className="flex min-w-0 items-center gap-1"><Globe className="w-3 h-3 shrink-0" /><span className="min-w-0 [overflow-wrap:anywhere]">{lead.domain}</span></span>
+                    {lead.email && <span className="flex min-w-0 items-center gap-1 text-accent"><Mail className="w-3 h-3 shrink-0" /><span className="min-w-0 [overflow-wrap:anywhere]">{cleanEmailValue(lead.email)}</span></span>}
                     {lead.niche && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary-light border border-primary/20">{lead.niche}</span>}
                     {lead.confidence && <span className="text-primary-light/70">{lead.confidence}% match</span>}
                   </div>

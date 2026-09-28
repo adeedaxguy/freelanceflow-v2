@@ -635,7 +635,7 @@ export default function LeadsPage() {
             </button>
           ))}
         </div>
-        <button onClick={() => setShowFilters(f => !f)}
+        <button aria-label="Filter jobs" aria-expanded={showFilters} onClick={() => setShowFilters(f => !f)}
           className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-all relative ${showFilters ? "bg-primary/10 border-primary/40 text-primary-light" : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>
           <Filter className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Filters</span>
@@ -658,7 +658,7 @@ export default function LeadsPage() {
                 placeholder="React, Figma, WordPress…"
                 className="dashboard-field w-full pl-3 pr-8 py-2 border rounded-lg text-sm text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20" />
               {keyword && (
-                <button onClick={() => setKeyword("")} className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground">
+                <button aria-label="Clear keyword filter" onClick={() => setKeyword("")} className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground">
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -668,7 +668,7 @@ export default function LeadsPage() {
             <label className="text-xs font-medium text-muted-foreground block mb-2">
               Min Match Score: <span className="text-primary-light font-bold">{minMatch}%</span>
             </label>
-            <input type="range" min={0} max={80} step={10} value={minMatch}
+            <input aria-label="Minimum Match Score" type="range" min={0} max={80} step={10} value={minMatch}
               onChange={e => { setMinMatch(Number(e.target.value)); setPage(1); }}
               className="w-full accent-primary mt-1" />
             <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
@@ -681,11 +681,12 @@ export default function LeadsPage() {
               { val: hasEmail,  set: setHasEmail,  icon: <Mail className="w-3.5 h-3.5 text-accent" />,             label: "Has Email",         color: "bg-accent" },
               { val: hasBudget, set: setHasBudget, icon: <DollarSign className="w-3.5 h-3.5 text-green-400" />,   label: "Stated Amount",     color: "bg-green-500" },
             ].map(({ val, set, icon, label, color }) => (
-              <label key={label} className="flex items-center gap-2.5 cursor-pointer">
-                <div className={`w-9 h-5 rounded-full transition-colors relative ${val ? color : "bg-muted"}`}
+              <label key={label} className="flex min-h-9 items-center gap-2.5 cursor-pointer">
+                <button type="button" role="switch" aria-label={label} aria-checked={val}
+                  className={`w-9 h-5 min-h-0 shrink-0 rounded-full transition-colors relative ${val ? color : "bg-muted"}`}
                   onClick={() => { set((v: boolean) => !v); setPage(1); }}>
                   <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${val ? "left-4" : "left-0.5"}`} />
-                </div>
+                </button>
                 <span className="text-sm text-foreground flex items-center gap-1.5">{icon} {label}</span>
               </label>
             ))}
@@ -860,7 +861,7 @@ export default function LeadsPage() {
                 </button>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {/* Sort dropdown */}
               <div className="relative">
                 <button onClick={() => setShowSortMenu(v => !v)}
@@ -870,7 +871,7 @@ export default function LeadsPage() {
                   <ChevronDown className={`w-3 h-3 transition-transform ${showSortMenu ? "rotate-180" : ""}`} />
                 </button>
                 {showSortMenu && (
-                  <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-border rounded-xl shadow-card-hover min-w-[160px] overflow-hidden">
+                  <div className="absolute left-0 top-full mt-1 z-50 bg-surface border border-border rounded-xl shadow-card-hover min-w-[160px] overflow-hidden sm:left-auto sm:right-0">
                     {SORT_OPTIONS.map(opt => (
                       <button key={opt.value} onClick={() => { setSortBy(opt.value); setShowSortMenu(false); setPage(1); }}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 text-xs font-medium transition-colors hover:bg-white/5 ${sortBy === opt.value ? "text-primary-light bg-white/5" : "text-foreground"}`}>

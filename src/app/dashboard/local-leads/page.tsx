@@ -588,12 +588,13 @@ function Pagination({ page, total, perPage, onChange }: { page: number; total: n
   const pages = Math.ceil(total / perPage);
   if (pages <= 1) return null;
   return (
-    <div className="flex items-center justify-between pt-2">
+    <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-muted-foreground">
         Showing {(page - 1) * perPage + 1}–{Math.min(page * perPage, total)} of {total}
       </p>
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         <button
+          aria-label="Previous page"
           onClick={() => onChange(page - 1)} disabled={page === 1}
           className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 disabled:opacity-40 transition-all"
         >
@@ -607,13 +608,14 @@ function Pagination({ page, total, perPage, onChange }: { page: number; total: n
             p = start + i;
           }
           return (
-            <button key={p} onClick={() => onChange(p)}
+            <button key={p} onClick={() => onChange(p)} aria-current={p === page ? "page" : undefined}
               className={`w-8 h-8 rounded-lg text-sm font-medium transition-all ${p === page ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
               {p}
             </button>
           );
         })}
         <button
+          aria-label="Next page"
           onClick={() => onChange(page + 1)} disabled={page === pages}
           className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/40 disabled:opacity-40 transition-all"
         >
@@ -1586,8 +1588,8 @@ export default function LocalLeadsPage() {
               </div>
 
               {/* Min rating */}
-              <div className="flex items-center gap-1.5">
-                <span className="dashboard-field-label text-xs font-bold">Min rating:</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="dashboard-field-label shrink-0 text-xs font-bold">Min rating:</span>
                 {[0, 3, 3.5, 4, 4.5].map(r => (
                   <button key={r} onClick={() => { setMinRating(r); setPage(1); }}
                     className={`dashboard-choice px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all ${minRating === r ? "bg-yellow-500/15 border-yellow-500/50 text-yellow-400 shadow-sm" : "text-muted-foreground"}`}>

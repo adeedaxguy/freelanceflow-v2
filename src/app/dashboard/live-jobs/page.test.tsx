@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import LiveJobsPage from "./page";
+import userEvent from "@testing-library/user-event";
 import { DASHBOARD_SEARCH_CACHE_KEYS, DASHBOARD_SEARCH_CACHE_VERSION } from "@/lib/dashboard-search-cache";
 
 jest.mock("@/lib/leads-aggregator", () => ({ ALL_SOURCE_LABELS: { arbeitnow: "Arbeitnow", jobicy: "Jobicy" } }));
@@ -29,6 +30,33 @@ beforeEach(() => {
   global.fetch = jest.fn().mockResolvedValue(json({}));
 });
 afterEach(() => { cleanup(); jest.useRealTimers(); jest.restoreAllMocks(); });
+
+it("exposes mobile icon actions and lets keyboard users cancel preference edits", async () => {
+  const user = userEvent.setup();
+  render(<LiveJobsPage />);
+  expect(screen.getByRole("button", { name: "Refresh" })).toBeEnabled();
+  await user.click(screen.getByRole("button", { name: "Best Match settings" }));
+  expect(screen.getByRole("dialog", { name: "Best Match Settings" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Close Best Match settings" })).toHaveFocus();
+  const toggle = screen.getByRole("switch", { name: "Require contact email" });
+  toggle.focus();
+  await user.keyboard(" ");
+  expect(toggle).toBeChecked();
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Best Match settings" }));
+  expect(screen.getByRole("switch", { name: "Require contact email" })).not.toBeChecked();
+});
+
+it("saves the same preference values through the accessible controls", async () => {
+  render(<LiveJobsPage />);
+  fireEvent.click(screen.getByRole("button", { name: "Best Match settings" }));
+  fireEvent.click(screen.getByRole("switch", { name: "Require contact email" }));
+  fireEvent.change(screen.getByRole("slider", { name: "Minimum Match Score" }), { target: { value: "70" } });
+  fireEvent.click(screen.getByRole("button", { name: "Save Preferences" }));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem("ff_best_match_prefs")!)).toMatchObject({ requireEmail: true, minConfidence: 70 });
+});
 
 it("keeps filters, shortlist and results when leaving and returning without another search", async () => {
   sessionStorage.setItem(key, JSON.stringify({ leads: [lead], fetchedAt: "2026-09-29T00:00:00Z" }));

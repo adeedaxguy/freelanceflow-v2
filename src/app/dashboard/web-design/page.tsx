@@ -708,8 +708,8 @@ function WebDesignBuilderContent() {
         </div>
 
         <section className="web-design-hero-card rounded-2xl border border-border bg-surface/85 p-4 shadow-card">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
+            <div className="flex min-w-0 flex-col gap-4 md:flex-row md:items-center">
               <div
                 className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-2xl text-lg font-black text-slate-950 shadow-glow"
                 style={{ background: `linear-gradient(135deg, ${identity.accent}, ${identity.accent2})` }}
@@ -721,19 +721,19 @@ function WebDesignBuilderContent() {
                   <span className="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-cyan-200">
                     {identity.logoLabel} preview
                   </span>
-                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
+                  <span className="max-w-full break-words rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
                     {data.category}
                   </span>
-                  <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
+                  <span className="max-w-full break-words rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-bold text-muted-foreground">
                     {data.location}
                   </span>
                 </div>
-                <h2 className="mt-2 truncate text-xl font-black text-foreground sm:text-2xl">{data.company}</h2>
+                <h2 className="mt-2 break-words text-xl font-black text-foreground sm:truncate sm:text-2xl">{data.company}</h2>
                 <p className="mt-1 line-clamp-2 max-w-3xl text-sm leading-6 text-muted-foreground">{identity.pitchHook}</p>
               </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
               {BUILDER_STEPS.map((step, index) => {
                 const StepIcon = step.icon;
                 const active = index === activeStep;
