@@ -5,6 +5,7 @@
 // npm test -- --runInBand --runTestsByPath src/lib/payments.sandbox.test.ts
 import { createHmac } from "crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 import { NextRequest } from "next/server";
 import { PLAN_MONTHLY_PRICES } from "./plan-pricing";
 import { getCallingPackages } from "./calling-packages";
@@ -38,7 +39,8 @@ type Checkout = {
 const phase = process.env.STRIPE_SANDBOX_PHASE;
 const secretKey = process.env.STRIPE_SANDBOX_SECRET_KEY || "";
 const config = { secretKey, webhookSecret: "local-sandbox-replay-only", mode: "test" as const, testMode: true };
-const output = "reports/stripe-sandbox-checkouts.json";
+const reportDir = process.env.STRIPE_SANDBOX_REPORT_DIR || "reports";
+const output = join(reportDir, "stripe-sandbox-checkouts.json");
 const cases: Checkout[] = [
   ...(["pro", "agency"] as const).flatMap(plan => (["month", "year"] as const).map(interval => ({
     name: `iCloseLeads ${plan === "pro" ? "Pro" : "Agency"}`,
@@ -90,7 +92,7 @@ async function replay(event: Record<string, unknown>) {
         });
         expect(checkout.id).toMatch(/^cs_test_/);
         prepared.push({ ...entry, id: checkout.id, url: checkout.url });
-        mkdirSync("reports", { recursive: true });
+        mkdirSync(reportDir, { recursive: true });
         writeFileSync(output, JSON.stringify(prepared, null, 2));
       }
       return;
@@ -151,6 +153,6 @@ async function replay(event: Record<string, unknown>) {
       }
       results.push({ failedPaymentEventsLogged: failures.data.length });
     }
-    writeFileSync(`reports/stripe-sandbox-${phase === "cleanup" ? "cleanup" : "results"}.json`, JSON.stringify(results, null, 2));
+    writeFileSync(join(reportDir, `stripe-sandbox-${phase === "cleanup" ? "cleanup" : "results"}.json`), JSON.stringify(results, null, 2));
   }, 180_000);
 });

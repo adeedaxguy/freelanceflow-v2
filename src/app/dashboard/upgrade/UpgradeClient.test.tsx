@@ -21,6 +21,7 @@ describe("upgrade experience", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.getByText("$10")).toBeInTheDocument();
     expect(screen.getByText("$15")).toBeInTheDocument();
+    expect(screen.getByText(/Stripe checkout identifies the seller as Technodigg Web Design/)).toBeInTheDocument();
   });
 
   it("prevents another checkout while activation is pending", () => {

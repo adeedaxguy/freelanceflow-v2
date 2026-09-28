@@ -8,6 +8,8 @@ import {
 
 import { requestJson } from "@/lib/client-request";
 import ConfirmModal from "@/components/ConfirmModal";
+import DraftReview from "@/components/dashboard/DraftReview";
+import FollowUpGuide from "@/components/dashboard/FollowUpGuide";
 
 interface Lead { id: string; company: string; domain: string; email?: string | null; }
 interface FollowUp {
@@ -254,6 +256,7 @@ export default function FollowUpsPage() {
               className="w-full px-3 py-3 bg-background border border-border rounded-xl text-foreground text-sm resize-none focus:outline-none focus:border-primary/50" />
           </div>
           {saveMsg && <p role="alert" className="text-destructive text-sm">{saveMsg}</p>}
+          <DraftReview email={leads.find(lead => lead.id === form.leadId)?.email} subject={form.subject} body={form.body} />
           <div className="flex gap-3">
             <button disabled={busy} onClick={() => void handleCreate()}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-semibold text-sm transition-all shadow-glow-primary">
@@ -318,6 +321,9 @@ export default function FollowUpsPage() {
                             <p className="text-muted-foreground text-xs mt-0.5 line-clamp-1">{fu.body.replace(/\n/g," ")}</p>
                           </>
                         )}
+                        <div className="mt-3">
+                          <DraftReview email={fu.lead?.email} subject={editingId === fu.id ? editDraft.subject : fu.subject} body={editingId === fu.id ? editDraft.body : fu.body} />
+                        </div>
                       </div>
 
                       <div className="col-start-2 flex flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:flex-shrink-0">
@@ -353,11 +359,14 @@ export default function FollowUpsPage() {
                     </div>
                   ))}
                 </div>
+                <div className="px-5"><FollowUpGuide company={company} /></div>
               </div>
             );
           })}
         </div>
       )}
+
+      {!loading && !loadError && followUps.length === 0 && <FollowUpGuide company="Prospect" />}
 
       {/* Tips */}
       <div className="bg-surface border border-border rounded-xl p-4">

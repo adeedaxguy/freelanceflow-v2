@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { copyText } from "@/lib/clipboard";
+import DraftReview from "@/components/dashboard/DraftReview";
 
 interface ProposalResult { subject: string; body: string; source: string; warning?: string; }
 interface PortfolioLink { label: string; url: string; }
@@ -434,6 +435,7 @@ function NewProposalInner() {
             </div>
           </div>
 
+          <DraftReview email={toEmail} subject={subject} body={body} />
           {warning && <p role="status" className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-foreground">{warning}</p>}
           {error && (
             <div className="text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3">

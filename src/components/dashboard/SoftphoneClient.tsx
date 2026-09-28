@@ -494,7 +494,7 @@ export default function SoftphoneClient({ isAdmin = false }: { isAdmin?: boolean
   );
   const canPlaceOutboundCall = Boolean(minutes?.canCall);
   const minuteLabel = minutes?.unlimited
-    ? "Unlimited test minutes"
+    ? "Unlimited admin minutes"
     : minutes?.package
       ? `${Math.ceil(minutes.remainingSeconds / 60)} of ${minutes.package.minutes} min left`
       : "Monthly calling package required";

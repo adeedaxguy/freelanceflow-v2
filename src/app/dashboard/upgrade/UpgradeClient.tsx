@@ -346,6 +346,9 @@ export default function UpgradeClient({
       </div>
 
       <p className="text-center text-xs text-muted-foreground mt-4">
+        Stripe checkout identifies the seller as Technodigg Web Design for your iCloseLeads subscription.
+      </p>
+      <p className="text-center text-xs text-muted-foreground mt-4">
         Need help choosing?{" "}
         <Link href="/dashboard/support" className="text-primary-light hover:underline">Chat with us →</Link>
       </p>
