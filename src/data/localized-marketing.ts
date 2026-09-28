@@ -23,7 +23,7 @@ export const localizedMarketing: Record<SupportedLocale, Record<LocalizedPageKey
   es: {
     home: {
       path: "",
-      title: "iCloseLeads en español | Leads y captación de clientes para freelancers",
+      title: "iCloseLeads en español | Leads para freelancers",
       description: "Encuentra leads locales y remotos, identifica señales de compra y prepara propuestas y seguimientos desde un solo espacio de trabajo.",
       heading: "Consigue mejores clientes sin depender de listas genéricas",
       intro: "iCloseLeads ayuda a freelancers y pequeñas agencias a encontrar oportunidades locales, empleos remotos y señales de demanda, evaluar cada lead y mantener el seguimiento organizado.",
@@ -109,7 +109,7 @@ export const localizedMarketing: Record<SupportedLocale, Record<LocalizedPageKey
   fr: {
     home: {
       path: "",
-      title: "iCloseLeads en français | Prospection et acquisition client freelance",
+      title: "iCloseLeads en français | Prospection freelance",
       description: "Trouvez des prospects locaux et à distance, qualifiez les signaux d'achat, préparez vos propositions et suivez chaque relance au même endroit.",
       heading: "Trouvez de meilleurs clients sans dépendre de listes génériques",
       intro: "iCloseLeads aide les freelances et petites agences à repérer des opportunités locales, des missions à distance et des demandes récentes, puis à organiser la prospection et le suivi.",
