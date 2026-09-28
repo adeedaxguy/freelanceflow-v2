@@ -77,6 +77,21 @@ interface SearchDiagnostics {
   initialResultCount?: number;
   broadenReason?: "empty" | "thin" | null;
 }
+interface LiveJobsCache {
+  leads: AggregatedLead[];
+  fetchedAt: string;
+  diagnostics: SearchDiagnostics | null;
+  selectedNiches: string[];
+  maxHours: number;
+  sortBy: "newest" | "bestMatch" | "confidence";
+  sourceFilter: string;
+  hasEmail: boolean;
+  minScore: number;
+  showFilter: boolean;
+  page: number;
+  savedIds: string[];
+  favIds: string[];
+}
 const DEFAULT_PREFS: BestMatchPrefs = {
   minConfidence: 40,
   preferRemote: true,
@@ -228,6 +243,8 @@ export default function LiveJobsPage() {
   const [showFilter,      setShowFilter]      = useState(false);
   const [sortBy,          setSortBy]          = useState<"newest"|"bestMatch"|"confidence">("bestMatch");
   const [countdown,       setCountdown]       = useState(0);
+  const [cooldownUntil,   setCooldownUntil]   = useState(0);
+  const [cacheReady,      setCacheReady]      = useState(false);
   const [seenIds,         setSeenIds]         = useState<Set<string>>(new Set());
   const [prefs,           setPrefs]           = useState<BestMatchPrefs>(DEFAULT_PREFS);
   const [showBMModal,     setShowBMModal]     = useState(false);
@@ -241,7 +258,6 @@ export default function LiveJobsPage() {
   const [sourceFilter,    setSourceFilter]    = useState<string>("all");
 
   const prevSeenRef = useRef<Set<string>>(new Set());
-  const timerRef    = useRef<ReturnType<typeof setInterval>|null>(null);
   const {
     appliedByUrl,
     countsByUrl,
@@ -257,21 +273,73 @@ export default function LiveJobsPage() {
     try {
       prepareDashboardSearchCache(sessionStorage);
       const p = localStorage.getItem(PREFS_KEY);
-      if (p) setPrefs(JSON.parse(p) as BestMatchPrefs);
+      if (p) {
+        const parsed = JSON.parse(p) as BestMatchPrefs | null;
+        if (parsed && Array.isArray(parsed.preferredNiches)) setPrefs({ ...DEFAULT_PREFS, ...parsed });
+      }
+    } catch {}
+    try {
       const s = localStorage.getItem(SEEN_KEY);
-      if (s) { const ids = new Set(JSON.parse(s) as string[]); setSeenIds(ids); prevSeenRef.current = ids; }
+      if (s) {
+        const parsed: unknown = JSON.parse(s);
+        if (Array.isArray(parsed) && parsed.every(id => typeof id === "string")) {
+          const ids = new Set<string>(parsed); setSeenIds(ids); prevSeenRef.current = ids;
+        }
+      }
+    } catch {}
+    try {
       // Restore last results so they persist when switching tabs
       const cached = sessionStorage.getItem(SS_LIVE_KEY);
       if (cached) {
-        const { leads: cl, fetchedAt: ft, diagnostics: dg } = JSON.parse(cached) as { leads: AggregatedLead[]; fetchedAt: string; diagnostics?: SearchDiagnostics };
-        setLeads(cl); setFetchedAt(ft);
-        if (dg) setDiagnostics(dg);
+        const parsed = JSON.parse(cached) as Partial<LiveJobsCache> | null;
+        if (parsed) {
+          if (Array.isArray(parsed.leads)) setLeads(parsed.leads);
+          if (typeof parsed.fetchedAt === "string") setFetchedAt(parsed.fetchedAt);
+          if (Array.isArray(parsed.diagnostics?.sources)) setDiagnostics(parsed.diagnostics);
+          if (Array.isArray(parsed.selectedNiches)) setSelectedNiches([...new Set(parsed.selectedNiches.filter(niche => LIVE_NICHES.includes(niche)))]);
+          if (parsed.maxHours && [24, 48, 72, 168, 720].includes(parsed.maxHours)) setMaxHours(parsed.maxHours);
+          if (parsed.sortBy && ["newest", "bestMatch", "confidence"].includes(parsed.sortBy)) setSortBy(parsed.sortBy);
+          if (parsed.sourceFilter === "all" || ALL_SOURCES.some(source => source.id === parsed.sourceFilter)) setSourceFilter(parsed.sourceFilter!);
+          if (typeof parsed.hasEmail === "boolean") setHasEmail(parsed.hasEmail);
+          if (typeof parsed.showFilter === "boolean") setShowFilter(parsed.showFilter);
+          if (typeof parsed.minScore === "number" && Number.isInteger(parsed.minScore) && parsed.minScore >= 0 && parsed.minScore <= 80 && parsed.minScore % 10 === 0) setMinScore(parsed.minScore);
+          if (typeof parsed.page === "number" && Number.isSafeInteger(parsed.page) && parsed.page > 0) setPage(parsed.page);
+          if (Array.isArray(parsed.savedIds)) setSavedIds(new Set(parsed.savedIds.filter(id => typeof id === "string")));
+          if (Array.isArray(parsed.favIds)) setFavIds(new Set(parsed.favIds.filter(id => typeof id === "string")));
+        }
       }
-      const last = parseInt(localStorage.getItem(COOLDOWN_KEY)??"0");
-      const elapsed = Date.now() - last;
-      if (elapsed < COOLDOWN_MS) setCountdown(Math.ceil((COOLDOWN_MS - elapsed)/1000));
     } catch {}
+    try {
+      const last = Number(localStorage.getItem(COOLDOWN_KEY) ?? "0");
+      const elapsed = Date.now() - last;
+      if (elapsed >= 0 && elapsed < COOLDOWN_MS) setCooldownUntil(last + COOLDOWN_MS);
+    } catch {}
+    setCacheReady(true);
   }, []);
+
+  useEffect(() => {
+    if (!cacheReady) return;
+    try {
+      const payload: LiveJobsCache = {
+        leads, fetchedAt, diagnostics, selectedNiches, maxHours, sortBy,
+        sourceFilter, hasEmail, minScore, showFilter, page,
+        savedIds: [...savedIds], favIds: [...favIds],
+      };
+      sessionStorage.setItem(SS_LIVE_KEY, JSON.stringify(payload));
+    } catch {}
+  }, [cacheReady, leads, fetchedAt, diagnostics, selectedNiches, maxHours, sortBy, sourceFilter, hasEmail, minScore, showFilter, page, savedIds, favIds]);
+
+  useEffect(() => {
+    if (!cooldownUntil) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000));
+      setCountdown(remaining);
+      if (remaining === 0) clearInterval(timer);
+    };
+    const timer = setInterval(tick, 1000);
+    tick();
+    return () => clearInterval(timer);
+  }, [cooldownUntil]);
 
   const refreshUsage = useCallback(async () => {
     try {
@@ -285,18 +353,7 @@ export default function LiveJobsPage() {
     void refreshUsage();
   }, [refreshUsage]);
 
-  function startTimer(secs: number) {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setCountdown(secs);
-    timerRef.current = setInterval(()=>{
-      setCountdown(c => {
-        if (c <= 1) { if (timerRef.current) clearInterval(timerRef.current); return 0; }
-        return c - 1;
-      });
-    }, 1000);
-  }
-
-  const fetchLive = useCallback(async (force = false) => {
+  const fetchLive = useCallback(async (force = false, rangeHours = maxHours) => {
     if (!force && countdown > 0) return;
     setLoading(true); setError(""); setFreshResultCount(0); setDiagnostics(null);
     const nichesToFetch = selectedNiches.length > 0 ? selectedNiches : LIVE_NICHES;
@@ -305,7 +362,7 @@ export default function LiveJobsPage() {
       const res = await fetch("/api/leads/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ niches: nichesToFetch, maxHours, minConfidence: 45 }),
+        body: JSON.stringify({ niches: nichesToFetch, maxHours: rangeHours, minConfidence: 45 }),
       });
 
       if (!res.ok) {
@@ -330,7 +387,7 @@ export default function LiveJobsPage() {
         lead_type: "live_job",
         search_term: nichesToFetch.join(", "),
         result_count: fetched.length,
-        range_hours: maxHours,
+        range_hours: rangeHours,
       };
       trackAnalyticsEvent("search", searchDetails);
       trackAnalyticsEvent("lead_search", searchDetails);
@@ -350,7 +407,6 @@ export default function LiveJobsPage() {
       setFetchedAt(ft);
       setPage(1);
       setSourceFilter("all"); // reset source filter on new fetch
-      try { sessionStorage.setItem(SS_LIVE_KEY, JSON.stringify({ leads: fetched, fetchedAt: ft, diagnostics: data.diagnostics ?? null })); } catch {}
 
       const newSeen = new Set([...prev, ...fetched.map(l => l.id)]);
       setSeenIds(newSeen);
@@ -358,8 +414,9 @@ export default function LiveJobsPage() {
       try { localStorage.setItem(SEEN_KEY, JSON.stringify([...newSeen].slice(-500))); } catch {}
 
       if (fetched.length > 0) {
-        try { localStorage.setItem(COOLDOWN_KEY, Date.now().toString()); } catch {}
-        startTimer(COOLDOWN_MS / 1000);
+        const now = Date.now();
+        try { localStorage.setItem(COOLDOWN_KEY, now.toString()); } catch {}
+        setCooldownUntil(now + COOLDOWN_MS);
       }
     } catch {
       setError("Failed to load live jobs. Please try again.");
@@ -399,6 +456,9 @@ export default function LiveJobsPage() {
   }, {});
 
   const totalPages = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
+  useEffect(() => {
+    if (cacheReady && page > totalPages) setPage(totalPages);
+  }, [cacheReady, page, totalPages]);
   const current = filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
   const isOnCooldown = countdown > 0;
   const mins = Math.floor(countdown/60);
@@ -471,13 +531,13 @@ export default function LiveJobsPage() {
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/30 bg-primary/5 text-primary-light text-sm font-medium hover:bg-primary/10 transition-all">
               <Target className="w-3.5 h-3.5"/> <span className="hidden sm:inline">Best Match</span>
             </button>
-            <select value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)}
+            <select aria-label="Sort jobs" value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)}
               className="dashboard-field px-3 py-2 rounded-lg border text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
               <option value="newest">Newest First</option>
               <option value="bestMatch">Best Match</option>
               <option value="confidence">Confidence</option>
             </select>
-            <button onClick={()=>setShowFilter(f=>!f)}
+            <button aria-label="Filter jobs" aria-expanded={showFilter} onClick={()=>setShowFilter(f=>!f)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${showFilter?"bg-primary/10 border-primary/40 text-primary-light":"border-border text-muted-foreground hover:border-primary/30"}`}>
               <Filter className="w-3.5 h-3.5"/> <ChevronDown className={`w-3 h-3 transition-transform ${showFilter?"rotate-180":""}`}/>
             </button>
@@ -498,7 +558,7 @@ export default function LiveJobsPage() {
                   <Globe className="w-4 h-4 text-primary-light"/> Niches
                 </span>
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                  <select value={maxHours} onChange={e=>{setMaxHours(Number(e.target.value));}}
+                  <select aria-label="Posted within" value={maxHours} onChange={e=>{setMaxHours(Number(e.target.value));}}
                     className="dashboard-field px-2.5 py-1.5 rounded-lg border text-xs sm:text-sm text-foreground focus:outline-none focus:border-primary/40 cursor-pointer">
                     <option value={24}>Last 24h</option>
                     <option value={48}>Last 48h</option>
@@ -516,7 +576,7 @@ export default function LiveJobsPage() {
                 {LIVE_NICHES.map(n => {
                   const active = selectedNiches.includes(n);
                   return (
-                    <button key={n} onClick={()=>setSelectedNiches(prev=>active?prev.filter(x=>x!==n):[...prev,n])}
+                    <button key={n} aria-pressed={active} onClick={()=>setSelectedNiches(prev=>active?prev.filter(x=>x!==n):[...prev,n])}
                       className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all ${active?"bg-primary/15 border-primary/40 text-primary-light":"border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"}`}>
                       {NICHE_LABELS[n] ?? n}
                     </button>
@@ -561,15 +621,16 @@ export default function LiveJobsPage() {
             {showFilter && (
               <div className="dashboard-control-panel rounded-xl p-4 flex items-center gap-6 flex-wrap">
                 <label className="flex items-center gap-2.5 cursor-pointer">
-                  <div className={`w-9 h-5 rounded-full transition-colors relative ${hasEmail?"bg-accent":"bg-muted"}`}
+                  <button type="button" role="switch" aria-label="Has email" aria-checked={hasEmail}
+                    className={`w-9 h-5 rounded-full transition-colors relative ${hasEmail?"bg-accent":"bg-muted"}`}
                     onClick={()=>{setHasEmail(v=>!v);setPage(1);}}>
                     <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${hasEmail?"left-4":"left-0.5"}`}/>
-                  </div>
+                  </button>
                   <span className="text-sm text-foreground flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-accent"/> Has Email</span>
                 </label>
                 <div>
                   <span className="text-xs text-muted-foreground">Min Score: <strong className="text-primary-light">{minScore}%</strong></span>
-                  <input type="range" min={0} max={80} step={10} value={minScore}
+                  <input aria-label="Minimum confidence" type="range" min={0} max={80} step={10} value={minScore}
                     onChange={e=>{setMinScore(Number(e.target.value));setPage(1);}} className="w-36 sm:w-40 accent-primary block mt-1"/>
                 </div>
                 <button onClick={()=>{setHasEmail(false);setMinScore(0);setPage(1);setSourceFilter("all");}}
@@ -825,7 +886,7 @@ export default function LiveJobsPage() {
                 <p className="text-muted-foreground text-sm mb-1">Select at least one specialty, then scan for current remote roles.</p>
                 <p className="text-muted-foreground text-xs">Results show their source and posting time.</p>
                 <div className="flex items-center justify-center gap-3 mt-5">
-                  <button onClick={()=>{setMaxHours(72);void fetchLive(true);}} disabled={loading||selectedNiches.length===0}
+                  <button onClick={()=>{setMaxHours(72);void fetchLive(true, 72);}} disabled={loading||selectedNiches.length===0}
                     className="px-5 py-2.5 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-primary-light transition-all disabled:opacity-50 flex items-center gap-2">
                     <Zap className="w-4 h-4"/> Scan Last 72h
                   </button>
