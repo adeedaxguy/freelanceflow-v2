@@ -42,40 +42,17 @@ function GoogleAnalyticsPageTracker({ measurementId }: { measurementId: string }
 
 export default function GoogleAnalytics() {
   useEffect(() => {
-    if (!MEASUREMENT_ID) return;
+    if (!MEASUREMENT_ID || window.gtag) return;
 
-    let timer: number | undefined;
-    let started = false;
-    const events = ["pointerdown", "keydown", "touchstart"] as const;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
+    window.gtag("js", new Date());
+    window.gtag("config", MEASUREMENT_ID, { send_page_view: true });
 
-    const removeListeners = () => {
-      events.forEach(event => window.removeEventListener(event, start));
-    };
-
-    const start = () => {
-      if (started) return;
-      started = true;
-      removeListeners();
-      if (timer) window.clearTimeout(timer);
-
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
-      window.gtag("js", new Date());
-      window.gtag("config", MEASUREMENT_ID, { send_page_view: true });
-
-      const script = document.createElement("script");
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
-      document.head.appendChild(script);
-    };
-
-    events.forEach(event => window.addEventListener(event, start, { once: true, passive: true }));
-    timer = window.setTimeout(start, 5000);
-
-    return () => {
-      removeListeners();
-      if (timer) window.clearTimeout(timer);
-    };
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`;
+    document.head.appendChild(script);
   }, []);
 
   if (!MEASUREMENT_ID) return null;
