@@ -463,8 +463,8 @@ export default function LiveJobsPage() {
   const isOnCooldown = countdown > 0;
   const mins = Math.floor(countdown/60);
   const secs = countdown % 60;
-  const bestMatchCount = scored.filter(l=>l.bmScore>=80).length;
-  const emailCount = leads.filter(l=>!!l.email).length;
+  const bestMatchCount = filtered.filter(l=>l.bmScore>=80).length;
+  const emailCount = filtered.filter(l=>!!l.email).length;
   const checkedSourceCount = diagnostics?.sources.length ?? 0;
   const matchingSourceCount = diagnostics?.sources.filter(source => source.kept > 0).length ?? 0;
   const unavailableSourceCount = diagnostics?.sources.filter(source => !source.ok).length ?? 0;
@@ -620,9 +620,9 @@ export default function LiveJobsPage() {
             {/* Extra filters panel */}
             {showFilter && (
               <div className="dashboard-control-panel rounded-xl p-4 flex items-center gap-6 flex-wrap">
-                <label className="flex items-center gap-2.5 cursor-pointer">
+                <label className="flex min-h-9 items-center gap-2.5 cursor-pointer">
                   <button type="button" role="switch" aria-label="Has email" aria-checked={hasEmail}
-                    className={`w-9 h-5 rounded-full transition-colors relative ${hasEmail?"bg-accent":"bg-muted"}`}
+                    className={`w-9 h-5 min-h-0 rounded-full transition-colors relative ${hasEmail?"bg-accent":"bg-muted"}`}
                     onClick={()=>{setHasEmail(v=>!v);setPage(1);}}>
                     <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${hasEmail?"left-4":"left-0.5"}`}/>
                   </button>

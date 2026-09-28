@@ -78,6 +78,20 @@ it("keeps a deliberately empty niche selection across navigation", async () => {
   expect(await screen.findByRole("button", { name: "Scan 0 Niches · 72h" })).toBeDisabled();
 });
 
+it("counts emails and best matches only in the displayed result set", async () => {
+  sessionStorage.setItem(key, JSON.stringify({ leads: [
+    { ...lead, email: undefined },
+    { ...lead, id: "job-other", source: "jobicy", sourceLabel: "Jobicy", title: "Remote engineer", confidence: 100, qualityScore: 100 },
+  ] }));
+  render(<LiveJobsPage />);
+  expect(await screen.findByText("1 with email")).toBeInTheDocument();
+  expect(screen.getByText("1 best matches")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "Arbeitnow (1)" }));
+  expect(screen.getByText(lead.title)).toBeInTheDocument();
+  expect(screen.queryByText("1 with email")).not.toBeInTheDocument();
+  expect(screen.queryByText("1 best matches")).not.toBeInTheDocument();
+});
+
 it("ignores invalid controls and clamps an out-of-range page without losing legacy results", async () => {
   sessionStorage.setItem(key, JSON.stringify({
     leads: [lead], selectedNiches: ["web-development", "unknown", "web-development"],
