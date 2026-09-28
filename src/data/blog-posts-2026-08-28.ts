@@ -411,8 +411,8 @@ function visualSet(topic: VerticalLeadTopic): BlogArticleVisual[] {
     },
     {
       src: "/blog-images/weekly-lead-sprint.svg",
-      alt: `600 free weekly leads sprint for ${topic.niche}`,
-      title: "600-lead weekly sprint",
+      alt: `600 free trial leads sprint for ${topic.niche}`,
+      title: "600-lead trial sprint",
       caption: "Free users can test a focused niche with enough weekly searches to build a small, proof-backed pipeline.",
     },
   ];
@@ -423,7 +423,7 @@ function funnel(topic: VerticalLeadTopic): BlogConversionFunnel {
     eyebrow: "Vertical lead sprint",
     title: `Find ${topic.niche} worth pitching`,
     summary:
-      `Use the free weekly lead allowance to search one market, qualify ${topic.niche} by public proof, and save only leads with a real reason to contact them.`,
+      `Use the 600-result free trial to search one market, qualify ${topic.niche} by public proof, and save only leads with a real reason to contact them.`,
     ctaLabel: "Start a free lead search",
     ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(topic.slug)}&source=august-28-vertical-seo-run`,
     proofNote:
@@ -463,7 +463,7 @@ Use these as seed ideas inside your weekly iCloseLeads sprint:
 
 ${list(topic.searchAngles)}
 
-Do not run all of them at once. Pick one angle, one city or service area, and one offer. A narrow search makes qualification easier and keeps your weekly lead allowance useful.
+Do not run all of them at once. Pick one angle, one city or service area, and one offer. A narrow search makes qualification easier and keeps the trial allowance useful.
 
 ## Prospect signals worth saving
 
@@ -491,7 +491,7 @@ Then offer a small next step, such as a three-point website audit, mobile conver
 
 ## How to use the 600-free-leads offer
 
-iCloseLeads currently gives free users a weekly lead allowance. For this niche, use it like a test sprint:
+iCloseLeads currently gives new users 600 lead results during a free 3-day trial. For this niche, use it like a test sprint:
 
 1. Search 60 to 120 businesses in one market.
 2. Save 20 to 30 prospects with visible proof.
@@ -509,7 +509,7 @@ If the public contact route is a phone number, the softphone path can help you b
 
 ## Internal workflow
 
-Start with the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a>, qualify prospects with the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business lead scorecard</a>, and then prepare the pitch with the <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready leads workflow</a>. If your offer is web design, also review the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a>, the <a href="/features/web-design-generator">prompt-to-website design feature</a>, and the <a href="/features/softphone">softphone feature</a>.
+Start with the <a href="/blog/600-free-leads-week-client-acquisition-plan">600-result trial plan</a>, qualify prospects with the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business lead scorecard</a>, and then prepare the pitch with the <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready leads workflow</a>. If your offer is web design, also review the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a>, the <a href="/features/web-design-generator">prompt-to-website design feature</a>, and the <a href="/features/softphone">softphone feature</a>.
 
 ## Compliance note
 
@@ -630,7 +630,7 @@ That is enough. Keep it simple and respectful.
 
 ## How it connects to the 600-free-leads offer
 
-Free users can use the weekly lead allowance to find a focused group of prospects first. The softphone becomes useful after qualification, not before it.
+New users can use the 600-result free trial to find a focused group of prospects first. The softphone becomes useful after qualification, not before it.
 
 Better sequence:
 

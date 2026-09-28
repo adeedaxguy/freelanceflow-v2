@@ -37,7 +37,7 @@ const comparisonVisuals: BlogArticleVisual[] = [
 
 const conversionFunnel: BlogConversionFunnel = {
   eyebrow: "Try the software route",
-  title: "Test client acquisition with 600 free weekly lead searches",
+  title: "Test client acquisition with 600 lead results in 3 days",
   summary:
     "Choose one niche, save the prospects with visible buyer signals, and move the strongest matches into outreach, proposals, softphone calls, or CRM follow-up.",
   ctaLabel: "Start a free lead sprint",

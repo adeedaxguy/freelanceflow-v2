@@ -53,14 +53,14 @@ const funnel = (slug: string, title: string, summary: string): BlogConversionFun
 export const AUGUST_25_2026_BLOG_POSTS: BlogPost[] = [
   {
     id: "free-leads-for-freelancers-qualification-workflow",
-    title: "Free Leads for Freelancers: How to Qualify 600 Weekly Prospects Before You Pitch",
+    title: "Free Leads for Freelancers: How to Qualify a 600-Lead Trial Before You Pitch",
     slug: "free-leads-for-freelancers-qualification-workflow",
-    excerpt: "A practical qualification workflow for freelancers using free leads, 600 weekly iCloseLeads searches, saved proof, and follow-up instead of random lead lists.",
+    excerpt: "A practical qualification workflow for freelancers using the 600-result iCloseLeads trial, saved proof, and follow-up instead of random lead lists.",
     content: `Free leads for freelancers can either create a pipeline or create noise.
 
 The difference is qualification. A freelancer who saves every name from a free lead list usually ends the week with a spreadsheet full of maybes. A freelancer who qualifies leads before pitching ends the week with fewer prospects, better context, and a real reason to follow up.
 
-iCloseLeads gives free users 600 leads per week, which is enough volume to test a market properly. But the goal is not to contact all 600. The goal is to find the 20 to 40 prospects that match your offer, show visible need, and deserve a specific first message.
+iCloseLeads gives new users 600 lead results during a free 3-day trial, which is enough volume to test a focused market. But the goal is not to contact all 600. The goal is to find the smaller set of prospects that match your offer, show visible need, and deserve a specific first message.
 
 ## Quick answer
 
@@ -105,7 +105,7 @@ The best free lead is useless if there is no respectful business-facing way to r
 
 If you send commercial outreach, review the <a href="https://www.ftc.gov/business-guidance/resources/can-spam-act-compliance-guide-business" target="_blank" rel="nofollow noopener">FTC CAN-SPAM guidance</a> and keep messages honest, relevant, and easy to decline.
 
-## A 600-lead weekly workflow
+## A 600-lead trial workflow
 
 Use the free allowance like this:
 
@@ -157,30 +157,30 @@ If visitors arrive from a client-acquisition guide, route them into one clear se
 
 ## Final takeaway
 
-Free leads for freelancers work when the process is disciplined. Use the 600 weekly leads to test markets, score prospects, save proof, draft from context, and follow up. The free allowance gives you room to learn, but qualification turns that room into revenue potential.`,
+Free leads for freelancers work when the process is disciplined. Use the 600 trial results to test a market, score prospects, save proof, draft from context, and follow up. The free allowance gives you room to learn, but qualification turns that room into revenue potential.`,
     category: "Lead Generation",
     published: true,
     coverImage: "/blog-images/default.svg",
     readTime: 8,
     createdAt: publishedAt(6, 0),
     updatedAt: publishedAt(6, 0),
-    metaTitle: "Free Leads for Freelancers | 600 Weekly Lead Qualification Workflow",
-    metaDescription: "Use free leads for freelancers the right way: qualify 600 weekly prospects by fit, proof, urgency, and contact route before pitching.",
+    metaTitle: "Free Leads for Freelancers | 600-Lead Trial Qualification Workflow",
+    metaDescription: "Use free leads for freelancers the right way: qualify a 600-result free trial by fit, proof, urgency, and contact route before pitching.",
     author: "iCloseLeads Team",
-    tags: ["free leads for freelancers", "600 free leads per week", "free B2B leads", "lead qualification"],
+    tags: ["free leads for freelancers", "600 free leads in 3 days", "free B2B leads", "lead qualification"],
     focusKeyword: "free leads for freelancers",
     articleVisuals: visualSet("free leads for freelancers qualification workflow"),
     conversionFunnel: funnel(
       "free-leads-for-freelancers-qualification-workflow",
-      "Turn free leads into a qualified weekly pipeline",
-      "Search 600 weekly leads with focus, save the best prospects with proof, and send only the messages that have a real reason to exist.",
+      "Turn free trial leads into a qualified pipeline",
+      "Use the 600-result trial with focus, save the best prospects with proof, and send only the messages that have a real reason to exist.",
     ),
   },
   {
     id: "google-maps-listing-pitch-examples-for-freelancers",
     title: "Google Maps Listing Pitch Examples for Freelancers: Turn Local Profiles Into Better Outreach",
     slug: "google-maps-listing-pitch-examples-for-freelancers",
-    excerpt: "Use Google Maps listing signals to write better freelance outreach, qualify local business leads, search 600 free weekly leads, and connect map profiles to website, SEO, or landing-page offers.",
+    excerpt: "Use Google Maps listing signals to write better freelance outreach, qualify local business leads, test the 600-result free trial, and connect map profiles to website, SEO, or landing-page offers.",
     content: `Google Maps leads for freelancers are useful because the buyer signal is visible.
 
 You can see the business category, reviews, photos, phone route, website link, and sometimes the exact gap that makes your service relevant. That is why Google Maps prospecting keeps showing up in freelancer and agency searches. The local profile gives you context before you ever write the first message.
@@ -282,7 +282,7 @@ Google Maps listing pitch examples work when they are tied to real public eviden
     createdAt: publishedAt(6, 10),
     updatedAt: publishedAt(6, 10),
     metaTitle: "Google Maps Listing Pitch Examples for Freelancers",
-    metaDescription: "Use Google Maps listing pitch examples to qualify local business leads, search 600 free weekly leads, and write better web design or SEO outreach.",
+    metaDescription: "Use Google Maps listing pitch examples to qualify local business leads, test a 600-result free trial, and write better web design or SEO outreach.",
     author: "iCloseLeads Team",
     tags: ["Google Maps leads for freelancers", "Google Maps listing pitch", "local business leads", "web design leads"],
     focusKeyword: "Google Maps leads for freelancers",
@@ -548,16 +548,16 @@ Upwork leads are demand that is already public. Direct freelance leads are deman
   },
   {
     id: "600-free-leads-weekly-sprint-for-web-designers",
-    title: "600 Free Leads Weekly Sprint for Web Designers: Turn Local Searches Into Website Projects",
+    title: "600 Free Trial Leads for Web Designers: Turn Local Searches Into Website Projects",
     slug: "600-free-leads-weekly-sprint-for-web-designers",
-    excerpt: "A 7-day sprint for web designers using 600 free weekly leads to find businesses with no website, outdated pages, weak mobile CTAs, and proposal-ready proof.",
+    excerpt: "A focused trial sprint for web designers using 600 lead results to find businesses with no website, outdated pages, weak mobile CTAs, and proposal-ready proof.",
     content: `Web designers do not need every business on the internet.
 
-They need a repeatable way to find the smaller group of businesses where a better website could create more calls, bookings, quotes, or trust. That is why a 600 free leads weekly sprint can work well for web designers. It gives enough search capacity to test niches without turning the week into blind outreach.
+They need a repeatable way to find the smaller group of businesses where a better website could create more calls, bookings, quotes, or trust. That is why the 600-result free trial can work well for web designers. It gives enough search capacity to test a niche without turning the trial into blind outreach.
 
 ## Quick answer
 
-Use the 600 free weekly leads to run one focused web design sprint: choose a niche and city, search local businesses, score website gaps, save only prospects with visible proof, draft a short audit-style pitch, and follow up inside the same pipeline.
+Use the 600 lead results in the free 3-day trial to run one focused web design sprint: choose a niche and city, search local businesses, score website gaps, save only prospects with visible proof, draft a short audit-style pitch, and follow up inside the same pipeline.
 
 ## The best web design lead signals
 
@@ -658,26 +658,26 @@ If one niche produced weak leads, change the niche before increasing volume.
 This sprint connects three strong iCloseLeads paths:
 
 - <a href="/blog/freelance-client-acquisition-system">Freelance client acquisition system</a> for the overall weekly plan.
-- <a href="/blog/600-free-leads-per-week-for-freelancers">600 free leads per week</a> for the product offer.
+- <a href="/blog/600-free-leads-per-week-for-freelancers">600 lead results in a free 3-day trial</a> for the product offer.
 - <a href="/resources/free-local-business-leads-for-web-designers">free local business leads for web designers</a> for the signup page.
 
 Together, they move a reader from search intent to product action.
 
 ## Final takeaway
 
-For web designers, 600 free weekly leads are valuable only when the search is narrow. Choose one niche, find visible website gaps, save proof, draft audit-style pitches, and follow up. That is how a free allowance becomes a real website project pipeline.`,
+For web designers, 600 free trial lead results are valuable only when the search is narrow. Choose one niche, find visible website gaps, save proof, draft audit-style pitches, and follow up. That is how a free allowance becomes a real website project pipeline.`,
     category: "Web Design Leads",
     published: true,
     coverImage: "/blog-images/default.svg",
     readTime: 8,
     createdAt: publishedAt(6, 40),
     updatedAt: publishedAt(6, 40),
-    metaTitle: "600 Free Leads Weekly Sprint for Web Designers",
-    metaDescription: "Use 600 free weekly leads to find web design prospects with no website, outdated pages, weak CTAs, and proposal-ready proof.",
+    metaTitle: "600 Free Trial Leads for Web Designers | iCloseLeads",
+    metaDescription: "Use a 600-result free trial to find web design prospects with no website, outdated pages, weak CTAs, and proposal-ready proof.",
     author: "iCloseLeads Team",
-    tags: ["600 free leads per week", "web design leads", "free local business leads", "businesses without websites"],
-    focusKeyword: "600 free leads per week for web designers",
-    articleVisuals: visualSet("600 free leads weekly sprint for web designers"),
+    tags: ["600 free leads in 3 days", "web design leads", "free local business leads", "businesses without websites"],
+    focusKeyword: "free trial leads for web designers",
+    articleVisuals: visualSet("600 free trial leads sprint for web designers"),
     conversionFunnel: funnel(
       "600-free-leads-weekly-sprint-for-web-designers",
       "Run a weekly web design lead sprint",

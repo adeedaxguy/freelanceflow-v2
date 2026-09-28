@@ -41,7 +41,7 @@ function funnel(slug: string, intent: string, title: string, summary: string): B
     eyebrow: "Start free",
     title,
     summary,
-    ctaLabel: "Search 600 weekly leads",
+    ctaLabel: "Test 600 lead results free",
     ctaHref: `/auth?mode=signup&intent=${encodeURIComponent(intent)}&source=${encodeURIComponent(slug)}`,
     proofNote:
       "Use the free weekly allowance as research capacity: pick one offer, find visible buyer signals, save only qualified prospects, and follow up from the same workflow.",

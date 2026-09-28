@@ -286,12 +286,12 @@ That is the iCloseLeads opportunity. Own the web design client acquisition clust
   },
   {
     id: "600-free-leads-per-week-for-freelancers",
-    title: "600 Free Leads Per Week for Freelancers: How to Turn the Offer Into Clients",
+    title: "600 Free Leads in 3 Days for Freelancers: How to Test the Offer",
     slug: "600-free-leads-per-week-for-freelancers",
-    excerpt: "iCloseLeads now gives free users 600 free leads per week. Here is a research-backed weekly workflow for freelancers who want leads, better outreach, and a real client pipeline.",
+    excerpt: "iCloseLeads gives new users 600 lead results during a free 3-day trial. Use this focused workflow to test a niche, qualify prospects, and build a real client pipeline.",
     content: `A bigger free lead allowance is only useful if freelancers know how to use it.
 
-iCloseLeads now gives free users 600 free leads per week. That is a strong offer because it lets a freelancer test real prospecting without paying first, but the goal should not be to collect 600 random names. The goal is to turn a weekly allowance into qualified searches, saved proof, better pitches, and follow-up.
+iCloseLeads gives new users 600 lead results during a free 3-day trial. That is useful because it lets a freelancer test real prospecting without paying first, but the goal should not be to collect 600 random names. The goal is to turn the trial allowance into qualified searches, saved proof, better pitches, and follow-up.
 
 Fresh SERP checks around free leads for freelancers, free lead generation tools, free B2B leads, and free web design leads show a crowded market. Some results promise free lead lists, some promote software trials, some point to marketplaces, and some explain manual prospecting. The gap is that most pages do not show a disciplined weekly system for turning free leads into actual client conversations.
 
@@ -299,15 +299,15 @@ That is the iCloseLeads angle.
 
 ## Short answer
 
-iCloseLeads gives free users 600 free leads per week so freelancers can run focused lead searches, qualify prospects, save proof, draft outreach, and build a follow-up pipeline before upgrading. Use the allowance as a weekly client-acquisition sprint: do not chase all 600 leads at once; divide them by niche, buyer signal, and outreach readiness.
+iCloseLeads gives new users 600 lead results during a free 3-day trial so freelancers can run focused searches, qualify prospects, save proof, draft outreach, and test the pipeline before upgrading. Do not chase all 600 results at once; divide the allowance by niche, buyer signal, and outreach readiness.
 
-## Why 600 free leads per week is a strong offer
+## Why 600 lead results in a 3-day trial is a useful test
 
 Most freelancers are blocked before outreach even starts. They do not know which businesses to search, which signals matter, whether the lead is worth saving, or what to say in the first message.
 
-The 600-lead weekly allowance solves the first bottleneck: enough search capacity to test a niche properly.
+The 600-result trial allowance solves the first bottleneck: enough search capacity to test a niche properly.
 
-For example, a freelancer can use one week to test:
+For example, a freelancer can use the trial to test:
 
 - 150 local business leads for web design or SEO services.
 - 150 remote job or live opportunity leads for project work.
@@ -339,11 +339,11 @@ Freelancers are still searching around Upwork, Freelancer, lead generation jobs,
 
 Many tools focus on the list. iCloseLeads should win by owning the full workflow: search, qualify, save, draft, follow up, and learn from the week.
 
-## The weekly 600-lead workflow
+## The 600-lead trial workflow
 
 Use the free allowance like a sprint, not a dump.
 
-### Day 1: Pick the offer and the niche
+### Step 1: Pick the offer and the niche
 
 Choose one clear service before searching.
 
@@ -357,13 +357,13 @@ Good examples:
 
 The offer decides what a good lead looks like.
 
-### Day 2: Run your first 150-lead search
+### Step 2: Run your first focused search
 
 Start with one lead type. For web design and SEO freelancers, begin with <a href="/use-cases/local-business-leads">local business leads</a>. Search one city and one niche, then filter for visible business signals such as no website, outdated website, active reviews, public phone route, or weak booking path.
 
 Do not save everything. Save only the leads where you can explain the opportunity in one sentence.
 
-### Day 3: Run a second search from a different angle
+### Step 3: Run a second search from a different angle
 
 If the first search was local, make the second one remote or live. If the first one was broad, make the second one narrower.
 
@@ -375,7 +375,7 @@ Examples:
 
 This gives you comparison data. You will quickly see which niche produces better leads.
 
-### Day 4: Qualify and save only the best prospects
+### Step 4: Qualify and save only the best prospects
 
 A qualified lead needs more than a business name.
 
@@ -389,7 +389,7 @@ Use this checklist:
 
 If any of those are missing, skip the lead or keep it for later research.
 
-### Day 5: Draft outreach from proof
+### Step 5: Draft outreach from proof
 
 Use <a href="/features/ai-proposals">AI proposals</a> or prepared outreach drafts to speed up writing, but do not send generic messages.
 
@@ -399,13 +399,13 @@ A good opener sounds like this:
 
 That works because it is tied to a real signal.
 
-### Day 6: Follow up and record outcomes
+### Step 6: Follow up and record outcomes
 
 Free leads become valuable when the freelancer learns from them. Track which niche produced replies, which signal created the best message, which lead source felt weak, and which offer was easiest to explain.
 
 Move the best leads into <a href="/features/crm-pipeline">CRM follow-up</a> so the week does not disappear into a spreadsheet.
 
-### Day 7: Review and choose next week's searches
+### Step 7: Review and choose the next searches
 
 At the end of the week, ask:
 
@@ -415,13 +415,13 @@ At the end of the week, ask:
 - Which saved leads deserve a follow-up?
 - Which searches should be repeated next week?
 
-The point of 600 free leads is not volume alone. It is enough weekly data to improve your pipeline.
+The point of 600 trial lead results is not volume alone. It is enough data to evaluate whether the workflow can improve your pipeline.
 
 ## Best keywords this article targets
 
 This page supports a practical query cluster instead of one isolated keyword:
 
-- 600 free leads per week
+- 600 free leads in 3 days
 - free leads for freelancers
 - free lead generation tool
 - free B2B leads
@@ -469,11 +469,11 @@ The best first test:
 5. Draft 3 messages from the saved proof.
 6. Follow up from the same pipeline.
 
-If that workflow gives you better prospects than marketplaces or manual searching, keep using the weekly allowance to sharpen the niche.
+If that workflow gives you better prospects than marketplaces or manual searching, use what you learned to sharpen the niche before upgrading.
 
 ## FAQ
 
-### Is 600 free leads per week enough for a freelancer?
+### Is 600 lead results during a 3-day trial enough for a freelancer?
 
 Yes, if the freelancer uses the allowance with focus. A solo freelancer does not need thousands of random prospects. They need enough searches to find a smaller set of qualified leads worth saving, pitching, and following up.
 
@@ -497,16 +497,16 @@ Use the same workflow with the updated allowance. The important part is the syst
     coverImage: "/blog-images/default.svg",
     readTime: 10,
     createdAt: new Date("2026-08-15T12:20:00Z"),
-    updatedAt: new Date("2026-08-15T12:20:00Z"),
-    metaTitle: "600 Free Leads Per Week for Freelancers | iCloseLeads",
-    metaDescription: "iCloseLeads gives free users 600 free leads per week. Learn the weekly workflow freelancers can use to search, qualify, pitch, and follow up.",
+    updatedAt: new Date("2026-09-28T00:00:00Z"),
+    metaTitle: "600 Free Leads in 3 Days for Freelancers | iCloseLeads",
+    metaDescription: "Test iCloseLeads with 600 lead results during a free 3-day trial. Learn how to search, qualify, pitch, and follow up without buying a list.",
     author: "iCloseLeads Team",
     tags: ["free leads for freelancers", "free lead generation tool", "free B2B leads", "local business leads"],
-    focusKeyword: "600 free leads per week",
-    articleVisuals: visualSet("600 free leads per week workflow"),
+    focusKeyword: "600 free leads in 3 days",
+    articleVisuals: visualSet("600 free leads in 3 days workflow"),
     conversionFunnel: funnel(
       "600-free-leads-per-week-for-freelancers",
-      "Use 600 weekly leads as a focused client sprint",
+      "Use 600 trial leads as a focused client sprint",
       "Start with one offer, one niche, and one lead source. Search in batches, save only qualified prospects, draft proof-led outreach, and track every follow-up from the same workflow.",
     ),
   },

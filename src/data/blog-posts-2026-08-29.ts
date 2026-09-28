@@ -230,7 +230,7 @@ Use iCloseLeads as the front of the workflow:
 4. Generate a concept only for the strongest leads.
 5. Pitch the result as a short audit or idea, not as a generic sales blast.
 
-This matches the intent behind <a href="/lead-generation/web-design-leads">web design leads</a>, <a href="/resources/web-design-lead-generation">web design lead generation</a>, and <a href="/blog/600-free-leads-weekly-sprint-for-web-designers">600 free weekly leads for web designers</a>.
+This matches the intent behind <a href="/lead-generation/web-design-leads">web design leads</a>, <a href="/resources/web-design-lead-generation">web design lead generation</a>, and <a href="/blog/600-free-leads-weekly-sprint-for-web-designers">600 free trial leads for web designers</a>.
 
 ## When AI is not enough
 
@@ -291,7 +291,7 @@ The goal is not to chase the lowest possible cost. The goal is to spend time and
 
 ## Short answer
 
-Customer acquisition cost for freelancers is the total cost of winning a client, including tools, ads, marketplace fees, research time, proposals, calls, and follow-up. iCloseLeads can help reduce wasted CAC by giving free users a weekly lead allowance, then guiding them to qualify prospects, save proof, draft better outreach, and track follow-up before paying for larger volume.
+Customer acquisition cost for freelancers is the total cost of winning a client, including tools, ads, marketplace fees, research time, proposals, calls, and follow-up. iCloseLeads can help reduce wasted CAC by giving new users 600 lead results during a free 3-day trial, then guiding them to qualify prospects, save proof, draft better outreach, and track follow-up before paying for larger volume.
 
 ## What counts as acquisition cost
 
@@ -381,7 +381,7 @@ That is the reason to connect <a href="/features/lead-discovery">lead discovery<
 
 ## Final takeaway
 
-Customer acquisition cost is not only about ad spend. For freelancers, it is also about wasted attention. Use the iCloseLeads free weekly lead allowance to test a market carefully, qualify before outreach, and build a pipeline where every saved prospect has a real reason to exist.`,
+Customer acquisition cost is not only about ad spend. For freelancers, it is also about wasted attention. Use the iCloseLeads 600-result free trial to test a market carefully, qualify before outreach, and build a pipeline where every saved prospect has a real reason to exist.`,
     category: "Client Acquisition",
     published: true,
     coverImage: "/blog-images/local-lead-scorecard.svg",

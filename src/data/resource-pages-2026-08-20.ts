@@ -29,7 +29,7 @@ function buildResourcePage(input: ResourceInput): ResourcePage {
     slug: input.slug,
     title: input.title,
     metaTitle: `${input.title} | iCloseLeads`,
-    metaDescription: `Use this ${input.keyword} workflow with iCloseLeads' free weekly lead allowance to find prospects, save proof, draft outreach, and follow up.`,
+    metaDescription: `Use this ${input.keyword} workflow with iCloseLeads' 600-result free trial to find prospects, save proof, draft outreach, and follow up.`,
     keyword: input.keyword,
     relatedSearches: input.relatedSearches,
     audience: input.audience,
@@ -87,7 +87,7 @@ function buildResourcePage(input: ResourceInput): ResourcePage {
       },
       {
         q: "Can free users use this workflow?",
-        a: "Yes. Free iCloseLeads users currently get a weekly lead allowance that can be used for focused searches, qualification, proposal drafts, and follow-up planning.",
+        a: "Yes. New iCloseLeads users currently get 600 lead results during a free 3-day trial for focused searches, qualification, proposal drafts, and follow-up planning.",
       },
       {
         q: "Should I pitch every lead I find?",

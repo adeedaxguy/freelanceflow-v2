@@ -124,7 +124,7 @@ Weak signs:
 
 ## Product paths to open next
 
-Use the <a href="/resources/web-design-lead-generation">web design lead generation workflow</a> when you want the resource-page version of this process. Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects, then move the best matches into <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead prep</a>. If you are testing the free offer first, start with the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a>.
+Use the <a href="/resources/web-design-lead-generation">web design lead generation workflow</a> when you want the resource-page version of this process. Use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a> before saving prospects, then move the best matches into <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead prep</a>. If you are testing the free offer first, start with the <a href="/blog/600-free-leads-week-client-acquisition-plan">600-result trial plan</a>.
 
 ## Example first message
 
@@ -132,7 +132,7 @@ Hi, I found your business while researching local web design opportunities. Your
 
 ## Use iCloseLeads for the workflow
 
-Free users currently get a weekly lead allowance, which is enough to test one focused market. Do not spend that allowance on broad searching. Use it to build a proof-backed mini pipeline:
+New users currently get 600 lead results during a free 3-day trial, which is enough to test one focused market. Do not spend that allowance on broad searching. Use it to build a proof-backed mini pipeline:
 
 - 20 to 40 prospects in one niche.
 - 10 saved leads with proof.
@@ -144,31 +144,31 @@ That is a real acquisition sprint, not a random list export.
   }),
   post({
     id: "600-free-leads-week-client-acquisition",
-    title: "600 Free Leads Per Week: How Freelancers Should Use the Offer",
+    title: "600 Free Leads in 3 Days: How Freelancers Should Test the Offer",
     slug: "600-free-leads-week-client-acquisition-plan",
     excerpt:
-      "How to use iCloseLeads' 600 free weekly leads as a focused client-acquisition sprint instead of wasting it on broad searches.",
+      "How to use iCloseLeads' 600-result free trial as a focused client-acquisition sprint instead of wasting it on broad searches.",
     category: "Client Acquisition",
-    focusKeyword: "600 free leads per week",
+    focusKeyword: "600 free leads in 3 days",
     tags: ["free leads", "client acquisition", "freelance leads"],
     readTime: 6,
-    metaTitle: "600 Free Leads Per Week | Client Acquisition Sprint for Freelancers",
+    metaTitle: "600 Free Leads in 3 Days | Client Acquisition Trial Sprint",
     metaDescription:
-      "Use iCloseLeads' 600 free weekly leads to test one niche, qualify prospects, save proof, draft outreach, and follow up without buying a list.",
+      "Use iCloseLeads' 600-result free trial to test one niche, qualify prospects, save proof, draft outreach, and follow up without buying a list.",
     conversionFunnel: funnel({
       slug: "600-free-leads-week-client-acquisition-plan",
       intent: "600-free-leads-week",
-      title: "Turn 600 free weekly leads into one focused sprint",
+      title: "Turn 600 free trial leads into one focused sprint",
       summary:
         "Use the free allowance to test one market at a time: search, reject weak matches, save the strongest proof-backed leads, draft outreach, and measure which niche deserves next week.",
       ctaLabel: "Start the free lead sprint",
     }),
     content: `
-iCloseLeads now gives free users a large weekly lead allowance. The right way to use it is not to collect the biggest possible spreadsheet. The right way is to run a narrow acquisition sprint where every saved lead has fit, proof, and a next action.
+iCloseLeads gives new users 600 lead results during a free 3-day trial. The right way to use it is not to collect the biggest possible spreadsheet. The right way is to run a narrow acquisition sprint where every saved lead has fit, proof, and a next action.
 
 ## The short answer
 
-Use the 600 free leads per week offer to test one market at a time. Search, qualify, save proof, draft outreach, and measure replies. If you split the allowance across too many services or cities, you will create noise instead of pipeline.
+Use the 600-result free trial to test one market at a time. Search, qualify, save proof, draft outreach, and measure replies. If you split the allowance across too many services or cities, you will create noise instead of pipeline.
 
 ## The 600-lead sprint structure
 
@@ -295,7 +295,7 @@ That is a lead worth saving.
 
 ## Where this scorecard sends the lead
 
-For website projects, connect the scorecard to the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> and the <a href="/resources/web-design-lead-generation">web design lead generation resource</a>. For free-plan testing, use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a>. When the lead passes the scorecard, turn it into a <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead</a> instead of sending a generic pitch.
+For website projects, connect the scorecard to the <a href="/blog/web-design-leads-data-led-workflow">web design leads workflow</a> and the <a href="/resources/web-design-lead-generation">web design lead generation resource</a>. For free-plan testing, use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600-result trial plan</a>. When the lead passes the scorecard, turn it into a <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready lead</a> instead of sending a generic pitch.
 
 ## How iCloseLeads helps
 
@@ -437,7 +437,7 @@ If the tool cannot help with that loop, more features will not fix the problem.
 
 ## Related tests inside the free plan
 
-Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600 free leads weekly plan</a> to structure the test. If your service is web design, start with <a href="/blog/web-design-leads-data-led-workflow">web design leads</a>. If your search is local, use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a>. If a prospect passes, make it <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready</a> before outreach.
+Use the <a href="/blog/600-free-leads-week-client-acquisition-plan">600-result trial plan</a> to structure the test. If your service is web design, start with <a href="/blog/web-design-leads-data-led-workflow">web design leads</a>. If your search is local, use the <a href="/blog/local-business-leads-scorecard-for-freelancers">local business leads scorecard</a>. If a prospect passes, make it <a href="/blog/proposal-ready-leads-for-freelancers">proposal-ready</a> before outreach.
 
 ## Why iCloseLeads fits this search
 
