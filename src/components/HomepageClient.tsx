@@ -728,7 +728,7 @@ export default function HomepageClient() {
               <p className="mt-5 text-base leading-8 text-muted-foreground">Start with up to 600 lead results over 3 days. Pro keeps discovery active at 1,000 results per week. Agency adds higher volume, a larger outreach allowance, and API access. Phone numbers and calling minutes are paid add-ons on every plan.</p>
             </div>
             <div className="mx-auto mt-12 grid max-w-6xl gap-5 lg:grid-cols-3">
-              {PRICING_TIERS.map((tier, index) => <PricingCard key={tier.name} tier={tier} index={index} />)}
+              {PRICING_TIERS.map((tier) => <PricingCard key={tier.name} tier={tier} />)}
             </div>
           </div>
         </section>

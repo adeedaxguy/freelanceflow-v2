@@ -54,6 +54,7 @@ export function verifyStripeSignature(
 
 export async function stripeRequest<T>(config: StripeConfig, path: string, body?: URLSearchParams, idempotencyKey?: string) {
   if (!config.secretKey) throw new Error("Stripe secret key is not configured.");
+  if (!stripeKeyMatchesMode(config)) throw new Error("Stripe mode does not match the configured secret key.");
   const response = await fetch(`https://api.stripe.com/v1${path}`, {
     method: body ? "POST" : "GET",
     headers: {
@@ -122,7 +123,11 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
 }
 
 export function isStripeCheckoutConfigured(config: StripeConfig) {
-  return Boolean(config.secretKey && config.webhookSecret);
+  return Boolean(config.secretKey && config.webhookSecret && stripeKeyMatchesMode(config));
+}
+
+function stripeKeyMatchesMode(config: StripeConfig) {
+  return new RegExp(`^(sk|rk)_${config.mode}_`).test(config.secretKey);
 }
 
 export async function createStripeBillingPortalSession(

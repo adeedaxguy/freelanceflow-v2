@@ -1,7 +1,7 @@
 /** @jest-environment node */
 
 import { createHmac } from "crypto";
-import { createStripeSubscriptionCheckout, createStripeBillingPortalSession, verifyStripeSignature } from "./stripe";
+import { createStripeSubscriptionCheckout, createStripeBillingPortalSession, isStripeCheckoutConfigured, verifyStripeSignature } from "./stripe";
 
 function signature(body: string, secret: string, timestamp: number) {
   const digest = createHmac("sha256", secret).update(`${timestamp}.${body}`).digest("hex");
@@ -9,6 +9,23 @@ function signature(body: string, secret: string, timestamp: number) {
 }
 
 describe("Stripe helpers", () => {
+  it("refuses a checkout when the configured mode and secret key disagree", async () => {
+    const request = jest.fn();
+    Object.defineProperty(global, "fetch", { configurable: true, value: request });
+    const config = { secretKey: "sk_live_mock", webhookSecret: "whsec_mock", mode: "test" as const, testMode: true };
+    try {
+      expect(isStripeCheckoutConfigured(config)).toBe(false);
+      await expect(createStripeSubscriptionCheckout(config, {
+        productName: "iCloseLeads Pro", amountCents: 1000,
+        successUrl: "https://icloseleads.com/success", cancelUrl: "https://icloseleads.com/cancel",
+        metadata: { plan: "pro" },
+      })).rejects.toThrow("Stripe mode does not match");
+      expect(request).not.toHaveBeenCalled();
+    } finally {
+      Reflect.deleteProperty(global, "fetch");
+    }
+  });
+
   it("verifies signed webhook bodies and rejects stale or tampered payloads", () => {
     const body = JSON.stringify({ id: "evt_test", type: "checkout.session.completed" });
     const secret = "whsec_test";

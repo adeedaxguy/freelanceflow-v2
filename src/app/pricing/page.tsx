@@ -43,7 +43,7 @@ export default function PricingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-16">
-              {PRICING_TIERS.map((tier, i) => <PricingCard key={tier.name} tier={tier} index={i} />)}
+              {PRICING_TIERS.map((tier) => <PricingCard key={tier.name} tier={tier} />)}
             </div>
 
             {/* Launch assurance */}
