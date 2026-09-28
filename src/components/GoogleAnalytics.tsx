@@ -45,7 +45,9 @@ export default function GoogleAnalytics() {
     if (!MEASUREMENT_ID || window.gtag) return;
 
     window.dataLayer = window.dataLayer || [];
-    window.gtag = (...args: unknown[]) => window.dataLayer?.push(args);
+    window.gtag = function () {
+      window.dataLayer?.push(arguments);
+    };
     window.gtag("js", new Date());
     window.gtag("config", MEASUREMENT_ID, { send_page_view: true });
 
