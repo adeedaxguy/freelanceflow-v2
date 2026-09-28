@@ -38,10 +38,12 @@ describe("Stripe helpers", () => {
   });
 
   it("uses a saved Stripe price without creating inline product data", async () => {
-    const request = jest.fn(async (_url: string, _options?: RequestInit) => ({
-      ok: true,
-      json: async () => ({ id: "cs_live", url: "https://checkout.stripe.com/live" }),
-    } as Response));
+    const request = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({
+        active: true, currency: "usd", livemode: true, unit_amount: 1000,
+        recurring: { interval: "month", interval_count: 1, usage_type: "licensed" },
+      }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ id: "cs_live", url: "https://checkout.stripe.com/live" }) });
     Object.defineProperty(global, "fetch", { configurable: true, value: request });
 
     try {
@@ -60,10 +62,31 @@ describe("Stripe helpers", () => {
         metadata: { plan: "pro" },
       });
 
-      const body = request.mock.calls[0]?.[1]?.body as URLSearchParams;
+      expect(request.mock.calls[0][0]).toBe("https://api.stripe.com/v1/prices/price_pro_monthly");
+      const body = request.mock.calls[1]?.[1]?.body as URLSearchParams;
       expect(body.get("line_items[0][price]")).toBe("price_pro_monthly");
       expect(body.has("line_items[0][price_data][unit_amount]")).toBe(false);
-      expect(request.mock.calls[0]?.[1]?.headers).toEqual(expect.objectContaining({ "Idempotency-Key": "plan:user:pro:monthly:1" }));
+      expect(request.mock.calls[1]?.[1]?.headers).toEqual(expect.objectContaining({ "Idempotency-Key": "plan:user:pro:monthly:1" }));
+    } finally {
+      Reflect.deleteProperty(global, "fetch");
+    }
+  });
+
+  it("does not open checkout for an old saved price", async () => {
+    const request = jest.fn(async () => ({ ok: true, json: async () => ({
+      active: true, currency: "usd", livemode: true, unit_amount: 2900,
+      recurring: { interval: "month", interval_count: 1, usage_type: "licensed" },
+    }) }));
+    Object.defineProperty(global, "fetch", { configurable: true, value: request });
+    try {
+      await expect(createStripeSubscriptionCheckout({
+        secretKey: "sk_live_mock", webhookSecret: "whsec_mock", mode: "live", testMode: false,
+      }, {
+        productName: "iCloseLeads Pro", amountCents: 1000, priceId: "price_old_pro",
+        successUrl: "https://icloseleads.com/success", cancelUrl: "https://icloseleads.com/cancel",
+        metadata: { plan: "pro" },
+      })).rejects.toThrow("does not match the displayed amount");
+      expect(request).toHaveBeenCalledTimes(1);
     } finally {
       Reflect.deleteProperty(global, "fetch");
     }

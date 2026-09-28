@@ -103,6 +103,21 @@ export async function createStripeSubscriptionCheckout(config: StripeConfig, inp
   });
 
   if (input.priceId) {
+    const price = await stripeRequest<{
+      active: boolean;
+      currency: string;
+      livemode: boolean;
+      unit_amount: number | null;
+      recurring: { interval: string; interval_count: number; usage_type: string } | null;
+    }>(config, `/prices/${encodeURIComponent(input.priceId)}`);
+    if (!price.active || price.livemode !== (config.mode === "live")
+      || price.currency !== (input.currency || "USD").toLowerCase()
+      || price.unit_amount !== input.amountCents
+      || price.recurring?.interval !== (input.interval || "month")
+      || price.recurring.interval_count !== 1
+      || price.recurring.usage_type !== "licensed") {
+      throw new Error("Saved Stripe price does not match the displayed amount and billing interval.");
+    }
     body.set("line_items[0][price]", input.priceId);
   } else {
     body.set("line_items[0][price_data][currency]", (input.currency || "USD").toLowerCase());
