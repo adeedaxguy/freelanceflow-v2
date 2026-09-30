@@ -2732,21 +2732,24 @@ export const RESOURCE_PAGES: ResourcePage[] = [
     },
     steps: [
       "Decide whether you need remote job signals, local business leads, decision-maker checks, or all three.",
+      "Separate marketplaces and hiring directories from software: one supplies opportunities, while the other should help you qualify, pitch, and follow up.",
       "Check whether the tool helps you qualify leads before exporting them.",
       "Look for proposal or cold-email support tied to the actual lead context.",
       "Avoid tools that only sell volume without a clear outreach workflow.",
       "Choose the tool that gets you from search to first reviewed pitch fastest.",
     ],
     proofPoints: [
-      "Live Google SERPs show a dedicated competitor listicle for this exact query, confirming list-comparison intent.",
-      "The current SERP also surfaces broad tools like Apollo and Instantly, leaving room for a freelancer-first workflow angle.",
-      "GA4 shows iCloseLeads resource and local lead pages already earning views, so expanding the resource hub supports visible user paths.",
+      "Fresh DataForSEO SERP evidence shows this query is split between freelance marketplaces, expert directories, forum discussions, and broad B2B tool roundups.",
+      "That mixed result set leaves a useful gap: a freelancer-first comparison based on the complete workflow after a lead is found, not a long feature inventory.",
+      "iCloseLeads connects lead discovery, saved evidence, proposal drafting, reviewed outreach, calling, and CRM follow-up so a searcher can test the workflow with a real prospect.",
     ],
     pitch:
       "If you are comparing lead tools, test one real workflow: find five leads, save the best two, draft one proposal, and schedule one follow-up. A tool that cannot complete that loop may not fit freelance acquisition.",
     internalLinks: [
       { label: "Freelance client acquisition", href: "/resources/freelance-client-acquisition" },
       { label: "Lead discovery software", href: "/features/lead-discovery" },
+      { label: "AI proposal generator", href: "/features/ai-proposals" },
+      { label: "Sales softphone", href: "/features/softphone" },
       { label: "Cold outreach CRM", href: "/resources/cold-outreach-crm-for-freelancers" },
     ],
     faqs: [
