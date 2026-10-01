@@ -196,7 +196,7 @@ const leadGenerationItemListJsonLd = {
       "@type": "ListItem",
       "position": 4,
       "name": "Local Business Leads",
-      "url": "https://icloseleads.com/lead-generation/local-business-leads",
+      "url": "https://icloseleads.com/use-cases/local-business-leads",
       "description": "Search local businesses by city, category, website signal, phone route, and pitch fit.",
     },
     {

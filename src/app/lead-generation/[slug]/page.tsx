@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import LeadGenerationMarketingPage from "@/components/LeadGenerationMarketingPage";
 import {
   getLeadGenerationPage,
@@ -24,6 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LeadGenerationDetailPage({ params }: Props) {
   const { slug } = await params;
+  if (slug === "local-business-leads") {
+    permanentRedirect("/use-cases/local-business-leads");
+  }
   const page = getLeadGenerationPage(slug);
   if (!page) notFound();
   return <LeadGenerationMarketingPage page={page} />;

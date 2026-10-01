@@ -17,7 +17,7 @@ import Logo from "./Logo";
 import { PublicFooterAd } from "./AdSenseUnit";
 
 const primaryLinks = [
-  { label: "Local Business Leads", href: "/lead-generation/local-business-leads" },
+  { label: "Local Business Leads", href: "/use-cases/local-business-leads" },
   { label: "Remote Freelance Jobs", href: "/lead-generation/remote-freelance-jobs" },
   { label: "Live Job Leads", href: "/use-cases/live-job-leads" },
   { label: "Decision Maker Finder", href: "/features/lead-discovery#capabilities" },
@@ -94,7 +94,7 @@ const trustNotes = [
 ];
 
 const mobileFooterLinks = [
-  { label: "Local leads", href: "/lead-generation/local-business-leads" },
+  { label: "Local leads", href: "/use-cases/local-business-leads" },
   { label: "Remote jobs", href: "/lead-generation/remote-freelance-jobs" },
   { label: "Live jobs", href: "/use-cases/live-job-leads" },
   { label: "Decision makers", href: "/features/lead-discovery#capabilities" },

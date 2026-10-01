@@ -136,7 +136,7 @@ const features = [
 
 const audiences = [
   ["Web designers", "Find businesses with no site, an outdated site, or a weak booking journey.", "/lead-generation/web-design-leads"],
-  ["SEO and ads specialists", "Spot local and remote buyers already showing growth intent.", "/lead-generation/local-business-leads"],
+  ["SEO and ads specialists", "Spot local and remote buyers already showing growth intent.", "/use-cases/local-business-leads"],
   ["Developers", "Catch remote contracts and urgent implementation work by stack.", "/lead-generation/remote-freelance-jobs"],
   ["Lean agencies", "Build a focused prospect list, share context, and keep follow-up visible.", "/use-cases/freelance-cold-outreach"],
 ] as const;

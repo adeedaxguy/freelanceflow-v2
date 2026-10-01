@@ -279,9 +279,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     eyebrow: "Local Business Leads",
     title: "Local business leads",
     accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads for Freelancers",
+    metaTitle: "Local Business Leads & Local Lead Finder | iCloseLeads",
     metaDescription:
-      "Find local business leads using website gaps, Google Maps signals, phone routes, and owner checks. Start with 600 lead results during a free 3-day trial.",
+      "Find local business leads and local SEO leads by city, website gap, Google Maps signal, phone route, and owner path. Try 600 lead results free for 3 days.",
     keywords: [
       "local business leads",
       "free local business leads",
@@ -300,6 +300,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       "business owner name finder",
       "decision maker finder for local business",
       "small business leads",
+      "local lead finder",
+      "local leads software",
+      "leads for local businesses",
       "website redesign leads",
     ],
     heroSummary:
@@ -308,7 +311,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     secondaryCta: "See Google Maps Pitch Workflow",
     dashboardPath: "/dashboard/local-leads",
     searchIntent:
-      "People searching for local business leads often want free web design leads, SEO clients, Google Maps listing pitch ideas, or small businesses with visible marketing gaps. This page targets that commercial intent with no-website, outdated-website, and local-profile conversion paths.",
+      "People searching for local business leads, a local lead finder, or local leads software often want free web design leads, SEO clients, Google Maps listing pitch ideas, or small businesses with visible marketing gaps. This page targets that commercial intent with no-website, outdated-website, and local-profile conversion paths.",
     audience:
       "Built for web designers, SEO consultants, local ads specialists, automation freelancers, copywriters, and agencies selling to small businesses.",
     outcome:
@@ -352,7 +355,8 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       },
     ],
     keywordsCluster: [
-      { group: "Core", terms: ["local business leads", "small business leads", "local client leads"] },
+      { group: "Core", terms: ["local business leads", "local leads", "leads for local businesses", "small business leads"] },
+      { group: "Tools", terms: ["local lead finder", "local leads software", "local lead generation"] },
       { group: "Web design", terms: ["businesses without websites", "outdated website leads", "find web design clients"] },
       { group: "Free offer", terms: ["free local business leads", "600 leads in a free 3-day trial", "web design leads free"] },
       { group: "Google Maps pitch", terms: ["the pitch google maps listing", "Google Maps listing pitch", "Google Maps prospecting tool"] },
@@ -387,6 +391,10 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       { oldWay: "Lose the map link and notes after saving.", icloseWay: "Keep contact info, Google Maps, notes, and proposal action on the saved lead." },
     ],
     faqs: [
+      {
+        q: "What is a local lead finder?",
+        a: "A local lead finder helps you search businesses by location and category, then qualify them using public signals such as website status, Google Maps profile details, reviews, phone availability, and contact paths. iCloseLeads adds saved notes, proposal drafting, and follow-up so the search can become a tracked sales workflow.",
+      },
       {
         q: "How do I find businesses without websites?",
         a: "Search a business category and city, then use the no or unknown website filter. Always verify the map profile before pitching because some businesses use social pages, booking platforms, or newly launched websites.",

@@ -103,7 +103,7 @@ Also avoid promising that every free lead is verified or ready to buy. A better 
 
 ## How iCloseLeads turns the query into a funnel
 
-Start with <a href="/lead-generation/local-business-leads">local business leads</a> when the buyer is local. Use <a href="/lead-generation/web-design-leads">web design leads</a> when the visible gap is the website. Use <a href="/features/softphone">softphone calling</a> when the phone route is public and the prospect is likely to prefer a call. Use <a href="/features/web-design-generator">AI website concepts</a> when the pitch needs a concrete visual direction.
+Start with <a href="/use-cases/local-business-leads">local business leads</a> when the buyer is local. Use <a href="/lead-generation/web-design-leads">web design leads</a> when the visible gap is the website. Use <a href="/features/softphone">softphone calling</a> when the phone route is public and the prospect is likely to prefer a call. Use <a href="/features/web-design-generator">AI website concepts</a> when the pitch needs a concrete visual direction.
 
 ## Example lead angle
 
@@ -276,7 +276,7 @@ It should not be the final source of truth. Before outreach, check:
 
 ## Where iCloseLeads fits
 
-iCloseLeads gives the freelancer a middle layer between raw search and outreach. Use <a href="/lead-generation/businesses-without-websites">businesses without websites</a> when the pitch is a website build. Use <a href="/lead-generation/local-business-leads">local business leads</a> for city/category prospecting. Use <a href="/features/crm-pipeline">CRM pipeline</a> to keep follow-up attached to the original proof.
+iCloseLeads gives the freelancer a middle layer between raw search and outreach. Use <a href="/lead-generation/businesses-without-websites">businesses without websites</a> when the pitch is a website build. Use <a href="/use-cases/local-business-leads">local business leads</a> for city/category prospecting. Use <a href="/features/crm-pipeline">CRM pipeline</a> to keep follow-up attached to the original proof.
 
 That is the difference between a list and a system.
 
@@ -361,7 +361,7 @@ A raw lead is not automatically a sales opportunity. Score each prospect from 0 
 
 **0-4:** Skip it and protect your time for better-fit prospects.
 
-For a deeper version of this decision process, use the <a href="/resources/qualified-leads-for-freelancers-scorecard">qualified leads scorecard for freelancers</a>. If you sell locally, the <a href="/lead-generation/local-business-leads">local business leads</a> page shows how to begin with a city and category rather than a broad list.
+For a deeper version of this decision process, use the <a href="/resources/qualified-leads-for-freelancers-scorecard">qualified leads scorecard for freelancers</a>. If you sell locally, the <a href="/use-cases/local-business-leads">local business leads</a> page shows how to begin with a city and category rather than a broad list.
 
 ## A clear free-week activation plan
 
@@ -451,7 +451,7 @@ That opener is stronger than a generic sales script because it starts from proof
 
 ## How the softphone fits the product
 
-Use <a href="/lead-generation/web-design-leads">web design leads</a> or <a href="/lead-generation/local-business-leads">local business leads</a> first. Save the prospect and proof. If phone outreach fits, use the <a href="/features/softphone">softphone</a>. After the call, move the lead into <a href="/features/crm-pipeline">CRM follow-up</a> with the outcome recorded.
+Use <a href="/lead-generation/web-design-leads">web design leads</a> or <a href="/use-cases/local-business-leads">local business leads</a> first. Save the prospect and proof. If phone outreach fits, use the <a href="/features/softphone">softphone</a>. After the call, move the lead into <a href="/features/crm-pipeline">CRM follow-up</a> with the outcome recorded.
 
 The call is one action inside the client-acquisition system, not the whole strategy.
 

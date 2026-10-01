@@ -104,7 +104,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
       { manual: "Lose track after the first message.", iclose: "Save the lead, add notes, prepare Gmail outreach, and follow up from CRM." },
     ],
     internalLinks: [
-      { label: "Local Business Leads", href: "/lead-generation/local-business-leads", description: "Find businesses by city, category, website status, and phone signals." },
+      { label: "Local Business Leads", href: "/use-cases/local-business-leads", description: "Find businesses by city, category, website status, and phone signals." },
       { label: "Free Business Leads", href: "/blog/free-business-leads-for-freelancers", description: "Use DataForSEO-backed free business lead terms as a weekly qualification sprint." },
       { label: "How to Get Free Leads", href: "/blog/how-to-get-free-leads-for-my-business", description: "Turn free lead searches into a simple score-and-follow-up workflow." },
       { label: "Web design leads for free vs verified", href: "/resources/web-design-leads-for-free-vs-verified", description: "Compare free research with a safer verified workflow before you pitch." },
@@ -473,7 +473,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
     ],
     internalLinks: [
       { label: "Web Design Leads", href: "/lead-generation/web-design-leads", description: "Turn no-website prospects into a focused design pipeline." },
-      { label: "Local Business Leads", href: "/lead-generation/local-business-leads", description: "Search broader local categories by city and signal." },
+      { label: "Local Business Leads", href: "/use-cases/local-business-leads", description: "Search broader local categories by city and signal." },
       { label: "AI Proposals", href: "/features/ai-proposals", description: "Turn the qualified lead into a reviewed outreach draft." },
     ],
     faqs: [

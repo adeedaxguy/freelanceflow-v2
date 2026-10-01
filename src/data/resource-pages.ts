@@ -7003,7 +7003,7 @@ function buildJuly24AcquisitionResourcePages(): ResourcePage[] {
       pitchAngle: "position iCloseLeads as a small-business lead platform for practical freelancer workflows",
       competitorGap: "Small-business lead platforms often emphasize database scale; iCloseLeads can win with verified public context, pitch-ready notes, and follow-up.",
       internalLinks: [
-        { label: "Local business leads", href: "/lead-generation/local-business-leads" },
+        { label: "Local business leads", href: "/use-cases/local-business-leads" },
         { label: "Businesses without websites", href: "/resources/businesses-without-websites" },
         { label: "Freelance client leads", href: "/lead-generation/freelance-client-leads" },
       ],

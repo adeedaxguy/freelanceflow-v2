@@ -64,7 +64,7 @@ const STATIC_PAGES: { url: string; changeFrequency: "always" | "hourly" | "daily
     priority: 0.86,
   })),
   { url: "/lead-generation", changeFrequency: "weekly", priority: 0.9 },
-  ...LEAD_GENERATION_PAGES.map(page => ({
+  ...LEAD_GENERATION_PAGES.filter(page => page.slug !== "local-business-leads").map(page => ({
     url: page.path,
     changeFrequency: "weekly" as const,
     priority: 0.89,
