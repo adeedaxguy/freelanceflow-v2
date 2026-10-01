@@ -319,7 +319,7 @@ export const LEAD_GENERATION_PAGES: LeadGenerationPageData[] = [
   },
   {
     slug: "local-business-leads",
-    path: "/lead-generation/local-business-leads",
+    path: "/use-cases/local-business-leads",
     primaryKeyword: "local business leads",
     metaTitle: "Local Business Leads | Free Web Design Leads by City, Website Signal, and Owner Path",
     metaDescription:
