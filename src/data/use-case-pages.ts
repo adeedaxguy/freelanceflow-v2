@@ -277,9 +277,9 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     slug: "local-business-leads",
     path: "/use-cases/local-business-leads",
     eyebrow: "Local Business Leads",
-    title: "Local business leads",
-    accentTitle: "for web designers, SEO consultants, and marketers",
-    metaTitle: "Local Business Leads & Local Lead Finder | iCloseLeads",
+    title: "Find local business leads",
+    accentTitle: "for web design and local SEO",
+    metaTitle: "Local Business Leads & Local SEO Lead Finder | iCloseLeads",
     metaDescription:
       "Find local business leads and local SEO leads by city, website gap, Google Maps signal, phone route, and owner path. Try 600 lead results free for 3 days.",
     keywords: [
@@ -307,7 +307,7 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
     ],
     heroSummary:
       "Find local business leads that already show a reason to pitch: no website, outdated site, weak Google Maps-to-website flow, public phone number, owner or manager verification path, strong reviews, or a service category that depends on trust and bookings. Then move the best leads into signup, a real local lead search, proposal drafting, and saved-lead follow-up without losing context or bouncing between tools.",
-    primaryCta: "Try Free for 3 Days",
+    primaryCta: "Find Local Leads Free",
     secondaryCta: "See Google Maps Pitch Workflow",
     dashboardPath: "/dashboard/local-leads",
     searchIntent:
@@ -410,6 +410,14 @@ export const USE_CASE_PAGES: UseCasePageData[] = [
       {
         q: "Can SEO consultants use local business leads?",
         a: "Yes. Local SEO consultants can search active business categories, review the profile, inspect the website status, and pitch visibility improvements tied to calls, appointments, and service-area demand.",
+      },
+      {
+        q: "What are local SEO leads?",
+        a: "Local SEO leads are businesses with a location-based visibility or conversion gap that an SEO consultant can verify before pitching. Useful signals include an incomplete local profile, weak service-area pages, an outdated website, missing booking or quote paths, and strong reviews that are not supported by an equally strong owned website.",
+      },
+      {
+        q: "How many leads should a local business get through its website?",
+        a: "There is no honest universal number because demand, location, service value, traffic, seasonality, and conversion rate all differ. Track qualified inquiries, booking or quote completion rate, cost per qualified lead, and closed revenue. A useful first goal is to improve one weak step in that path rather than promise a fixed lead count.",
       },
       {
         q: "How should I pitch a Google Maps listing lead?",
